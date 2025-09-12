@@ -1,0 +1,64 @@
+<?php
+
+namespace App\Imports;
+
+use App\Models\Academic\Section;
+use App\Models\Academic\AcademicClass;
+use App\Models\Admin\Company;
+use App\Models\Admin\Branch;
+use App\Models\Student\AcademicSession;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
+use Maatwebsite\Excel\Concerns\ToCollection;
+use Maatwebsite\Excel\Concerns\WithHeadingRow;
+
+class SectionExcelImport implements ToCollection, WithHeadingRow
+{
+    public function collection(Collection $rows)
+    {
+        foreach ($rows as $row) {
+            Log::info('Importing row:', $row->toArray());
+
+            try {
+                $company        = Company::where('name', $row['company'])->first();
+                $branch         = Branch::where('name', $row['branch'])->first();
+                $session        = AcademicSession::where('name', $row['academic_session'])->first();
+                $activeSession  = AcademicSession::where('name', $row['active_session'])->first();
+                $academicClass  = AcademicClass::where('name', $row['class'])->first();
+
+                echo"<pre>";
+                print_r($company);
+                die;
+
+
+                $missing = [];
+                if (!$company)        $missing[] = 'company';
+                if (!$branch)         $missing[] = 'branch';
+                if (!$session)        $missing[] = 'academic_session';
+                if (!$academicClass)  $missing[] = 'class';
+                if (!$activeSession)  $missing[] = 'active_session';
+                if (empty($row['name'])) $missing[] = 'name';
+
+                if (!empty($missing)) {
+                    Log::warning('Skipping row. Missing: ' . implode(', ', $missing), $row->toArray());
+                    continue;
+                }
+
+                Section::create([
+                    'company_id'        => $company->id,
+                    'branch_id'         => $branch->id,
+                    'session_id'        => $session->id,
+                    'active_session_id' => $activeSession->id,
+                    'class_id'          => $academicClass->id,
+                    'name'              => trim($row['name']),
+                    'status'            => 1,
+                ]);
+            } catch (\Throwable $e) {
+                Log::error('Import Error', [
+                    'message' => $e->getMessage(),
+                    'row'     => $row->toArray(),
+                ]);
+            }
+        }
+    }
+}

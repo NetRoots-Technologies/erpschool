@@ -1,0 +1,156 @@
+@extends('admin.layouts.main')
+
+@section('title')
+    Assign Class
+@stop
+@section('css')
+@endsection
+
+@section('content')
+    <div class="container-fluid">
+        <div class="row w-100  mt-4 ">
+            <h3 class="text-22 text-center text-bold w-100 mb-4"> Assign Class
+            </h3>
+        </div>
+        <div class="row    mt-4 mb-4 ">
+      @if (Gate::allows('AssignClassSection-create'))
+            <div class="col-12 text-right">
+                <a href="{!! route('academic.assign_class.create') !!}" class="btn btn-primary btn-md"><b>Assign Class
+                    </b></a>
+            </div>
+     @endif
+        </div>
+        <div class="row w-100 text-center">
+            <div class="col-12">
+                <div class="card basic-form">
+                    <div class="card-body table-responsive">
+                        <table class="w-100 table border-top-0 table-bordered   border-bottom " id="data_table">
+                            <thead>
+                            <tr>
+                                <th class="heading_style">No</th>
+                                <th class="heading_style">Student ID</th>
+                                <th class="heading_style">Company</th>
+                                <th class="heading_style">Branch</th>
+                                <th class="heading_style">Class</th>
+                                <th class="heading_style">Section</th>
+                                <th class="heading_style">Student</th>
+                                <th class="heading_style">Action</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+@stop
+@section('css')
+    <link href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css" rel="stylesheet">
+@endsection
+@section('js')
+
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.colVis.min.js"></script>
+    {{--<script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>--}}
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+    {{--<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>--}}
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            var dataTable = $('#data_table').DataTable({
+                "processing": true,
+                "serverSide": true,
+                "pageLength": 100,
+                dom: 'Bfrtip',
+                buttons: [
+                    {
+                        extend: 'excel',
+                        exportOptions: {
+                            columns: ':visible'
+                        }
+                    },
+                    {
+                        extend: 'pdf',
+                        exportOptions: {
+                            columns: ':visible'
+                        }
+                    },
+                    {
+                        extend: 'print',
+                        exportOptions: {
+                            columns: ':visible'
+                        }
+                    },
+                    'colvis'
+                ],
+                "columnDefs": [
+                    {"visible": false}
+                ],
+                ajax: {
+                    "url": "{{ route('datatable.get-data-assignClass') }}",
+                    "type": "POST",
+                    "data": {_token: "{{csrf_token()}}"}
+                },
+                "columns": [
+                    { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
+                    {data: 'student_id', name: 'student_id'},
+                    {data: 'company', name: 'company'},
+                    {data: 'branch', name: 'branch'},
+                    {data: 'class', name: 'class'},
+                    {data: 'section', name: 'section'},
+                    {data: 'student', name: 'student'},
+                    {data: 'action', name: 'action', orderable: false, searchable: false},
+                ]
+            });
+
+            $(document).on("click", ".btnDelete", function(e) {
+
+                e.preventDefault();
+                const id = $(this).data('id');
+                const url = $(this).data('url');
+
+                confirmDelete(id, url);
+            })
+
+            function confirmDelete(id, url) {
+                Swal.fire({
+                    title: "Are you sure?",
+                    text: "You won't be able to revert this!",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Yes, delete it!"
+                    }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: url,
+                            type: 'POST',
+                            data: {
+                                id: id,
+                                _method: 'DELETE',
+                                _token: $('meta[name="csrf-token"]').attr('content')
+                            },
+                            success: function (result) {
+                                toastr.success("Record deleted!");
+                                $("#data_table").DataTable().ajax.reload();
+                            },
+                            error: function (xhr, textStatus, errorThrown) {
+                             toastr.error(xhr.responseText);
+                            }
+
+                         // dataTable.row( $(this).parents('tr') ).remove().draw( false );
+                        });
+                    }
+                });
+            }
+
+
+        });
+
+    </script>
+@endsection

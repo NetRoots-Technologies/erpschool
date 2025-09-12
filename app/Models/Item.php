@@ -1,0 +1,53 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+class Item extends Model
+{
+    use HasFactory, SoftDeletes;
+
+    protected $fillable = ['name', 'status', 'type', 'measuring_unit'];
+
+    public function scopeActive()
+    {
+        return $this->where('status', 1);
+    }
+    public function scopeFood($query)
+    {
+        return $query->where('type', 'F');
+    }
+
+    public function scopeStationary($query)
+    {
+        return $query->where('type', 'S');
+    }
+
+    public function quoteItem()
+    {
+        return $this->hasOne(QuoteItem::class, 'item_id', 'id');
+    }
+
+    public function supplierItems()
+    {
+        return $this->hasMany(SupplierItem::class, 'item_id', 'id');
+    }
+
+    public static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($item) {
+            if ($item->quoteItem) {
+                $item->quoteItem->delete();
+            }
+
+            $item->supplierItems()->each(function ($supplierItem) {
+                $supplierItem->delete();
+            });
+        });
+    }
+}

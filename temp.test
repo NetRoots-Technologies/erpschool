@@ -1,0 +1,211 @@
+item
+	id
+	name
+	status
+	type[FOOD,STATIONERY]
+
+requisition
+	id
+	requester_id
+	item_id
+	type [ASSET,STATIONERY,FOOD]
+	quantity
+	priority [HIGH, MEDIUM, LOW]
+	justification
+	status [PENDING,APPROVED,REJECTED,FULFILLED]
+	is_approved
+	approved_by
+	comments
+	approved_date
+	requested_date
+	fulfilled_date
+
+supplier
+	id
+	name
+	branch_id
+	company_name
+	contact
+	address
+	email
+	rating
+	status
+
+inventory
+	id
+	name 
+	branch_id
+	item_id
+	product_id
+    quantity
+	unit_price
+	cost_price
+	sale_price
+	measuring_unit
+	type [ITEM, PRODUCT]
+	expiry_date
+
+quote
+	id
+    supplier_id
+	branch_id
+    quote_date
+	due_date
+	comments
+quote_item
+    id
+    quote_id
+    item_id
+    quantity
+    unit_price
+	total_price
+	measuring_unit
+
+purchase_order
+	id
+	supplier_id
+	total_amount
+	order_date
+    delivery_date
+	delivery_status [PENDING,SHIPPED,DELIVERED]
+	payment_status [PAID,PENDING,OVERDUE]
+	payment_method ['BANK', 'CASH', 'CHEQUE']
+purchase_order_item
+	id
+	item_id
+	purchase_order_id
+    quantity
+    unit_price
+    total_price
+	quote_item_price
+	received_quantity
+    measuring_unit
+
+products
+	id
+	name
+	cost_amount
+	sale_price
+	status
+	description
+product_item
+	id	
+	product_id
+	item_id
+	quantity
+	measuring_unit
+
+lunch_Served
+	id	
+	product_id
+	inventory_id
+	student_id
+	received
+	date
+
+
+supplier_items(pivot)
+	supplier_id
+	item_id
+
+branch_suppliers(pivot)
+	supplier_id
+	branch_id
+
+notifications
+	id
+	sender_id
+	reciver_id
+	title
+	message
+	is_read
+	link
+	
+
+
+aleem.iqbal@netrootstech.com
+#NRTroots
+
+
+
+
+===================
+
+
+
+React Environment Setup (Week 1)
+
+Install Node.js and npm
+Create React App (CRA) or Vite setup
+Understanding project structure
+Basic npm commands
+Setting up VS Code with helpful extensions
+
+
+React Fundamentals (Weeks 2-3)
+
+JSX and its rules
+Components (Function Components)
+Props
+Event handling
+State with useState
+Building your first small app (like a todo list)
+
+
+React Hooks (Weeks 4-5)
+
+useEffect for lifecycle
+Managing side effects
+useRef for DOM manipulation
+Custom hooks
+Build a project using multiple hooks (like a data dashboard)
+
+
+Data Flow & Management (Weeks 6-7)
+
+Parent-child communication
+Lifting state up
+Context API for global state
+Build a multi-page application
+
+
+Forms & User Input (Week 8)
+
+Controlled components
+Form validation
+useReducer for complex forms
+Building a registration/login system
+
+
+API Integration (Weeks 9-10)
+
+Fetch/Axios for API calls
+Error handling
+Loading states
+Build a project consuming real API
+
+
+React Router (Week 11)
+
+Route setup
+Dynamic routing
+Protected routes
+Navigation and history
+Build a multi-page application
+
+
+State Management (Weeks 12-13)
+
+Redux basics
+Redux Toolkit
+Alternative solutions (Zustand)
+Build a full e-commerce cart
+
+
+
+Practical Project Ideas for Each Stage:
+
+Beginner: Todo List
+Basic: Weather App
+Intermediate: Social Media Feed
+Advanced: E-commerce Store
