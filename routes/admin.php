@@ -10,31 +10,29 @@ use App\Http\Controllers\FinancialzkController;
 use App\Http\Controllers\Admin\BranchController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Admin\CompanyController;
-use App\Http\Controllers\Admin\FeeHeadController;
-use App\Http\Controllers\Admin\FeeTermController;
 use App\Http\Controllers\Admin\LedgersController;
 use App\Http\Controllers\Admin\BankFileController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DataBankController;
 use App\Http\Controllers\Admin\SettingsController;
-use App\Http\Controllers\Admin\FeeFactorController;
 use App\Http\Controllers\Admin\DepartmentController;
-use App\Http\Controllers\Admin\FeeSectionController;
-use App\Http\Controllers\Admin\StudentFeeController;
-use App\Http\Controllers\Admin\AccountHeadController;
-use App\Http\Controllers\Admin\FeeCategoryController;
 use App\Http\Controllers\Admin\VideoUploadController;
 use App\Http\Controllers\Admin\AcademicYearController;
 use App\Http\Controllers\Admin\BankBranchesController;
 use App\Http\Controllers\Admin\BanksAccountController;
-use App\Http\Controllers\Admin\FeeStructureController;
-use App\Http\Controllers\Admin\FeeCollectionController;
-use App\Http\Controllers\Admin\BillGenerationController;
 use App\Http\Controllers\Admin\MarketingVideoController;
 use App\Http\Controllers\Admin\MarketingBannerAdController;
 use App\Http\Controllers\Admin\PromotionalMessageController;
 use App\Http\Controllers\Admin\MarketingNotificationController;
 use App\Http\Controllers\Admin\SignatoryAuthorityController;
+use App\Http\Controllers\Fee\FeeCategoryController;
+use App\Http\Controllers\Fee\FeeHeadController;
+use App\Http\Controllers\Fee\FeeStructureController;
+use App\Http\Controllers\Fee\FeeCollectionController;
+use App\Http\Controllers\Fee\FeeDiscountController;
+use App\Http\Controllers\Fee\FeeTermController;
+use App\Http\Controllers\Fee\FeeSectionController;
+use App\Http\Controllers\Fee\ChallanController;
 
 Route::group(['middleware' => ['auth'], 'prefix' => 'admin', 'as' => 'admin.'], function () {
 
@@ -150,18 +148,6 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'admin', 'as' => 'admin.'], 
     Route::resource('academic_years', AcademicYearController::class);
     Route::resource('banks_file', BankFileController::class);
 
-    //    fee cruds
-
-    Route::resource('fee-sections', FeeSectionController::class);
-    Route::resource('fee-heads', FeeHeadController::class);
-    Route::resource('fee-structure', FeeStructureController::class);
-    Route::resource('fee-terms', FeeTermController::class);
-    Route::resource('account-head', AccountHeadController::class);
-    Route::resource('fee-category', FeeCategoryController::class);
-    Route::resource('student-regular-fee', StudentFeeController::class);
-    Route::resource('fee-collection', FeeCollectionController::class);
-    Route::resource('bill-generation', BillGenerationController::class);
-    Route::resource('fee-factor', FeeFactorController::class);
     Route::resource('financial-years', FinancialController::class);
     Route::resource('banks', BankController::class);
     Route::resource('banks_branches', BankBranchesController::class);
@@ -170,35 +156,11 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'admin', 'as' => 'admin.'], 
     Route::post('/admin/financial-years/change-status', [FinancialController::class, 'changeStatus'])->name('financial-years.change-status');
     Route::post('import-bankFile', [BankFileController::class, 'import'])->name('import.bankFile');
 
-    //fee status
-    Route::post('fee-section-status', [FeeSectionController::class, 'changeStatus'])->name('fee-sections.change-status');
-    Route::post('fee-heads-status', [FeeHeadController::class, 'changeStatus'])->name('fee-heads.change-status');
-    Route::post('account-head-status', [AccountHeadController::class, 'changeStatus'])->name('account-head.change-status');
-    Route::post('fee-category-status', [FeeCategoryController::class, 'changeStatus'])->name('fee-category.change-status');
-    //    Route::post('account-head-status', [AccountHeadController::class, 'changeStatus'])->name('account-head.change-status');
-
-
-    Route::post('/account-head-bulk-action', [AccountHeadController::class, 'handleBulkAction'])->name('account-head-bulk');
-    Route::post('/fee-term-bulk-action', [FeeTermController::class, 'handleBulkAction'])->name('fee-terms-bulk');
-    Route::post('/fee-student-fee-action', [StudentFeeController::class, 'handleBulkAction'])->name('student-fee-bulk');
-    Route::post('/bill-generation-bulk-action', [BillGenerationController::class, 'handleBulkAction'])->name('bill-generation-bulk');
     Route::post('/bankBulk-action', [BankController::class, 'handleBulkAction'])->name('bank-bulk');
     Route::post('/banksAcount-action', [BanksAccountController::class, 'handleBulkAction'])->name('banks_account-bulk');
 
-    Route::post('fee-structure-data', [FeeStructureController::class, 'feeStructureData'])->name('feeStructure.data');
-    Route::post('fee-term-data', [FeeTermController::class, 'feeTermData'])->name('feeTerm.data');
-    Route::post('fee-student-Regular-Fee', [StudentFeeController::class, 'studentRegularFee'])->name('studentRegularFee.data');
-    Route::post('fee-collection-Regular-Fee', [FeeCollectionController::class, 'searchFeeCollection'])->name('fee_collection.search');
-
-    Route::post('fee-factor-status', [FeeFactorController::class, 'changeStatus'])->name('fee-factor.change-status');
     Route::post('bank-branch-change-status', [BankBranchesController::class, 'changeStatus'])->name('bank-branch.change-status');
-
-    Route::post('bill-generation-status', [BillGenerationController::class, 'changeStatus'])->name('bill-generation.change-status');
     Route::post('bank-status', [BankController::class, 'changeStatus'])->name('bank.change-status');
-    Route::get('fee-collection-view/{id}', [FeeCollectionController::class, 'view'])->name('fee-collection-view');
-    Route::post('fee-collection-make-installments', [FeeCollectionController::class, 'make_installments'])->name('fee-collection-make-installments');
-    Route::get('fee-collection-print/{id}', [FeeCollectionController::class, 'print_voucher'])->name('fee-collection-print');
-
 
     Route::get('fetch-bankBranch', [BankBranchesController::class, 'fetchBankBranch'])->name('fetch.bankBranches');
 
@@ -212,6 +174,64 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'admin', 'as' => 'admin.'], 
     Route::post('listing', [LedgerController::class, 'coaListing'])->name('listing');
     Route::post('/coa/{id}/toggle-status', [LedgerController::class, 'toggleStatus'])
         ->name('coa.toggleStatus');
+
+    // Fee Management Routes
+    Route::group(['prefix' => 'fee', 'as' => 'fee.'], function () {
+        // Fee Categories
+        Route::resource('fee-categories', FeeCategoryController::class);
+        Route::get('fee-categories-data', [FeeCategoryController::class, 'getdata'])->name('fee-categories.data');
+        Route::post('fee-categories-change-status', [FeeCategoryController::class, 'changeStatus'])->name('fee-categories.change-status');
+        Route::post('fee-categories-bulk-action', [FeeCategoryController::class, 'handleBulkAction'])->name('fee-categories.bulk-action');
+
+        // Fee Sections
+        Route::resource('fee-sections', FeeSectionController::class);
+        Route::get('fee-sections-data', [FeeSectionController::class, 'getdata'])->name('fee-sections.data');
+        Route::post('fee-sections-change-status', [FeeSectionController::class, 'changeStatus'])->name('fee-sections.change-status');
+        Route::post('fee-sections-bulk-action', [FeeSectionController::class, 'handleBulkAction'])->name('fee-sections.bulk-action');
+
+        // Fee Heads
+        Route::resource('fee-heads', FeeHeadController::class);
+        Route::get('fee-heads-data', [FeeHeadController::class, 'getdata'])->name('fee-heads.data');
+        Route::post('fee-heads-change-status', [FeeHeadController::class, 'changeStatus'])->name('fee-heads.change-status');
+        Route::post('fee-heads-bulk-action', [FeeHeadController::class, 'handleBulkAction'])->name('fee-heads.bulk-action');
+
+        // Fee Structures
+        Route::resource('fee-structures', FeeStructureController::class);
+        Route::get('fee-structures-data', [FeeStructureController::class, 'getdata'])->name('fee-structures.data');
+        Route::post('fee-structures-change-status', [FeeStructureController::class, 'changeStatus'])->name('fee-structures.change-status');
+        Route::post('fee-structures-bulk-action', [FeeStructureController::class, 'handleBulkAction'])->name('fee-structures.bulk-action');
+
+        // Fee Collections
+        Route::resource('fee-collections', FeeCollectionController::class);
+        Route::get('fee-collections-data', [FeeCollectionController::class, 'getdata'])->name('fee-collections.data');
+        Route::post('fee-collections-change-status', [FeeCollectionController::class, 'changeStatus'])->name('fee-collections.change-status');
+        Route::get('fee-collections-student-details/{student_id}', [FeeCollectionController::class, 'getStudentFeeDetails'])->name('fee-collections.student-details');
+        Route::get('fee-collections-generate-receipt/{id}', [FeeCollectionController::class, 'generateReceipt'])->name('fee-collections.generate-receipt');
+
+        // Fee Discounts
+        Route::resource('fee-discounts', FeeDiscountController::class);
+        Route::get('fee-discounts-data', [FeeDiscountController::class, 'getdata'])->name('fee-discounts.data');
+        Route::post('fee-discounts-change-status', [FeeDiscountController::class, 'changeStatus'])->name('fee-discounts.change-status');
+        Route::post('fee-discounts-bulk-discount', [FeeDiscountController::class, 'applyBulkDiscount'])->name('fee-discounts.bulk-discount');
+
+        // Fee Terms
+        Route::resource('fee-terms', FeeTermController::class);
+        Route::get('fee-terms-data', [FeeTermController::class, 'getdata'])->name('fee-terms.data');
+        Route::post('fee-terms-change-status', [FeeTermController::class, 'changeStatus'])->name('fee-terms.change-status');
+        Route::post('fee-terms-bulk-action', [FeeTermController::class, 'handleBulkAction'])->name('fee-terms.bulk-action');
+        Route::post('fee-terms-bulk-delete', [FeeTermController::class, 'bulkDelete'])->name('fee-terms.bulk-delete');
+        Route::post('fee-terms-bulk-status', [FeeTermController::class, 'bulkStatus'])->name('fee-terms.bulk-status');
+        
+        // Challan Routes
+        Route::get('challans', [ChallanController::class, 'index'])->name('challans.index');
+        Route::get('challans/data', [ChallanController::class, 'getdata'])->name('challans.data');
+        Route::get('challans/student-collections/{student_id}', [ChallanController::class, 'getStudentFeeCollections'])->name('challans.student-collections');
+        Route::post('challans/generate', [ChallanController::class, 'generateChallan'])->name('challans.generate');
+        Route::get('challans/{voucher}/print', [ChallanController::class, 'printChallan'])->name('challans.print');
+        Route::get('challans/{voucher}/download', [ChallanController::class, 'downloadChallan'])->name('challans.download');
+        Route::post('challans/bulk-generate', [ChallanController::class, 'bulkGenerate'])->name('challans.bulk-generate');
+    });
+
     //Inventory Routes
     // Route::resource('/inventory/budget/',BudgetController::class);
     // Route::get('/inventory',function()

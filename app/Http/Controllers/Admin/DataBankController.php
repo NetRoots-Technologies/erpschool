@@ -7,7 +7,9 @@ use App\Models\Admin\Course;
 use App\Models\Admin\Session;
 use App\Models\Admin\StudentDataBank;
 use App\Models\Admin\StudentDataBankCourse;
-use App\Models\Fee\StudentFee;
+use App\Models\Fee\FeeCollection;
+use App\Models\Fee\FeeCollectionDetail;
+// use App\Models\Fee\StudentFee; // Removed - model no longer exists
 use App\Services\DataBank;
 use Illuminate\Http\Request;
 use App\Services\StudentServices;
@@ -86,12 +88,30 @@ class DataBankController extends Controller
         if (!Gate::allows('students')) {
             return abort(503);
         }
-        $data = StudentFee::where('student_fee.student_id', $id)->join('paid_student_fee', 'student_fee.id', '=', 'paid_student_fee.student_fee_id')->join('students', 'students.id', '=', 'student_fee.student_id')->join('courses', 'student_fee.course_id', '=', 'courses.id')->join('sessions', 'sessions.id', '=', 'student_fee.session_id')->select('student_fee.id as id', 'students.name as student_name', 'student_fee.student_fee', 'student_fee.course_fee', 'student_fee.installement_type', 'student_fee.discount_amount', 'sessions.title as session_title', 'courses.name as course_name', 'student_fee.installement_type', 'paid_student_fee.installement_amount', 'paid_student_fee.installement_no', 'paid_student_fee.start_date', 'paid_student_fee.due_date', 'paid_student_fee.paid_date', 'paid_student_fee.paid_status', 'paid_student_fee.id as paid_fee_id', 'paid_student_fee.source')->get();
+        
+        // Updated to use new fee structure - FeeCollection instead of old StudentFee/PaidStudentFee
+        $data = FeeCollection::where('fee_collections.student_id', $id)
+            ->join('students', 'students.id', '=', 'fee_collections.student_id')
+            ->join('classes', 'fee_collections.class_id', '=', 'classes.id')
+            ->join('acadmeic_sessions', 'acadmeic_sessions.id', '=', 'fee_collections.academic_session_id')
+            ->select(
+                'fee_collections.id as id', 
+                'students.name as student_name', 
+                'fee_collections.total_amount as student_fee', 
+                'fee_collections.paid_amount', 
+                'fee_collections.balance_amount', 
+                'fee_collections.discount_amount', 
+                'acadmeic_sessions.title as session_title', 
+                'classes.name as class_name', 
+                'fee_collections.due_date', 
+                'fee_collections.status as paid_status', 
+                'fee_collections.id as paid_fee_id'
+            )->get();
 
 
         return Datatables::of($data)->addIndexColumn()
             ->addColumn('action', function ($row) {
-                if (isset($row->paid_date)) {
+                if ($row->paid_status == 'paid') {
                     $btn = '<p>Paid</p>';
                     return $btn;
                 } else {

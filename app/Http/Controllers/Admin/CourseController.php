@@ -10,7 +10,8 @@ use App\Models\Admin\Company;
 use App\Models\Admin\Course;
 use App\Models\Admin\CourseType;
 use App\Models\Exam\ClassSubject;
-use App\Models\Fee\StudentFee;
+use App\Models\Fee\FeeCollection;
+// use App\Models\Fee\StudentFee; // Removed - model no longer exists
 use App\Models\Student\AcademicSession;
 use App\Services\CourseServices;
 use Illuminate\Http\Request;

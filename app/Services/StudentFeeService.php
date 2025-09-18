@@ -9,7 +9,9 @@ use App\Models\Account\Entry;
 use App\Models\Admin\FeeHead;
 use App\Models\Account\Ledger;
 use App\Models\Admin\Groups;
-use App\Models\Fee\StudentFee;
+use App\Models\Fee\FeeCollection;
+use App\Models\Fee\FeeCollectionDetail;
+// use App\Models\Fee\StudentFee; // Old model - replaced with FeeCollection
 use App\Models\Student\Students;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\DB;
@@ -36,9 +38,9 @@ class StudentFeeService
             if ($students) {
                 foreach ($students as $key => $studentId) {
                     logger()->debug("Processing student ID: $studentId");
-                    $existingFeeRecord = StudentFee::where("student_id", $studentId)
+                    $existingFeeRecord = FeeCollection::where("student_id", $studentId)
                         ->where('generated_month', $request->get('generated_month'))
-                        ->where("session_id", $request->get('session_id'))
+                        ->where("academic_session_id", $request->get('session_id'))
                         ->where("company_id", $request->get('company_id'))
                         ->where("branch_id", $request->get('branch_id'))
                         ->where("class_id", $request->get('class_id'))
@@ -62,33 +64,27 @@ class StudentFeeService
 
                     $entry = $this->ledgerService->createEntry($entryData);
 
-                    $studentFee = new StudentFee();
-                    $studentFee->student_id = $studentId;
-                    $studentFee->session_id = $request->get('session_id');
-                    $studentFee->company_id = $request->get('company_id');
-                    $studentFee->branch_id = $request->get('branch_id');
-                    $studentFee->class_id = $request->get('class_id');
-                    $studentFee->generated_month = $request->get('generated_month');
-
-                    $studentFee->total_monthly_amount = $request->get('total_amount_of_month')[$studentId];
-                    $studentFee->total_amount_after_discount = $request->get('total_amount_of_discount')[$studentId];
-                    $studentFee->fee_factor_id = $request->get('fee_factor_id')[$key];
-
-                    $studentFee->save();
+                    $feeCollection = new FeeCollection();
+                    $feeCollection->student_id = $studentId;
+                    $feeCollection->academic_session_id = $request->get('session_id');
+                    $feeCollection->company_id = $request->get('company_id');
+                    $feeCollection->branch_id = $request->get('branch_id');
+                    $feeCollection->class_id = $request->get('class_id');
+                    $feeCollection->generated_month = $request->get('generated_month');
+                    $feeCollection->total_amount = $request->get('total_amount_of_month')[$studentId];
+                    $feeCollection->discount_amount = $request->get('total_amount_of_discount')[$studentId];
+                    $feeCollection->paid_status = 'unpaid';
+                    $feeCollection->save();
                     $studentMonthlyAmount = $request->input('total_amount_of_month')[$studentId];
                     if ($studentMonthlyAmount) {
                         foreach ($studentMonthlyAmount as $index => $monthAmount) {
-                            $StudentFeeData = new StudentFeeData();
-
-                            $StudentFeeData->monthly_amount = $monthAmount;
-                            $StudentFeeData->fee_head_id = $request->get('fee_head_id')[$studentId][$index];
-                            $StudentFeeData->students_fee_id = $studentFee->id;
-                            $StudentFeeData->discount_percent = $request->get('discount')[$studentId][$index];
-                            $StudentFeeData->discount_rupees = $request->get('discount_rupees')[$studentId][$index];
-                            $StudentFeeData->claim1 = $request->get('claim_1')[$studentId][$index];
-                            $StudentFeeData->claim2 = $request->get('claim_2')[$studentId][$index];
-                            $StudentFeeData->total_amount_after_discount = $request->input('total_amount_after_discount')[$studentId][$index];
-
+                            $feeCollectionDetail = new FeeCollectionDetail();
+                            $feeCollectionDetail->fee_collection_id = $feeCollection->id;
+                            $feeCollectionDetail->fee_head_id = $request->get('fee_head_id')[$studentId][$index];
+                            $feeCollectionDetail->amount = $monthAmount;
+                            $feeCollectionDetail->discount_percent = $request->get('discount')[$studentId][$index];
+                            $feeCollectionDetail->discount_amount = $request->get('discount_rupees')[$studentId][$index];
+                            $feeCollectionDetail->final_amount = $request->input('total_amount_after_discount')[$studentId][$index];
 
                             $feeHeadId = (int) $fee_head_ids[$studentId][$index];
                             $parentHead = config('constants.FixedGroups.asset_heads');
@@ -99,7 +95,7 @@ class StudentFeeService
                                 ->get();
 
                             foreach ($ledgers as $legder) {
-                                $StudentFeeData->ledger_id = $legder->id;
+                                $feeCollectionDetail->ledger_id = $legder->id;
 
                                 $entryData['balanceType'] = $legder->account_type_id == 1 ? 'd' : "c";
 
@@ -111,7 +107,7 @@ class StudentFeeService
 
                                 $this->ledgerService->createEntryItems($entryData);
                             }
-                            $StudentFeeData->save();
+                            $feeCollectionDetail->save();
 
                         }
                     }
@@ -185,16 +181,14 @@ class StudentFeeService
         if (!Gate::allows('students')) {
             return abort(503);
         }
-        $studentFee = StudentFee::find($id);
+        $feeCollection = FeeCollection::find($id);
 
-        if ($studentFee) {
-            foreach ($studentFee->student_fee_data as $index => $item) {
-                $item->monthly_amount = $request->input('monthly_amount')[$index];
+        if ($feeCollection) {
+            foreach ($feeCollection->feeCollectionDetails as $index => $item) {
+                $item->amount = $request->input('monthly_amount')[$index];
                 $item->discount_percent = $request->input('discount')[$index];
-                $item->discount_rupees = $request->input('discount_rupees')[$index];
-                $item->claim1 = $request->input('claim_1')[$index];
-                $item->claim2 = $request->input('claim_2')[$index];
-                $item->total_amount_after_discount = $request->input('total_amount_after_discount')[$index];
+                $item->discount_amount = $request->input('discount_rupees')[$index];
+                $item->final_amount = $request->input('total_amount_after_discount')[$index];
                 $item->save();
             }
         }
@@ -202,12 +196,12 @@ class StudentFeeService
     }
 
 
-    public function destroy($studentFee)
+    public function destroy($feeCollection)
     {
         if (!Gate::allows('students')) {
             return abort(503);
         }
-        $studentFee->student_fee_data()->delete();
-        $studentFee->delete();
+        $feeCollection->feeCollectionDetails()->delete();
+        $feeCollection->delete();
     }
 }

@@ -14,8 +14,6 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'admin', 'as' => 'admin.'], 
 
     Route::get('ledger_report', [reportLedgerController::class, 'index'])->name('ledger_report');
 
-    Route::get('fee_collection', [LedgersController::class, 'fee_collection_index'])->name('fee_collection_index');
-
     Route::resource('/groups', GroupController::class);
 
     Route::get('/fetch_coa/{id}',[GroupController::class,'fetch_coa'])->name('fetch_coa');

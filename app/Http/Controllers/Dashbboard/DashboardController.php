@@ -9,10 +9,11 @@ use http\Client\Curl\User;
 use Illuminate\Http\Request;
 use App\Models\HRM\Employees;
 use NsTechNs\JazzCMS\JazzCMS;
-use App\Models\Fee\StudentFee;
+// use App\Models\Fee\StudentFee; // Removed - model no longer exists
 use App\Services\LedgerService;
 use App\Models\Student\Students;
-use App\Models\Fee\PaidStudentFee;
+use App\Models\Fee\FeeCollection;
+use App\Models\Fee\FeeCollectionDetail;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Http;
@@ -38,13 +39,17 @@ class DashboardController extends Controller
         }
         $employees_name = Employees::latest()->limit(6)->get();
 
-        $paid_student_fee = PaidStudentFee::where('paid_date', today())->get();
+        // Get today's fee collections using new fee structure
+        $today_fee_collections = FeeCollection::whereDate('created_at', today())
+            ->where('status', 'paid')
+            ->sum('paid_amount');
 
-        $today_fee = $paid_student_fee->sum('installement_amount');
+        $today_fee = $today_fee_collections;
 
-        $monthFee = PaidStudentFee::whereBetween('paid_date', [date('Y-m-01'), date('Y-m-d')])
-            ->where('paid_status', 'paid')
-            ->sum('installement_amount');
+        // Get monthly fee collections using new fee structure
+        $monthFee = FeeCollection::whereBetween('created_at', [date('Y-m-01'), date('Y-m-d')])
+            ->where('status', 'paid')
+            ->sum('paid_amount');
 
         $employees = Employees::with('department')->get();
 

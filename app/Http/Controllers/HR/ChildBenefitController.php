@@ -3,7 +3,8 @@
 namespace App\Http\Controllers\HR;
 
 use App\Http\Controllers\Controller;
-use App\Models\Fee\StudentFee;
+use App\Models\Fee\FeeCollection;
+// use App\Models\Fee\StudentFee; // Removed - model no longer exists
 use App\Models\HR\ChildBenefit;
 use App\Models\HRM\Employees;
 use App\Models\Student\Students;

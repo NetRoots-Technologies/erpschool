@@ -4,7 +4,10 @@ namespace App\Services;
 
 use Config;
 use DataTables;
-use App\Models\Admin\FeeHead;
+use App\Models\Fee\FeeHead;
+use App\Models\Fee\FeeCategory;
+use App\Models\Admin\Branch;
+use App\Models\Admin\Company;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Auth;
@@ -15,35 +18,35 @@ class FeeHeadService
 
     public function store($request)
     {
-        if (!Gate::allows('students')) {
-            return abort(503);
+        if (!Gate::allows('FeeHead-create')) {
+            return abort(403);
         }
-        $feeHead = new FeeHead();
         
-        $feeHead->session_id = $request->get('session_id');
-        $feeHead->company_id = $request->get('company_id');
-        $feeHead->branch_id = $request->get('branch_id');
-        $feeHead->class_id = $request->get('class_id');
-        $feeHead->account_head_id = $request->get('account_head_id');
-        $feeHead->fee_section_id = $request->get('fee_section_id');
-        $feeHead->fee_head = $request->get('fee_head');
-        $feeHead->details = $request->get('details');
-        $feeHead->dividable = $request->get('dividable');
-        $feeHead->save();
+        $feeHead = FeeHead::create([
+            'name' => $request->name,
+            'description' => $request->description,
+            'fee_category_id' => $request->fee_category_id,
+            'amount' => $request->amount,
+            'is_compulsory' => $request->is_compulsory ?? 0,
+            'is_refundable' => $request->is_refundable ?? 0,
+            'company_id' => $request->company_id,
+            'branch_id' => $request->branch_id,
+            'created_by' => Auth::id(),
+        ]);
 
-        return $feeHead;
+        return response()->json(['message' => 'Fee head created successfully', 'data' => $feeHead]);
     }
 
 
     public function getdata()
     {
-        if (!Gate::allows('students')) {
-            return abort(503);
+        if (!Gate::allows('FeeHead-list')) {
+            return abort(403);
         }
-       $query = FeeHead::with('company', 'branch', 'AcademicClass', 'AccountHead', 'FeeSection')
-                        ->orderBy('created_at', 'desc');
+        
+        $query = FeeHead::with(['feeCategory', 'company', 'branch', 'createdBy'])
+            ->orderBy('created_at', 'desc');
 
-                        
         if (Auth::check()) {
             $user = Auth::user();
 
@@ -56,103 +59,85 @@ class FeeHeadService
             }
         }
 
-        $data = $query->get();
-
-
-        return Datatables::of($data)->addIndexColumn()
-            ->addColumn('action', function ($row) {
-                $btn = '<div style="display: flex;">';
-
-                //                if (Gate::allows('Employee-edit'))
-                $btn .= '<a href="' . route("admin.fee-heads.edit", $row->id) . '" class="btn btn-primary btn-sm"  style="margin-right: 4px;">Edit</a>';
-
-                //                if (Gate::allows('Employee-destroy')) {
-                $btn .= '<form method="POST" onsubmit="return confirm(\'Are you sure you want to Delete this?\');" action="' . route("admin.fee-heads.destroy", $row->id) . '">';
-                $btn .= '<button type="submit" class="btn btn-danger btn-sm" style="margin-right: 4px;">Delete</button>';
-                $btn .= method_field('DELETE') . csrf_field();
-                $btn .= '</form>';
-                //                }
-    
-                $btn .= '</div>';
-
-                return $btn;
-
-            })->addColumn('company', function ($row) {
-
-
-                if ($row->company) {
-                    return $row->company->name;
-
-                } else {
-                    return "N/A";
-                }
-
-
-            })->addColumn('branch', function ($row) {
-
-
-                if ($row->branch) {
-                    return $row->branch->name;
-
-                } else {
-                    return "N/A";
-                }
-
-
-            })->addColumn('AccountHead', function ($row) {
-
-
-                if ($row->AccountHead) {
-                    return $row->AccountHead->name;
-
-                } else {
-                    return "N/A";
-                }
-
-
-            })->addColumn('FeeSection', function ($row) {
-
-
-                if ($row->FeeSection) {
-                    return $row->FeeSection->name;
-
-                } else {
-                    return "N/A";
-                }
-
-
+        return Datatables::of($query)->addIndexColumn()
+            ->addColumn('category', function ($row) {
+                return $row->feeCategory ? $row->feeCategory->name : "N/A";
             })
-            ->rawColumns(['action', 'company', 'branch', 'AccountHead', 'FeeSection'])
+            ->addColumn('company', function ($row) {
+                return $row->company ? $row->company->name : "N/A";
+            })
+            ->addColumn('branch', function ($row) {
+                return $row->branch ? $row->branch->name : "N/A";
+            })
+            ->addColumn('amount', function ($row) {
+                return number_format($row->amount, 2);
+            })
+            ->addColumn('compulsory', function ($row) {
+                return $row->is_compulsory ? 'Yes' : 'No';
+            })
+            ->addColumn('refundable', function ($row) {
+                return $row->is_refundable ? 'Yes' : 'No';
+            })
+            ->addColumn('status', function ($row) {
+                return ($row->status == 1)
+                    ? '<button type="button" class="btn btn-success btn-sm change-status" data-id="' . $row->id . '" data-status="inactive">Active</button>'
+                    : '<button type="button" class="btn btn-warning btn-sm change-status" data-id="' . $row->id . '" data-status="active">Inactive</button>';
+            })
+            ->addColumn('action', function ($row) {
+                $btn = '<form class="delete_form" data-route="' . route("fee.fee-heads.destroy", $row->id) . '" id="fee-head-' . $row->id . '" method="POST">';
+
+                if (Gate::allows('FeeHead-edit')) {
+                    $btn .= '<a data-id="' . $row->id . '" class="btn btn-primary text-white btn-sm fee-head-edit" data-fee-head-edit=\'' . $row . '\'>Edit</a>';
+                }
+
+                if (Gate::allows('FeeHead-delete')) {
+                    $btn .= ' <button data-id="fee-head-' . $row->id . '" type="submit" class="btn btn-danger delete btn-sm">Delete</button>';
+                    $btn .= method_field('DELETE') . csrf_field();
+                }
+
+                $btn .= '</form>';
+                return $btn;
+            })
+            ->rawColumns(['action', 'status'])
             ->make(true);
     }
 
 
     public function update($request, $id)
     {
-        if (!Gate::allows('students')) {
-            return abort(503);
+        if (!Gate::allows('FeeHead-edit')) {
+            return abort(403);
         }
-        $data = FeeHead::find($id);
-        $data->update([
-            'session_id' => $request->get('session_id'),
-            'company_id' => $request->get('company_id'),
-            'branch_id' => $request->get('branch_id'),
-            'class_id' => $request->get('class_id'),
-            'account_head_id' => $request->get('account_head_id'),
-            'fee_section_id' => $request->get('fee_section_id'),
-            'fee_head' => $request->get('fee_head'),
-            'details' => $request->get('details'),
-            'dividable' => $request->get('dividable'),
-        ]);
+        
+        $feeHead = FeeHead::find($id);
+        $input = $request->all();
+        $input['updated_by'] = Auth::id();
+        $feeHead->update($input);
+
+        return response()->json(['message' => 'Fee head updated successfully', 'data' => $feeHead]);
     }
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
-            return abort(503);
+        if (!Gate::allows('FeeHead-delete')) {
+            return abort(403);
         }
+        
         $feeHead = FeeHead::findOrFail($id);
-        if ($feeHead)
+        if ($feeHead) {
             $feeHead->delete();
+        }
+
+        return response()->json(['message' => 'Fee head deleted successfully']);
+    }
+
+    public function changeStatus($request)
+    {
+        $feeHead = FeeHead::find($request->id);
+        if ($feeHead) {
+            $feeHead->status = ($request->status == 'active') ? 1 : 0;
+            $feeHead->save();
+            return $feeHead;
+        }
     }
 }

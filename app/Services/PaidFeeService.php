@@ -6,8 +6,10 @@ use Config;
 use DataTables;
 use App\Models\User;
 use App\Models\Admin\Course;
-use App\Models\Fee\StudentFee;
-use App\Models\Fee\PaidStudentFee;
+use App\Models\Fee\FeeCollection;
+use App\Models\Fee\FeeCollectionDetail;
+// use App\Models\Fee\StudentFee; // Removed - model no longer exists
+// use App\Models\Fee\PaidStudentFee; // Removed - model no longer exists
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
@@ -32,7 +34,7 @@ class PaidFeeService
         }
         $data['course'] = Course::all();
         $data['databank'] = StudentDataBank::all();
-        $data['student_fee'] = StudentFee::all();
+        $data['fee_collections'] = FeeCollection::all(); // Updated to use new fee structure
 
         return $data;
 

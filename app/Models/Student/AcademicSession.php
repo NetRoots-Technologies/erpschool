@@ -16,7 +16,8 @@ class AcademicSession extends Model
         'name',
         'start_date',
         'end_date',
-        'status'
+        'status',
+        'branch_id'
     ];
     public function company()
     {

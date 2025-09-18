@@ -2,8 +2,10 @@
 
 namespace App\Services;
 
-use App\Models\Admin\FeeSection;
-use App\Models\HRM\Employees;
+use App\Models\Fee\FeeSection;
+use App\Models\Fee\FeeCategory;
+use App\Models\Admin\Branch;
+use App\Models\Admin\Company;
 use Config;
 use DataTables;
 use Illuminate\Support\Facades\Gate;
@@ -14,109 +16,122 @@ class FeeSectionService
 
     public function store($request)
     {
-        if (!Gate::allows('students')) {
-            return abort(503);
+        if (!Gate::allows('FeeSection-create')) {
+            return abort(403);
         }
-        return $feeSection = FeeSection::create([
-            'branch_id' => $request->branch_id,
-            'print_section' => $request->print_section,
+        
+        $feeSection = FeeSection::create([
             'name' => $request->name,
+            'description' => $request->description,
+            'fee_category_id' => $request->fee_category_id,
+            'company_id' => $request->company_id,
+            'branch_id' => $request->branch_id,
+            'created_by' => Auth::id(),
         ]);
 
+        return response()->json(['message' => 'Fee section created successfully', 'data' => $feeSection]);
     }
 
 
     public function getdata()
     {
-        if (!Gate::allows('students')) {
-            return abort(503);
+        if (!Gate::allows('FeeSection-list')) {
+            return abort(403);
         }
-        $query = FeeSection::with('branch')->orderBy('created_at', 'desc');
+        
+        $query = FeeSection::with(['feeCategory', 'company', 'branch', 'createdBy'])
+            ->orderBy('created_at', 'desc');
+
         if (Auth::check()) {
             $user = Auth::user();
+
+            if (!is_null($user->company_id)) {
+                $query->where('company_id', $user->company_id);
+            }
+
             if (!is_null($user->branch_id)) {
                 $query->where('branch_id', $user->branch_id);
             }
         }
 
-        $data = $query->get();
-
-        return Datatables::of($data)->addIndexColumn()
-            ->addColumn('action', function ($row) {
-                $btn = '<div style="display: flex;">';
-
-                //                if (Gate::allows('Employee-edit'))
-                $btn .= '<a href="' . route("admin.fee-sections.edit", $row->id) . '" class="btn btn-primary btn-sm"  style="margin-right: 4px;">Edit</a>';
-
-                //                if (Gate::allows('Employee-destroy')) {
-                $btn .= '<form method="POST" onsubmit="return confirm(\'Are you sure you want to Delete this?\');" action="' . route("admin.fee-sections.destroy", $row->id) . '">';
-                $btn .= '<button type="submit" class="btn btn-danger btn-sm" style="margin-right: 4px;">Delete</button>';
-                $btn .= method_field('DELETE') . csrf_field();
-                $btn .= '</form>';
-                //                }
-                $btn .= '</div>';
-
-                return $btn;
-
+        return Datatables::of($query)->addIndexColumn()
+            ->addColumn('fee_category', function ($row) {
+                return $row->feeCategory ? $row->feeCategory->name : "N/A";
+            })
+            ->addColumn('company', function ($row) {
+                return $row->company ? $row->company->name : "N/A";
             })
             ->addColumn('branch', function ($row) {
-
-
-                if ($row->branch) {
-                    return $row->branch->name;
-
-                } else {
-                    return "N/A";
-                }
-
-
-            })->addColumn('status', function ($row) {
-                $statusButton = ($row->status == 1)
+                return $row->branch ? $row->branch->name : "N/A";
+            })
+            ->addColumn('status', function ($row) {
+                return ($row->is_active == 1)
                     ? '<button type="button" class="btn btn-success btn-sm change-status" data-id="' . $row->id . '" data-status="inactive">Active</button>'
                     : '<button type="button" class="btn btn-warning btn-sm change-status" data-id="' . $row->id . '" data-status="active">Inactive</button>';
-
-                return $statusButton;
             })
-            ->rawColumns(['action', 'branch', 'status'])
-            ->make(true);
+            ->addColumn('action', function ($row) {
+                $btn = '<form class="delete_form" data-route="' . route("admin.fee.fee-sections.destroy", $row->id) . '" id="fee-section-' . $row->id . '" method="POST">';
 
+                if (Gate::allows('FeeSection-edit')) {
+                    $btn .= '<a data-id="' . $row->id . '" class="btn btn-primary text-white btn-sm fee-section-edit" data-fee-section-edit=\'' . $row . '\'>Edit</a>';
+                }
+
+                if (Gate::allows('FeeSection-delete')) {
+                    $btn .= ' <button data-id="fee-section-' . $row->id . '" type="submit" class="btn btn-danger delete btn-sm">Delete</button>';
+                    $btn .= method_field('DELETE') . csrf_field();
+                }
+
+                $btn .= '</form>';
+                return $btn;
+            })
+            ->rawColumns(['action', 'status'])
+            ->make(true);
     }
 
 
     public function update($request, $id)
     {
-        if (!Gate::allows('students')) {
-            return abort(503);
+        if (!Gate::allows('FeeSection-edit')) {
+            return abort(403);
         }
-        $feeSection = FeeSection::find($id);
+        
+        $feeSection = FeeSection::findOrFail($id);
+        
         $feeSection->update([
-            'branch_id' => $request->branch_id,
-            'print_section' => $request->print_section,
             'name' => $request->name,
+            'description' => $request->description,
+            'fee_category_id' => $request->fee_category_id,
+            'company_id' => $request->company_id,
+            'branch_id' => $request->branch_id,
+            'updated_by' => Auth::id(),
         ]);
+
+        return response()->json(['message' => 'Fee section updated successfully', 'data' => $feeSection]);
     }
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
-            return abort(503);
+        if (!Gate::allows('FeeSection-delete')) {
+            return abort(403);
         }
+        
         $feeSection = FeeSection::findOrFail($id);
-        if ($feeSection)
-            $feeSection->delete();
+        $feeSection->delete();
+
+        return response()->json(['message' => 'Fee section deleted successfully']);
     }
 
-    public function changeStatus($request)
+    public function changeStatus($id, $status)
     {
-        if (!Gate::allows('students')) {
-            return abort(503);
+        if (!Gate::allows('FeeSection-edit')) {
+            return abort(403);
         }
-        $feeSection = FeeSection::find($request->id);
-        if ($feeSection) {
-            $feeSection->status = ($request->status == 'active') ? 1 : 0;
-            $feeSection->save();
-            return $feeSection;
-        }
+        
+        $feeSection = FeeSection::findOrFail($id);
+        $feeSection->is_active = ($status == 'active') ? 1 : 0;
+        $feeSection->save();
+
+        return response()->json(['message' => 'Status updated successfully']);
     }
 
 }

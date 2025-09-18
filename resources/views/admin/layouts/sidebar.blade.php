@@ -545,44 +545,7 @@
                     </li>
                 {{-- @endcan --}}
 
-                @can('Fee')
-                    <li class="side-item side-item-category">Fee</li>
-                    <li class="slide">
-                        <a class="side-menu__item {{ request()->is('admin/fee-structure*', 'admin/fee-sections*', 'admin/account-head*', 'admin/fee-heads*', 'admin/fee-terms*', 'admin/fee-category*', 'admin/student-regular-fee*', 'admin/bill-generation*', 'admin/fee-collection*', 'admin/banks*', 'admin/banks_branches*', 'admin/banks_accounts*', 'admin/banks_file*') ? 'active' : '' }}"
-                            data-bs-toggle="slide" href="javascript:void(0);">
-                            <i class="fas fa-dollar icons8 icon-style" aria-hidden="true"></i>
-                            <span class="side-menu__label">Fee</span>
-                            <i class="angle fe fe-chevron-down"></i>
-                        </a>
-                        <ul class="slide-menu"
-                            style="display: {{ request()->is('admin/fee-structure*', 'admin/fee-sections*', 'admin/account-head*', 'admin/fee-heads*', 'admin/fee-terms*', 'admin/fee-category*', 'admin/student-regular-fee*', 'admin/bill-generation*', 'admin/fee-collection*', 'admin/banks*', 'admin/banks_branches*', 'admin/banks_accounts*', 'admin/banks_file*') ? 'block' : 'none' }}">
-                            <li><a class="slide-item {{ request()->is('admin/fee-sections*') ? 'active' : '' }}"
-                                    href="{{ route('admin.fee-sections.index') }}">Fee Sections</a></li>
-                            <li><a class="slide-item {{ request()->is('admin/account-head*') ? 'active' : '' }}"
-                                    href="{{ route('admin.account-head.index') }}">Account Head</a></li>
-                            <li><a class="slide-item {{ request()->is('admin/fee-heads*') ? 'active' : '' }}"
-                                    href="{{ route('admin.fee-heads.index') }}">Fee Head</a></li>
-                            <li><a class="slide-item {{ request()->is('admin/fee-category*') ? 'active' : '' }}"
-                                    href="{{ route('admin.fee-category.index') }}">Fee Category</a></li>
-                            <li><a class="slide-item {{ request()->is('admin/fee-structure*') ? 'active' : '' }}"
-                                    href="{{ route('admin.fee-structure.index') }}">Fee Structure</a></li>
-                            <li><a class="slide-item {{ request()->is('admin/student-regular-fee*') ? 'active' : '' }}"
-                                    href="{{ route('admin.student-regular-fee.index') }}">Student Regular Fee</a></li>
-                            <li><a class="slide-item {{ request()->is('admin/bill-generation*') ? 'active' : '' }}"
-                                    href="{{ route('admin.bill-generation.index') }}">Bill Generation</a></li>
-                            <li><a class="slide-item {{ request()->is('admin/fee-collection*') ? 'active' : '' }}"
-                                    href="{{ route('admin.fee-collection.index') }}">Fee Collection</a></li>
-                            <li><a class="slide-item {{ request()->routeIs('admin.banks.*') ? 'active' : '' }}"
-                                    href="{{ route('admin.banks.index') }}">Bank</a></li>
-                            <li><a class="slide-item {{ request()->routeIs('admin.banks_branches.*') ? 'active' : '' }}"
-                                    href="{{ route('admin.banks_branches.index') }}">Bank Branches</a></li>
-                            <li><a class="slide-item {{ request()->routeIs('admin.banks_accounts.*') ? 'active' : '' }}"
-                                    href="{{ route('admin.banks_accounts.index') }}">Bank Account</a></li>
-                            <li><a class="slide-item {{ request()->routeIs('admin.banks_file.*') ? 'active' : '' }}"
-                                    href="{{ route('admin.banks_file.index') }}">Bank File</a></li>
-                        </ul>
-                    </li>
-                @endcan
+               
 
 
 
@@ -674,14 +637,14 @@
                     <li class="side-item side-item-category">Accounts Management</li>
                     @can('Accounts')
                         <li class="slide">
-                            <a class="side-menu__item {{ request()->is('admin/ledger_tree*', 'admin/report-center*', 'admin/entries*', 'admin/fee_collection*') ? 'active' : '' }}"
+                            <a class="side-menu__item {{ request()->is('admin/ledger_tree*', 'admin/report-center*', 'admin/entries*') ? 'active' : '' }}"
                                 data-bs-toggle="slide" href="javascript:void(0);">
                                 <i class="fa fa-calculator icons8 icon-style" aria-hidden="true"></i>
                                 <span class="side-menu__label">Accounts</span>
                                 <i class="angle fe fe-chevron-down"></i>
                             </a>
                             <ul class="slide-menu"
-                                style="display: {{ request()->is('admin/ledger_tree*', 'admin/report-center*', 'admin/entries*', 'admin/fee_collection*') ? 'block' : 'none' }}">
+                                style="display: {{ request()->is('admin/ledger_tree*', 'admin/report-center*', 'admin/entries*') ? 'block' : 'none' }}">
                                 <li><a class="slide-item {{ request()->is('admin/ledger_tree*') ? 'active' : '' }}"
                                         href="{{ route('admin.accounts.chart_of_accounts.ledger_tree') }}">Chart of Accounts</a>
                                 </li>
@@ -689,8 +652,7 @@
                                         href="{{ route('admin.accounts.reports') }}">Report Center</a></li>
                                 <li><a class="slide-item {{ request()->is('admin/entries*') ? 'active' : '' }}"
                                         href="{{ route('admin.entries.index') }}">Journal Entry</a></li>
-                                <li><a class="slide-item {{ request()->is('admin/fee_collection*') ? 'active' : '' }}"
-                                        href="{{ route('admin.fee_collection_index') }}">Fee Collection</a></li>
+                               
                             </ul>
                         </li>
                     @endcan
@@ -733,6 +695,81 @@
                         </li>
                     @endcan
                 @endcanany
+
+                {{-- Fee Management Section --}}
+                <li class="side-item side-item-category">Fee Management</li>
+                
+                {{-- Fee Categories --}}
+                <li class="slide">
+                    <a class="side-menu__item {{ request()->is('admin/fee/fee-categories*') ? 'active' : '' }}"
+                        href="{{ route('admin.fee.fee-categories.index') }}">
+                        <i class="fa fa-tags icons8 icon-style" aria-hidden="true"></i>
+                        <span class="side-menu__label">Fee Categories</span>
+                    </a>
+                </li>
+
+                {{-- Fee Sections --}}
+                <li class="slide">
+                    <a class="side-menu__item {{ request()->is('admin/fee/fee-sections*') ? 'active' : '' }}"
+                        href="{{ route('admin.fee.fee-sections.index') }}">
+                        <i class="fa fa-list-alt icons8 icon-style" aria-hidden="true"></i>
+                        <span class="side-menu__label">Fee Sections</span>
+                    </a>
+                </li>
+
+                {{-- Fee Heads --}}
+                <li class="slide">
+                    <a class="side-menu__item {{ request()->is('admin/fee/fee-heads*') ? 'active' : '' }}"
+                        href="{{ route('admin.fee.fee-heads.index') }}">
+                        <i class="fa fa-money icons8 icon-style" aria-hidden="true"></i>
+                        <span class="side-menu__label">Fee Heads</span>
+                    </a>
+                </li>
+
+                {{-- Fee Structures --}}
+                <li class="slide">
+                    <a class="side-menu__item {{ request()->is('admin/fee/fee-structures*') ? 'active' : '' }}"
+                        href="{{ route('admin.fee.fee-structures.index') }}">
+                        <i class="fa fa-building icons8 icon-style" aria-hidden="true"></i>
+                        <span class="side-menu__label">Fee Structures</span>
+                    </a>
+                </li>
+
+                {{-- Fee Collections --}}
+                <li class="slide">
+                    <a class="side-menu__item {{ request()->is('admin/fee/fee-collections*') ? 'active' : '' }}"
+                        href="{{ route('admin.fee.fee-collections.index') }}">
+                        <i class="fa fa-credit-card icons8 icon-style" aria-hidden="true"></i>
+                        <span class="side-menu__label">Fee Collections</span>
+                    </a>
+                </li>
+
+                {{-- Fee Discounts --}}
+                <li class="slide">
+                    <a class="side-menu__item {{ request()->is('admin/fee/fee-discounts*') ? 'active' : '' }}"
+                        href="{{ route('admin.fee.fee-discounts.index') }}">
+                        <i class="fa fa-percent icons8 icon-style" aria-hidden="true"></i>
+                        <span class="side-menu__label">Fee Discounts</span>
+                    </a>
+                </li>
+
+                {{-- Fee Terms --}}
+                <li class="slide">
+                    <a class="side-menu__item {{ request()->is('admin/fee/fee-terms*') ? 'active' : '' }}"
+                        href="{{ route('admin.fee.fee-terms.index') }}">
+                        <i class="fa fa-calendar icons8 icon-style" aria-hidden="true"></i>
+                        <span class="side-menu__label">Fee Terms</span>
+                    </a>
+                </li>
+
+                {{-- Challans --}}
+                <li class="slide">
+                    <a class="side-menu__item {{ request()->is('admin/fee/challans*') ? 'active' : '' }}"
+                        href="{{ route('admin.fee.challans.index') }}">
+                        <i class="fa fa-file-text icons8 icon-style" aria-hidden="true"></i>
+                        <span class="side-menu__label">Fee Challans</span>
+                    </a>
+                </li>
 
                 @canany(['EmployeeWelfare', 'EOBI', 'ProfitFunds', 'SocialSecurity'])
                     <li class="side-item side-item-category">Funds</li>

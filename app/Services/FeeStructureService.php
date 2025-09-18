@@ -2,13 +2,13 @@
 
 namespace App\Services;
 
-use App\Models\Admin\FeeStructure;
-use App\Models\Admin\FeeSection;
-use App\Models\Admin\FeeHead;
-use App\Models\Admin\FeeStructureValue;
-use Config;
-use DataTables;
+use App\Models\Fee\FeeStructure;
+use App\Models\Fee\FeeCategory;
+use App\Models\Admin\Branch;
+use App\Models\Admin\Company;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Auth;
+use Yajra\DataTables\Facades\DataTables;
 
 
 class FeeStructureService
@@ -16,108 +16,134 @@ class FeeStructureService
 
     public function store($request)
     {
-        if (!Gate::allows('students')) {
-            return abort(503);
+        if (!Gate::allows('FeeStructure-create')) {
+            return abort(403);
         }
-        //        $totalAnnualAmount = $request->get('total_annual_amount');
-        $totalMonthlyAmount = $request->get('total_monthly_amount');
 
-        $feeStructure = FeeStructure::updateOrCreate(
-            [
-                'session_id' => $request->get('session_id'),
-                'company_id' => $request->get('company_id'),
-                'branch_id' => $request->get('branch_id'),
-                'class_id' => $request->get('class_id'),
-            ],
-            []
-        );
+        $input = $request->all();
+        $input['created_by'] = Auth::id();
+        $input['company_id'] = Auth::user()->company_id ?? $request->company_id;
+        $input['branch_id'] = Auth::user()->branch_id ?? $request->branch_id;
 
-        $feeStructure->update([
-            //            'total_annual_amount' => $totalAnnualAmount,
-            'total_month_amount' => $totalMonthlyAmount,
-        ]);
+        $feeStructure = FeeStructure::create($input);
 
-        $monthly_amount = $request->get('monthly_amount') == null ? array() : $request->get('monthly_amount');
-
-        foreach ($monthly_amount as $key => $amount) {
-            $attributes = [
-                'monthly_amount' => $amount,
-                'fee_head_id' => $request->get('fee_head_id')[$key],
-                'discount_percent' => $request->get('discount')[$key],
-                'discount_rupees' => $request->get('discount_rupees')[$key],
-                'claim1' => $request->get('claim_1')[$key],
-                'claim2' => $request->get('claim_2')[$key],
-                'total_amount_after_discount' => $request->get('total_amount_after_discount')[$key],
-
-            ];
-
-            if ($request->has('fee_structure_id') && isset($request->fee_structure_id[$key])) {
-                $feeStructureId = $request->get('fee_structure_id')[$key];
-
-                $feeStructureValue = FeeStructureValue::find($feeStructureId);
-
-                if ($feeStructureValue) {
-                    $feeStructureValue->update($attributes);
-                }
-            } else {
-                $attributes['fee_structure_id'] = $feeStructure->id;
-                FeeStructureValue::create($attributes);
-            }
-        }
+        return response()->json(['message' => 'Fee structure created successfully', 'data' => $feeStructure]);
     }
-
-
 
     public function getdata()
     {
-        if (!Gate::allows('students')) {
-            return abort(503);
+        if (!Gate::allows('FeeStructure-list')) {
+            return abort(403);
         }
-        $data = FeeStructure::with('branch', 'company', 'AcademicClass')->orderBy('created_at', 'desc')->get();
-        return Datatables::of($data)->addIndexColumn()
+        
+        $query = FeeStructure::with(['feeCategory', 'company', 'branch', 'academicSession', 'academicClass', 'createdBy'])
+            ->orderBy('created_at', 'desc');
 
-            ->addColumn('action', function ($row) {
+        if (Auth::check()) {
+            $user = Auth::user();
 
-                //                $btn = ' <form class="delete_form" data-route="' . route("admin.company.destroy", $row->id) . '"   id="company-' . $row->id . '"  method="POST"> ';
-                // if (Gate::allows('company-edit'))
-                $btn = '<a href="' . route("admin.fee-structure.edit", $row->id) . '" class="btn btn-primary btn-sm"  style="margin-right: 4px;">Edit</a>';
+            if (!is_null($user->company_id)) {
+                $query->where('company_id', $user->company_id);
+            }
 
+            if (!is_null($user->branch_id)) {
+                $query->where('branch_id', $user->branch_id);
+            }
+        }
 
-                //                // if (Gate::allows('company-delete'))
-//                $btn = $btn . ' <button data-id="company-' . $row->id . '" type="button" class="btn btn-danger delete btn-sm "" >Delete</button>';
-//                $btn = $btn . method_field('DELETE') . '' . csrf_field();
-//                $btn = $btn . ' </form>';
-                return $btn;
+        return Datatables::of($query)->addIndexColumn()
+            ->addColumn('fee_category', function ($row) {
+                return $row->feeCategory ? $row->feeCategory->name : "N/A";
+            })
+            ->addColumn('class', function ($row) {
+                return $row->academicClass ? $row->academicClass->name : "N/A";
+            })
+            ->addColumn('session', function ($row) {
+                return $row->academicSession ? $row->academicSession->name : "N/A";
             })
             ->addColumn('company', function ($row) {
-                if ($row->company) {
-                    return $row->company->name;
-
-                } else {
-                    return "N/A";
-                }
-
-            })->addColumn('branch', function ($row) {
-                if ($row->branch) {
-                    return $row->branch->name;
-
-                } else {
-                    return "N/A";
-                }
-
-
-            })->addColumn('AcademicClass', function ($row) {
-                if ($row->AcademicClass) {
-                    return $row->AcademicClass->name;
-
-                } else {
-                    return "N/A";
-                }
+                return $row->company ? $row->company->name : "N/A";
             })
-            ->rawColumns(['action', 'feeHead', 'company', 'branch', 'AcademicClass'])
+            ->addColumn('branch', function ($row) {
+                return $row->branch ? $row->branch->name : "N/A";
+            })
+            ->addColumn('total_amount', function ($row) {
+                return number_format($row->total_amount, 2);
+            })
+            ->addColumn('status', function ($row) {
+                return ($row->status == 1)
+                    ? '<button type="button" class="btn btn-success btn-sm change-status" data-id="' . $row->id . '" data-status="inactive">Active</button>'
+                    : '<button type="button" class="btn btn-warning btn-sm change-status" data-id="' . $row->id . '" data-status="active">Inactive</button>';
+            })
+            ->addColumn('action', function ($row) {
+                $btn = '<form class="delete_form" data-route="' . route("fee.fee-structures.destroy", $row->id) . '" id="fee-structure-' . $row->id . '" method="POST">';
+
+                if (Gate::allows('FeeStructure-edit')) {
+                    $btn .= '<a data-id="' . $row->id . '" class="btn btn-primary text-white btn-sm fee-structure-edit" data-fee-structure-edit=\'' . $row . '\'>Edit</a>';
+                }
+
+                if (Gate::allows('FeeStructure-delete')) {
+                    $btn .= ' <button data-id="fee-structure-' . $row->id . '" type="submit" class="btn btn-danger delete btn-sm">Delete</button>';
+                    $btn .= method_field('DELETE') . csrf_field();
+                }
+
+                $btn .= '</form>';
+                return $btn;
+            })
+            ->rawColumns(['action', 'status'])
             ->make(true);
     }
 
+    public function edit($id)
+    {
+        return FeeStructure::with(['feeCategory', 'company', 'branch', 'academicSession', 'classModel'])->find($id);
+    }
 
+    public function update($request, $id)
+    {
+        if (!Gate::allows('FeeStructure-edit')) {
+            return abort(403);
+        }
+        
+        $feeStructure = FeeStructure::find($id);
+        $input = $request->all();
+        $input['updated_by'] = Auth::id();
+        $feeStructure->update($input);
 
+        return response()->json(['message' => 'Fee structure updated successfully', 'data' => $feeStructure]);
+    }
+
+    public function destroy($id)
+    {
+        if (!Gate::allows('FeeStructure-delete')) {
+            return abort(403);
+        }
+        
+        $feeStructure = FeeStructure::findOrFail($id);
+        if ($feeStructure) {
+            $feeStructure->delete();
+        }
+
+        return response()->json(['message' => 'Fee structure deleted successfully']);
+    }
+
+    public function changeStatus($request)
+    {
+        $feeStructure = FeeStructure::find($request->id);
+        if ($feeStructure) {
+            $feeStructure->status = ($request->status == 'active') ? 1 : 0;
+            $feeStructure->save();
+            return $feeStructure;
+        }
+    }
+
+    public function bulkDelete($ids)
+    {
+        if (!Gate::allows('FeeStructure-delete')) {
+            return abort(403);
+        }
+        
+        FeeStructure::whereIn('id', $ids)->delete();
+        return response()->json(['message' => 'Bulk delete completed successfully']);
+    }
 }

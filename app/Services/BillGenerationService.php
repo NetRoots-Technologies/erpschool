@@ -6,7 +6,9 @@ namespace App\Services;
 use Exception;
 use Carbon\Carbon;
 use App\Models\Admin\Biling;
-use App\Models\Fee\StudentFee;
+use App\Models\Fee\FeeCollection;
+use App\Models\Fee\FeeCollectionDetail;
+// use App\Models\Fee\StudentFee; // Old model - replaced with FeeCollection
 use App\Models\Admin\BilingData;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\DB;
@@ -30,42 +32,41 @@ class BillGenerationService
             $data = $request->all();
             $yearMonth = substr($data['year_month'], 0, 7);
             $month_format = Carbon::createFromFormat('Y-m', $yearMonth);
-            $studentFees = StudentFee::with('student_fee_data.feeHead', 'AcademicClass')
+            $feeCollections = FeeCollection::with('feeCollectionDetails.feeHead', 'AcademicClass')
                 ->where('company_id', $data['company_id'])
                 ->where('branch_id', $data['branch_id'])
-                ->where('session_id', $data['session_id'])
+                ->where('academic_session_id', $data['session_id'])
                 ->whereIn('class_id', $data['class_id'])
-                ->whereIn('fee_factor_id', $data['fee_factor'])
                 ->get();
                 
-            if ($studentFees->isEmpty()) {
-                throw new Exception('No student fees found for the given criteria.');
+            if ($feeCollections->isEmpty()) {
+                throw new Exception('No fee collections found for the given criteria.');
             }
 
-            foreach ($studentFees as $studentFee) {
-                $voucherCheck = Biling::where('class_id', $studentFee->AcademicClass->id)->where('student_id', $studentFee->student_id)->first();
+            foreach ($feeCollections as $feeCollection) {
+                $voucherCheck = Biling::where('class_id', $feeCollection->AcademicClass->id)->where('student_id', $feeCollection->student_id)->first();
                 $totalFeeForStudent = 0;
 
-                foreach ($studentFee->student_fee_data as $feeData) {
-                    if ($feeData->feeHead->dividable == 'yes') {
-                        $fee = intval($feeData->total_amount_after_discount / $studentFee->fee_factor_id);
+                foreach ($feeCollection->feeCollectionDetails as $feeDetail) {
+                    if ($feeDetail->feeHead->dividable == 'yes') {
+                        $fee = intval($feeDetail->final_amount);
                         $totalFeeForStudent += $fee;
 
                     }
-                    if (!$voucherCheck && $feeData->feeHead->dividable == 'no') {
-                        $totalFeeForStudent += $feeData->total_amount_after_discount;
+                    if (!$voucherCheck && $feeDetail->feeHead->dividable == 'no') {
+                        $totalFeeForStudent += $feeDetail->final_amount;
                     }
 
                 }
                 $arrears = 0;
                 if ($request->has('arrears') && $request->input('arrears') == 0) {
-                    $arrears = Biling::where('student_id', $studentFee->student_id)
+                    $arrears = Biling::where('student_id', $feeCollection->student_id)
                         ->where('status', 0)
                         ->sum('fees');
                     $totalFeeForStudent += $arrears;
                 }
 
-                $amountType = Biling::where('student_id', $studentFee->student_id)
+                $amountType = Biling::where('student_id', $feeCollection->student_id)
                     ->where('status', 0)
                     ->first();
                 if ($amountType && $amountType->amount_type != null && $amountType->amount_type == 'arrears') {
@@ -74,10 +75,9 @@ class BillGenerationService
 
 
                 $BillGenerate = Biling::create([
-                    'class_id' => $studentFee->AcademicClass->id,
+                    'class_id' => $feeCollection->AcademicClass->id,
                     'fees' => $totalFeeForStudent,
-                    'student_id' => $studentFee->student_id,
-                    'fee_factor' => $studentFee->fee_factor_id,
+                    'student_id' => $feeCollection->student_id,
                     'bill_date' => $data['bill_date'],
                     'due_date' => $data['due_date'],
                     'valid_date' => $data['valid_date'],
@@ -93,21 +93,21 @@ class BillGenerationService
                 ]);
                 $totalFeeForStudent = 0;
 
-                foreach ($studentFee->student_fee_data as $feeData) {
-                    if ($feeData->feeHead->dividable == 'yes') {
-                        $fee = intval($feeData->total_amount_after_discount / $studentFee->fee_factor_id);
+                foreach ($feeCollection->feeCollectionDetails as $feeDetail) {
+                    if ($feeDetail->feeHead->dividable == 'yes') {
+                        $fee = intval($feeDetail->final_amount);
                         $totalFeeForStudent += $fee;
                     }
 
-                    if (!$voucherCheck && $feeData->feeHead->dividable == 'no') {
-                        $totalFeeForStudent += $feeData->total_amount_after_discount;
-                    } elseif ($feeData->feeHead->dividable == 'no') {
+                    if (!$voucherCheck && $feeDetail->feeHead->dividable == 'no') {
+                        $totalFeeForStudent += $feeDetail->final_amount;
+                    } elseif ($feeDetail->feeHead->dividable == 'no') {
                         $totalFeeForStudent = 0;
                     }
                     BilingData::create([
-                        'fee_head_id' => $feeData->fee_head_id,
+                        'fee_head_id' => $feeDetail->fee_head_id,
                         'bills_amount' => $totalFeeForStudent,
-                        'ledger_id' => $feeData->ledger_id,
+                        'ledger_id' => $feeDetail->ledger_id,
                         'bills_id' => $BillGenerate->id,
                     ]);
                 }

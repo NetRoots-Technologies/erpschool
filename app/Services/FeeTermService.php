@@ -2,165 +2,139 @@
 
 namespace App\Services;
 
-
-use App\Models\Admin\FeeStructure;
-use App\Models\Admin\FeeTerm;
-use App\Models\Admin\FeeTermVoucher;
-use DataTables;
+use App\Models\Fee\FeeTerm;
+use App\Models\Admin\Branch;
+use App\Models\Admin\Company;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Auth;
+use Yajra\DataTables\Facades\DataTables;
 
 
 class FeeTermService
 {
     public function store($request)
     {
-        if (!Gate::allows('students')) {
-            return abort(503);
+        if (!Gate::allows('FeeTerm-create')) {
+            return abort(403);
         }
-        $existingTerm = FeeTerm::where('term', $request->input('term'))
-            ->where('branch_id', $request->input('branch_id'))
-            ->where('session_id', $request->input('session_id'))
-            ->where('company_id', $request->input('company_id'))
-            ->where('class_id', $request->input('class_id'))
-            ->first();
 
-        if (!$existingTerm) {
-            foreach ($request->input('voucher_date') as $key => $voucherDate) {
-                FeeTerm::create([
-                    'branch_id' => $request->input('branch_id'),
-                    'session_id' => $request->input('session_id'),
-                    'company_id' => $request->input('company_id'),
-                    'class_id' => $request->input('class_id'),
-                    'term' => $request->input('term'),
-                    'voucher_date' => $voucherDate,
-                    'starting_date' => $request->input('starting_date')[$key],
-                    'ending_date' => $request->input('ending_date')[$key],
-                    'installment' => $key + 1,
-                ]);
+        $input = $request->all();
+        $input['created_by'] = Auth::id();
+        $input['company_id'] = Auth::user()->company_id ?? $request->company_id;
+        $input['branch_id'] = Auth::user()->branch_id ?? $request->branch_id;
 
-            }
-            return 'success';
-        } else {
-            return 'exists';
-        }
+        $feeTerm = FeeTerm::create($input);
+
+        return response()->json(['message' => 'Fee term created successfully', 'data' => $feeTerm]);
     }
 
-    public function getData()
+    public function getdata()
     {
-        if (!Gate::allows('students')) {
-            return abort(503);
+        if (!Gate::allows('FeeTerm-list')) {
+            return abort(403);
         }
-        $data = FeeTerm::with('company', 'branch', 'AcademicClass')->orderBy('created_at', 'desc')->get();
+        
+        $query = FeeTerm::with(['company', 'branch', 'createdBy'])
+            ->orderBy('created_at', 'desc');
 
-        return Datatables::of($data)->addIndexColumn()
-            ->addColumn('action', function ($row) {
-                $btn = '<div style="display: flex;">';
+        if (Auth::check()) {
+            $user = Auth::user();
 
-                //                if (Gate::allows('Employee-edit'))
-                $btn .= '<a href="' . route("admin.fee-terms.edit", $row->id) . '" class="btn btn-primary btn-sm"  style="margin-right: 4px;">Edit</a>';
+            if (!is_null($user->company_id)) {
+                $query->where('company_id', $user->company_id);
+            }
 
-                //                if (Gate::allows('Employee-destroy')) {
-                $btn .= '<form method="POST" onsubmit="return confirm(\'Are you sure you want to Delete this?\');" action="' . route("admin.fee-terms.destroy", $row->id) . '">';
-                $btn .= '<button type="submit" class="btn btn-danger btn-sm" style="margin-right: 4px;">Delete</button>';
-                $btn .= method_field('DELETE') . csrf_field();
-                $btn .= '</form>';
-                //                }
-    
+            if (!is_null($user->branch_id)) {
+                $query->where('branch_id', $user->branch_id);
+            }
+        }
 
-                $btn .= '</div>';
-
-                return $btn;
-
+        return Datatables::of($query)->addIndexColumn()
+            ->addColumn('name', function ($row) {
+                return $row->name;
+            })
+            ->addColumn('description', function ($row) {
+                return $row->description ?? "N/A";
+            })
+            ->addColumn('start_date', function ($row) {
+                return $row->start_date ? $row->start_date->format('Y-m-d') : "N/A";
+            })
+            ->addColumn('end_date', function ($row) {
+                return $row->end_date ? $row->end_date->format('Y-m-d') : "N/A";
+            })
+            ->addColumn('due_date', function ($row) {
+                return $row->due_date ? $row->due_date->format('Y-m-d') : "N/A";
             })
             ->addColumn('company', function ($row) {
-                if ($row->company) {
-                    return $row->company->name;
-
-                } else {
-                    return "N/A";
-                }
-
-            })->addColumn('branch', function ($row) {
-                if ($row->branch) {
-                    return $row->branch->name;
-
-                } else {
-                    return "N/A";
-                }
-
-
-            })->addColumn('AcademicClass', function ($row) {
-                if ($row->AcademicClass) {
-                    return $row->AcademicClass->name;
-
-                } else {
-                    return "N/A";
-                }
+                return $row->company ? $row->company->name : "N/A";
             })
-            ->addColumn('voucherDate', function ($row) {
-                if ($row->voucher_date) {
-                    $voucherDates = $row->voucher_date;
-                    return $voucherDates;
-                } else {
-                    return "N/A";
-                }
+            ->addColumn('branch', function ($row) {
+                return $row->branch ? $row->branch->name : "N/A";
             })
-            ->addColumn('startDate', function ($row) {
-                if ($row->starting_date) {
-                    $startingDates = $row->starting_date;
-                    return $startingDates;
-                } else {
-                    return "N/A";
-                }
+            ->addColumn('status', function ($row) {
+                return ($row->status == 1)
+                    ? '<button type="button" class="btn btn-success btn-sm change-status" data-id="' . $row->id . '" data-status="inactive">Active</button>'
+                    : '<button type="button" class="btn btn-warning btn-sm change-status" data-id="' . $row->id . '" data-status="active">Inactive</button>';
             })
-            ->addColumn('endDate', function ($row) {
-                if ($row->ending_date) {
-                    $endingDates = $row->ending_date;
+            ->addColumn('action', function ($row) {
+                $btn = '<form class="delete_form" data-route="' . route("fee.fee-terms.destroy", $row->id) . '" id="fee-term-' . $row->id . '" method="POST">';
 
-                    return $endingDates;
-                } else {
-                    return "N/A";
+                if (Gate::allows('FeeTerm-edit')) {
+                    $btn .= '<a data-id="' . $row->id . '" class="btn btn-primary text-white btn-sm fee-term-edit" data-fee-term-edit=\'' . $row . '\'>Edit</a>';
                 }
-            })->addColumn('term', function ($row) {
-                if ($row->term) {
-                    return $row->term . '-Term';
-                } else {
-                    return "N/A";
+
+                if (Gate::allows('FeeTerm-delete')) {
+                    $btn .= ' <button data-id="fee-term-' . $row->id . '" type="submit" class="btn btn-danger delete btn-sm">Delete</button>';
+                    $btn .= method_field('DELETE') . csrf_field();
                 }
-            })->addColumn('installment', function ($row) {
-                if ($row->installment) {
-                    return $row->installment . '-Installment';
-                } else {
-                    return "N/A";
-                }
+
+                $btn .= '</form>';
+                return $btn;
             })
-            ->rawColumns(['action', 'company', 'branch', 'AcademicClass', 'voucherDate', 'startDate', 'endDate', 'term', 'installment'])
+            ->rawColumns(['action', 'status'])
             ->make(true);
+    }
+
+    public function edit($id)
+    {
+        return FeeTerm::with(['company', 'branch'])->find($id);
     }
 
     public function update($request, $id)
     {
-        if (!Gate::allows('students')) {
-            return abort(503);
+        if (!Gate::allows('FeeTerm-edit')) {
+            return abort(403);
         }
+        
         $feeTerm = FeeTerm::find($id);
-        $feeTerm->update([
-            'voucher_date' => $request->input('starting_date'),
-            'starting_date' => $request->input('starting_date'),
-            'ending_date' => $request->input('ending_date'),
-            'installment' => $feeTerm->installment,
-        ]);
+        $input = $request->all();
+        $input['updated_by'] = Auth::id();
+        $feeTerm->update($input);
+
+        return response()->json(['message' => 'Fee term updated successfully', 'data' => $feeTerm]);
     }
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
-            return abort(503);
+        if (!Gate::allows('FeeTerm-delete')) {
+            return abort(403);
         }
-        $feeTerm = FeeTerm::find($id);
+        
+        $feeTerm = FeeTerm::findOrFail($id);
         if ($feeTerm) {
             $feeTerm->delete();
         }
+
+        return response()->json(['message' => 'Fee term deleted successfully']);
     }
 
+    public function changeStatus($request)
+    {
+        $feeTerm = FeeTerm::find($request->id);
+        if ($feeTerm) {
+            $feeTerm->status = ($request->status == 'active') ? 1 : 0;
+            $feeTerm->save();
+            return $feeTerm;
+        }
+    }
 }

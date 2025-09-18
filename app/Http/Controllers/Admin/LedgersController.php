@@ -15,11 +15,10 @@ use App\Helpers\CoreAccounts;
 use App\Models\Account\Group;
 use App\Models\Admin\Ledgers;
 use App\Models\Admin\Session;
-use App\Models\Fee\StudentFee;
-use App\Models\Admin\Companies;
-use App\Models\Admin\Currencies;
-use App\Models\Admin\AccountTypes;
-use App\Models\Fee\PaidStudentFee;
+use App\Models\Fee\FeeCollection;
+use App\Models\Fee\FeeCollectionDetail;
+// use App\Models\Fee\StudentFee; // Removed - model no longer exists
+// use App\Models\Fee\PaidStudentFee; // Removed - model no longer exists
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
 use App\Http\Controllers\Controller;
@@ -400,7 +399,7 @@ if (!Gate::allows('students')) {
         if (!Gate::allows('students')) {
             return abort(503);
         }
-        $students = PaidStudentFee::with('student', 'sessions')->get();
+        $students = FeeCollection::with('student', 'academicSession')->get();
         $sessions = Session::orderby('id', 'DESC')->get();
 
         return view('admin.ledgers.fee_collection_index', compact('students', 'sessions'));
@@ -415,19 +414,14 @@ if (!Gate::allows('students')) {
         if (isset($request->session)) {
             if ($request->session) {
                 $session = $request->session;
-                $students = StudentFee::where('session_id', $session)->pluck('student_id');
+                $students = FeeCollection::where('academic_session_id', $session)->pluck('student_id');
 
-
-                //                $data = PaidStudentFee::whereHas('sessions', function ($query) use ($session) {
-//                    $query->where('id', $session);
-//                })->with('course', 'student', 'student_fee.session');
-//
-                $data = PaidStudentFee::whereIN('student_id', $students)->with('course', 'student', 'student_fee.session');
-
+                // Updated to use new fee structure
+                $data = FeeCollection::whereIN('student_id', $students)->with('student', 'academicSession');
 
             }
         } else {
-            $data = PaidStudentFee::with('course', 'student', 'sessions', 'student_fee.session');
+            $data = FeeCollection::with('student', 'academicSession');
         }
         if ($request->student_id) {
             $data = $data->where('student_id', $request->student_id);
@@ -449,9 +443,8 @@ if (!Gate::allows('students')) {
         $data = $data->where('paid_status', 'paid')->get();
         return Datatables::of($data)->addIndexColumn()
             ->addColumn('sessions', function ($row) {
-
-                if (isset($row->student_fee->session)) {
-                    $btn = $row->student_fee->session->title;
+                if (isset($row->academicSession)) {
+                    $btn = $row->academicSession->title;
                     return $btn;
                 } else {
                     $btn = 'N/A';

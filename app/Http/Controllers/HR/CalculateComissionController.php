@@ -4,7 +4,7 @@ namespace App\Http\Controllers\HR;
 
 use App\Http\Controllers\Controller;
 use App\Models\Fee\PaidStudentFee;
-use App\Models\Fee\StudentFee;
+// use App\Models\Fee\StudentFee; // Removed - model no longer exists
 use App\Models\HR\Agent;
 use App\Models\HR\AgentNewSaleIncentive;
 use App\Models\HR\AgentNewSaleIncentiveStudents;

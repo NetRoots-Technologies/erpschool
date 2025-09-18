@@ -14,10 +14,7 @@ use App\Http\Controllers\Academic\TimeTableController;
 use App\Http\Controllers\Admin\AccountHeadController;
 use App\Http\Controllers\Admin\CourseController;
 use App\Http\Controllers\Admin\CourseTypeController;
-use App\Http\Controllers\Admin\FeeCategoryController;
-use App\Http\Controllers\Admin\FeeFactorController;
-use App\Http\Controllers\Admin\FeeHeadController;
-use App\Http\Controllers\Admin\FeeSectionController;
+use App\Http\Controllers\Admin\LedgersController;
 use App\Http\Controllers\Exam\ComponentController;
 use App\Http\Controllers\Exam\ExamScheduleController;
 use App\Http\Controllers\Student\AcademicSessionController;
@@ -99,10 +96,6 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'academic', 'as' => 'academi
     Route::post('/course_type-action', [CourseTypeController::class, 'handleBulkAction'])->name('courseType-bulk');
     Route::post('/student_bulk-action', [StudentController::class, 'handleBulkAction'])->name('student-bulk');
     Route::post('/studentDataBank-bulk-action', [StudentDataBankController::class, 'handleBulkAction'])->name('studentDataBank-bulk');
-    Route::post('/fee-section-bulk-action', [FeeSectionController::class, 'handleBulkAction'])->name('fee-section-bulk');
-    Route::post('/fee-head-bulk-action', [FeeHeadController::class, 'handleBulkAction'])->name('fee-heads-bulk');
-    Route::post('/fee-category-bulk-action', [FeeCategoryController::class, 'handleBulkAction'])->name('fee-category-bulk');
-    Route::post('/fee-factor-bulk-action', [FeeFactorController::class, 'handleBulkAction'])->name('fee-factor-bulk');
     Route::post('/academic-studentAttendance-action', [AttendanceController::class, 'handleBulkAction'])->name('studentAttendance-bulk');
 
     //    for fetch data
@@ -119,7 +112,6 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'academic', 'as' => 'academi
     Route::get('fetch-academic-schoolTypes', [ActiveSessionController::class, 'fetch_schoolType'])->name('fetch.schools');
     Route::get('fetch-academic-siblingClass', [StudentController::class, 'fetch_siblingClass'])->name('fetch.siblingClass');
     Route::get('fetch-academic-siblingDob', [StudentController::class, 'fetch_siblingDob'])->name('fetch_siblingDob');
-    Route::get('fetch-academic-feeSection', [FeeHeadController::class, 'fetchFeeSection'])->name('fetchFeeSection');
     Route::get('fetch-academic-studentId', [StudentController::class, 'fetchStudentData'])->name('fetch_studentId');
     Route::get('fetch-academic-rollNo', [StudentController::class, 'StudentRollNo'])->name('fetchRollNo');
     Route::get('fetch-academic-empRoll', [StudentController::class, 'EmpCode'])->name('fetchEmpNo');
