@@ -27,7 +27,7 @@ class AgentController extends Controller
 
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $agent_type = AgentType::all();
@@ -43,7 +43,7 @@ class AgentController extends Controller
      */
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $agent_type = AgentType::all();
@@ -58,7 +58,7 @@ class AgentController extends Controller
      */
     public function store(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
 
@@ -83,7 +83,7 @@ class AgentController extends Controller
      */
     public function show($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -96,7 +96,7 @@ class AgentController extends Controller
      */
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $agent_type = AgentType::get();
@@ -113,7 +113,7 @@ class AgentController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $user = User::where('agent_id', $id)->first();
@@ -138,7 +138,7 @@ class AgentController extends Controller
 
     public function getData()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $agent = $this->AgentServices->getdata();
@@ -147,10 +147,11 @@ class AgentController extends Controller
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $agent = $this->AgentServices->destroy($id);
         return 'done';
     }
 }
+

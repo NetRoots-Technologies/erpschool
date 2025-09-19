@@ -22,8 +22,8 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        if (!Gate::allows('students')) {
-            return abort(503);
+        if (!Gate::allows('Category-list')) {
+            return abort(403);
         }
         return view('admin.category.index');
     }
@@ -35,8 +35,8 @@ class CategoryController extends Controller
      */
     public function create()
     {
-        if (!Gate::allows('students')) {
-            return abort(503);
+        if (!Gate::allows('Category-list')) {
+            return abort(403);
         }
     }
 
@@ -48,16 +48,16 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        if (!Gate::allows('students')) {
-            return abort(503);
+        if (!Gate::allows('Category-list')) {
+            return abort(403);
         }
     }
 
 
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('students')) {
-            return abort(503);
+        if (!Gate::allows('Category-list')) {
+            return abort(403);
         }
         
         return $Category = $this->CategoryService->update($request, $id);
@@ -65,11 +65,12 @@ class CategoryController extends Controller
 
     public function getdata()
     {
-        if (!Gate::allows('students')) {
-            return abort(503);
+        if (!Gate::allows('Category-list')) {
+            return abort(403);
         }
         $category = $this->CategoryService->getdata();
         return $category;
     }
 
 }
+

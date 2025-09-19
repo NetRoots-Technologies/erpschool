@@ -31,7 +31,7 @@ class GroupController extends Controller
 
     public function index(Request $request)
     {
-if (!Gate::allows('students')) {
+if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $AccountTypes = AccountType::all()->getDictionary();
@@ -51,7 +51,7 @@ if (!Gate::allows('students')) {
      */
     public function create()
     {
-       if (!Gate::allows('students')) {
+       if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
 
@@ -69,7 +69,7 @@ if (!Gate::allows('students')) {
      */
     public function store(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
 
@@ -100,7 +100,7 @@ if (!Gate::allows('students')) {
 
     public function edit(Group $group)
     {
-       if (!Gate::allows('students')) {
+       if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
 
@@ -130,7 +130,7 @@ if (!Gate::allows('students')) {
      */
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         if (!Gate::allows('Groups-edit')) {
@@ -152,7 +152,7 @@ if (!Gate::allows('students')) {
      */
     public function destroy(Request $request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         try {
@@ -192,7 +192,7 @@ if (!Gate::allows('students')) {
 
     public function fetch_coa($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $groups = Group::with('ledgers')->where('id', $id)->get();
@@ -200,3 +200,4 @@ if (!Gate::allows('students')) {
         return response()->json(['result' => $groups]);
     }
 }
+

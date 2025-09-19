@@ -11,8 +11,8 @@ class CategoryService
 
     public function getdata()
     {
-        if (!Gate::allows('students')) {
-            return abort(503);
+        if (!Gate::allows('Category-list')) {
+            return abort(403);
         }
         $data = Category::orderby('id', 'DESC');
         return Datatables::of($data)->addIndexColumn()
@@ -32,8 +32,8 @@ class CategoryService
 
     public function update($request, $id)
     {
-        if (!Gate::allows('students')) {
-            return abort(503);
+        if (!Gate::allows('Category-list')) {
+            return abort(403);
         }
         $data = Category::find($id);
         $input = $request->all();
@@ -44,3 +44,4 @@ class CategoryService
 
 
 }
+

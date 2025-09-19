@@ -12,7 +12,7 @@ class PayrollReportController extends Controller
 {
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
 
@@ -21,7 +21,7 @@ class PayrollReportController extends Controller
 
     public function fetchFilterRecord(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
 
@@ -29,3 +29,4 @@ class PayrollReportController extends Controller
         return view('hr.payroll.payrollReport', compact('payrolls'));
     }
 }
+

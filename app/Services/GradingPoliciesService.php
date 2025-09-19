@@ -10,7 +10,7 @@ class GradingPoliciesService
 {
     public function store($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $logs = [
@@ -40,7 +40,7 @@ class GradingPoliciesService
 
     public function getdata()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = GradingPolicies::with('academic_session', 'academic_class')->orderby('id', 'DESC');
@@ -87,7 +87,7 @@ class GradingPoliciesService
 
     public function update($request, $id, $image = null)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $grading_policies = GradingPolicies::find($id);
@@ -123,14 +123,14 @@ class GradingPoliciesService
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
 
     public function changeStatus($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $grading_policies = GradingPolicies::find($request->id);
@@ -157,3 +157,4 @@ class GradingPoliciesService
         return null;
     }
 }
+

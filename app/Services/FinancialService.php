@@ -12,7 +12,7 @@ class FinancialService
 
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -20,7 +20,7 @@ class FinancialService
 
     public function store($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $financial = Financial::create(['name' => $request->name, 'start_date' => $request->start_date, 'end_date' => $request->end_date]);
@@ -29,7 +29,7 @@ class FinancialService
 
     public function getdata()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = Financial::orderby('id', 'DESC');
@@ -67,7 +67,7 @@ class FinancialService
 
     public function update($request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = Financial::find($id);
@@ -78,7 +78,7 @@ class FinancialService
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $Financial = Financial::findOrFail($id);
@@ -90,7 +90,7 @@ class FinancialService
 
     public function changeStatus($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $financialYear = Financial::find($request->id);
@@ -102,3 +102,4 @@ class FinancialService
     }
 
 }
+

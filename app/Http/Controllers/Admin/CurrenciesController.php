@@ -16,7 +16,7 @@ class CurrenciesController extends Controller
 
     public function index()
     {
-if (!Gate::allows('students')) {
+if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = Currencies::all();
@@ -26,7 +26,7 @@ if (!Gate::allows('students')) {
 
     function add(Request $req)
     {
-if (!Gate::allows('students')) {
+if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $currency = new Currencies;
@@ -58,7 +58,7 @@ if (!Gate::allows('students')) {
 
     public function delete($id)
     {
-if (!Gate::allows('students')) {
+if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $var = Currencies::find($id)->delete();
@@ -70,7 +70,7 @@ if (!Gate::allows('students')) {
 
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = Currencies::find($id);
@@ -80,7 +80,7 @@ if (!Gate::allows('students')) {
 
     function update(Request $req)
     {
-if (!Gate::allows('students')) {
+if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $currency = Currencies::find($req->id);
@@ -98,7 +98,7 @@ if (!Gate::allows('students')) {
     public function getData()
     {
 
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = Currencies::all();
@@ -117,3 +117,4 @@ if (!Gate::allows('students')) {
     }
 
 }
+

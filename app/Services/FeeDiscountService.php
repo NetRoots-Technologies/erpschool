@@ -4,180 +4,263 @@ namespace App\Services;
 
 use App\Models\Fee\FeeDiscount;
 use App\Models\Fee\FeeCategory;
-use App\Models\Admin\Student;
-use App\Models\Admin\Branch;
-use App\Models\Admin\Company;
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Student\Students;
 use Illuminate\Support\Facades\DB;
-use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Support\Facades\Auth;
 
 class FeeDiscountService
 {
-    public function store($request)
+    /**
+     * Create individual discount
+     */
+    public function createIndividualDiscount($data)
     {
-        if (!Gate::allows('FeeDiscount-create')) {
-            return abort(403);
-        }
-
-        $input = $request->all();
-        $input['created_by'] = Auth::id();
-        $input['company_id'] = Auth::user()->company_id ?? $request->company_id;
-        $input['branch_id'] = Auth::user()->branch_id ?? $request->branch_id;
-
-        $feeDiscount = FeeDiscount::create($input);
-
-        return response()->json(['message' => 'Fee discount created successfully', 'data' => $feeDiscount]);
+        return FeeDiscount::create([
+            'student_id' => $data['student_id'],
+            'category_id' => $data['category_id'],
+            'discount_type' => $data['discount_type'],
+            'discount_value' => $data['discount_value'],
+            'reason' => $data['reason'] ?? null,
+            'is_active' => $data['is_active'] ?? true,
+            'created_by' => Auth::id(),
+        ]);
     }
 
-    public function getdata()
+    /**
+     * Create bulk discount for multiple students
+     */
+    public function createBulkDiscount($data)
     {
-        if (!Gate::allows('FeeDiscount-list')) {
-            return abort(403);
-        }
-        
-        $query = FeeDiscount::with(['student', 'feeCategory', 'company', 'branch', 'createdBy'])
-            ->orderBy('created_at', 'desc');
-
-        if (Auth::check()) {
-            $user = Auth::user();
-
-            if (!is_null($user->company_id)) {
-                $query->where('company_id', $user->company_id);
-            }
-
-            if (!is_null($user->branch_id)) {
-                $query->where('branch_id', $user->branch_id);
-            }
-        }
-
-        return Datatables::of($query)->addIndexColumn()
-            ->addColumn('student', function ($row) {
-                return $row->student ? $row->student->name : "N/A";
-            })
-            ->addColumn('fee_category', function ($row) {
-                return $row->feeCategory ? $row->feeCategory->name : "N/A";
-            })
-            ->addColumn('discount_type', function ($row) {
-                return ucfirst($row->discount_type);
-            })
-            ->addColumn('discount_value', function ($row) {
-                if ($row->discount_type == 'percentage') {
-                    return $row->discount_value . '%';
-                } else {
-                    return number_format($row->discount_value, 2);
-                }
-            })
-            ->addColumn('valid_from', function ($row) {
-                return $row->valid_from ? $row->valid_from->format('Y-m-d') : "N/A";
-            })
-            ->addColumn('valid_to', function ($row) {
-                return $row->valid_to ? $row->valid_to->format('Y-m-d') : "N/A";
-            })
-            ->addColumn('company', function ($row) {
-                return $row->company ? $row->company->name : "N/A";
-            })
-            ->addColumn('branch', function ($row) {
-                return $row->branch ? $row->branch->name : "N/A";
-            })
-            ->addColumn('status', function ($row) {
-                return ($row->status == 1)
-                    ? '<button type="button" class="btn btn-success btn-sm change-status" data-id="' . $row->id . '" data-status="inactive">Active</button>'
-                    : '<button type="button" class="btn btn-warning btn-sm change-status" data-id="' . $row->id . '" data-status="active">Inactive</button>';
-            })
-            ->addColumn('action', function ($row) {
-                $btn = '<form class="delete_form" data-route="' . route("fee.fee-discounts.destroy", $row->id) . '" id="fee-discount-' . $row->id . '" method="POST">';
-
-                if (Gate::allows('FeeDiscount-edit')) {
-                    $btn .= '<a data-id="' . $row->id . '" class="btn btn-primary text-white btn-sm fee-discount-edit" data-fee-discount-edit=\'' . $row . '\'>Edit</a>';
-                }
-
-                if (Gate::allows('FeeDiscount-delete')) {
-                    $btn .= ' <button data-id="fee-discount-' . $row->id . '" type="submit" class="btn btn-danger delete btn-sm">Delete</button>';
-                    $btn .= method_field('DELETE') . csrf_field();
-                }
-
-                $btn .= '</form>';
-                return $btn;
-            })
-            ->rawColumns(['action', 'status'])
-            ->make(true);
-    }
-
-    public function edit($id)
-    {
-        return FeeDiscount::with(['student', 'feeCategory', 'company', 'branch'])->find($id);
-    }
-
-    public function update($request, $id)
-    {
-        if (!Gate::allows('FeeDiscount-edit')) {
-            return abort(403);
-        }
-        
-        $feeDiscount = FeeDiscount::find($id);
-        $input = $request->all();
-        $input['updated_by'] = Auth::id();
-        $feeDiscount->update($input);
-
-        return response()->json(['message' => 'Fee discount updated successfully', 'data' => $feeDiscount]);
-    }
-
-    public function destroy($id)
-    {
-        if (!Gate::allows('FeeDiscount-delete')) {
-            return abort(403);
-        }
-        
-        $feeDiscount = FeeDiscount::findOrFail($id);
-        if ($feeDiscount) {
-            $feeDiscount->delete();
-        }
-
-        return response()->json(['message' => 'Fee discount deleted successfully']);
-    }
-
-    public function changeStatus($request)
-    {
-        $feeDiscount = FeeDiscount::find($request->id);
-        if ($feeDiscount) {
-            $feeDiscount->status = ($request->status == 'active') ? 1 : 0;
-            $feeDiscount->save();
-            return $feeDiscount;
-        }
-    }
-
-    public function applyBulkDiscount($request)
-    {
-        if (!Gate::allows('FeeDiscount-create')) {
-            return abort(403);
-        }
-
         DB::beginTransaction();
         try {
-            $studentIds = $request->student_ids;
-            $discountData = [
-                'fee_category_id' => $request->fee_category_id,
-                'discount_type' => $request->discount_type,
-                'discount_value' => $request->discount_value,
-                'valid_from' => $request->valid_from,
-                'valid_to' => $request->valid_to,
-                'reason' => $request->reason,
-                'created_by' => Auth::id(),
-                'company_id' => Auth::user()->company_id ?? $request->company_id,
-                'branch_id' => Auth::user()->branch_id ?? $request->branch_id,
-            ];
-
-            foreach ($studentIds as $studentId) {
-                $discountData['student_id'] = $studentId;
-                FeeDiscount::create($discountData);
+            $discounts = [];
+            
+            foreach ($data['student_ids'] as $studentId) {
+                $discounts[] = FeeDiscount::create([
+                    'student_id' => $studentId,
+                    'category_id' => $data['category_id'],
+                    'discount_type' => $data['discount_type'],
+                    'discount_value' => $data['discount_value'],
+                    'reason' => $data['reason'] ?? null,
+                    'is_active' => $data['is_active'] ?? true,
+                    'created_by' => Auth::id(),
+                ]);
             }
 
             DB::commit();
-            return response()->json(['message' => 'Bulk discount applied successfully']);
+            return $discounts;
         } catch (\Exception $e) {
             DB::rollback();
-            return response()->json(['error' => 'Failed to apply bulk discount: ' . $e->getMessage()], 500);
+            throw $e;
         }
     }
+
+    /**
+     * Update discount
+     */
+    public function updateDiscount($id, $data)
+    {
+        $discount = FeeDiscount::findOrFail($id);
+        
+        $discount->update([
+            'category_id' => $data['category_id'],
+            'discount_type' => $data['discount_type'],
+            'discount_value' => $data['discount_value'],
+            'reason' => $data['reason'] ?? null,
+            'is_active' => $data['is_active'] ?? true,
+            'updated_by' => Auth::id(),
+        ]);
+        
+        return $discount;
+    }
+
+    /**
+     * Delete discount
+     */
+    public function deleteDiscount($id)
+    {
+        $discount = FeeDiscount::findOrFail($id);
+        $discount->delete();
+        return true;
+    }
+
+    /**
+     * Calculate discount amount
+     */
+    public function calculateDiscountAmount($studentId, $categoryId, $baseAmount)
+    {
+        $discounts = FeeDiscount::where('student_id', $studentId)
+            ->where('category_id', $categoryId)
+            ->where('is_active', 1)
+            ->get();
+
+        $totalDiscount = 0;
+
+        foreach ($discounts as $discount) {
+            if ($discount->discount_type == 'percentage') {
+                $discountAmount = ($baseAmount * $discount->discount_value) / 100;
+            } else {
+                $discountAmount = $discount->discount_value;
+            }
+
+            $totalDiscount += $discountAmount;
+        }
+
+        // Ensure discount doesn't exceed the base amount
+        return min($totalDiscount, $baseAmount);
+    }
+
+    /**
+     * Get student discounts
+     */
+    public function getStudentDiscounts($studentId, $categoryId = null)
+    {
+        $query = FeeDiscount::where('student_id', $studentId)
+            ->where('is_active', 1)
+            ->with(['category']);
+
+        if ($categoryId) {
+            $query->where('category_id', $categoryId);
+        }
+
+        return $query->get();
+    }
+
+    /**
+     * Get discount statistics
+     */
+    public function getDiscountStats($fromDate = null, $toDate = null)
+    {
+        $query = FeeDiscount::query();
+
+        if ($fromDate && $toDate) {
+            $query->whereBetween('created_at', [$fromDate, $toDate]);
+        }
+
+        return [
+            'total_discounts' => $query->count(),
+            'active_discounts' => $query->where('is_active', 1)->count(),
+            'inactive_discounts' => $query->where('is_active', 0)->count(),
+            'percentage_discounts' => $query->where('discount_type', 'percentage')->count(),
+            'fixed_discounts' => $query->where('discount_type', 'fixed')->count(),
+        ];
+    }
+
+    /**
+     * Get discounts by category
+     */
+    public function getDiscountsByCategory($categoryId)
+    {
+        return FeeDiscount::where('category_id', $categoryId)
+            ->where('is_active', 1)
+            ->with(['student', 'category'])
+            ->get();
+    }
+
+    /**
+     * Get discounts by student
+     */
+    public function getDiscountsByStudent($studentId)
+    {
+        return FeeDiscount::where('student_id', $studentId)
+            ->where('is_active', 1)
+            ->with(['category'])
+            ->get();
+    }
+
+    /**
+     * Apply discount to fee collection
+     */
+    public function applyDiscountToCollection($studentId, $collections)
+    {
+        $discountedCollections = [];
+
+        foreach ($collections as $collection) {
+            $categoryId = $collection['category_id'];
+            $baseAmount = $collection['amount'];
+            
+            $discountAmount = $this->calculateDiscountAmount($studentId, $categoryId, $baseAmount);
+            $discountedAmount = $baseAmount - $discountAmount;
+
+            $discountedCollections[] = [
+                'category_id' => $categoryId,
+                'amount' => $baseAmount,
+                'discount_amount' => $discountAmount,
+                'discounted_amount' => $discountedAmount,
+            ];
+        }
+
+        return $discountedCollections;
+    }
+
+    /**
+     * Get discount summary for student
+     */
+    public function getStudentDiscountSummary($studentId)
+    {
+        $discounts = $this->getStudentDiscounts($studentId);
+        
+        $summary = [
+            'total_discounts' => $discounts->count(),
+            'categories' => []
+        ];
+
+        foreach ($discounts as $discount) {
+            $categoryName = $discount->category->name;
+            
+            if (!isset($summary['categories'][$categoryName])) {
+                $summary['categories'][$categoryName] = [
+                    'count' => 0,
+                    'total_value' => 0,
+                    'type' => $discount->discount_type
+                ];
+            }
+            
+            $summary['categories'][$categoryName]['count']++;
+            $summary['categories'][$categoryName]['total_value'] += $discount->discount_value;
+        }
+
+        return $summary;
+    }
+
+    /**
+     * Validate discount data
+     */
+    public function validateDiscountData($data)
+    {
+        $errors = [];
+
+        if ($data['discount_type'] == 'percentage' && ($data['discount_value'] < 1 || $data['discount_value'] > 100)) {
+            $errors[] = 'Percentage discount must be between 1 and 100';
+        }
+
+        if ($data['discount_type'] == 'fixed' && $data['discount_value'] <= 0) {
+            $errors[] = 'Fixed amount discount must be greater than 0';
+        }
+
+        // Check if student exists
+        if (!Students::find($data['student_id'])) {
+            $errors[] = 'Selected student does not exist';
+        }
+
+        // Check if category exists
+        if (!FeeCategory::find($data['category_id'])) {
+            $errors[] = 'Selected fee category does not exist';
+        }
+
+        return $errors;
+    }
+
+    /**
+     * Get active discounts for bulk operations
+     */
+    public function getActiveDiscountsForBulk($studentIds, $categoryId)
+    {
+        return FeeDiscount::whereIn('student_id', $studentIds)
+            ->where('category_id', $categoryId)
+            ->where('is_active', 1)
+            ->with(['student', 'category'])
+            ->get();
+    }
 }
+

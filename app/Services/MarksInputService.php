@@ -13,7 +13,7 @@ class MarksInputService
 {
     public function store($request)
 {
-    if (!Gate::allows('students')) {
+    if (!Gate::allows('Dashboard-list')) {
         return abort(503);
     }
 
@@ -87,7 +87,7 @@ class MarksInputService
 
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $marksInput = MarkInput::find($id);
@@ -104,7 +104,7 @@ class MarksInputService
 
     public function getData()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = MarkInput::with(['academicSession', 'company', 'branch', 'section', 'fetchClass', 'subject', 'component'])->orderBy('created_at', 'desc');
@@ -187,7 +187,7 @@ class MarksInputService
 
     public function delete($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $marksInput = MarkInput::find($id);
@@ -199,3 +199,4 @@ class MarksInputService
         }
     }
 }
+

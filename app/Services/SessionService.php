@@ -13,7 +13,7 @@ class SessionService
 
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -21,7 +21,7 @@ class SessionService
 
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         // return Permission::with('child')->where('main', 1)->get();
@@ -30,7 +30,7 @@ class SessionService
 
     public function store($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
 
@@ -41,7 +41,7 @@ class SessionService
 
     public function getdata()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = Session::join('courses', 'courses.id', '=', 'sessions.course_id')
@@ -75,7 +75,7 @@ class SessionService
 
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return Session::find($id);
@@ -86,7 +86,7 @@ class SessionService
 
     public function update($request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = Session::find($id);
@@ -96,7 +96,7 @@ class SessionService
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $session = Session::findOrFail($id);
@@ -104,3 +104,4 @@ class SessionService
             $session->delete();
     }
 }
+

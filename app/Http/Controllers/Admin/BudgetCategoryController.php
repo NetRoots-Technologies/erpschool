@@ -23,7 +23,7 @@ class BudgetCategoryController extends Controller
 
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $categories = BCategory::all(); // Fetch all categories
@@ -35,7 +35,7 @@ class BudgetCategoryController extends Controller
        public function store(CategoryRpequest $request)
     {
 
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $this->BcategoryService->store($request->validated());
@@ -44,7 +44,7 @@ class BudgetCategoryController extends Controller
 
      public function getData()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return $this->BcategoryService->getData();
@@ -52,7 +52,7 @@ class BudgetCategoryController extends Controller
 
       public function update(CategoryRpequest $request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $this->BcategoryService->update($request->validated(),$id);
@@ -64,10 +64,11 @@ class BudgetCategoryController extends Controller
 
         public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $this->BcategoryService->delete($id);
         return response()->json(['success' => 'Budget deleted successfully.']);
     }
 }
+

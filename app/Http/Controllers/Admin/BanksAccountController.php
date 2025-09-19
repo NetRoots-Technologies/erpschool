@@ -27,7 +27,7 @@ class BanksAccountController extends Controller
 
     public function getData()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $BankAccount = $this->BankAccountService->getdata();
@@ -40,7 +40,7 @@ class BanksAccountController extends Controller
      */
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return view('fee.banks_account.index');
@@ -53,7 +53,7 @@ class BanksAccountController extends Controller
      */
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $banks = Bank::where('status', 1)->get();
@@ -69,7 +69,7 @@ class BanksAccountController extends Controller
     public function store(Request $request)
     {
 
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         DB::beginTransaction();
@@ -118,7 +118,7 @@ class BanksAccountController extends Controller
      */
     public function show($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -131,7 +131,7 @@ class BanksAccountController extends Controller
      */
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $bankAccount = BankAccount::find($id);
@@ -148,7 +148,7 @@ class BanksAccountController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $bankAccount = $this->BankAccountService->update($request, $id);
@@ -173,7 +173,7 @@ class BanksAccountController extends Controller
      */
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $this->BankAccountService->delete($id);
@@ -182,7 +182,7 @@ class BanksAccountController extends Controller
 
     public function handleBulkAction(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $ids = $request->get('ids');
@@ -195,3 +195,4 @@ class BanksAccountController extends Controller
         return response()->json(['message' => 'Bulk Action Completed Successfully']);
     }
 }
+

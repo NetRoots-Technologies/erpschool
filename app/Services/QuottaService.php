@@ -15,7 +15,7 @@ class QuottaService
 
     public function store($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $quota = Quotta::create([
@@ -35,7 +35,7 @@ class QuottaService
 
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return Quotta::with('department')->find($id);
@@ -43,7 +43,7 @@ class QuottaService
 
     public function getdata()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = Quotta::orderby('id', 'DESC');
@@ -67,7 +67,7 @@ class QuottaService
 
     public function update($request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $quota = Quotta::findOrFail($id);
@@ -93,7 +93,7 @@ class QuottaService
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $quota = Quotta::find($id);
@@ -101,3 +101,4 @@ class QuottaService
     }
 
 }
+

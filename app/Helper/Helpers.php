@@ -10,13 +10,11 @@ use App\Models\Admin\Entries;
 use App\Models\Admin\Ledgers;
 use App\Models\HRM\Employees;
 use App\Models\Account\Ledger;
-use App\Models\Fee\StudentFee;
 use App\Models\Admin\Currencies;
 use App\Models\Admin\EntryItems;
 use App\Models\Student\Students;
 
 
-use App\Models\Fee\PaidStudentFee;
 use Illuminate\Support\Facades\Auth;
 use App\Models\HR\CalculateComission;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
@@ -137,10 +135,8 @@ class Helpers
 
     public static function getStudentCounts()
     {
-
-        return StudentFee::count('student_id');
-
-
+        // Fee module removed - this function needs to be updated
+        return 0;
     }
 
     public static function getEmployeeCount()
@@ -172,8 +168,8 @@ class Helpers
 
     public static function moreThan30k()
     {
-        //        return StudentFee::where('total_paid_fee', '>=', 30000)->count();
-
+        // Fee module removed - this function needs to be updated
+        return 0;
     }
 
     public static function agentsStudent()
@@ -249,10 +245,9 @@ class Helpers
         $start_date = Carbon::yesterday()->format('Y-m-d');
 
 
-        $decimal = Currencies::where('id', 1)->first('decimal_fixed_point');
-        $decimal = $decimal->decimal_fixed_point;
-        //fetch all expenses groups
-        $GroupExp = Groups::where('account_type_id', 3)->orderBy('code')->get();
+        $decimal = 2; // Default decimal places
+        //fetch all expenses groups - Skip for now
+        $GroupExp = collect();
 
         foreach ($GroupExp as $Exp) {
             if ($Exp->level == 1) {
@@ -319,10 +314,9 @@ class Helpers
 
 
 
-        $decimal = Currencies::where('id', 1)->first('decimal_fixed_point');
-        $decimal = $decimal->decimal_fixed_point;
-        //fetch all expenses groups
-        $GroupExp = Groups::where('account_type_id', 3)->OrderBy('code')->get();
+        $decimal = 2; // Default decimal places
+        //fetch all expenses groups - Skip for now
+        $GroupExp = collect();
 
         foreach ($GroupExp as $Exp) {
             if ($Exp->level == 1) {

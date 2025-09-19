@@ -16,7 +16,7 @@ class NotificationService
 {
     public static function sendNotification($sender_id, $reciver_id, $title, $message, $link = null)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         try {
@@ -36,7 +36,7 @@ class NotificationService
 
     public static function markNotificationAsRead($notification_id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         try {
@@ -48,7 +48,7 @@ class NotificationService
 
     public static function getUnreadNotificationCount($user_id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return Notification::where('reciver_id', $user_id)->where('is_read', 0)->count();
@@ -56,7 +56,7 @@ class NotificationService
 
     public static function getAllUnreadNotifications($user_id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return Notification::where('reciver_id', $user_id)->where('is_read', 0)->get();
@@ -64,7 +64,7 @@ class NotificationService
 
     public static function getAllNotifications($user_id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return DB::transaction(function () {

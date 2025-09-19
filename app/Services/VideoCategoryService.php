@@ -14,7 +14,7 @@ class VideoCategoryService
 
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return VideoCategory::all();
@@ -24,14 +24,14 @@ class VideoCategoryService
     public function create()
     {
 
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
 
     public function store($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $video_category = VideoCategory::create(['name' => $request->name, 'session_id' => $request->session_id]);
@@ -40,7 +40,7 @@ class VideoCategoryService
 
     public function update($request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = VideoCategory::find($id);
@@ -54,7 +54,7 @@ class VideoCategoryService
 
     public function getData()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = VideoCategory::with('course', 'session')->get();
@@ -92,7 +92,7 @@ class VideoCategoryService
     }
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $video_category = VideoCategory::findOrFail($id);
@@ -101,4 +101,5 @@ class VideoCategoryService
 
     }
 }
+
 

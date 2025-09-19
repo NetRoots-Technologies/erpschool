@@ -21,7 +21,7 @@ class ManageLeaveService
 
     public function getData()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = LeaveRequest::with(['workShift', 'quota', 'employee', 'approvalRequests.approvalAuthority.user'])->get();
@@ -106,7 +106,7 @@ class ManageLeaveService
 
     public function status($request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $leaveRequest = LeaveRequest::find($id);
@@ -294,3 +294,4 @@ class ManageLeaveService
         }
     }
 }
+

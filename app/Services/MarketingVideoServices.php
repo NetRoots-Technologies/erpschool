@@ -15,7 +15,7 @@ class MarketingVideoServices
 {
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         //        $data['Categorys'] = Category::all();
@@ -26,7 +26,7 @@ class MarketingVideoServices
 
     public function store($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = $request->all();
@@ -42,7 +42,7 @@ class MarketingVideoServices
 
     public function show($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return markting_video::where('id', $id)->first();
@@ -50,7 +50,7 @@ class MarketingVideoServices
 
     public function getdata()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = markting_video::select('id', 'name', 'description')->get();
@@ -72,7 +72,7 @@ class MarketingVideoServices
 
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return markting_video::where('id', $id)->first();
@@ -80,7 +80,7 @@ class MarketingVideoServices
 
     public function uploadImage($path, $image)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $folderPath = $path;
@@ -96,7 +96,7 @@ class MarketingVideoServices
 
     public function update($request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $banner = markting_video::find($id);
@@ -111,7 +111,7 @@ class MarketingVideoServices
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $Service = markting_video::findOrFail($id);
@@ -119,3 +119,4 @@ class MarketingVideoServices
             $Service->delete();
     }
 }
+

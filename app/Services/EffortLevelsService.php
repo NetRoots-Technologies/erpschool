@@ -10,7 +10,7 @@ class EffortLevelsService
 {
     public function store($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $logs = [
@@ -30,7 +30,7 @@ class EffortLevelsService
 
     public function getdata()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = EffortLevels::orderby('id', 'DESC');
@@ -62,7 +62,7 @@ class EffortLevelsService
 
     public function update($request, $id, $image = null)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $effort_levels = EffortLevels::find($id);
@@ -87,14 +87,14 @@ class EffortLevelsService
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         } 
     }
 
     public function changeStatus($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $effort_levels = EffortLevels::find($request->id);
@@ -116,3 +116,4 @@ class EffortLevelsService
         return null;
     }
 }
+

@@ -20,7 +20,7 @@ class AgentComissionServices
 
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return view('hr.agentcommissionplan.index');
@@ -29,7 +29,7 @@ class AgentComissionServices
 
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $agent_type = AgentType::all();
@@ -39,7 +39,7 @@ class AgentComissionServices
 
     public function store($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $agent_comission = new AgentComissionPlan();
@@ -57,7 +57,7 @@ class AgentComissionServices
 
     public function getdata()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = AgentComissionPlan::with('agent_type')->get();
@@ -87,7 +87,7 @@ class AgentComissionServices
 
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return AgentComissionPlan::find($id);
@@ -97,7 +97,7 @@ class AgentComissionServices
 
     public function update($request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $agent_comission = AgentComissionPlan::find($id);
@@ -113,7 +113,7 @@ class AgentComissionServices
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $agent_comission = AgentComissionPlan::findOrFail($id);
@@ -123,4 +123,5 @@ class AgentComissionServices
         return redirect()->route('hr.agent_comission.index');
     }
 }
+
 

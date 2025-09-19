@@ -18,7 +18,7 @@ class SettingsController extends Controller
 
     public function web_form_edit()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return view('admin.web_registration_form_banner.edit');
@@ -26,7 +26,7 @@ class SettingsController extends Controller
 
     public function web_form_edit_post(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $validated = $request->validate([
@@ -41,3 +41,4 @@ class SettingsController extends Controller
         return redirect()->route('admin.web_form_edit');
     }
 }
+

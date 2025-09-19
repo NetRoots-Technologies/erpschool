@@ -12,7 +12,7 @@ class AllowanceService
 
     public function store($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $allowance = new Allowance();
@@ -23,7 +23,7 @@ class AllowanceService
 
     public function getData()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = Allowance::orderby('id', 'DESC');
@@ -54,7 +54,7 @@ class AllowanceService
 
     public function update($request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = Allowance::find($id);
@@ -65,7 +65,7 @@ class AllowanceService
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $Allowance = Allowance::findOrFail($id);
@@ -76,7 +76,7 @@ class AllowanceService
 
     public function changeStatus($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $Allowance = Allowance::find($request->id);
@@ -87,3 +87,4 @@ class AllowanceService
         }
     }
 }
+

@@ -15,7 +15,7 @@ class MarketingNotificationService
 
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         //        $data['Categorys'] = Category::all();
@@ -26,7 +26,7 @@ class MarketingNotificationService
 
     public function store($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = $request->all();
@@ -53,7 +53,7 @@ class MarketingNotificationService
 
     public function show($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return Notification::where('id', $id)->first();
@@ -61,7 +61,7 @@ class MarketingNotificationService
 
     public function getdata()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = Notification::select('id', 'notification_title', 'notification_description')->get();
@@ -83,7 +83,7 @@ class MarketingNotificationService
 
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return Notification::where('id', $id)->first();
@@ -91,7 +91,7 @@ class MarketingNotificationService
 
     public function uploadImage($path, $image)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $folderPath = $path;
@@ -107,7 +107,7 @@ class MarketingNotificationService
 
     public function update($request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $banner = Notification::find($id);
@@ -130,7 +130,7 @@ class MarketingNotificationService
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $Service = Notification::findOrFail($id);
@@ -138,4 +138,5 @@ class MarketingNotificationService
             $Service->delete();
     }
 }
+
 

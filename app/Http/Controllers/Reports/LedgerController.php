@@ -24,7 +24,7 @@ class LedgerController extends Controller
     //
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $currencies = Currencies::pluck('id', 'code');
@@ -35,7 +35,7 @@ class LedgerController extends Controller
 
     public function basic_ledger_report()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         if (!Gate::allows('ledgers_manage')) {
@@ -47,7 +47,7 @@ class LedgerController extends Controller
 
     public function get_ledger_rep(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
 
@@ -220,7 +220,7 @@ class LedgerController extends Controller
         $opening_array,
         $closing_array
     ) {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         header('Content-Type: application/vnd.ms-excel charset=UTF-8');
@@ -275,7 +275,7 @@ class LedgerController extends Controller
         function impure_accounts_report(
         Request $request
     ) {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $job_id = RoutingCalculations::get();
@@ -293,7 +293,7 @@ class LedgerController extends Controller
         function impure_accounts_report_view(
         $id
     ) {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $ledger = Config::get('constants.Impure_Purchase_Profit_loss');
@@ -310,7 +310,7 @@ class LedgerController extends Controller
 
     public function coaListing()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         // \Illuminate\Support\Facades\DB::statement('SET FOREIGN_KEY_CHECKS=0;');
@@ -349,7 +349,7 @@ class LedgerController extends Controller
 
     public function toggleStatus(Request $request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $group = Group::findOrFail($id);
@@ -368,3 +368,4 @@ class LedgerController extends Controller
     }
 
 }
+

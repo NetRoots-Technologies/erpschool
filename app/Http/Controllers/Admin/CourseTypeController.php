@@ -25,7 +25,7 @@ class CourseTypeController extends Controller
 
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return view('acadmeic.course_type.index');
@@ -33,7 +33,7 @@ class CourseTypeController extends Controller
 
     public function getData()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $Users = $this->CourseTypeService->getdata();
@@ -48,7 +48,7 @@ class CourseTypeController extends Controller
 
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return view('admin.coursetype.create');
@@ -63,7 +63,7 @@ class CourseTypeController extends Controller
      */
     public function store(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $this->CourseTypeService->store($request);
@@ -80,7 +80,7 @@ class CourseTypeController extends Controller
      */
     public function show($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -93,7 +93,7 @@ class CourseTypeController extends Controller
      */
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = CourseType::find($id);
@@ -111,7 +111,7 @@ class CourseTypeController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $this->validate($request, [
@@ -133,7 +133,7 @@ class CourseTypeController extends Controller
      */
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $this->CourseTypeService->destroy($id);
@@ -145,7 +145,7 @@ class CourseTypeController extends Controller
 
     public function changeStatus(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return $coursetype = $this->CourseTypeService->changeStatus($request);
@@ -153,7 +153,7 @@ class CourseTypeController extends Controller
 
     public function handleBulkAction(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $ids = $request->input('ids');
@@ -165,3 +165,4 @@ class CourseTypeController extends Controller
         return response()->json(['message' => 'Bulk action completed successfully']);
     }
 }
+

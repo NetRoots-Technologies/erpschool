@@ -12,7 +12,7 @@ class EobiService
 {
     public function store($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         foreach ($request['employee_id'] as $key => $employee) {
@@ -39,7 +39,7 @@ class EobiService
 
     public function getdata()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = DB::table('eobis')
@@ -67,7 +67,7 @@ class EobiService
 
     public function update($request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $attendance = Eobi::find($id);
@@ -85,7 +85,7 @@ class EobiService
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $eobi = Eobi::find($id);
@@ -96,3 +96,4 @@ class EobiService
 
 
 }
+

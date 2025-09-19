@@ -14,7 +14,7 @@ class MarketingBannerAdService
 
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         //        $data['Categorys'] = Category::all();
@@ -24,7 +24,7 @@ class MarketingBannerAdService
 
     public function store($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $bannerad = BannerAd::create(['banner_title' => $request->banner_title, 'banner_description' => $request->banner_description]);
@@ -32,7 +32,7 @@ class MarketingBannerAdService
 
     public function show($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return BannerAd::where('id', $id)->first();
@@ -41,7 +41,7 @@ class MarketingBannerAdService
 
     public function getdata()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = BannerAd::get();
@@ -63,7 +63,7 @@ class MarketingBannerAdService
 
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return BannerAd::where('id', $id)->first();
@@ -71,7 +71,7 @@ class MarketingBannerAdService
 
     public function uploadImage($path, $image)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $folderPath = $path;
@@ -87,7 +87,7 @@ class MarketingBannerAdService
 
     public function update($request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $banner = BannerAd::find($id);
@@ -98,7 +98,7 @@ class MarketingBannerAdService
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $Service = BannerAd::findOrFail($id);
@@ -108,4 +108,5 @@ class MarketingBannerAdService
 
 
 }
+
 

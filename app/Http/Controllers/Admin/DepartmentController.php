@@ -30,7 +30,7 @@ class DepartmentController extends Controller
 
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $user = Auth::user();
@@ -63,14 +63,14 @@ class DepartmentController extends Controller
      */
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
 
     public function company(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return $this->DepartmentService->company($request);
@@ -78,7 +78,7 @@ class DepartmentController extends Controller
 
   public function getdepartments(Request $request)    
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         // dd($request->all());
@@ -87,7 +87,7 @@ class DepartmentController extends Controller
 
     public function getdata()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return $this->DepartmentService->getdata();
@@ -101,7 +101,7 @@ class DepartmentController extends Controller
      */
     public function store(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return $this->DepartmentService->store($request);
@@ -115,7 +115,7 @@ class DepartmentController extends Controller
      */
     public function show($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -128,7 +128,7 @@ class DepartmentController extends Controller
      */
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -142,7 +142,7 @@ class DepartmentController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return $this->DepartmentService->update($request, $id);
@@ -156,7 +156,7 @@ class DepartmentController extends Controller
      */
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return $this->DepartmentService->destroy($id);
@@ -164,7 +164,7 @@ class DepartmentController extends Controller
 
     public function changeStatus(Request $request)
     {
-if (!Gate::allows('students')) {
+if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return $department = $this->DepartmentService->changeStatus($request);
@@ -174,7 +174,7 @@ if (!Gate::allows('students')) {
 
 
         public function exportbulkfile(){
-            if (!Gate::allows('students')) {
+            if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return Excel::download(new DepartmentSampleExport, 'Department_bulk_sample.xlsx');
@@ -207,7 +207,7 @@ if (!Gate::allows('students')) {
 
 public function importBulkFile(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         try {
@@ -246,3 +246,4 @@ public function importBulkFile(Request $request)
 
 
 }
+

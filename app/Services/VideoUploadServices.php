@@ -20,7 +20,7 @@ class VideoUploadServices
 
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return VideoUpload::all();
@@ -29,7 +29,7 @@ class VideoUploadServices
 
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return view('admin.video.index');
@@ -38,7 +38,7 @@ class VideoUploadServices
 
     public function store($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         foreach ($request->name as $key => $value) {
@@ -58,7 +58,7 @@ class VideoUploadServices
 
     public function getdata($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         //        $data = VideoUpload::with('get_course')->get();
@@ -103,7 +103,7 @@ class VideoUploadServices
 
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return VideoUpload::find($id);
@@ -113,7 +113,7 @@ class VideoUploadServices
 
     public function update($request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
 
@@ -130,7 +130,7 @@ class VideoUploadServices
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $video = VideoUpload::findOrFail($id);
@@ -141,4 +141,5 @@ class VideoUploadServices
 
     }
 }
+
 

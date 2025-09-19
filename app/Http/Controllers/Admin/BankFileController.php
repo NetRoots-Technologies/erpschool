@@ -14,7 +14,7 @@ class BankFileController extends Controller
 {
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $bank_list = BankAccount::with('bank', 'bankBranch')->get();
@@ -34,7 +34,7 @@ class BankFileController extends Controller
 
     public function import(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $request->validate([
@@ -47,3 +47,4 @@ class BankFileController extends Controller
 
 
 }
+

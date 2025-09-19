@@ -3,8 +3,6 @@
 namespace App\Http\Controllers\HR;
 
 use App\Http\Controllers\Controller;
-use App\Models\Fee\FeeCollection;
-// use App\Models\Fee\StudentFee; // Removed - model no longer exists
 use App\Models\HR\ChildBenefit;
 use App\Models\HRM\Employees;
 use App\Models\Student\Students;
@@ -15,14 +13,14 @@ class ChildBenefitController extends Controller
 {
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return view('hr.child_benefit.index');
     }
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $employees = Employees::all();
@@ -33,7 +31,7 @@ class ChildBenefitController extends Controller
     public function store(Request $request)
     {
 
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $childBenefit = new ChildBenefit();
@@ -42,3 +40,4 @@ class ChildBenefitController extends Controller
 
     }
 }
+

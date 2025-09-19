@@ -19,7 +19,7 @@ class ClassSubjectService
 {
     public function store($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $fields = ['skill', 'acd', 'compulsory'];
@@ -47,7 +47,7 @@ class ClassSubjectService
 
     public function getdata()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = ClassSubject::with('user', 'company', 'branch', 'Subject', 'AcademicClass')->orderBy('created_at', 'desc');
@@ -135,7 +135,7 @@ class ClassSubjectService
 
     public function update($request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $fields = ['skill', 'acd', 'compulsory'];
@@ -166,7 +166,7 @@ class ClassSubjectService
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $classSubject = ClassSubject::find($id);
@@ -177,3 +177,4 @@ class ClassSubjectService
 
 
 }
+

@@ -24,7 +24,7 @@ class VendorController extends Controller
 
     public function getDataIndex()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = Vendor::with('vendorCategorys')->orderBy('created_at', 'desc')->get();
@@ -39,7 +39,7 @@ class VendorController extends Controller
      */
     public function index(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         if ($request->ajax()) {
@@ -88,7 +88,7 @@ class VendorController extends Controller
      */
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $vendorCategory = VendorCategory::where('level', 1)->get();
@@ -108,7 +108,7 @@ class VendorController extends Controller
     public function store(VendorRequest $request)
     {
 
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = $request->validated();
@@ -124,7 +124,7 @@ class VendorController extends Controller
      */
     public function show($id)
     {
-if (!Gate::allows('students')) {
+if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -137,7 +137,7 @@ if (!Gate::allows('students')) {
      */
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $edit = Vendor::where('id', $id)->with('vendorCategorys')->first();
@@ -157,7 +157,7 @@ if (!Gate::allows('students')) {
      */
     public function update(VendorRequest $validatedDate, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $vendor = Vendor::findorFail($id);
@@ -192,7 +192,7 @@ if (!Gate::allows('students')) {
      */
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = Vendor::findOrFail($id);
@@ -202,7 +202,7 @@ if (!Gate::allows('students')) {
     }
     public function getCities(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $request->validate([
@@ -213,7 +213,7 @@ if (!Gate::allows('students')) {
 
     public function toggleStatus(Request $request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $vendor = Vendor::findOrFail($id);
@@ -232,3 +232,4 @@ if (!Gate::allows('students')) {
     }
 
 }
+

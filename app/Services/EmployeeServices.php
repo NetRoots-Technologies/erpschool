@@ -44,7 +44,7 @@ class EmployeeServices
 
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return Employees::all();
@@ -52,7 +52,7 @@ class EmployeeServices
 
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $type = EmployeeTypes::all();
@@ -62,7 +62,7 @@ class EmployeeServices
 
     public function sync_employee_attendance() //hr.sync_employee_attendance
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $zk = new ZKTeco($this->ip, $this->port);
@@ -133,7 +133,7 @@ class EmployeeServices
 
     public function employee_attendance()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $attendance = HrmEmployeeAttendance::with('user_name')->get();
@@ -143,7 +143,7 @@ class EmployeeServices
 
     public function store($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $request->validate([
@@ -390,7 +390,7 @@ class EmployeeServices
 
     public function getdata()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = Employees::with('company', 'branch', 'department')->orderBy('created_at', 'desc')->get();
@@ -507,7 +507,7 @@ class EmployeeServices
 
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return Employees::with('educations', 'workExperince', 'employeeFamily', 'providentFund', 'Otherbranch', 'employeeAllowance', 'employeeWelfare')->find($id);
@@ -515,7 +515,7 @@ class EmployeeServices
 
     public function update($request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         //        dd($request->all());
@@ -765,7 +765,7 @@ class EmployeeServices
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $employee = Employees::find($id);
@@ -786,7 +786,7 @@ class EmployeeServices
 
     public function changeStatus($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $employee = Employees::find($request->id);
@@ -799,4 +799,5 @@ class EmployeeServices
         }
     }
 }
+
 

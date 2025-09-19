@@ -29,7 +29,7 @@ class AttendanceController extends Controller
 
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
 
@@ -41,7 +41,7 @@ class AttendanceController extends Controller
 
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
 
@@ -54,7 +54,7 @@ class AttendanceController extends Controller
 
     public function store(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         try {
@@ -76,14 +76,14 @@ class AttendanceController extends Controller
 
     public function show($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
 
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $attendance = Attendance::with('employee')->find($id);
@@ -99,7 +99,7 @@ class AttendanceController extends Controller
 
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
 
@@ -125,7 +125,7 @@ class AttendanceController extends Controller
 
     public function fetchDepartment(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         try {
@@ -138,7 +138,7 @@ class AttendanceController extends Controller
 
     public function fetchEmployee(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         try {
@@ -151,7 +151,7 @@ class AttendanceController extends Controller
 
     public function employeesAttendance(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = $request->all();
@@ -179,7 +179,7 @@ class AttendanceController extends Controller
 
     public function getData(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $attendance = $this->AttendanceService->getData($request);
@@ -188,7 +188,7 @@ class AttendanceController extends Controller
 
     public function handleBulkAction(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $ids = $request->input('ids');
@@ -202,10 +202,11 @@ class AttendanceController extends Controller
 
     public function exportExcel()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return Excel::download(new AttendanceExport, 'attendance.xlsx');
     }
 
 }
+

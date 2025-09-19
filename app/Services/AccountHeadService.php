@@ -9,7 +9,7 @@ class AccountHeadService
 {
     public function store($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return AccountHead::create([
@@ -19,7 +19,7 @@ class AccountHeadService
 
     public function getData()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = AccountHead::orderby('id', 'DESC');
@@ -50,7 +50,7 @@ class AccountHeadService
 
     public function update($request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $accountHead = AccountHead::find($id);
@@ -62,7 +62,7 @@ class AccountHeadService
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $accountHead = AccountHead::find($id);
@@ -73,7 +73,7 @@ class AccountHeadService
 
     public function changeStatus($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $accountHead = AccountHead::find($request->id);
@@ -85,3 +85,4 @@ class AccountHeadService
     }
 
 }
+

@@ -16,14 +16,14 @@ class UserServise
 
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
 
     public function apiindex()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return User::all();
@@ -32,7 +32,7 @@ class UserServise
 
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return Role::all();
@@ -40,7 +40,7 @@ class UserServise
 
     public function store($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         // dd($request->all());
@@ -74,7 +74,7 @@ class UserServise
 
     public function user_deactive($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $user = User::find($id);
@@ -86,7 +86,7 @@ class UserServise
 
     public function user_data($slug)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return $user = User::where('slug', $slug)->first();
@@ -95,7 +95,7 @@ class UserServise
 
     public function user_active($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $user = User::find($id);
@@ -109,7 +109,7 @@ class UserServise
 
     public function getdata()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = User::get();
@@ -156,7 +156,7 @@ class UserServise
 
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return User::find($id);
@@ -199,7 +199,7 @@ class UserServise
 
     public function update($request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $input = $request->all();
@@ -236,7 +236,7 @@ class UserServise
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $User = User::findOrFail($id);
@@ -245,3 +245,4 @@ class UserServise
 
     }
 }
+

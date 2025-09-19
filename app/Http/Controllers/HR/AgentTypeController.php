@@ -24,7 +24,7 @@ class AgentTypeController extends Controller
 
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return view('hr.agent_type.index');
@@ -37,7 +37,7 @@ class AgentTypeController extends Controller
      */
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return view('hr.agent_type.create');
@@ -52,7 +52,7 @@ class AgentTypeController extends Controller
     public function store(Request $request)
     {
 
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $validated = $request->validate([
@@ -72,7 +72,7 @@ class AgentTypeController extends Controller
      */
     public function show($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -85,7 +85,7 @@ class AgentTypeController extends Controller
      */
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $agent = $this->AgentTypeServices->edit($id);
@@ -101,7 +101,7 @@ class AgentTypeController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $validated = $request->validate([
@@ -122,7 +122,7 @@ class AgentTypeController extends Controller
 
     public function getData()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $agent = $this->AgentTypeServices->getdata();
@@ -131,7 +131,7 @@ class AgentTypeController extends Controller
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $agent = $this->AgentTypeServices->destroy($id);
@@ -139,3 +139,4 @@ class AgentTypeController extends Controller
             ->with('success', 'Agent Type deleted successfully');
     }
 }
+

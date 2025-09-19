@@ -19,7 +19,7 @@ class DepartmentService
 
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         // return Permission::with('child')->where('main', 1)->get();
@@ -28,7 +28,7 @@ class DepartmentService
 
     public function company($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $html = "<option value='' selected disabled>Select Branch</option> ";
@@ -44,7 +44,7 @@ class DepartmentService
 
     public function getdepartments(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $html = "<option value='' selected disabled>Select Department</option>";
@@ -67,7 +67,7 @@ class DepartmentService
 
     public function store($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         //dd($request->all());
@@ -92,7 +92,7 @@ class DepartmentService
 
     public function getdata()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = Department::with('branch.company')->OrderBy('created_at', 'desc');
@@ -159,7 +159,7 @@ class DepartmentService
 
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return Department::find($id);
@@ -168,7 +168,7 @@ class DepartmentService
 
     public function update($request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $categoryIds = $request->input('selectCategory');
@@ -183,7 +183,7 @@ class DepartmentService
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $Department = Department::findOrFail($id);
@@ -194,7 +194,7 @@ class DepartmentService
 
     public function changeStatus($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $department = Department::find($request->id);
@@ -205,3 +205,4 @@ class DepartmentService
         }
     }
 }
+

@@ -20,7 +20,7 @@ class LedgerService
 {
     public function createAutoLedgers($group_ids, $ledger_name, $branch_id, $model_name, $model_type_id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $groups = $this->getGroups($group_ids);
@@ -47,7 +47,7 @@ class LedgerService
 
     public function getGroup($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return Group::find($id);
@@ -55,7 +55,7 @@ class LedgerService
 
     public function getGroups($ids)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return Group::whereIn("id", $ids)->get();
@@ -63,7 +63,7 @@ class LedgerService
 
     public function getLedger($parent_type, $parent_type_id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return Ledgers::where('parent_type', $parent_type)
@@ -74,7 +74,7 @@ class LedgerService
 
     public function createLedger($data): Ledgers
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         try {
@@ -113,7 +113,7 @@ class LedgerService
 
     public function getLedgers($group_ids, $parent_type, $parent_type_id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return Ledgers::whereIn('group_id', $group_ids)->where('parent_type', $parent_type)
@@ -155,21 +155,21 @@ class LedgerService
     // }
     public function credit()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
 
     public function debit()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
 
     public static function generateLevelAndNumber($parent_id, $adittional_number = 0)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $ParentGroup = Groups::findOrFail($parent_id);
@@ -181,7 +181,7 @@ class LedgerService
 
     public function createEntry($data)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         try {
@@ -210,7 +210,7 @@ class LedgerService
 
     public function createEntryItems($data)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $entry_items = new EntryItems();
@@ -230,7 +230,7 @@ class LedgerService
 
     static function getVouchertMaxId($type, $branch_id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $parent_data = Entry::where('entry_type_id', $type)
@@ -245,3 +245,4 @@ class LedgerService
         return $parent_id;
     }
 }
+

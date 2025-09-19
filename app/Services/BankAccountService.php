@@ -11,7 +11,7 @@ class BankAccountService
 {
     public function store($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return BankAccount::create([
@@ -24,7 +24,7 @@ class BankAccountService
 
     public function getdata()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = BankAccount::with('bank', 'bankBranch')->orderby('id', 'DESC');
@@ -88,7 +88,7 @@ class BankAccountService
 
     public function update($request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $bankAccount = BankAccount::find($id);
@@ -103,7 +103,7 @@ class BankAccountService
 
     public function delete($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $bank = BankAccount::find($id);
@@ -114,3 +114,4 @@ class BankAccountService
 
 
 }
+

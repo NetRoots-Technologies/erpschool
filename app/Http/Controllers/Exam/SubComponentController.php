@@ -21,7 +21,7 @@ class SubComponentController extends Controller
 
     public function getData()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $subComponent = $this->subComponentService->getdata();
@@ -35,7 +35,7 @@ class SubComponentController extends Controller
      */
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
             
         }
@@ -51,7 +51,7 @@ class SubComponentController extends Controller
      */
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $companies = Company::where('status', 1)->get();
@@ -67,7 +67,7 @@ class SubComponentController extends Controller
      */
     public function store(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         try {
@@ -86,7 +86,7 @@ class SubComponentController extends Controller
      */
     public function show($id)
     {
-       if (!Gate::allows('students')) {
+       if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -99,7 +99,7 @@ class SubComponentController extends Controller
      */
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
 
@@ -131,7 +131,7 @@ class SubComponentController extends Controller
      */
   public function update(Request $request, $id)
 {
-    if (!Gate::allows('students')) {
+    if (!Gate::allows('Dashboard-list')) {
         return abort(503);
     }
     try {
@@ -156,7 +156,7 @@ class SubComponentController extends Controller
      */
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         try {
@@ -169,7 +169,7 @@ class SubComponentController extends Controller
 
     public function sub_component_data(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $component = Component::with('componentData.test_type')->find($request->component_id);
@@ -179,7 +179,7 @@ class SubComponentController extends Controller
 
     public function handleBulkAction(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $ids = $request->get('ids');
@@ -195,7 +195,7 @@ class SubComponentController extends Controller
 
     public function fetchSubComponent(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $subComponent = SubComponent::with('test_type')->where('component_id', $request->component_id)->get();
@@ -204,7 +204,7 @@ class SubComponentController extends Controller
 
     public function fetchMarks(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $marks = SubComponent::where('id', $request->sub_component_id)->first();
@@ -233,3 +233,4 @@ class SubComponentController extends Controller
     //         ->with('success', 'SubComponent Cloned successfully');
     // }
 }
+

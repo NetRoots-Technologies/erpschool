@@ -131,3 +131,4 @@ class SchoolTypeController extends Controller
         return response()->json(['message' => 'Bulk Action Completed Successfully']);
     }
 }
+

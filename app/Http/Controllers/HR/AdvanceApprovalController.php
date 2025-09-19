@@ -13,7 +13,7 @@ class AdvanceApprovalController extends Controller
 {
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return view('hr.advanceApproval.index');
@@ -21,7 +21,7 @@ class AdvanceApprovalController extends Controller
 
     public function getData()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = Advance::with('employee')->get();
@@ -68,7 +68,7 @@ class AdvanceApprovalController extends Controller
 
     public function changeStatus(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $advance = Advance::find($request->id);
@@ -84,3 +84,4 @@ class AdvanceApprovalController extends Controller
 
 
 }
+

@@ -18,7 +18,7 @@ class DepartmentController extends Controller
      */
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return view('hr.department.index');
@@ -31,7 +31,7 @@ class DepartmentController extends Controller
      */
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return view('hr.department.create');
@@ -46,7 +46,7 @@ class DepartmentController extends Controller
      */
     public function store(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $department = new Departments();
@@ -65,7 +65,7 @@ class DepartmentController extends Controller
      */
     public function show($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -78,7 +78,7 @@ class DepartmentController extends Controller
      */
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $department = Departments::find($id);
@@ -94,7 +94,7 @@ class DepartmentController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $department = Departments::find($id);
@@ -113,7 +113,7 @@ class DepartmentController extends Controller
      */
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $department = Departments::findOrFail($id);
@@ -124,7 +124,7 @@ class DepartmentController extends Controller
 
     public function get_data_department()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = Departments::get();
@@ -154,7 +154,7 @@ class DepartmentController extends Controller
     public function changeStatus(Request $request)
     {
 
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $department = Department::find($request->id);
@@ -167,3 +167,4 @@ class DepartmentController extends Controller
 
 
 }
+

@@ -13,7 +13,7 @@ class StudentDataBankService
 
     public function store($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $studentDatabank = StudentDataBank::create([
@@ -45,7 +45,7 @@ class StudentDataBankService
 
     public function getData()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = StudentDataBank::orderBy('created_at', 'desc')->get();
@@ -91,7 +91,7 @@ class StudentDataBankService
 
     public function update($request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $studentDatabank = StudentDataBank::find($id);
@@ -122,7 +122,7 @@ class StudentDataBankService
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $studentDatabank = StudentDataBank::find($id);
@@ -132,3 +132,4 @@ class StudentDataBankService
     }
 
 }
+

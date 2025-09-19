@@ -24,7 +24,7 @@ class FinancialController extends Controller
 
     public function getData()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $financial = $this->FinancialService->getdata();
@@ -33,7 +33,7 @@ class FinancialController extends Controller
 
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return view('admin.financial_years.index');
@@ -46,7 +46,7 @@ class FinancialController extends Controller
      */
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -59,7 +59,7 @@ class FinancialController extends Controller
      */
     public function store(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return $financial = $this->FinancialService->store($request);
@@ -74,7 +74,7 @@ class FinancialController extends Controller
      */
     public function show($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -87,7 +87,7 @@ class FinancialController extends Controller
      */
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -101,7 +101,7 @@ class FinancialController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return $Company = $this->FinancialService->update($request, $id);
@@ -116,7 +116,7 @@ class FinancialController extends Controller
      */
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return $this->FinancialService->destroy($id);
@@ -124,7 +124,7 @@ class FinancialController extends Controller
 
     public function changeStatus(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return $financial = $this->FinancialService->changeStatus($request);
@@ -132,7 +132,7 @@ class FinancialController extends Controller
 
     public function handleBulkAction(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $ids = $request->get('ids');
@@ -146,3 +146,4 @@ class FinancialController extends Controller
         return response()->json(['message', 'Bulk action completed successfully']);
     }
 }
+

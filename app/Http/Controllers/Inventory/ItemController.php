@@ -24,7 +24,7 @@ class ItemController extends Controller
     }
     public function index($type)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         // if (!Gate::allows('item')) {
@@ -37,7 +37,7 @@ class ItemController extends Controller
 
     public function store(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         // if (!Gate::allows('item-store')) {
@@ -79,7 +79,7 @@ class ItemController extends Controller
      */
     public function destroy(Item $item)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         // if (!Gate::allows('item-delete')) {
@@ -101,7 +101,7 @@ class ItemController extends Controller
 
     public function getData(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $query = Item::query();
@@ -112,7 +112,7 @@ class ItemController extends Controller
     }
     public function changeStatus(Item $item)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $item->status = !$item->status;
@@ -120,3 +120,4 @@ class ItemController extends Controller
         return response()->json(["success" => true, 'message' => 'Status Changed', 'data' => []], 200);
     }
 }
+

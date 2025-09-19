@@ -24,7 +24,7 @@ class SessionController extends Controller
 
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         if (!Gate::allows('session-list')) {
@@ -43,7 +43,7 @@ class SessionController extends Controller
     public function create()
     {
         
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return view('admin.session.create');
@@ -51,7 +51,7 @@ class SessionController extends Controller
 
     public function getData()
     {
-if (!Gate::allows('students')) {
+if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $Users = $this->SessionService->getdata();
@@ -67,7 +67,7 @@ if (!Gate::allows('students')) {
      */
     public function store(Request $request)
     {
-       if (!Gate::allows('students')) {
+       if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
 
@@ -94,7 +94,7 @@ if (!Gate::allows('students')) {
      */
     public function show($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -107,7 +107,7 @@ if (!Gate::allows('students')) {
      */
     public function edit($id)
     {
-       if (!Gate::allows('students')) {
+       if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = \App\Models\Admin\Session::find($id);
@@ -123,7 +123,7 @@ if (!Gate::allows('students')) {
      */
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $this->validate($request, [
@@ -151,10 +151,11 @@ if (!Gate::allows('students')) {
      */
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $this->SessionService->destroy($id);
         return 'done';
     }
 }
+

@@ -7,9 +7,6 @@ use App\Models\Admin\Course;
 use App\Models\Admin\Session;
 use App\Models\Admin\StudentDataBank;
 use App\Models\Admin\StudentDataBankCourse;
-use App\Models\Fee\FeeCollection;
-use App\Models\Fee\FeeCollectionDetail;
-// use App\Models\Fee\StudentFee; // Removed - model no longer exists
 use App\Services\DataBank;
 use Illuminate\Http\Request;
 use App\Services\StudentServices;
@@ -37,7 +34,7 @@ class DataBankController extends Controller
 
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
 
@@ -50,7 +47,7 @@ class DataBankController extends Controller
 
     public function view_data_bank_courses($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = StudentDataBankCourse::join('courses', 'courses.id', '=', 'student_data_bank_courses.course_id')
@@ -74,7 +71,7 @@ class DataBankController extends Controller
 
     public function students_view_installemet(Request $request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $student_id = $id;
@@ -85,28 +82,12 @@ class DataBankController extends Controller
 
     public function students_view_specific_installemet($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         
-        // Updated to use new fee structure - FeeCollection instead of old StudentFee/PaidStudentFee
-        $data = FeeCollection::where('fee_collections.student_id', $id)
-            ->join('students', 'students.id', '=', 'fee_collections.student_id')
-            ->join('classes', 'fee_collections.class_id', '=', 'classes.id')
-            ->join('acadmeic_sessions', 'acadmeic_sessions.id', '=', 'fee_collections.academic_session_id')
-            ->select(
-                'fee_collections.id as id', 
-                'students.name as student_name', 
-                'fee_collections.total_amount as student_fee', 
-                'fee_collections.paid_amount', 
-                'fee_collections.balance_amount', 
-                'fee_collections.discount_amount', 
-                'acadmeic_sessions.title as session_title', 
-                'classes.name as class_name', 
-                'fee_collections.due_date', 
-                'fee_collections.status as paid_status', 
-                'fee_collections.id as paid_fee_id'
-            )->get();
+        // Fee module removed - this function needs to be updated for new fee structure
+        $data = collect([]); // Return empty collection for now
 
 
         return Datatables::of($data)->addIndexColumn()
@@ -150,7 +131,7 @@ class DataBankController extends Controller
 
     public function walk_in_student(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $validated = $request->validate([
@@ -166,7 +147,7 @@ class DataBankController extends Controller
 
     public function walk_in_student_get()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return view('admin.databank.index');
@@ -174,7 +155,7 @@ class DataBankController extends Controller
 
     public function walk_in_student_view()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $courses = Course::get();
@@ -184,7 +165,7 @@ class DataBankController extends Controller
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $delete = $this->DataBank->destroy($id);
@@ -199,7 +180,7 @@ class DataBankController extends Controller
      */
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -212,7 +193,7 @@ class DataBankController extends Controller
      */
     public function store(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -225,7 +206,7 @@ class DataBankController extends Controller
      */
     public function show($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -238,7 +219,7 @@ class DataBankController extends Controller
      */
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -252,7 +233,7 @@ class DataBankController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -267,7 +248,7 @@ class DataBankController extends Controller
 
     public function student_databank_create($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = $this->StudentServices->create();
@@ -285,7 +266,7 @@ class DataBankController extends Controller
 
     public function student_databank_remarks(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $this->DataBank->student_databank_remarks($request);
@@ -294,7 +275,7 @@ class DataBankController extends Controller
 
     public function student_databank_status(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $this->DataBank->student_databank_status($request);
@@ -303,7 +284,7 @@ class DataBankController extends Controller
 
     public function getData(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $dataBank = $this->DataBank->getdata($request);
@@ -313,7 +294,7 @@ class DataBankController extends Controller
     public function bv_form_view(Request $request)
     {
 
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return view('admin.databank.business_valley');
@@ -321,7 +302,7 @@ class DataBankController extends Controller
 
     public function bv_form_get_data(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $dataBank = $this->DataBank->bv_form_get_data($request);
@@ -329,7 +310,7 @@ class DataBankController extends Controller
     }
     public function seminar_form_view(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return view('admin.databank.seminar');
@@ -337,7 +318,7 @@ class DataBankController extends Controller
 
     public function seminar_form_get_data(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $dataBank = $this->DataBank->seminar_form_get_data($request);
@@ -346,7 +327,7 @@ class DataBankController extends Controller
 
     public function onezcamp_form_view(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return view('admin.databank.onezcamp');
@@ -354,13 +335,14 @@ class DataBankController extends Controller
 
     public function onezcamp_form_get_data(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $dataBank = $this->DataBank->onezcamp_form_get_data($request);
         return $dataBank;
     }
 }
+
 
 
 

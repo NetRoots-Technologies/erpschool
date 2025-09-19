@@ -16,7 +16,7 @@ class ProductItemController extends Controller
      */
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -28,7 +28,7 @@ class ProductItemController extends Controller
      */
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -41,7 +41,7 @@ class ProductItemController extends Controller
      */
     public function store(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -54,7 +54,7 @@ class ProductItemController extends Controller
      */
     public function show(ProductItem $productItem)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -67,7 +67,7 @@ class ProductItemController extends Controller
      */
     public function edit(ProductItem $productItem)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -81,7 +81,7 @@ class ProductItemController extends Controller
      */
     public function update(Request $request, ProductItem $productItem)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -94,8 +94,9 @@ class ProductItemController extends Controller
      */
     public function destroy(ProductItem $productItem)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
 }
+

@@ -14,7 +14,7 @@ class RolesServise
 
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return Permission::with('child')->where('main', 1)->get();
@@ -22,7 +22,7 @@ class RolesServise
 
     public function apiindex()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return Role::all();
@@ -31,7 +31,7 @@ class RolesServise
 
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return Permission::with('child')->where('main', 1)->get();
@@ -40,7 +40,7 @@ class RolesServise
 
     public function store($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $permissions = [];
@@ -53,7 +53,7 @@ class RolesServise
 
     public function getdata()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
 
@@ -78,7 +78,7 @@ class RolesServise
 
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return Role::find($id);
@@ -88,7 +88,7 @@ class RolesServise
 
     public function AllowedPermissions($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return Permission::join('role_has_permissions', 'role_has_permissions.permission_id', '=', 'permissions.id')
@@ -99,7 +99,7 @@ class RolesServise
 
     public function update($request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $role = Role::find($id);
@@ -111,7 +111,7 @@ class RolesServise
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $role = Role::findOrFail($id);
@@ -120,3 +120,4 @@ class RolesServise
 
     }
 }
+

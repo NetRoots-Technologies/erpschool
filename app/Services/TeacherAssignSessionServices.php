@@ -13,7 +13,7 @@ class TeacherAssignSessionServices
 
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return TeacherAssignSession::all();
@@ -22,7 +22,7 @@ class TeacherAssignSessionServices
 
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
 
@@ -30,7 +30,7 @@ class TeacherAssignSessionServices
 
     public function store($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $agent = new TeacherAssignSession();
@@ -43,7 +43,7 @@ class TeacherAssignSessionServices
 
     public function getdata()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
 
@@ -91,7 +91,7 @@ class TeacherAssignSessionServices
 
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return TeacherAssignSession::find($id);
@@ -101,7 +101,7 @@ class TeacherAssignSessionServices
 
     public function update($request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $agent = TeacherAssignSession::find($request->id);
@@ -114,7 +114,7 @@ class TeacherAssignSessionServices
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $teacher = TeacherAssignSession::findOrFail($id);
@@ -124,4 +124,5 @@ class TeacherAssignSessionServices
 
     }
 }
+
 

@@ -13,7 +13,7 @@ class BudgetService
 
     private function generateEndDate($startDate,$timeFrame)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         switch($timeFrame)
@@ -31,7 +31,7 @@ class BudgetService
     }
     public function getDepartments()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return Department::with('branch')->where('status', true)->get();
@@ -39,7 +39,7 @@ class BudgetService
 
     public function getCategories()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return BCategory::get();
@@ -47,7 +47,7 @@ class BudgetService
 
     public function store($validatedData)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         // dd($validatedData);
@@ -66,7 +66,7 @@ class BudgetService
 
     public function getData()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = Budget::with('category', 'department.branch')->orderBy('created_at', 'desc');
@@ -106,7 +106,7 @@ class BudgetService
 
     public function update($validatedData,$id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data=Budget::findOrFail($id);
@@ -120,7 +120,7 @@ class BudgetService
     }
     public function delete($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $budget = Budget::findOrFail($id);
@@ -129,3 +129,4 @@ class BudgetService
     
 
 }
+

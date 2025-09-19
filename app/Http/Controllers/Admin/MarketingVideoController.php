@@ -17,7 +17,7 @@ class MarketingVideoController extends Controller
 
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return view('admin.marketing_video.index');
@@ -26,7 +26,7 @@ class MarketingVideoController extends Controller
     public function create()
     {
 
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return view('admin.marketing_video.create');
@@ -34,7 +34,7 @@ class MarketingVideoController extends Controller
 
     public function getdata()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return $this->MarketingVideoServices->getdata();
@@ -43,7 +43,7 @@ class MarketingVideoController extends Controller
 
     public function store(Request $request)
     {
-if (!Gate::allows('students')) {
+if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $this->MarketingVideoServices->store($request);
@@ -55,7 +55,7 @@ if (!Gate::allows('students')) {
     public function show($id)
     {
 
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = $this->MarketingVideoServices->show($id);
@@ -65,7 +65,7 @@ if (!Gate::allows('students')) {
 
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = $this->MarketingVideoServices->edit($id);
@@ -75,7 +75,7 @@ if (!Gate::allows('students')) {
 
     public function update(Request $request, $id)
     {
-if (!Gate::allows('students')) {
+if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $this->MarketingVideoServices->update($request, $id);
@@ -85,7 +85,7 @@ if (!Gate::allows('students')) {
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $this->MarketingVideoServices->destroy($id);
@@ -93,3 +93,4 @@ if (!Gate::allows('students')) {
             ->with('success', 'Video delete successfully');
     }
 }
+

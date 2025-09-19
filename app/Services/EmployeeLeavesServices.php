@@ -21,7 +21,7 @@ class EmployeeLeavesServices
 
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return view('hr.employee_leaves.index');
@@ -30,7 +30,7 @@ class EmployeeLeavesServices
 
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $users = User::all();
@@ -41,7 +41,7 @@ class EmployeeLeavesServices
 
     public function store($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $employee_leaves = new EmployeeLeaves();
@@ -63,7 +63,7 @@ class EmployeeLeavesServices
 
     public function getdata()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = EmployeeLeaves::with('employee_name')->get();
@@ -145,7 +145,7 @@ class EmployeeLeavesServices
 
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $employee_leaves = EmployeeLeaves::find($id);
@@ -157,7 +157,7 @@ class EmployeeLeavesServices
 
     public function update($request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $employee_leaves = EmployeeLeaves::find($id);
@@ -176,7 +176,7 @@ class EmployeeLeavesServices
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $employee_leaves = EmployeeLeaves::findOrFail($id);
@@ -186,4 +186,5 @@ class EmployeeLeavesServices
         return redirect()->route('hr.employee_leaves.index');
     }
 }
+
 

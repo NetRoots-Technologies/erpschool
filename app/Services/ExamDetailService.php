@@ -16,7 +16,7 @@ class ExamDetailService
 
     public function store(\Symfony\Component\HttpFoundation\Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
 
@@ -71,7 +71,7 @@ class ExamDetailService
 
     public function getData()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = $data = ExamDetail::with(['testType', 'examType','user'])
@@ -128,7 +128,7 @@ class ExamDetailService
 
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
 
@@ -180,7 +180,7 @@ class ExamDetailService
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $examDetail = ExamDetail::find($id);
@@ -190,3 +190,4 @@ class ExamDetailService
     }
 
 }
+

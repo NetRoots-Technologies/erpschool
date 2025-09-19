@@ -22,7 +22,7 @@ class CompanyService
 
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         // return Permission::with('child')->where('main', 1)->get();
@@ -31,7 +31,7 @@ class CompanyService
 
     public function store($request, $image = null)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         // return 'hello';
@@ -48,7 +48,7 @@ class CompanyService
 
     public function getdata()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = Company::orderby('id', 'DESC');
@@ -78,7 +78,7 @@ class CompanyService
 
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return Company::find($id);
@@ -87,7 +87,7 @@ class CompanyService
 
     public function update($request, $id, $image = null)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $company = Company::find($id);
@@ -113,7 +113,7 @@ class CompanyService
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $Company = Company::findOrFail($id);
@@ -123,7 +123,7 @@ class CompanyService
 
     public function changeStatus($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $company = Company::find($request->id);
@@ -134,3 +134,4 @@ class CompanyService
         }
     }
 }
+

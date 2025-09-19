@@ -22,7 +22,7 @@ class SkillGroupController extends Controller
      */
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $companies = Company::where('status', 1)->get();
@@ -37,7 +37,7 @@ class SkillGroupController extends Controller
      */
     public function create()
     {
-       if (!Gate::allows('students')) {
+       if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -50,7 +50,7 @@ class SkillGroupController extends Controller
      */
     public function store(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return $this->skillGroupService->store($request);
@@ -65,7 +65,7 @@ class SkillGroupController extends Controller
      */
     public function show($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -78,7 +78,7 @@ class SkillGroupController extends Controller
      */
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -92,7 +92,7 @@ class SkillGroupController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return $this->skillGroupService->update($request, $id);
@@ -108,7 +108,7 @@ class SkillGroupController extends Controller
     public function destroy($id)
     {
 
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return $this->skillGroupService->destroy($id);
@@ -119,7 +119,7 @@ class SkillGroupController extends Controller
 
     public function getdata()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return $this->skillGroupService->getdata();
@@ -127,7 +127,7 @@ class SkillGroupController extends Controller
 
     public function changeStatus(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return $class = $this->skillGroupService->changeStatus($request);
@@ -136,7 +136,7 @@ class SkillGroupController extends Controller
 
     public function handleBulkAction(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $ids = $request->get('ids');
@@ -148,3 +148,4 @@ class SkillGroupController extends Controller
     }
 
 }
+

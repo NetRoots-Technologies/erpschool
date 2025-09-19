@@ -14,7 +14,7 @@ class PromotionalMessageController extends Controller
 {
     public function promotional_messages_index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $regular_students = Students::select('id', 'name', 'mobile_no', 'student_data_bank_id')->where('student_data_bank_id', '!=', null)->pluck('student_data_bank_id');
@@ -26,7 +26,7 @@ class PromotionalMessageController extends Controller
 
     public function promotional_messages_send(Request $request)
     {
-if (!Gate::allows('students')) {
+if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         dd($request);
@@ -58,7 +58,7 @@ if (!Gate::allows('students')) {
 
     public function get_student_with_course(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $regular_students = Students::select('id', 'name', 'mobile_no', 'student_data_bank_id')->where('student_data_bank_id', '!=', null)->pluck('student_data_bank_id');
@@ -100,7 +100,7 @@ if (!Gate::allows('students')) {
 
     public function get_student(Request $request)
     {
-if (!Gate::allows('students')) {
+if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $regular_students = Students::select('id', 'name', 'mobile_no', 'student_data_bank_id')->where('student_data_bank_id', '!=', null)->pluck('student_data_bank_id');
@@ -132,3 +132,4 @@ if (!Gate::allows('students')) {
 
     }
 }
+

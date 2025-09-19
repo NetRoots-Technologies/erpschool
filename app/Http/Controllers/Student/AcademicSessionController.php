@@ -30,7 +30,7 @@ class AcademicSessionController extends Controller
      */
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $companies = Company::where('status', 1)->get();
@@ -46,7 +46,7 @@ class AcademicSessionController extends Controller
      */
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -59,7 +59,7 @@ class AcademicSessionController extends Controller
      */
     public function store(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return $financial = $this->AcademicSessionService->store($request);
@@ -74,7 +74,7 @@ class AcademicSessionController extends Controller
      */
     public function show($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -87,7 +87,7 @@ class AcademicSessionController extends Controller
      */
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -101,7 +101,7 @@ class AcademicSessionController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return $Company = $this->AcademicSessionService->update($request, $id);
@@ -116,7 +116,7 @@ class AcademicSessionController extends Controller
      */
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return $this->AcademicSessionService->destroy($id);
@@ -125,7 +125,7 @@ class AcademicSessionController extends Controller
 
     public function getData()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $AcademicSession = $this->AcademicSessionService->getdata();
@@ -134,7 +134,7 @@ class AcademicSessionController extends Controller
 
     public function changeStatus(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return $academic = $this->AcademicSessionService->changeStatus($request);
@@ -142,7 +142,7 @@ class AcademicSessionController extends Controller
 
     public function handleBulkAction(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $ids = $request->input('ids');
@@ -155,14 +155,14 @@ class AcademicSessionController extends Controller
     }
     public function exportBulkFile()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return Excel::download(new AcademicSessionSampleExport, 'academic_session_bulk.xlsx');
     }
     public function importBulkFile(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $request->validate(
@@ -185,3 +185,4 @@ class AcademicSessionController extends Controller
     }
 
 }
+

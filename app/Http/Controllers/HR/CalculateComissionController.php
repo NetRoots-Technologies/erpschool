@@ -3,8 +3,6 @@
 namespace App\Http\Controllers\HR;
 
 use App\Http\Controllers\Controller;
-use App\Models\Fee\PaidStudentFee;
-// use App\Models\Fee\StudentFee; // Removed - model no longer exists
 use App\Models\HR\Agent;
 use App\Models\HR\AgentNewSaleIncentive;
 use App\Models\HR\AgentNewSaleIncentiveStudents;
@@ -30,7 +28,7 @@ class CalculateComissionController extends Controller
 
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return $this->CalculateCommissionServices->index();
@@ -43,7 +41,7 @@ class CalculateComissionController extends Controller
      */
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return $this->CalculateCommissionServices->create();
@@ -57,7 +55,7 @@ class CalculateComissionController extends Controller
      */
     public function store(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return $this->CalculateCommissionServices->store($request);
@@ -71,7 +69,7 @@ class CalculateComissionController extends Controller
      */
     public function show($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -84,7 +82,7 @@ class CalculateComissionController extends Controller
      */
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return $this->CalculateCommissionServices->edit();
@@ -99,7 +97,7 @@ class CalculateComissionController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return $this->CalculateCommissionServices->update();
@@ -113,7 +111,7 @@ class CalculateComissionController extends Controller
      */
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return $this->CalculateCommissionServices->destroy();
@@ -121,7 +119,7 @@ class CalculateComissionController extends Controller
 
     public function old_commission_getdata()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return $this->CalculateCommissionServices->old_commission_getdata();
@@ -130,7 +128,7 @@ class CalculateComissionController extends Controller
 
     public function get_agent_comission()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return $this->CalculateCommissionServices->get_agent_comission();
@@ -139,7 +137,7 @@ class CalculateComissionController extends Controller
 
     public function new_incentive_post(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return $this->CalculateCommissionServices->new_incentive_post($request);
@@ -182,7 +180,8 @@ class CalculateComissionController extends Controller
 
 
         $data['count'] = $students->count();
-        $data['fee'] = PaidStudentFee::whereIn('student_id', $studentIds)->where('type', '=', 'advance')->where('paid_status', '=', 'paid')->sum('installement_amount');
+        // Fee module removed - this needs to be updated for new fee structure
+        $data['fee'] = 0;
         $data['html'] = $html;
 
 
@@ -229,29 +228,25 @@ class CalculateComissionController extends Controller
         $to = date('Y-m-d', strtotime($request->end_date));
 
 
-        $students = Students::with('StudentFee', 'PaidStudentFee')->where('agent_id', $request->agent_id)
-            ->get();
+        // Fee module removed - this needs to be updated for new fee structure
+        $students = Students::where('agent_id', $request->agent_id)->get();
 
         $studentIds = $students->pluck('id')->toArray();
         $student_fee_ids = [];
 
 
+        // Fee module removed - this needs to be updated for new fee structure
         foreach ($students as $student) {
-            $student_fee_ids[] = $student->StudentFee->id;
-            $html = $html . '<tr> <td>' . $student->name . '</td><td>' . $student->email . '<input hidden name="student_id[]" value="' . $student->id . '"><input hidden name="student_fee_id[]" class="student_fee_id" value="' . $student->StudentFee->id . '"></td></tr>';
+            $html = $html . '<tr> <td>' . $student->name . '</td><td>' . $student->email . '<input hidden name="student_id[]" value="' . $student->id . '"></td></tr>';
         }
 
 
         //        $data['count'] = $students->count();
-        $PaidStudentFees = PaidStudentFee::whereBetween('paid_date', [$from, $to])->whereIn('student_fee_id', $student_fee_ids)->whereNotIn('id', $old_student_ids)->where('type', '=', 'installment')->where('paid_status', '=', 'paid')->get();
-
-
-        $data['paid_intallment_fee'] = $PaidStudentFees->sum('installement_amount');
-
-        $data['paid_ids'] = $PaidStudentFees->pluck('id');
-
-        $data['student_fee'] = StudentFee::whereIn('student_id', $studentIds)->sum('student_fee');
-        $data['recovered_percentage'] = $data['paid_intallment_fee'] * 100 / $data['student_fee'];
+        // Fee module removed - these need to be updated for new fee structure
+        $data['paid_intallment_fee'] = 0;
+        $data['paid_ids'] = collect([]);
+        $data['student_fee'] = 0;
+        $data['recovered_percentage'] = 0;
 
         $data['html'] = $html;
 
@@ -280,3 +275,4 @@ class CalculateComissionController extends Controller
 
 
 }
+

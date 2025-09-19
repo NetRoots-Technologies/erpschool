@@ -13,7 +13,7 @@ class SalaryTaxController extends Controller
 {
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return view('hr.salary_tax.index');
@@ -21,7 +21,7 @@ class SalaryTaxController extends Controller
 
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $taxes = TaxSlab::where('tax_type', 'salaryTax')->get();
@@ -40,7 +40,7 @@ class SalaryTaxController extends Controller
 
     public function getData()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = TaxSlab::with('financial')->where('tax_type', 'salaryTax')->get();
@@ -67,3 +67,4 @@ class SalaryTaxController extends Controller
     }
 
 }
+

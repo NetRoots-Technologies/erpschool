@@ -10,8 +10,6 @@ use App\Models\Admin\Company;
 use App\Models\Admin\Course;
 use App\Models\Admin\CourseType;
 use App\Models\Exam\ClassSubject;
-use App\Models\Fee\FeeCollection;
-// use App\Models\Fee\StudentFee; // Removed - model no longer exists
 use App\Models\Student\AcademicSession;
 use App\Services\CourseServices;
 use Illuminate\Http\Request;
@@ -35,7 +33,7 @@ class CourseController extends Controller
     }
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
 
@@ -51,7 +49,7 @@ class CourseController extends Controller
      */
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $companies = Company::where('status', 1)->get();
@@ -66,7 +64,7 @@ class CourseController extends Controller
 
     public function getData()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $Users = $this->CourseServices->getdata();
@@ -80,7 +78,7 @@ class CourseController extends Controller
      */
     public function store(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
 
@@ -99,7 +97,7 @@ class CourseController extends Controller
      */
     public function show($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -112,7 +110,7 @@ class CourseController extends Controller
      */
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $course = Course::find($id);
@@ -135,7 +133,7 @@ class CourseController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
 
@@ -154,7 +152,7 @@ class CourseController extends Controller
      */
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
 
@@ -166,7 +164,7 @@ class CourseController extends Controller
 
     public function changeStatus(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return $coursetype = $this->CourseServices->changeStatus($request);
@@ -175,7 +173,7 @@ class CourseController extends Controller
 
     public function fetchAcademicClass(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $class = AcademicClass::where('branch_id', $request->branch_id)->get();
@@ -185,7 +183,7 @@ class CourseController extends Controller
     public function fetchAcademicClasses(Request $request)
     {
 
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $class = AcademicClass::where('branch_id', $request->branch_id)->get();
@@ -194,7 +192,7 @@ class CourseController extends Controller
 
     public function exportbulkfile()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return Excel::download(new CourseSampleExport, 'Course_bulk_sample.xlsx');
@@ -202,7 +200,7 @@ class CourseController extends Controller
 
     public function importBulkFile(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         try {
@@ -227,7 +225,7 @@ class CourseController extends Controller
 
     public function fetchSubject(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return Course::where('class_id', $request->id)->get();
@@ -256,3 +254,4 @@ class CourseController extends Controller
             ->with('success', 'Course Cloned successfully');
     }
 }
+

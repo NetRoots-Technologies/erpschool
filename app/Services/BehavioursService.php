@@ -10,7 +10,7 @@ class BehavioursService
 {
     public function store($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $logs = [
@@ -30,7 +30,7 @@ class BehavioursService
 
     public function getdata()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = Behaviours::orderby('id', 'DESC');
@@ -63,7 +63,7 @@ class BehavioursService
 
     public function update($request, $id, $image = null)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $behaviours = Behaviours::find($id);
@@ -88,14 +88,14 @@ class BehavioursService
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         } 
     }
 
     public function changeStatus($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $behaviours = Behaviours::find($request->id);
@@ -117,3 +117,4 @@ class BehavioursService
         return null;
     }
 }
+

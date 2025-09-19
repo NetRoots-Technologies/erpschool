@@ -14,7 +14,7 @@ class ComponentService
 {
     public function store($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $component = Component::create([
@@ -40,7 +40,7 @@ class ComponentService
 
     public function getdata()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = Component::with('user')->orderby('id', 'DESC');
@@ -116,7 +116,7 @@ class ComponentService
 
     public function update($request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $component = Component::find($id);
@@ -150,7 +150,7 @@ class ComponentService
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $component = Component::with('componentData')->findOrFail($id);
@@ -164,7 +164,7 @@ class ComponentService
 
     public function changeStatus($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $component = Component::find($request->id);
@@ -176,3 +176,4 @@ class ComponentService
     }
 
 }
+

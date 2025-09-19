@@ -6,9 +6,6 @@ namespace App\Services;
 use Exception;
 use Carbon\Carbon;
 use App\Models\Admin\Biling;
-use App\Models\Fee\FeeCollection;
-use App\Models\Fee\FeeCollectionDetail;
-// use App\Models\Fee\StudentFee; // Old model - replaced with FeeCollection
 use App\Models\Admin\BilingData;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\DB;
@@ -25,7 +22,7 @@ class BillGenerationService
 
     public function store($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         try {
@@ -121,7 +118,7 @@ class BillGenerationService
 
     public function getdata()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = Biling::with('AcademicClass', 'student', 'branch')->orderBy('created_at', 'desc')->get();
@@ -185,7 +182,7 @@ class BillGenerationService
 
     public function update($request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = $request->all();
@@ -200,7 +197,7 @@ class BillGenerationService
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $billing = Biling::with('billingData')->find($id);
@@ -214,7 +211,7 @@ class BillGenerationService
 
     public function changeStatus($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         try {
@@ -273,4 +270,5 @@ class BillGenerationService
     }
 
 }
+
 

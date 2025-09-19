@@ -24,7 +24,7 @@ class LeaveRequestService
 
     public function store($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $uploadedFile = $request->file('employee_image');
@@ -171,7 +171,7 @@ class LeaveRequestService
 
     public function getData()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = LeaveRequest::with('workShift', 'quota', 'employee')->get();
@@ -239,7 +239,7 @@ class LeaveRequestService
 
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $leaveRequests = LeaveRequest::with('workShift', 'quota', 'employee')->find($id);
@@ -248,7 +248,7 @@ class LeaveRequestService
 
     public function update($request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $leaveRequest = LeaveRequest::find($id);
@@ -284,7 +284,7 @@ class LeaveRequestService
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $leaveRequest = LeaveRequest::find($id);
@@ -293,7 +293,7 @@ class LeaveRequestService
 
     public function employee_leave($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $compensatoryQuota = Quotta::where('compensatory_status', 1)->get();
@@ -309,3 +309,4 @@ class LeaveRequestService
     }
 
 }
+

@@ -16,7 +16,7 @@ class AddBranchIdToUsersTable extends Migration
 
         Schema::table('users', function (Blueprint $table) {
             if (!Schema::hasColumn('users', 'branch_id')) {
-                $table->unsignedBigInteger('branch_id');
+                $table->unsignedBigInteger('branch_id')->nullable();
 
                 // Correct foreign key syntax
                 $table->foreign('branch_id')

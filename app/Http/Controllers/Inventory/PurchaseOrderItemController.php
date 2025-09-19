@@ -15,7 +15,7 @@ class PurchaseOrderItemController extends Controller
      */
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -27,7 +27,7 @@ class PurchaseOrderItemController extends Controller
      */
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -40,7 +40,7 @@ class PurchaseOrderItemController extends Controller
      */
     public function store(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -53,7 +53,7 @@ class PurchaseOrderItemController extends Controller
      */
     public function show(PurchaseOrderItem $purchaseOrderItem)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -66,7 +66,7 @@ class PurchaseOrderItemController extends Controller
      */
     public function edit(PurchaseOrderItem $purchaseOrderItem)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -80,7 +80,7 @@ class PurchaseOrderItemController extends Controller
      */
     public function update(Request $request, PurchaseOrderItem $purchaseOrderItem)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -93,8 +93,9 @@ class PurchaseOrderItemController extends Controller
      */
     public function destroy(PurchaseOrderItem $purchaseOrderItem)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
 }
+

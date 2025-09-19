@@ -15,7 +15,7 @@ class StudentAssignSessionServices
 
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return Students::all();
@@ -25,7 +25,7 @@ class StudentAssignSessionServices
 
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
 
@@ -33,7 +33,7 @@ class StudentAssignSessionServices
 
     public function store($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         //        $agent = new TeacherAssignSession();
@@ -48,7 +48,7 @@ class StudentAssignSessionServices
 
     public function getdata()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = Students::join('sessions', 'sessions.id', '=', 'students.session_id')->select('students.id as id', 'sessions.title as session_title', 'students.name as name', 'students.status as status')->get();
@@ -66,7 +66,7 @@ class StudentAssignSessionServices
 
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return TeacherAssignSession::find($id);
@@ -76,7 +76,7 @@ class StudentAssignSessionServices
 
     public function update($request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $agent = TeacherAssignSession::find($request->id);
@@ -89,7 +89,7 @@ class StudentAssignSessionServices
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $teacher = TeacherAssignSession::findOrFail($id);
@@ -99,4 +99,5 @@ class StudentAssignSessionServices
 
     }
 }
+
 

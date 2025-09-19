@@ -16,7 +16,7 @@ class QuoteItemController extends Controller
      */
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -28,7 +28,7 @@ class QuoteItemController extends Controller
      */
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -41,7 +41,7 @@ class QuoteItemController extends Controller
      */
     public function store(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -54,7 +54,7 @@ class QuoteItemController extends Controller
      */
     public function show(QuoteItem $quoteItem)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -67,7 +67,7 @@ class QuoteItemController extends Controller
      */
     public function edit(QuoteItem $quoteItem)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -81,7 +81,7 @@ class QuoteItemController extends Controller
      */
     public function update(Request $request, QuoteItem $quoteItem)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -94,8 +94,9 @@ class QuoteItemController extends Controller
      */
     public function destroy(QuoteItem $quoteItem)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
 }
+

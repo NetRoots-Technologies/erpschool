@@ -18,7 +18,7 @@ class AttendanceService
 
     public function fetchDepartment($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $departments = Department::where('branch_id', $request->branch_id)->get();
@@ -28,7 +28,7 @@ class AttendanceService
 
     public function fetchEmployee($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $employees = Employees::where('status', 1)->where('department_id', $request->department_id)->get();
@@ -37,7 +37,7 @@ class AttendanceService
 
     public function store($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $errors = new MessageBag();
@@ -74,7 +74,7 @@ class AttendanceService
 
     public function getdata($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         if (!empty($request->from_date)) {
@@ -139,7 +139,7 @@ class AttendanceService
 
     public function update($request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $attendance = Attendance::find($id);
@@ -160,7 +160,7 @@ class AttendanceService
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $attendance = Attendance::find($id);
@@ -170,3 +170,4 @@ class AttendanceService
     }
 
 }
+

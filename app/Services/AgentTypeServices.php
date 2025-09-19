@@ -19,7 +19,7 @@ class AgentTypeServices
 
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return AgentType::all();
@@ -28,7 +28,7 @@ class AgentTypeServices
 
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
 
@@ -36,7 +36,7 @@ class AgentTypeServices
 
     public function store($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $agent_type = new AgentType();
@@ -50,7 +50,7 @@ class AgentTypeServices
 
     public function getdata()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = AgentType::get();
@@ -70,7 +70,7 @@ class AgentTypeServices
 
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return AgentType::find($id);
@@ -80,7 +80,7 @@ class AgentTypeServices
 
     public function update($request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $agent_type = AgentType::find($id);
@@ -91,7 +91,7 @@ class AgentTypeServices
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $agent_type = AgentType::findOrFail($id);
@@ -100,4 +100,5 @@ class AgentTypeServices
 
     }
 }
+
 
