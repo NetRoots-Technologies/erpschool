@@ -15,38 +15,42 @@ class EmployeeSeeder extends Seeder
      */
 public function run()
 {
-    // Fetch all department IDs
-    $departmentIds = DB::table('departments')->pluck('id')->toArray();
+    // Fetch all departments
+    $departments = DB::table('departments')->get();
 
-    // Fetch all work shift IDs
+    // Fetch all work shifts
     $workShiftIds = DB::table('work_shifts')->pluck('id')->toArray();
 
-    if (empty($departmentIds) || empty($workShiftIds)) {
+    if ($departments->isEmpty() || empty($workShiftIds)) {
         $this->command->error('Departments or work shifts not found. Please seed those tables first.');
         return;
     }
 
     $employees = [];
+    $i = 1;
 
-    for ($i = 1; $i <= 10; $i++) {
-        // Random department
-        $departmentId = $departmentIds[array_rand($departmentIds)];
-
-        // Get related designation
+    foreach ($departments as $department) {
+        // Try to find a designation for this department
         $designationId = DB::table('designations')
-            ->where('department_id', $departmentId)
+            ->where('department_id', $department->id)
             ->inRandomOrder()
             ->value('id');
+
+        // If no designation found, skip
+        if (!$designationId) {
+            $this->command->warn("No designation found for department ID: {$department->id}, skipping...");
+            continue;
+        }
 
         // Random work shift
         $workShiftId = $workShiftIds[array_rand($workShiftIds)];
 
         $employees[] = [
             'name' => 'Employee ' . $i,
-            'emp_id' => 'ERTY-1 ' . $i,
+            'emp_id' => 'EMP-' . str_pad($i, 4, '0', STR_PAD_LEFT),
             'email' => 'employee' . $i . '@example.com',
             'father_name' => 'Father ' . $i,
-            'cnic_card' => '35202-123456' . $i . '-1',
+            'cnic_card' => '35202-123456' . $i,
             'tell_no' => '042-123456' . $i,
             'mobile_no' => '03' . rand(10, 49) . rand(1000000, 9999999),
             'email_address' => 'employee' . $i . '@mail.com',
@@ -59,9 +63,9 @@ public function run()
             'deductedAmount' => '0',
             'dob' => Carbon::now()->subYears(25)->format('Y-m-d'),
             'work_shift_id' => $workShiftId,
-            'company_id' => 1,
-            'branch_id' => 1,
-            'department_id' => $departmentId,
+            'company_id' => $department->company_id,
+            'branch_id' => $department->branch_id,
+            'department_id' => $department->id,
             'designation_id' => $designationId,
             'employee_id' => null,
             'other_branch' => null,
@@ -83,9 +87,13 @@ public function run()
             'created_at' => now(),
             'updated_at' => now(),
         ];
+
+        $i++;
     }
 
+    // Insert all generated employees
     DB::table('hrm_employees')->insert($employees);
 }
+
 
 }

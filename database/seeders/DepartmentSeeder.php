@@ -7,7 +7,6 @@ use App\Models\Admin\Company;
 use App\Models\Admin\Department;
 use App\Models\Category;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 class DepartmentSeeder extends Seeder
 {
@@ -47,12 +46,12 @@ class DepartmentSeeder extends Seeder
             'Quality Assurance'
         ];
 
-        foreach ($departmentNames as $index => $name) {
+        foreach ($departmentNames as $name) {
             Department::create([
                 'name' => $name,
                 'company_id' => $company->id,
-                 'branch_id' => $index % 2 == 0 ? $branches['PTCHS Campus'] : $branches['Global Campus'],
-                'category_id' => $index % 2 == 0 ? $categories['CFO'] : $categories['Head of Central Office'],
+                'branch_id' => $branches['Global Campus'] ?? null, // always Global Campus
+                'category_id' => $categories['Head of Central Office'] ?? null, // fixed category
                 'parent_id' => $headOffice->id,
                 'created_by' => $userId,
                 'updated_by' => $userId,

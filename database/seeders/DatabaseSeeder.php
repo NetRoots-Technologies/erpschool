@@ -26,8 +26,11 @@ class DatabaseSeeder extends Seeder
         $this->call(BankBranchesSeeder::class);
         $this->call(BankAccountsSeeder::class);
         $this->call(AccountTypesSeeder::class);
-        $this->call(LedgersSeeder::class);
+        // $this->call(LedgersSeeder::class);
         $this->call(WorkShiftsTableSeeder::class);
+        $this->call(StudentSeeder::class);
+
+        
         // $this->call(CreateCourseTypeSeeder::class);
         // $this->call(CreateCourseSeeder::class);
         // $this->call(CountrySeeder::class);
@@ -39,8 +42,8 @@ class DatabaseSeeder extends Seeder
         // $this->call(BudgetsSeeder::class);
         //$this->call(SessionSeeder::class);
         $this->call(CreateAdminUserSeeder::class);
-        $this->call(StudentSeeder::class);
-
+        $this->call(EmployeeSeeder::class);
+        $this->call(StudentSeeder::class);  
         // $this->call(AgentSeeder::class);
         // $this->call(AgentRole::class);
         // $this->call(TeacherRole::class);
