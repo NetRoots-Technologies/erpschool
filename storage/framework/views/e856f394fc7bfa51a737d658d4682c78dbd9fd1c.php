@@ -1,5 +1,3 @@
-
-
 <?php $__env->startSection('title', 'Fee Billing'); ?>
 
 <?php $__env->startSection('content'); ?>

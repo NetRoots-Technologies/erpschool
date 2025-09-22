@@ -32,26 +32,6 @@
                         
                         <!-- Student Selection -->
                         <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="student_id" class="form-label">Student <span class="text-danger">*</span></label>
-                                    <select class="form-control @error('student_id') is-invalid @enderror" 
-                                            id="student_id" name="student_id" required>
-                                        <option value="">Select Student</option>
-                                        @foreach($students as $student)
-                                            <option value="{{ $student->id }}" 
-                                                    data-class="{{ $student->AcademicClass->name ?? 'N/A' }}"
-                                                    data-session="{{ $student->academicSession->name ?? 'N/A' }}"
-                                                    {{ old('student_id') == $student->id ? 'selected' : '' }}>
-                                                {{ $student->fullname }} ({{ $student->AcademicClass->name ?? 'N/A' }})
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    @error('student_id')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
                             <div class="col-md-3">
                                 <div class="form-group">
                                     <label for="academic_class_id" class="form-label">Class <span class="text-danger">*</span></label>
@@ -69,17 +49,24 @@
                                     @enderror
                                 </div>
                             </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="student_id" class="form-label">Student <span class="text-danger">*</span></label>
+                                    <select class="form-control @error('student_id') is-invalid @enderror" 
+                                            id="student_id" name="student_id" required disabled>
+                                        <option value="">First select a class</option>
+                                    </select>
+                                    @error('student_id')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
                             <div class="col-md-3">
                                 <div class="form-group">
                                     <label for="academic_session_id" class="form-label">Session <span class="text-danger">*</span></label>
                                     <select class="form-control @error('academic_session_id') is-invalid @enderror" 
-                                            id="academic_session_id" name="academic_session_id" required>
-                                        <option value="">Select Session</option>
-                                        @foreach($sessions as $session)
-                                            <option value="{{ $session->id }}" {{ old('academic_session_id') == $session->id ? 'selected' : '' }}>
-                                                {{ $session->name }}
-                                            </option>
-                                        @endforeach
+                                            id="academic_session_id" name="academic_session_id" required disabled>
+                                        <option value="">Auto-filled when student is selected</option>
                                     </select>
                                     @error('academic_session_id')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -326,18 +313,61 @@
             $('#totalAmount').text('Rs. ' + total.toLocaleString());
         }
         
-        // Auto-fill class and session when student is selected
+        // Handle class selection to load students
+        $('#academic_class_id').change(function() {
+            const classId = $(this).val();
+            const studentSelect = $('#student_id');
+            const sessionSelect = $('#academic_session_id');
+            
+            // Clear and disable student and session selects
+            studentSelect.html('<option value="">Loading students...</option>').prop('disabled', true);
+            sessionSelect.html('<option value="">Auto-filled when student is selected</option>').prop('disabled', true);
+            
+            if (classId) {
+                // Fetch students for the selected class
+                $.ajax({
+                    url: '{{ route("admin.fee-management.collections.students-by-class", ":classId") }}'.replace(':classId', classId),
+                    type: 'GET',
+                    success: function(response) {
+                        studentSelect.html('<option value="">Select Student</option>');
+                        
+                        if (response.students.length > 0) {
+                            response.students.forEach(function(student) {
+                                studentSelect.append(
+                                    '<option value="' + student.id + '" ' +
+                                    'data-session-id="' + (student.session_id || '') + '" ' +
+                                    'data-session-name="' + student.session_name + '">' +
+                                    student.name + ' (' + student.class_name + ')' +
+                                    '</option>'
+                                );
+                            });
+                            studentSelect.prop('disabled', false);
+                        } else {
+                            studentSelect.html('<option value="">No students found in this class</option>');
+                        }
+                    },
+                    error: function() {
+                        studentSelect.html('<option value="">Error loading students</option>');
+                    }
+                });
+            } else {
+                studentSelect.html('<option value="">First select a class</option>');
+            }
+        });
+        
+        // Handle student selection to auto-fill session
         $('#student_id').change(function() {
             const selectedOption = $(this).find('option:selected');
-            const classId = selectedOption.data('class');
-            const sessionId = selectedOption.data('session');
+            const sessionId = selectedOption.data('session-id');
+            const sessionName = selectedOption.data('session-name');
+            const sessionSelect = $('#academic_session_id');
             
-            // Auto-fill class and session if available
-            if (classId && classId !== 'N/A') {
-                $('#academic_class_id').val(classId);
-            }
-            if (sessionId && sessionId !== 'N/A') {
-                $('#academic_session_id').val(sessionId);
+            if (sessionId && sessionName) {
+                sessionSelect.html('<option value="' + sessionId + '">' + sessionName + '</option>');
+                sessionSelect.prop('disabled', false);
+            } else {
+                sessionSelect.html('<option value="">Auto-filled when student is selected</option>');
+                sessionSelect.prop('disabled', true);
             }
         });
         

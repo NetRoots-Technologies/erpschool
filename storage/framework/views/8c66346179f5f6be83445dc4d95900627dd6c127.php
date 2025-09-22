@@ -32,6 +32,38 @@
                         
                         <!-- Student Selection -->
                         <div class="row">
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <label for="academic_class_id" class="form-label">Class <span class="text-danger">*</span></label>
+                                    <select class="form-control <?php $__errorArgs = ['academic_class_id'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>" 
+                                            id="academic_class_id" name="academic_class_id" required>
+                                        <option value="">Select Class</option>
+                                        <?php $__currentLoopData = $classes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $class): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                            <option value="<?php echo e($class->id); ?>" <?php echo e(old('academic_class_id') == $class->id ? 'selected' : ''); ?>>
+                                                <?php echo e($class->name); ?>
+
+                                            </option>
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                    </select>
+                                    <?php $__errorArgs = ['academic_class_id'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                        <div class="invalid-feedback"><?php echo e($message); ?></div>
+                                    <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+                                </div>
+                            </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="student_id" class="form-label">Student <span class="text-danger">*</span></label>
@@ -43,16 +75,8 @@ $message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>" 
-                                            id="student_id" name="student_id" required>
-                                        <option value="">Select Student</option>
-                                        <?php $__currentLoopData = $students; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $student): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                            <option value="<?php echo e($student->id); ?>" 
-                                                    data-class="<?php echo e($student->AcademicClass->name ?? 'N/A'); ?>"
-                                                    data-session="<?php echo e($student->academicSession->name ?? 'N/A'); ?>"
-                                                    <?php echo e(old('student_id') == $student->id ? 'selected' : ''); ?>>
-                                                <?php echo e($student->fullname); ?> (<?php echo e($student->AcademicClass->name ?? 'N/A'); ?>)
-                                            </option>
-                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                            id="student_id" name="student_id" required disabled>
+                                        <option value="">First select a class</option>
                                     </select>
                                     <?php $__errorArgs = ['student_id'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
@@ -77,14 +101,8 @@ $message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>" 
-                                            id="academic_session_id" name="academic_session_id" required>
-                                        <option value="">Select Session</option>
-                                        <?php $__currentLoopData = $sessions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $session): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                            <option value="<?php echo e($session->id); ?>" <?php echo e(old('academic_session_id') == $session->id ? 'selected' : ''); ?>>
-                                                <?php echo e($session->name); ?>
-
-                                            </option>
-                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                            id="academic_session_id" name="academic_session_id" required disabled>
+                                        <option value="">Auto-filled when student is selected</option>
                                     </select>
                                     <?php $__errorArgs = ['academic_session_id'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
@@ -380,14 +398,61 @@ unset($__errorArgs, $__bag); ?>
             $('#totalAmount').text('Rs. ' + total.toLocaleString());
         }
         
-        // Auto-fill session when student is selected
+        // Handle class selection to load students
+        $('#academic_class_id').change(function() {
+            const classId = $(this).val();
+            const studentSelect = $('#student_id');
+            const sessionSelect = $('#academic_session_id');
+            
+            // Clear and disable student and session selects
+            studentSelect.html('<option value="">Loading students...</option>').prop('disabled', true);
+            sessionSelect.html('<option value="">Auto-filled when student is selected</option>').prop('disabled', true);
+            
+            if (classId) {
+                // Fetch students for the selected class
+                $.ajax({
+                    url: '<?php echo e(route("admin.fee-management.collections.students-by-class", ":classId")); ?>'.replace(':classId', classId),
+                    type: 'GET',
+                    success: function(response) {
+                        studentSelect.html('<option value="">Select Student</option>');
+                        
+                        if (response.students.length > 0) {
+                            response.students.forEach(function(student) {
+                                studentSelect.append(
+                                    '<option value="' + student.id + '" ' +
+                                    'data-session-id="' + (student.session_id || '') + '" ' +
+                                    'data-session-name="' + student.session_name + '">' +
+                                    student.name + ' (' + student.class_name + ')' +
+                                    '</option>'
+                                );
+                            });
+                            studentSelect.prop('disabled', false);
+                        } else {
+                            studentSelect.html('<option value="">No students found in this class</option>');
+                        }
+                    },
+                    error: function() {
+                        studentSelect.html('<option value="">Error loading students</option>');
+                    }
+                });
+            } else {
+                studentSelect.html('<option value="">First select a class</option>');
+            }
+        });
+        
+        // Handle student selection to auto-fill session
         $('#student_id').change(function() {
             const selectedOption = $(this).find('option:selected');
-            const sessionId = selectedOption.data('session');
+            const sessionId = selectedOption.data('session-id');
+            const sessionName = selectedOption.data('session-name');
+            const sessionSelect = $('#academic_session_id');
             
-            // Auto-fill session if available
-            if (sessionId && sessionId !== 'N/A') {
-                $('#academic_session_id').val(sessionId);
+            if (sessionId && sessionName) {
+                sessionSelect.html('<option value="' + sessionId + '">' + sessionName + '</option>');
+                sessionSelect.prop('disabled', false);
+            } else {
+                sessionSelect.html('<option value="">Auto-filled when student is selected</option>');
+                sessionSelect.prop('disabled', true);
             }
         });
         

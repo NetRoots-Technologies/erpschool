@@ -434,6 +434,30 @@ class FeeManagementController extends Controller
         return view('admin.fee-management.collections.create', compact('students', 'classes', 'sessions'));
     }
 
+    public function getStudentsByClass($classId)
+    {
+        if (!Gate::allows('Dashboard-list')) {
+            abort(403, 'Unauthorized access');
+        }
+
+        $students = Students::with(['AcademicClass', 'academicSession'])
+            ->where('class_id', $classId)
+            ->get();
+
+        return response()->json([
+            'students' => $students->map(function($student) {
+                return [
+                    'id' => $student->id,
+                    'name' => $student->fullname,
+                    'class_name' => $student->AcademicClass->name ?? 'N/A',
+                    'session_name' => $student->academicSession->name ?? 'N/A',
+                    'class_id' => $student->AcademicClass->id ?? null,
+                    'session_id' => $student->academicSession->id ?? null
+                ];
+            })
+        ]);
+    }
+
     public function storeCollection(Request $request)
     {
         if (!Gate::allows('Dashboard-list')) {
@@ -802,9 +826,10 @@ class FeeManagementController extends Controller
             foreach ($students as $student) {
                 \Log::info('Processing student: ' . $student->id . ' - ' . $student->fullname);
                 
-                // Check if billing already exists for this student and session
+                // Check if billing already exists for this student, session and billing month
                 $existingBilling = FeeBilling::where('student_id', $student->id)
                     ->where('academic_session_id', $request->academic_session_id)
+                    ->where('billing_month', $request->billing_month)
                     ->first();
 
                 if ($existingBilling) {
@@ -824,6 +849,7 @@ class FeeManagementController extends Controller
                     'student_id' => $student->id,
                     'academic_session_id' => $request->academic_session_id,
                     'challan_number' => $challanNumber,
+                    'billing_month' => $request->billing_month,
                     'total_amount' => $totalAmount,
                     'bill_date' => now(),
                     'due_date' => now()->addDays(30), // 30 days from now

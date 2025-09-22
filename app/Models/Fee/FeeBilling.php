@@ -27,6 +27,7 @@ class FeeBilling extends Model
         'paid_amount',
         'outstanding_amount',
         'challan_number',
+        'billing_month',
         'status',
         'company_id',
         'branch_id',

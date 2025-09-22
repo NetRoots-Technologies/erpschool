@@ -173,6 +173,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'admin', 'as' => 'admin.'], 
         Route::get('/collections', [FeeManagementController::class, 'collections'])->name('collections');
         Route::get('/collections/data', [FeeManagementController::class, 'getCollectionsData'])->name('collections.data');
         Route::get('/collections/create', [FeeManagementController::class, 'createCollection'])->name('collections.create');
+        Route::get('/collections/students-by-class/{classId}', [FeeManagementController::class, 'getStudentsByClass'])->name('collections.students-by-class');
         Route::post('/collections', [FeeManagementController::class, 'storeCollection'])->name('collections.store');
         Route::get('/collections/{id}', [FeeManagementController::class, 'showCollection'])->name('collections.show');
         Route::get('/collections/{id}/edit', [FeeManagementController::class, 'editCollection'])->name('collections.edit');
