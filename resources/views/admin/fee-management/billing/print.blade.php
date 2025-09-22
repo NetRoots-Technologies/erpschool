@@ -93,7 +93,7 @@
             top: 20px;
             right: 20px;
             background-color: #007bff;
-            color: white;
+            color: #212529;
             border: none;
             padding: 10px 20px;
             border-radius: 5px;

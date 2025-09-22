@@ -21,11 +21,11 @@ class StudentFeeAssignment extends Model
     protected $fillable = [
         'student_id',
         'fee_structure_id',
-        'academic_session_id',
-        'class_id',
-        'assignment_date',
+        'fee_category_id',
+        'amount',
         'due_date',
-        'is_active',
+        'notes',
+        'is_paid',
         'company_id',
         'branch_id',
         'created_by',
@@ -33,9 +33,9 @@ class StudentFeeAssignment extends Model
     ];
 
     protected $casts = [
-        'assignment_date' => 'date',
+        'amount' => 'decimal:2',
         'due_date' => 'date',
-        'is_active' => 'boolean',
+        'is_paid' => 'boolean',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
@@ -50,6 +50,11 @@ class StudentFeeAssignment extends Model
     public function feeStructure()
     {
         return $this->belongsTo(FeeStructure::class);
+    }
+
+    public function feeCategory()
+    {
+        return $this->belongsTo(FeeCategory::class);
     }
 
     public function academicSession()

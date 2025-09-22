@@ -24,7 +24,7 @@
             <div class="card">
                 <div class="card-body">
                     <div class="d-flex align-items-center">
-                        <div class="icon-box icon-box-sm bg-primary text-white me-3">
+                        <div class="icon-box icon-box-sm bg-primary me-3" style="color: #212529 !important;">
                             <i class="fa fa-tags"></i>
                         </div>
                         <div>
@@ -39,7 +39,7 @@
             <div class="card">
                 <div class="card-body">
                     <div class="d-flex align-items-center">
-                        <div class="icon-box icon-box-sm bg-success text-white me-3">
+                        <div class="icon-box icon-box-sm bg-success me-3" style="color: #212529 !important;">
                             <i class="fa fa-sitemap"></i>
                         </div>
                         <div>
@@ -54,7 +54,7 @@
             <div class="card">
                 <div class="card-body">
                     <div class="d-flex align-items-center">
-                        <div class="icon-box icon-box-sm bg-info text-white me-3">
+                        <div class="icon-box icon-box-sm bg-info me-3" style="color: #212529 !important;">
                             <i class="fa fa-money"></i>
                         </div>
                         <div>
@@ -69,7 +69,7 @@
             <div class="card">
                 <div class="card-body">
                     <div class="d-flex align-items-center">
-                        <div class="icon-box icon-box-sm bg-warning text-white me-3">
+                        <div class="icon-box icon-box-sm bg-warning me-3" style="color: #212529 !important;">
                             <i class="fa fa-clock-o"></i>
                         </div>
                         <div>
@@ -140,9 +140,31 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td colspan="5" class="text-center">No recent collections found</td>
-                                </tr>
+                                <?php if($data['recent_collections'] && $data['recent_collections']->count() > 0): ?>
+                                    <?php $__currentLoopData = $data['recent_collections']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $collection): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <tr>
+                                        <td><?php echo e($collection->student->fullname ?? 'N/A'); ?></td>
+                                        <td><span class="badge badge-secondary"><?php echo e($collection->student->AcademicClass->name ?? 'N/A'); ?></span></td>
+                                        <td><span class="text-success font-weight-bold">Rs. <?php echo e(number_format($collection->paid_amount, 2)); ?></span></td>
+                                        <td><?php echo e($collection->collection_date ? \Carbon\Carbon::parse($collection->collection_date)->format('d M Y') : 'N/A'); ?></td>
+                                        <td>
+                                            <?php if($collection->status == 'paid'): ?>
+                                                <span class="badge badge-success">Paid</span>
+                                            <?php elseif($collection->status == 'pending'): ?>
+                                                <span class="badge badge-warning">Pending</span>
+                                            <?php elseif($collection->status): ?>
+                                                <span class="badge badge-info"><?php echo e(ucfirst($collection->status)); ?></span>
+                                            <?php else: ?>
+                                                <span class="badge badge-secondary">Not Set</span>
+                                            <?php endif; ?>
+                                        </td>
+                                    </tr>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                <?php else: ?>
+                                    <tr>
+                                        <td colspan="5" class="text-center">No recent collections found</td>
+                                    </tr>
+                                <?php endif; ?>
                             </tbody>
                         </table>
                     </div>
@@ -160,6 +182,34 @@
         console.log('Fee Management Dashboard loaded');
     });
 </script>
+<?php $__env->stopSection(); ?>
+
+<?php $__env->startSection('css'); ?>
+<style>
+.badge {
+    color: #212529 !important;
+}
+.badge-success {
+    background-color: #28a745 !important;
+    color: #212529 !important;
+}
+.badge-danger {
+    background-color: #dc3545 !important;
+    color: #212529 !important;
+}
+.badge-warning {
+    background-color: #ffc107 !important;
+    color: #212529 !important;
+}
+.badge-info {
+    background-color: #17a2b8 !important;
+    color: #212529 !important;
+}
+.badge-secondary {
+    background-color: #6c757d !important;
+    color: #212529 !important;
+}
+</style>
 <?php $__env->stopSection(); ?>
 
 <?php echo $__env->make('admin.layouts.main', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\xampp\htdocs\erpschool\resources\views/admin/fee-management/index.blade.php ENDPATH**/ ?>

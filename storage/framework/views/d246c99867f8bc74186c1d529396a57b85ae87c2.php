@@ -172,25 +172,23 @@ unset($__errorArgs, $__bag); ?>
                         <!-- Fee Categories Section -->
                         <div class="row">
                             <div class="col-md-12">
-                                <h5>Fee Categories</h5>
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h5 class="mb-0">Fee Categories</h5>
+                                    <button type="button" class="btn btn-outline-success btn-sm" id="addCategory">
+                                        <i class="fa fa-plus"></i> Add Another Category
+                                    </button>
+                                </div>
                                 <div id="feeCategories">
                                     <div class="row fee-category-row">
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label>Category</label>
-                                                <div class="input-group">
-                                                    <select class="form-control category-select" name="categories[0][category_id]" required>
-                                                        <option value="">Select Category</option>
-                                                        <?php $__currentLoopData = $categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                                            <option value="<?php echo e($category->id); ?>"><?php echo e($category->name); ?></option>
-                                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                                                    </select>
-                                                    <div class="input-group-append">
-                                                        <button type="button" class="btn btn-outline-primary btn-sm" data-toggle="modal" data-target="#categoryModal">
-                                                            <i class="fa fa-plus"></i>
-                                                        </button>
-                                                    </div>
-                                                </div>
+                                                <select class="form-control category-select" name="categories[0][category_id]" required>
+                                                    <option value="">Select Category</option>
+                                                    <?php $__currentLoopData = $categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                        <option value="<?php echo e($category->id); ?>"><?php echo e($category->name); ?></option>
+                                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                                </select>
                                             </div>
                                         </div>
                                         <div class="col-md-3">
@@ -207,8 +205,7 @@ unset($__errorArgs, $__bag); ?>
                                         </div>
                                         <div class="col-md-2">
                                             <div class="form-group">
-                                                <label>&nbsp;</label>
-                                                <button type="button" class="btn btn-danger btn-sm remove-category" style="display: none;">
+                                                <button type="button" class="btn btn-danger btn-sm remove-category" style="display: none; margin-top: 30px;">
                                                     <i class="fa fa-trash"></i>
                                                 </button>
                                             </div>
@@ -231,56 +228,6 @@ unset($__errorArgs, $__bag); ?>
     </div>
 </div>
 
-<!-- Category Creation Modal -->
-<div class="modal fade" id="categoryModal" tabindex="-1" role="dialog" aria-labelledby="categoryModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="categoryModalLabel">Create New Category</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label for="category_name">Category Name <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" id="category_name" required>
-                </div>
-                <div class="form-group">
-                    <label for="category_description">Description</label>
-                    <textarea class="form-control" id="category_description" rows="3"></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="category_type">Type <span class="text-danger">*</span></label>
-                    <select class="form-control" id="category_type" required>
-                        <option value="">Select Type</option>
-                        <option value="admission">Admission</option>
-                        <option value="monthly">Monthly</option>
-                        <option value="annual">Annual</option>
-                        <option value="one_time">One Time</option>
-                        <option value="allocation">Allocation</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <div class="form-check">
-                        <input type="checkbox" class="form-check-input" id="is_mandatory">
-                        <label class="form-check-label" for="is_mandatory">Mandatory</label>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="form-check">
-                        <input type="checkbox" class="form-check-input" id="affects_financials" checked>
-                        <label class="form-check-label" for="affects_financials">Affects Financials</label>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" id="saveCategory">Save Category</button>
-            </div>
-        </div>
-    </div>
-</div>
 <?php $__env->stopSection(); ?>
 
 <?php $__env->startSection('js'); ?>
@@ -288,10 +235,47 @@ unset($__errorArgs, $__bag); ?>
     $(document).ready(function() {
         let categoryIndex = 1;
 
-        // Add new category row when + button is clicked
-        $(document).on('click', '[data-toggle="modal"][data-target="#categoryModal"]', function() {
-            // Store reference to the button that opened the modal
-            window.currentCategoryButton = $(this);
+
+        // Add new category row when "Add Another Category" button is clicked
+        $('#addCategory').click(function() {
+            const newRow = `
+                <div class="row fee-category-row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Category</label>
+                            <select class="form-control category-select" name="categories[${categoryIndex}][category_id]" required>
+                                <option value="">Select Category</option>
+                                <?php $__currentLoopData = $categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <option value="<?php echo e($category->id); ?>"><?php echo e($category->name); ?></option>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Amount</label>
+                            <input type="number" class="form-control amount-input" name="categories[${categoryIndex}][amount]" step="0.01" min="0" required>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Notes</label>
+                            <input type="text" class="form-control" name="categories[${categoryIndex}][notes]" placeholder="Optional notes">
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <button type="button" class="btn btn-danger btn-sm remove-category" style="margin-top: 30px;">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            $('#feeCategories').append(newRow);
+            categoryIndex++;
+            updateRemoveButtons();
         });
 
         // Remove category row
@@ -330,123 +314,6 @@ unset($__errorArgs, $__bag); ?>
             }
         });
 
-        // Handle category creation
-        $('#saveCategory').click(function() {
-            const formData = {
-                name: $('#category_name').val(),
-                description: $('#category_description').val(),
-                type: $('#category_type').val(),
-                is_mandatory: $('#is_mandatory').is(':checked'),
-                affects_financials: $('#affects_financials').is(':checked'),
-                _token: $('meta[name="csrf-token"]').attr('content')
-            };
-
-            if (!formData.name || !formData.type) {
-                alert('Please fill in all required fields.');
-                return;
-            }
-
-            $.ajax({
-                url: '<?php echo e(route("admin.fee-management.categories.store")); ?>',
-                type: 'POST',
-                data: formData,
-                success: function(response) {
-                    // Add new option to all category selects
-                    const newOption = `<option value="${response.category.id}">${response.category.name}</option>`;
-                    $('.category-select').each(function() {
-                        $(this).append(newOption);
-                    });
-                    
-                    // If this was opened from a + button, add a new row
-                    if (window.currentCategoryButton && window.currentCategoryButton.length) {
-                        const newRow = `
-                            <div class="row fee-category-row">
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label>Category</label>
-                                        <div class="input-group">
-                                            <select class="form-control category-select" name="categories[${categoryIndex}][category_id]" required>
-                                                <option value="">Select Category</option>
-                                                <?php $__currentLoopData = $categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                                    <option value="<?php echo e($category->id); ?>"><?php echo e($category->name); ?></option>
-                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                                                <option value="${response.category.id}">${response.category.name}</option>
-                                            </select>
-                                            <div class="input-group-append">
-                                                <button type="button" class="btn btn-outline-primary btn-sm" data-toggle="modal" data-target="#categoryModal">
-                                                    <i class="fa fa-plus"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label>Amount</label>
-                                        <input type="number" class="form-control amount-input" name="categories[${categoryIndex}][amount]" step="0.01" min="0" required>
-                                    </div>
-                                </div>
-                    <div class="col-md-3">
-                        <div class="form-group">
-                            <label>Notes</label>
-                            <input type="text" class="form-control" name="categories[${categoryIndex}][notes]" placeholder="Optional notes">
-                        </div>
-                    </div>
-                                <div class="col-md-2">
-                                    <div class="form-group">
-                                        <label>&nbsp;</label>
-                                        <button type="button" class="btn btn-danger btn-sm remove-category">
-                                            <i class="fa fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                        
-                        $('#feeCategories').append(newRow);
-                        // Select the newly created category in the new row
-                        $('#feeCategories .fee-category-row').last().find('.category-select').val(response.category.id);
-                        categoryIndex++;
-                        updateRemoveButtons();
-                    } else {
-                        // Select the newly created category in the current row
-                        const currentRow = $('.fee-category-row').last();
-                        currentRow.find('.category-select').val(response.category.id);
-                    }
-                    
-                    // Close modal and reset form
-                    $('#categoryModal').modal('hide');
-                    $('#category_name, #category_description, #category_type').val('');
-                    $('#is_mandatory, #affects_financials').prop('checked', false);
-                    $('#affects_financials').prop('checked', true);
-                    
-                    // Clear the reference
-                    window.currentCategoryButton = null;
-                    
-                    toastr.success('Category created successfully!');
-                },
-                error: function(xhr) {
-                    if (xhr.responseJSON && xhr.responseJSON.errors) {
-                        let errorMessage = 'Please fix the following errors:\n';
-                        Object.values(xhr.responseJSON.errors).forEach(errors => {
-                            errors.forEach(error => {
-                                errorMessage += '- ' + error + '\n';
-                            });
-                        });
-                        alert(errorMessage);
-                    } else {
-                        alert('Error creating category. Please try again.');
-                    }
-                }
-            });
-        });
-
-        // Reset modal form when closed
-        $('#categoryModal').on('hidden.bs.modal', function() {
-            $('#category_name, #category_description, #category_type').val('');
-            $('#is_mandatory, #affects_financials').prop('checked', false);
-            $('#affects_financials').prop('checked', true);
-        });
     });
 </script>
 <?php $__env->stopSection(); ?>

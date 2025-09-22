@@ -189,7 +189,7 @@
 }
 .badge-success {
     background-color: #28a745;
-    color: white;
+    color: #212529;
 }
 .badge-warning {
     background-color: #ffc107;
@@ -197,15 +197,15 @@
 }
 .badge-info {
     background-color: #17a2b8;
-    color: white;
+    color: #212529;
 }
 .badge-danger {
     background-color: #dc3545;
-    color: white;
+    color: #212529;
 }
 .badge-secondary {
     background-color: #6c757d;
-    color: white;
+    color: #212529;
 }
 </style>
 <?php $__env->stopSection(); ?>

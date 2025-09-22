@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="card">
-  <div class="card-header bg-primary text-white">Exam Report Filter</div>
+  <div class="card-header bg-primary" style="color: #212529 !important;">Exam Report Filter</div>
   <div class="card-body">
     <div class="row">
 

@@ -213,10 +213,9 @@ unset($__errorArgs, $__bag); ?>
                                                 <div class="input-group">
                                                     <select class="form-control category-select" name="collections[0][category_id]" required>
                                                         <option value="">Select Category</option>
-                                                        <option value="1">Monthly Tuition</option>
-                                                        <option value="2">Admission Fee</option>
-                                                        <option value="3">Security</option>
-                                                        <option value="4">Books & Stationery</option>
+                                                        <?php $__currentLoopData = $categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                            <option value="<?php echo e($category->id); ?>"><?php echo e($category->name); ?></option>
+                                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                     </select>
                                                     <div class="input-group-append">
                                                         <button type="button" class="btn btn-outline-primary btn-sm" data-toggle="modal" data-target="#categoryModal">
@@ -242,6 +241,11 @@ unset($__errorArgs, $__bag); ?>
                                             </div>
                                         </div>
                                     </div>
+                                </div>
+                                <div class="mt-2">
+                                    <button type="button" class="btn btn-outline-success btn-sm" id="addCategory">
+                                        <i class="fa fa-plus"></i> Add Another Category
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -367,6 +371,51 @@ unset($__errorArgs, $__bag); ?>
             window.currentCategoryButton = $(this);
         });
         
+        // Add new category row
+        $('#addCategory').click(function() {
+            categoryCount++;
+            const newRow = `
+                <div class="row mb-2" id="categoryRow${categoryCount}">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Category</label>
+                            <div class="input-group">
+                                <select class="form-control category-select" name="collections[${categoryCount}][category_id]" required>
+                                    <option value="">Select Category</option>
+                                    <?php $__currentLoopData = $categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <option value="<?php echo e($category->id); ?>"><?php echo e($category->name); ?></option>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                </select>
+                                <div class="input-group-append">
+                                    <button type="button" class="btn btn-outline-primary btn-sm" data-toggle="modal" data-target="#categoryModal">
+                                        <i class="fa fa-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Amount</label>
+                            <input type="number" class="form-control amount-input" name="collections[${categoryCount}][amount]" 
+                                   placeholder="Amount" min="0" step="0.01" required>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>&nbsp;</label>
+                            <button type="button" class="btn btn-danger btn-sm remove-category">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            $('#feeCategories').append(newRow);
+            updateRemoveButtons();
+        });
+
         // Remove category row
         $(document).on('click', '.remove-category', function() {
             $(this).closest('.row').remove();
@@ -518,10 +567,9 @@ unset($__errorArgs, $__bag); ?>
                                         <div class="input-group">
                                             <select class="form-control category-select" name="collections[${categoryCount}][category_id]" required>
                                                 <option value="">Select Category</option>
-                                                <option value="1">Monthly Tuition</option>
-                                                <option value="2">Admission Fee</option>
-                                                <option value="3">Security</option>
-                                                <option value="4">Books & Stationery</option>
+                                                <?php $__currentLoopData = $categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                    <option value="<?php echo e($category->id); ?>"><?php echo e($category->name); ?></option>
+                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                 <option value="${response.category.id}">${response.category.name}</option>
                                             </select>
                                             <div class="input-group-append">

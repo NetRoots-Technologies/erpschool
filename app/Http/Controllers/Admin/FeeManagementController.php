@@ -44,6 +44,10 @@ class FeeManagementController extends Controller
             'total_structures' => FeeStructure::count(),
             'total_collections' => FeeCollection::where('status', 'paid')->sum('paid_amount'),
             'pending_amount' => FeeCollection::where('status', 'pending')->sum('paid_amount'),
+            'recent_collections' => FeeCollection::with(['student.AcademicClass', 'academicSession'])
+                ->orderBy('created_at', 'desc')
+                ->limit(5)
+                ->get(),
         ];
 
         return view('admin.fee-management.index', compact('data'));
@@ -295,7 +299,7 @@ class FeeManagementController extends Controller
             abort(403, 'Unauthorized access');
         }
 
-        $structure = FeeStructure::with('details')->findOrFail($id);
+        $structure = FeeStructure::with('feeStructureDetails')->findOrFail($id);
         $classes = AcademicClass::where('status', 1)->get();
         $sessions = AcademicSession::where('status', 1)->get();
         $factors = FeeFactor::where('is_active', 1)->get();
@@ -312,14 +316,14 @@ class FeeManagementController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'academic_class_id' => 'required|exists:academic_classes,id',
-            'academic_session_id' => 'required|exists:academic_sessions,id',
+            'academic_class_id' => 'required|exists:classes,id',
+            'academic_session_id' => 'required|exists:acadmeic_sessions,id',
             'fee_factor_id' => 'required|exists:fee_factors,id',
             'description' => 'nullable|string',
             'categories' => 'required|array|min:1',
             'categories.*.category_id' => 'required|exists:fee_categories,id',
             'categories.*.amount' => 'required|numeric|min:0',
-            'categories.*.due_date' => 'nullable|date',
+            'categories.*.notes' => 'nullable|string',
         ]);
 
         DB::beginTransaction();
@@ -335,15 +339,17 @@ class FeeManagementController extends Controller
             ]);
 
             // Delete existing details
-            FeeStructureDetail::where('structure_id', $structure->id)->delete();
+            FeeStructureDetail::where('fee_structure_id', $structure->id)->delete();
 
             // Create new details
             foreach ($request->categories as $category) {
                 FeeStructureDetail::create([
-                    'structure_id' => $structure->id,
-                    'category_id' => $category['category_id'],
+                    'fee_structure_id' => $structure->id,
+                    'fee_category_id' => $category['category_id'],
                     'amount' => $category['amount'],
-                    'due_date' => $category['due_date'] ?? null,
+                    'notes' => $category['notes'] ?? null,
+                    'company_id' => auth()->user()->company_id ?? null,
+                    'branch_id' => auth()->user()->branch_id ?? null,
                     'created_by' => auth()->id(),
                 ]);
             }
@@ -415,7 +421,7 @@ class FeeManagementController extends Controller
             abort(403, 'Unauthorized access');
         }
 
-        $collection = FeeCollection::with(['student', 'academicClass', 'academicSession', 'details.feeCategory'])
+        $collection = FeeCollection::with(['student.AcademicClass', 'academicClass', 'academicSession', 'details.feeCategory'])
             ->findOrFail($id);
 
         return view('admin.fee-management.collections.show', compact('collection'));
@@ -430,8 +436,9 @@ class FeeManagementController extends Controller
         $students = Students::with(['AcademicClass', 'academicSession'])->get();
         $classes = AcademicClass::where('status', 1)->get();
         $sessions = AcademicSession::where('status', 1)->get();
+        $categories = FeeCategory::where('is_active', 1)->get();
 
-        return view('admin.fee-management.collections.create', compact('students', 'classes', 'sessions'));
+        return view('admin.fee-management.collections.create', compact('students', 'classes', 'sessions', 'categories'));
     }
 
     public function getStudentsByClass($classId)
@@ -981,5 +988,6 @@ class FeeManagementController extends Controller
 
         return view('admin.fee-management.reports.student-ledger', compact('student', 'collections', 'adjustments'));
     }
+
 }
 

@@ -15,6 +15,7 @@ class FeeStructureDetail extends Model
         'fee_structure_id',
         'fee_category_id',
         'amount',
+        'notes',
         'is_mandatory',
         'is_active',
         'company_id',

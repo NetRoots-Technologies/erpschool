@@ -17,7 +17,7 @@
         <div class="row mt-4 mb-4 ">
            @if (Gate::allows('create types'))
         <div class="col-auto p-0">
-            <a class="btn btn-primary btn-md text-white" style="margin-left: 15px;" data-toggle="modal"
+            <a class="btn btn-primary btn-md" style="margin-left: 15px; color: #212529 !important;" data-toggle="modal"
                 data-target="#createTypeModal">
                 <b>Add Type</b>
             </a>

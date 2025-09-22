@@ -117,3 +117,27 @@
     }
 </script>
 @endsection
+
+@section('css')
+<style>
+.badge {
+    color: #212529 !important;
+}
+.badge-success {
+    background-color: #28a745 !important;
+    color: #212529 !important;
+}
+.badge-danger {
+    background-color: #dc3545 !important;
+    color: #212529 !important;
+}
+.badge-warning {
+    background-color: #ffc107 !important;
+    color: #212529 !important;
+}
+.badge-info {
+    background-color: #17a2b8 !important;
+    color: #212529 !important;
+}
+</style>
+@endsection

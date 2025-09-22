@@ -128,10 +128,9 @@
                                                 <div class="input-group">
                                                     <select class="form-control category-select" name="collections[0][category_id]" required>
                                                         <option value="">Select Category</option>
-                                                        <option value="1">Monthly Tuition</option>
-                                                        <option value="2">Admission Fee</option>
-                                                        <option value="3">Security</option>
-                                                        <option value="4">Books & Stationery</option>
+                                                        @foreach($categories as $category)
+                                                            <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                                        @endforeach
                                                     </select>
                                                     <div class="input-group-append">
                                                         <button type="button" class="btn btn-outline-primary btn-sm" data-toggle="modal" data-target="#categoryModal">
@@ -157,6 +156,11 @@
                                             </div>
                                         </div>
                                     </div>
+                                </div>
+                                <div class="mt-2">
+                                    <button type="button" class="btn btn-outline-success btn-sm" id="addCategory">
+                                        <i class="fa fa-plus"></i> Add Another Category
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -282,6 +286,51 @@
             window.currentCategoryButton = $(this);
         });
         
+        // Add new category row
+        $('#addCategory').click(function() {
+            categoryCount++;
+            const newRow = `
+                <div class="row mb-2" id="categoryRow${categoryCount}">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Category</label>
+                            <div class="input-group">
+                                <select class="form-control category-select" name="collections[${categoryCount}][category_id]" required>
+                                    <option value="">Select Category</option>
+                                    @foreach($categories as $category)
+                                        <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                    @endforeach
+                                </select>
+                                <div class="input-group-append">
+                                    <button type="button" class="btn btn-outline-primary btn-sm" data-toggle="modal" data-target="#categoryModal">
+                                        <i class="fa fa-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Amount</label>
+                            <input type="number" class="form-control amount-input" name="collections[${categoryCount}][amount]" 
+                                   placeholder="Amount" min="0" step="0.01" required>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>&nbsp;</label>
+                            <button type="button" class="btn btn-danger btn-sm remove-category">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            $('#feeCategories').append(newRow);
+            updateRemoveButtons();
+        });
+
         // Remove category row
         $(document).on('click', '.remove-category', function() {
             $(this).closest('.row').remove();
@@ -433,10 +482,9 @@
                                         <div class="input-group">
                                             <select class="form-control category-select" name="collections[${categoryCount}][category_id]" required>
                                                 <option value="">Select Category</option>
-                                                <option value="1">Monthly Tuition</option>
-                                                <option value="2">Admission Fee</option>
-                                                <option value="3">Security</option>
-                                                <option value="4">Books & Stationery</option>
+                                                @foreach($categories as $category)
+                                                    <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                                @endforeach
                                                 <option value="${response.category.id}">${response.category.name}</option>
                                             </select>
                                             <div class="input-group-append">

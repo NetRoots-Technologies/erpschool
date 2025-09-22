@@ -27,6 +27,37 @@
                     <h3 class="card-title">Edit Fee Structure</h3>
                 </div>
                 <div class="card-body">
+                    @if(session('success'))
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            {{ session('success') }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    @endif
+
+                    @if(session('error'))
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            {{ session('error') }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    @endif
+
+                    @if($errors->any())
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <ul class="mb-0">
+                                @foreach($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    @endif
+
                     <form action="{{ route('admin.fee-management.structures.update', $structure->id) }}" method="POST" id="structureForm">
                         @csrf
                         @method('PUT')
@@ -45,13 +76,13 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="class_id">Class <span class="text-danger">*</span></label>
-                                    <select class="form-control" id="class_id" name="class_id" required>
+                                    <select class="form-control" id="academic_class_id" name="academic_class_id" required>
                                         <option value="">Select Class</option>
                                         @foreach($classes as $class)
-                                            <option value="{{ $class->id }}" {{ $structure->class_id == $class->id ? 'selected' : '' }}>{{ $class->name }}</option>
+                                            <option value="{{ $class->id }}" {{ $structure->academic_class_id == $class->id ? 'selected' : '' }}>{{ $class->name }}</option>
                                         @endforeach
                                     </select>
-                                    @error('class_id')
+                                    @error('academic_class_id')
                                         <span class="text-danger">{{ $message }}</span>
                                     @enderror
                                 </div>
@@ -62,13 +93,13 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="session_id">Academic Session <span class="text-danger">*</span></label>
-                                    <select class="form-control" id="session_id" name="session_id" required>
+                                    <select class="form-control" id="academic_session_id" name="academic_session_id" required>
                                         <option value="">Select Session</option>
                                         @foreach($sessions as $session)
-                                            <option value="{{ $session->id }}" {{ $structure->session_id == $session->id ? 'selected' : '' }}>{{ $session->name }}</option>
+                                            <option value="{{ $session->id }}" {{ $structure->academic_session_id == $session->id ? 'selected' : '' }}>{{ $session->name }}</option>
                                         @endforeach
                                     </select>
-                                    @error('session_id')
+                                    @error('academic_session_id')
                                         <span class="text-danger">{{ $message }}</span>
                                     @enderror
                                 </div>
@@ -77,13 +108,13 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="factor_id">Fee Factor <span class="text-danger">*</span></label>
-                                    <select class="form-control" id="factor_id" name="factor_id" required>
+                                    <select class="form-control" id="fee_factor_id" name="fee_factor_id" required>
                                         <option value="">Select Factor</option>
                                         @foreach($factors as $factor)
-                                            <option value="{{ $factor->id }}" {{ $structure->factor_id == $factor->id ? 'selected' : '' }}>{{ $factor->name }}</option>
+                                            <option value="{{ $factor->id }}" {{ $structure->fee_factor_id == $factor->id ? 'selected' : '' }}>{{ $factor->name }}</option>
                                         @endforeach
                                     </select>
-                                    @error('factor_id')
+                                    @error('fee_factor_id')
                                         <span class="text-danger">{{ $message }}</span>
                                     @enderror
                                 </div>
@@ -105,10 +136,15 @@
                         <!-- Fee Categories Section -->
                         <div class="row">
                             <div class="col-md-12">
-                                <h5>Fee Categories</h5>
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h5 class="mb-0">Fee Categories</h5>
+                                    <button type="button" class="btn btn-outline-success btn-sm" id="addCategory">
+                                        <i class="fa fa-plus"></i> Add Another Category
+                                    </button>
+                                </div>
                                 <div id="feeCategories">
-                                    @if($structure->details && count($structure->details) > 0)
-                                        @foreach($structure->details as $index => $detail)
+                                    @if($structure->feeStructureDetails && count($structure->feeStructureDetails) > 0)
+                                        @foreach($structure->feeStructureDetails as $index => $detail)
                                             <div class="row fee-category-row">
                                                 <div class="col-md-4">
                                                     <div class="form-group">
@@ -116,7 +152,7 @@
                                                         <select class="form-control category-select" name="categories[{{ $index }}][category_id]" required>
                                                             <option value="">Select Category</option>
                                                             @foreach($categories as $category)
-                                                                <option value="{{ $category->id }}" {{ $detail->category_id == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
+                                                                <option value="{{ $category->id }}" {{ $detail->fee_category_id == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
                                                             @endforeach
                                                         </select>
                                                     </div>
@@ -129,14 +165,13 @@
                                                 </div>
                                                 <div class="col-md-3">
                                                     <div class="form-group">
-                                                        <label>Due Date</label>
-                                                        <input type="date" class="form-control" name="categories[{{ $index }}][due_date]" value="{{ $detail->due_date }}">
+                                                        <label>Notes</label>
+                                                        <input type="text" class="form-control" name="categories[{{ $index }}][notes]" value="{{ $detail->notes ?? '' }}" placeholder="Optional notes">
                                                     </div>
                                                 </div>
                                                 <div class="col-md-2">
                                                     <div class="form-group">
-                                                        <label>&nbsp;</label>
-                                                        <button type="button" class="btn btn-danger btn-sm remove-category" {{ count($structure->details) <= 1 ? 'style=display:none' : '' }}>
+                                                        <button type="button" class="btn btn-danger btn-sm remove-category" style="margin-top: 30px;" {{ count($structure->feeStructureDetails) <= 1 ? 'style=display:none;margin-top:30px;' : '' }}>
                                                             <i class="fa fa-trash"></i>
                                                         </button>
                                                     </div>
@@ -164,14 +199,13 @@
                                             </div>
                                             <div class="col-md-3">
                                                 <div class="form-group">
-                                                    <label>Due Date</label>
-                                                    <input type="date" class="form-control" name="categories[0][due_date]">
+                                                    <label>Notes</label>
+                                                    <input type="text" class="form-control" name="categories[0][notes]" placeholder="Optional notes">
                                                 </div>
                                             </div>
                                             <div class="col-md-2">
                                                 <div class="form-group">
-                                                    <label>&nbsp;</label>
-                                                    <button type="button" class="btn btn-danger btn-sm remove-category" style="display: none;">
+                                                    <button type="button" class="btn btn-danger btn-sm remove-category" style="display: none; margin-top: 30px;">
                                                         <i class="fa fa-trash"></i>
                                                     </button>
                                                 </div>
@@ -179,9 +213,6 @@
                                         </div>
                                     @endif
                                 </div>
-                                <button type="button" class="btn btn-success btn-sm" id="addCategory">
-                                    <i class="fa fa-plus"></i> Add Category
-                                </button>
                             </div>
                         </div>
 
@@ -197,14 +228,16 @@
         </div>
     </div>
 </div>
+
 @endsection
 
 @section('js')
 <script>
     $(document).ready(function() {
-        let categoryIndex = {{ $structure->details ? count($structure->details) : 1 }};
+        let categoryIndex = {{ $structure->feeStructureDetails ? count($structure->feeStructureDetails) : 1 }};
 
-        // Add new category row
+
+        // Add new category row when "Add Another Category" button is clicked
         $('#addCategory').click(function() {
             const newRow = `
                 <div class="row fee-category-row">
@@ -227,18 +260,17 @@
                     </div>
                     <div class="col-md-3">
                         <div class="form-group">
-                            <label>Due Date</label>
-                            <input type="date" class="form-control" name="categories[${categoryIndex}][due_date]">
+                            <label>Notes</label>
+                            <input type="text" class="form-control" name="categories[${categoryIndex}][notes]" placeholder="Optional notes">
                         </div>
                     </div>
-                    <div class="col-md-2">
-                        <div class="form-group">
-                            <label>&nbsp;</label>
-                            <button type="button" class="btn btn-danger btn-sm remove-category">
-                                <i class="fa fa-trash"></i>
-                            </button>
-                        </div>
-                    </div>
+                                                <div class="col-md-2">
+                                                    <div class="form-group">
+                                                        <button type="button" class="btn btn-danger btn-sm remove-category" style="margin-top: 30px;">
+                                                            <i class="fa fa-trash"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
                 </div>
             `;
             
@@ -282,6 +314,7 @@
                 return false;
             }
         });
+
     });
 </script>
 @endsection

@@ -24,7 +24,7 @@
             <div class="card">
                 <div class="card-body">
                     <div class="d-flex align-items-center">
-                        <div class="icon-box icon-box-sm bg-primary text-white me-3">
+                        <div class="icon-box icon-box-sm bg-primary me-3" style="color: #212529 !important;">
                             <i class="fa fa-tags"></i>
                         </div>
                         <div>
@@ -39,7 +39,7 @@
             <div class="card">
                 <div class="card-body">
                     <div class="d-flex align-items-center">
-                        <div class="icon-box icon-box-sm bg-success text-white me-3">
+                        <div class="icon-box icon-box-sm bg-success me-3" style="color: #212529 !important;">
                             <i class="fa fa-sitemap"></i>
                         </div>
                         <div>
@@ -54,7 +54,7 @@
             <div class="card">
                 <div class="card-body">
                     <div class="d-flex align-items-center">
-                        <div class="icon-box icon-box-sm bg-info text-white me-3">
+                        <div class="icon-box icon-box-sm bg-info me-3" style="color: #212529 !important;">
                             <i class="fa fa-money"></i>
                         </div>
                         <div>
@@ -69,7 +69,7 @@
             <div class="card">
                 <div class="card-body">
                     <div class="d-flex align-items-center">
-                        <div class="icon-box icon-box-sm bg-warning text-white me-3">
+                        <div class="icon-box icon-box-sm bg-warning me-3" style="color: #212529 !important;">
                             <i class="fa fa-clock-o"></i>
                         </div>
                         <div>
@@ -140,9 +140,31 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td colspan="5" class="text-center">No recent collections found</td>
-                                </tr>
+                                @if($data['recent_collections'] && $data['recent_collections']->count() > 0)
+                                    @foreach($data['recent_collections'] as $collection)
+                                    <tr>
+                                        <td>{{ $collection->student->fullname ?? 'N/A' }}</td>
+                                        <td><span class="badge badge-secondary">{{ $collection->student->AcademicClass->name ?? 'N/A' }}</span></td>
+                                        <td><span class="text-success font-weight-bold">Rs. {{ number_format($collection->paid_amount, 2) }}</span></td>
+                                        <td>{{ $collection->collection_date ? \Carbon\Carbon::parse($collection->collection_date)->format('d M Y') : 'N/A' }}</td>
+                                        <td>
+                                            @if($collection->status == 'paid')
+                                                <span class="badge badge-success">Paid</span>
+                                            @elseif($collection->status == 'pending')
+                                                <span class="badge badge-warning">Pending</span>
+                                            @elseif($collection->status)
+                                                <span class="badge badge-info">{{ ucfirst($collection->status) }}</span>
+                                            @else
+                                                <span class="badge badge-secondary">Not Set</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                    @endforeach
+                                @else
+                                    <tr>
+                                        <td colspan="5" class="text-center">No recent collections found</td>
+                                    </tr>
+                                @endif
                             </tbody>
                         </table>
                     </div>
@@ -160,4 +182,32 @@
         console.log('Fee Management Dashboard loaded');
     });
 </script>
+@endsection
+
+@section('css')
+<style>
+.badge {
+    color: #212529 !important;
+}
+.badge-success {
+    background-color: #28a745 !important;
+    color: #212529 !important;
+}
+.badge-danger {
+    background-color: #dc3545 !important;
+    color: #212529 !important;
+}
+.badge-warning {
+    background-color: #ffc107 !important;
+    color: #212529 !important;
+}
+.badge-info {
+    background-color: #17a2b8 !important;
+    color: #212529 !important;
+}
+.badge-secondary {
+    background-color: #6c757d !important;
+    color: #212529 !important;
+}
+</style>
 @endsection

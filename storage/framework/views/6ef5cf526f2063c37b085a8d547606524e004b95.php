@@ -44,9 +44,11 @@ endif;
 unset($__errorArgs, $__bag); ?>" 
                                             id="student_id" name="student_id" required>
                                         <option value="">Select Student</option>
-                                        <option value="1">Student 1</option>
-                                        <option value="2">Student 2</option>
-                                        <option value="3">Student 3</option>
+                                        <?php $__currentLoopData = $students; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $student): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                            <option value="<?php echo e($student->id); ?>">
+                                                <?php echo e($student->fullname); ?> (<?php echo e($student->AcademicClass->name ?? 'N/A'); ?>)
+                                            </option>
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                     </select>
                                     <?php $__errorArgs = ['student_id'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
