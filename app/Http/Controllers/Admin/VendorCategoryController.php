@@ -24,7 +24,7 @@ class VendorCategoryController extends Controller
      */
     public function index(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return view('admin.inventory_management.vendor_category.index');
@@ -37,7 +37,7 @@ class VendorCategoryController extends Controller
      */
     public function create()
     {
-       if (!Gate::allows('students')) {
+       if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -50,7 +50,7 @@ class VendorCategoryController extends Controller
      */
     public function store(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $request->validate([
@@ -77,7 +77,7 @@ class VendorCategoryController extends Controller
      */
     public function show($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -90,7 +90,7 @@ class VendorCategoryController extends Controller
      */
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $category = VendorCategory::findOrFail($id);
@@ -106,7 +106,7 @@ class VendorCategoryController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $request->validate(
@@ -130,7 +130,7 @@ class VendorCategoryController extends Controller
      */
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         if ($this->vendorCategoryService->destroy($id)) {
@@ -143,7 +143,7 @@ class VendorCategoryController extends Controller
 
     public function getData(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = $this->vendorCategoryService->getCategoriesLevelOne();
@@ -169,3 +169,4 @@ class VendorCategoryController extends Controller
     }
 
 }
+

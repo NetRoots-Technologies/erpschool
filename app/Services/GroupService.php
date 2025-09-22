@@ -18,7 +18,7 @@ class GroupService
 
     public function index($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $globalSearch = AllowedFilter::callback('global', function ($query, $value) {
@@ -52,7 +52,7 @@ class GroupService
 
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return Permission::with('child')->where('parent_id', 0)->get();
@@ -61,7 +61,7 @@ class GroupService
 
     public function store($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $permissions = [];
@@ -73,7 +73,7 @@ class GroupService
 
     public function getdata()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = Role::select('id', 'name')->get();
@@ -93,7 +93,7 @@ class GroupService
 
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return Role::find($id);
@@ -103,7 +103,7 @@ class GroupService
 
     public function AllowedPermissions($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return Permission::join('role_has_permissions', 'role_has_permissions.permission_id', '=', 'permissions.id')
@@ -113,7 +113,7 @@ class GroupService
 
     public function update($request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $role = Role::find($id);
@@ -125,7 +125,7 @@ class GroupService
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $role = Role::findOrFail($id);
@@ -135,3 +135,4 @@ class GroupService
     }
 
 }
+

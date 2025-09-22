@@ -42,7 +42,7 @@ class PayrollApprovalController extends Controller
 
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return view('hr.payroll.approve');
@@ -51,7 +51,7 @@ class PayrollApprovalController extends Controller
 
     public function getData(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = $request->all();
@@ -95,7 +95,7 @@ class PayrollApprovalController extends Controller
 
     public function payrollStatus($id)
     {
-if (!Gate::allows('students')) {
+if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $payrollApproval = PayrollApproval::with('payroll')->findorfail($id);
@@ -107,7 +107,7 @@ if (!Gate::allows('students')) {
 
     public function payroll_status_approve($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         ini_set('max_execution_time', 120000);
@@ -267,7 +267,7 @@ if (!Gate::allows('students')) {
 
     public function payroll_status_reject($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $salary = PayrollApproval::find($id);
@@ -278,3 +278,4 @@ if (!Gate::allows('students')) {
 
     }
 }
+

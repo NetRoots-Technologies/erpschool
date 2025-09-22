@@ -25,7 +25,7 @@ class LeaveRequestController extends Controller
      */
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return view('hr.leave_requests.index');
@@ -38,7 +38,7 @@ class LeaveRequestController extends Controller
      */
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $employees = Employees::where('job_seeking', '!=', 'visitingLecturer')->get();
@@ -58,7 +58,7 @@ class LeaveRequestController extends Controller
      */
     public function store(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         try {
@@ -79,7 +79,7 @@ class LeaveRequestController extends Controller
      */
     public function show($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -92,7 +92,7 @@ class LeaveRequestController extends Controller
      */
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $employees = Employees::where('job_seeking', '!=', 'visitingLecturer')->get();
@@ -114,7 +114,7 @@ class LeaveRequestController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $leaveRequest = $this->LeaveRequestService->update($request, $id);
@@ -131,7 +131,7 @@ class LeaveRequestController extends Controller
      */
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $this->LeaveRequestService->destroy($id);
@@ -143,7 +143,7 @@ class LeaveRequestController extends Controller
 
     public function getData()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $LeaveRequest = $this->LeaveRequestService->getdata();
@@ -152,7 +152,7 @@ class LeaveRequestController extends Controller
 
     public function employee_leave(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $quotaSettings = $this->LeaveRequestService->employee_leave($request);
@@ -162,3 +162,4 @@ class LeaveRequestController extends Controller
 
 
 }
+

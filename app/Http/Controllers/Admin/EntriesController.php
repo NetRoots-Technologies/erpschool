@@ -42,7 +42,7 @@ class EntriesController extends Controller
      */
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $EntryTypes = EntryTypes::all()->getDictionary();
@@ -54,7 +54,7 @@ class EntriesController extends Controller
 
     public function getData(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $EntryTypes = EntryTypes::all()->getDictionary();
@@ -127,7 +127,7 @@ class EntriesController extends Controller
      */
     public function entry($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $Entrie = Entries::findOrFail($id);
@@ -188,7 +188,7 @@ class EntriesController extends Controller
      */
     public function show($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $Entrie = Entries::findOrFail($id);
@@ -203,7 +203,7 @@ class EntriesController extends Controller
      */
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return view('admin.entries.create');
@@ -212,7 +212,7 @@ class EntriesController extends Controller
     public function downloadPDF($id)
     {
 
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $Entrie = Entries::findOrFail($id);
@@ -292,7 +292,7 @@ class EntriesController extends Controller
      */
     public function store(StoreEntriesRequest $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         Entries::create([
@@ -317,7 +317,7 @@ class EntriesController extends Controller
      */
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
 
@@ -407,7 +407,7 @@ class EntriesController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
 
@@ -433,7 +433,7 @@ class EntriesController extends Controller
      */
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $Entrie = Entries::findOrFail($id);
@@ -452,7 +452,7 @@ class EntriesController extends Controller
      */
     public function active($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
 
@@ -473,7 +473,7 @@ class EntriesController extends Controller
      */
     public function inactive($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
 
@@ -493,7 +493,7 @@ class EntriesController extends Controller
      */
     public function gjv_create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
 
@@ -711,7 +711,7 @@ class EntriesController extends Controller
      */
     public function crv_store(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         //$response = CoreAccounts::createEntry($request->all());
@@ -810,7 +810,7 @@ class EntriesController extends Controller
      */
     public function crv_search(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         if (isset($request['item']) && $request['item']) {
@@ -857,7 +857,7 @@ class EntriesController extends Controller
      */
     public function cpv_create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
 
@@ -929,7 +929,7 @@ class EntriesController extends Controller
      */
     public function cpv_store(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         //$response = CoreAccounts::createEntry($request->all());
@@ -961,7 +961,7 @@ class EntriesController extends Controller
     public function cpv_search(Request $request)
     {
 
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         if (isset($request['item']) && $request['item']) {
@@ -1022,7 +1022,7 @@ class EntriesController extends Controller
      */
     public function brv_create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
 
@@ -1103,7 +1103,7 @@ class EntriesController extends Controller
      */
     public function brv_store(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $response = CoreAccounts::createEntry($request->all());
@@ -1126,7 +1126,7 @@ class EntriesController extends Controller
      */
     public function brv_search(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         if (isset($request['item']) && $request['item']) {
@@ -1175,7 +1175,7 @@ class EntriesController extends Controller
 
     public function lcpv_create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $VoucherData = Session::get('_old_input');
@@ -1260,7 +1260,7 @@ class EntriesController extends Controller
      */
     public function lcpv_store(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $response = CoreAccounts::createLcEntry($request->all());
@@ -1282,7 +1282,7 @@ class EntriesController extends Controller
      */
     public function lcpv_search(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         if (isset($request['item']) && $request['item']) {
@@ -1337,7 +1337,7 @@ class EntriesController extends Controller
 
     public function lrp_create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
 
@@ -1435,7 +1435,7 @@ class EntriesController extends Controller
      */
     public function lrp_store(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $response = CoreAccounts::createLcInventory($request->all());
@@ -1457,7 +1457,7 @@ class EntriesController extends Controller
      */
     public function lrp_search($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $ledger = Ledgers::where('id', $id)->first();
@@ -1483,7 +1483,7 @@ class EntriesController extends Controller
      */
     public function bpv_create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
 
@@ -1564,7 +1564,7 @@ class EntriesController extends Controller
      */
     public function bpv_store(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $response = CoreAccounts::createEntry($request->all());
@@ -1587,7 +1587,7 @@ class EntriesController extends Controller
      */
     public function bpv_search(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         if (isset($request['item']) && $request['item']) {
@@ -1641,7 +1641,7 @@ class EntriesController extends Controller
 
     public function grv_create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
 
@@ -1714,7 +1714,7 @@ class EntriesController extends Controller
      */
     public function grv_store(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         //$response = CoreAccounts::createEntry($request->all());
@@ -1812,7 +1812,7 @@ class EntriesController extends Controller
      */
     public function grv_search(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         if (isset($request['item']) && $request['item']) {
@@ -1866,7 +1866,7 @@ class EntriesController extends Controller
      */
     public function cash_search(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         if (isset($request['item']) && $request['item']) {
@@ -1907,7 +1907,7 @@ class EntriesController extends Controller
      */
     public function bank_search(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         if (isset($request['item']) && $request['item']) {
@@ -1951,7 +1951,7 @@ class EntriesController extends Controller
      */
     public function cashbank_search(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         if (isset($request['item']) && $request['item']) {
@@ -1987,7 +1987,7 @@ class EntriesController extends Controller
 
     public function get_invList($ledger_id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $groupID = Ledgers::where('id', $ledger_id)->value('group_id');
@@ -2000,7 +2000,7 @@ class EntriesController extends Controller
 
     public function get_voucher_balance($ledgerID)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $Currencies = LedgerCurrencies::where('ledger_id', $ledgerID)->get();
@@ -2025,7 +2025,7 @@ class EntriesController extends Controller
 
     public function gpv_create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
 
@@ -2100,7 +2100,7 @@ class EntriesController extends Controller
 
     public function gpv_store(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $param = $request->all();
@@ -2188,3 +2188,4 @@ class EntriesController extends Controller
         return redirect()->route('admin.voucher.gpv_create')->with('successMessage', 'Gold Voucher');
     }
 }
+

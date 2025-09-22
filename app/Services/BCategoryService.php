@@ -9,7 +9,7 @@ class BCategoryService
 
     public function store($validatedData)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         // dd($validatedData);
@@ -22,7 +22,7 @@ class BCategoryService
 
     public function getData()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = BCategory::all();
@@ -47,7 +47,7 @@ class BCategoryService
 
     public function update($validatedData, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = BCategory::findOrFail($id);
@@ -57,7 +57,7 @@ class BCategoryService
     }
     public function delete($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $bcategory = BCategory::findOrFail($id);
@@ -66,3 +66,4 @@ class BCategoryService
 
 
 }
+

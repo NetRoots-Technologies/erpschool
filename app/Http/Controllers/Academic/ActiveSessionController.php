@@ -74,7 +74,7 @@ class ActiveSessionController extends Controller
      */
     public function show($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -142,7 +142,7 @@ class ActiveSessionController extends Controller
 
     public function fetch_activeSession(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $session = ActiveSession::with('academicSession')->where('class_id', $request->class_id)->first();
@@ -156,7 +156,7 @@ class ActiveSessionController extends Controller
 
     public function fetch_schoolType(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $branch = Branch::with('schoolBranch')->find($request->branch_id);
@@ -179,3 +179,4 @@ class ActiveSessionController extends Controller
 
 
 }
+

@@ -31,7 +31,7 @@ class ProductController extends Controller
 
     public function index($type)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $query = Inventry::query();
@@ -49,7 +49,7 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         // dd($request->all());
@@ -103,7 +103,7 @@ class ProductController extends Controller
 
     public function getData(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $query = Product::query()->with(['ProductItems', 'ProductItems.inventoryItems', 'branch']);
@@ -116,7 +116,7 @@ class ProductController extends Controller
 
     public function destroy(Product $product)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $product->delete();
@@ -126,7 +126,7 @@ class ProductController extends Controller
 
     public function calculate(Product $product)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $maxProductsForItem = PHP_INT_MAX;
@@ -169,7 +169,7 @@ class ProductController extends Controller
 
     public function productInventory(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         DB::beginTransaction();
@@ -278,7 +278,7 @@ class ProductController extends Controller
 
     public function productCompleted()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $goods = Inventry::where('type', 'p')->get();
@@ -288,7 +288,7 @@ class ProductController extends Controller
 
     public function getCompleted()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $query = Inventry::where('type', 'p')->get();
@@ -296,3 +296,4 @@ class ProductController extends Controller
         return response()->json(["success" => true, 'data' => $query]);
     }
 }
+

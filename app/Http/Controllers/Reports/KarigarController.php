@@ -12,16 +12,17 @@ class KarigarController extends Controller
 {
     public function karigar_report()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return view('admin.account_reports.karigar_reports.index');
     }
     public function print_karigar_report(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return view('admin.account_reports.karigar_reports.print_report');
     }
 }
+

@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Admin\Course;
 use App\Models\Admin\CourseType;
 use App\Models\Admin\Session;
-use App\Models\Fee\StudentFee;
 use App\Services\CourseServices;
 use App\Services\VideoCategoryService;
 use Illuminate\Http\Request;
@@ -27,7 +26,7 @@ class VideoCategoryController extends Controller
     }
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
 
@@ -43,7 +42,7 @@ class VideoCategoryController extends Controller
      */
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $sessions = Session::get();
@@ -66,7 +65,7 @@ class VideoCategoryController extends Controller
      */
     public function store(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $validated = $request->validate([
@@ -90,7 +89,7 @@ class VideoCategoryController extends Controller
      */
     public function show($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -103,7 +102,7 @@ class VideoCategoryController extends Controller
      */
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $courses = Course::find($id);
@@ -119,7 +118,7 @@ class VideoCategoryController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $this->validate($request, [
@@ -143,10 +142,11 @@ class VideoCategoryController extends Controller
      */
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $this->VideoCategoryService->destroy($id);
         //
     }
 }
+

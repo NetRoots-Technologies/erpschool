@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Validator;
 class ExamScheduleService{
     public function store($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         // dd($request->all());
@@ -48,7 +48,7 @@ class ExamScheduleService{
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $examSchedule = ExamSchedule::find($id);

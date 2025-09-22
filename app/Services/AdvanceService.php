@@ -12,7 +12,7 @@ class AdvanceService
 {
     public function store($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $fileNameToStore = null;
@@ -38,7 +38,7 @@ class AdvanceService
 
     public function getData()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = Advance::with('employee')->get();
@@ -78,7 +78,7 @@ class AdvanceService
 
     public function update($request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $advance = Advance::findOrFail($id);
@@ -106,7 +106,7 @@ class AdvanceService
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $advance = Advance::find($id);
@@ -115,3 +115,4 @@ class AdvanceService
         }
     }
 }
+

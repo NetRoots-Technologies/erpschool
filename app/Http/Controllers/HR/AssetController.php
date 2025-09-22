@@ -56,7 +56,7 @@ class AssetController extends Controller
      */
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return view('hr.asset.index');
@@ -69,7 +69,7 @@ class AssetController extends Controller
      */
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $asserts = AssetType::get();
@@ -89,7 +89,7 @@ class AssetController extends Controller
      */
     public function store(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         // dd($request->all());
@@ -141,7 +141,7 @@ class AssetController extends Controller
      */
     public function show($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -154,7 +154,7 @@ class AssetController extends Controller
      */
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $asset_type = AssetType::get();
@@ -175,7 +175,7 @@ class AssetController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         try {
@@ -194,7 +194,7 @@ class AssetController extends Controller
      */
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $this->AssetService->destroy($id);
@@ -203,7 +203,7 @@ class AssetController extends Controller
 
     public function getdata()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return $this->AssetService->getdata();
@@ -211,7 +211,7 @@ class AssetController extends Controller
 
     public function bulkShow()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return view('hr.asset.bulk');
@@ -219,7 +219,7 @@ class AssetController extends Controller
 
     public function bulkSave(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         try {
@@ -347,7 +347,7 @@ class AssetController extends Controller
 
     public function exportbulkfile()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return Excel::download(new AssetSampleExport, 'class_bulk_sample.xlsx');
@@ -355,7 +355,7 @@ class AssetController extends Controller
 
     public function importBulkFile(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $request->validate([
@@ -383,3 +383,4 @@ class AssetController extends Controller
     }
 
 }
+

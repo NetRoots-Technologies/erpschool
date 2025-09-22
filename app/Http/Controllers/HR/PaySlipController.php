@@ -18,7 +18,7 @@ class PaySlipController extends Controller
 
     public function index()
     {
-       if (!Gate::allows('students')) {
+       if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
 
@@ -28,7 +28,7 @@ class PaySlipController extends Controller
     public function getData(Request $request)
     {
 
-       if (!Gate::allows('students')) {
+       if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
 
@@ -69,7 +69,7 @@ class PaySlipController extends Controller
 
     public function salarySlip($id)
     {
-       if (!Gate::allows('students')) {
+       if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
 
@@ -92,3 +92,4 @@ class PaySlipController extends Controller
     }
 
 }
+

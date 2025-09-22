@@ -20,7 +20,7 @@ class MarketingNotificationController extends Controller
 
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return view('admin.marketing_notification.index');
@@ -28,7 +28,7 @@ class MarketingNotificationController extends Controller
 
     public function getdata()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return $this->MarketingNotificationService->getdata();
@@ -37,7 +37,7 @@ class MarketingNotificationController extends Controller
 
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = $this->MarketingNotificationService->create();
@@ -47,7 +47,7 @@ class MarketingNotificationController extends Controller
 
     public function store(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = $this->MarketingNotificationService->store($request);
@@ -59,7 +59,7 @@ class MarketingNotificationController extends Controller
 
     public function show($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $ad = $this->MarketingNotificationService->show($id);
@@ -69,7 +69,7 @@ class MarketingNotificationController extends Controller
 
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $client = $this->MarketingNotificationService->edit($id);
@@ -80,7 +80,7 @@ class MarketingNotificationController extends Controller
     public function update(Request $request, $id)
     {
 
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $post = $this->MarketingNotificationService->update($request, $id);
@@ -91,7 +91,7 @@ class MarketingNotificationController extends Controller
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $this->MarketingNotificationService->destroy($id);
@@ -100,3 +100,4 @@ class MarketingNotificationController extends Controller
         return redirect()->route('admin.marketing_notification.index');
     }
 }
+

@@ -6,7 +6,6 @@ use Config;
 use DataTables;
 use App\Models\Admin\Tool;
 use App\Models\Admin\Course;
-use App\Models\Fee\StudentFee;
 use App\Models\Admin\AssignTool;
 use App\Models\Admin\VideoCategory;
 use Illuminate\Support\Facades\Gate;
@@ -18,7 +17,7 @@ class ToolsServices
 
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return Tool::all();
@@ -27,7 +26,7 @@ class ToolsServices
 
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
 
@@ -35,7 +34,7 @@ class ToolsServices
 
     public function store($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $tools = Tool::create(['name' => $request->name, 'description' => $request->description]);
@@ -44,7 +43,7 @@ class ToolsServices
 
     public function assign_tools_post($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $assign_tools = new AssignTool();
@@ -70,7 +69,7 @@ class ToolsServices
 
     public function update($request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = Tool::find($id);
@@ -82,7 +81,7 @@ class ToolsServices
     //for tool index
     public function getData()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = Tool::get();
@@ -108,7 +107,7 @@ class ToolsServices
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $tools = Tool::findOrFail($id);
@@ -119,7 +118,7 @@ class ToolsServices
 
     public function assign_tools_delete($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $tools = AssignTool::findOrFail($id);
@@ -131,7 +130,7 @@ class ToolsServices
 
     public function assign_tools_get($student_id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data['student'] = StudentFee::with('course', 'student', 'session')->where('id', $student_id)->first();
@@ -145,7 +144,7 @@ class ToolsServices
     //specific student tools datatable
     public function get_data_old_assign_tools($student_id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = AssignTool::with('tool')->where('student_id', $student_id)->get();
@@ -178,4 +177,5 @@ class ToolsServices
     //specific student tools datatable
 
 }
+
 

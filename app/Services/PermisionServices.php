@@ -12,7 +12,7 @@ class PermisionServices
 
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = Permission::select('id', 'name')->get();
@@ -20,7 +20,7 @@ class PermisionServices
 
     public function apiindex()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return Permission::all();
@@ -28,7 +28,7 @@ class PermisionServices
 
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         //        dd('a');
@@ -37,7 +37,7 @@ class PermisionServices
 
     public function getdata()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = Permission::select('id', 'name', 'main', 'parent_id')->get();
@@ -62,7 +62,7 @@ class PermisionServices
 
     public function store($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
 
@@ -75,7 +75,7 @@ class PermisionServices
 
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return Permission::findOrFail($id);
@@ -83,7 +83,7 @@ class PermisionServices
 
     public function update($request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $Permission = Permission::find($id);
@@ -98,7 +98,7 @@ class PermisionServices
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $Permission = Permission::findOrFail($id);
@@ -108,3 +108,4 @@ class PermisionServices
 
     }
 }
+

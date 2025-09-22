@@ -9,7 +9,7 @@ class TestTypeService
 {
     public function store($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         TestType::create([
@@ -19,7 +19,7 @@ class TestTypeService
 
     public function getdata()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = TestType::orderby('id', 'DESC');
@@ -49,7 +49,7 @@ class TestTypeService
 
     public function update($request, $id, $image = null)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $testType = TestType::find($id);
@@ -61,7 +61,7 @@ class TestTypeService
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $testType = TestType::findOrFail($id);
@@ -71,7 +71,7 @@ class TestTypeService
 
     public function changeStatus($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $testType = TestType::find($request->id);
@@ -83,3 +83,4 @@ class TestTypeService
     }
 
 }
+

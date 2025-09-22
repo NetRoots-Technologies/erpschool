@@ -15,7 +15,7 @@ class academicEvaluationKeyService
 
     public function store($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         AcademicEvaluationKey::create(['key' => $request->key, 'abbr' => $request->abbr, 'user_id' => Auth::id()]);
@@ -23,7 +23,7 @@ class academicEvaluationKeyService
 
     public function getdata()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = AcademicEvaluationKey::with('user')->orderby('id', 'DESC')->get();
@@ -63,7 +63,7 @@ class academicEvaluationKeyService
 
     public function update($request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $academicEvaluation = AcademicEvaluationKey::find($id);
@@ -76,7 +76,7 @@ class academicEvaluationKeyService
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $academicEvaluation = AcademicEvaluationKey::findOrFail($id);
@@ -86,7 +86,7 @@ class academicEvaluationKeyService
 
     public function changeStatus($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $academicEvaluation = AcademicEvaluationKey::find($request->id);
@@ -99,3 +99,4 @@ class academicEvaluationKeyService
 
 
 }
+

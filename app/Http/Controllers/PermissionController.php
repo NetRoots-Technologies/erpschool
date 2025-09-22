@@ -36,7 +36,7 @@ class PermissionController extends Controller
 
     public function getData()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $Users = $this->PermisionServices->getdata();
@@ -87,7 +87,7 @@ class PermissionController extends Controller
      */
     public function show($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -138,3 +138,4 @@ class PermissionController extends Controller
         $Permision = $this->PermisionServices->destroy($id);
     }
 }
+

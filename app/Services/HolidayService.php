@@ -17,7 +17,7 @@ class HolidayService
 
     public function store($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $isRecurring = $request->has('is_recurring') ? $request->is_recurring : 0;
@@ -38,7 +38,7 @@ class HolidayService
     }
     public function getdata()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = Holiday::all();
@@ -75,7 +75,7 @@ class HolidayService
 
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return Holiday::find($id);
@@ -83,7 +83,7 @@ class HolidayService
 
     public function update($request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $holiday = Holiday::findOrFail($id);
@@ -105,7 +105,7 @@ class HolidayService
     }
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $holiday = Holiday::findOrFail($id);
@@ -114,4 +114,5 @@ class HolidayService
 
 
 }
+
 

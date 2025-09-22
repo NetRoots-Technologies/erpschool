@@ -21,7 +21,7 @@ class AcademicYearController extends Controller
 
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $company = $this->AcademicYearService->create();
@@ -35,7 +35,7 @@ class AcademicYearController extends Controller
      */
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -48,7 +48,7 @@ class AcademicYearController extends Controller
      */
     public function store(Request $request)
     {
-       if (!Gate::allows('students')) {
+       if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -61,7 +61,7 @@ class AcademicYearController extends Controller
      */
     public function show($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -74,7 +74,7 @@ class AcademicYearController extends Controller
      */
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -88,7 +88,7 @@ class AcademicYearController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -101,8 +101,9 @@ class AcademicYearController extends Controller
      */
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
 }
+

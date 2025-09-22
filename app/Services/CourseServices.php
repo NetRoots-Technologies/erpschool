@@ -14,7 +14,7 @@ class CourseServices
 
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return Course::all();
@@ -23,7 +23,7 @@ class CourseServices
 
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
 
@@ -31,7 +31,7 @@ class CourseServices
 
     public function store($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $coursetype = Course::create([
@@ -49,7 +49,7 @@ class CourseServices
 
     public function user_deactive($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $user = User::find($id);
@@ -62,7 +62,7 @@ class CourseServices
 
     public function user_active($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $user = User::find($id);
@@ -76,7 +76,7 @@ class CourseServices
 
     public function getdata()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = Course::with('courseType', 'company', 'branch')->orderBy('created_at', 'desc');
@@ -164,7 +164,7 @@ class CourseServices
 
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return Agent::find($id);
@@ -174,7 +174,7 @@ class CourseServices
 
     public function update($request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = Course::find($id);
@@ -185,7 +185,7 @@ class CourseServices
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $course = Course::findOrFail($id);
@@ -197,7 +197,7 @@ class CourseServices
 
     public function changeStatus($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $coursetype = Course::find($request->id);
@@ -209,4 +209,5 @@ class CourseServices
     }
 
 }
+
 

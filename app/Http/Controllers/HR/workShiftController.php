@@ -22,7 +22,7 @@ class workShiftController extends Controller
      */
     public function index()
     {
-         if (!Gate::allows('students')) {
+         if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return view('hr.workshift.index');
@@ -31,7 +31,7 @@ class workShiftController extends Controller
     public function getData()
     {
 
-         if (!Gate::allows('students')) {
+         if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $WrokShift = $this->WorkShiftService->getdata();
@@ -45,7 +45,7 @@ class workShiftController extends Controller
      */
     public function create()
     {
- if (!Gate::allows('students')) {
+ if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -58,7 +58,7 @@ class workShiftController extends Controller
      */
     public function store(Request $request)
     {
-         if (!Gate::allows('students')) {
+         if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return $WrokShift = $this->WorkShiftService->store($request);
@@ -72,7 +72,7 @@ class workShiftController extends Controller
      */
     public function show($id)
     {
-       if (!Gate::allows('students')) {
+       if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -85,7 +85,7 @@ class workShiftController extends Controller
      */
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -99,7 +99,7 @@ class workShiftController extends Controller
      */
     public function update(Request $request, $id)
     {
-         if (!Gate::allows('students')) {
+         if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return $WrokShift = $this->WorkShiftService->update($request, $id);
@@ -114,7 +114,7 @@ class workShiftController extends Controller
      */
     public function destroy($id)
     {
-         if (!Gate::allows('students')) {
+         if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return $this->WorkShiftService->destroy($id);
@@ -123,7 +123,7 @@ class workShiftController extends Controller
 
     public function changeStatus(Request $request)
     {
- if (!Gate::allows('students')) {
+ if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return $WorkShift = $this->WorkShiftService->changeStatus($request);
@@ -131,3 +131,4 @@ class workShiftController extends Controller
 
     }
 }
+

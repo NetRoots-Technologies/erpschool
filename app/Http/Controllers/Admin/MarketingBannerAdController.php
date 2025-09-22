@@ -21,7 +21,7 @@ class MarketingBannerAdController extends Controller
 
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return view('admin.marketing_banner_ad.index');
@@ -29,7 +29,7 @@ class MarketingBannerAdController extends Controller
 
     public function getdata()
     {
-if (!Gate::allows('students')) {
+if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return $this->MarketingBannerAdService->getdata();
@@ -38,7 +38,7 @@ if (!Gate::allows('students')) {
 
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = $this->MarketingBannerAdService->create();
@@ -48,7 +48,7 @@ if (!Gate::allows('students')) {
 
     public function store(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = $this->MarketingBannerAdService->store($request);
@@ -60,7 +60,7 @@ if (!Gate::allows('students')) {
 
     public function show($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $ad = $this->MarketingBannerAdService->show($id);
@@ -70,7 +70,7 @@ if (!Gate::allows('students')) {
 
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $client = $this->MarketingBannerAdService->edit($id);
@@ -80,7 +80,7 @@ if (!Gate::allows('students')) {
 
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $post = $this->MarketingBannerAdService->update($request, $id);
@@ -91,7 +91,7 @@ if (!Gate::allows('students')) {
 
     public function destroy($id)
     {
-if (!Gate::allows('students')) {
+if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $this->MarketingBannerAdService->destroy($id);
@@ -104,3 +104,4 @@ if (!Gate::allows('students')) {
 
 
 }
+

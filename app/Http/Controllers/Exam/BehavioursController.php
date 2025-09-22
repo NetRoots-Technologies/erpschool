@@ -19,7 +19,7 @@ class BehavioursController extends Controller
 
     public function getData()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $behaviours = $this->behavioursService->getdata();
@@ -32,7 +32,7 @@ class BehavioursController extends Controller
      */
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return view('exam.behaviours.index');
@@ -45,7 +45,7 @@ class BehavioursController extends Controller
      */
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -58,7 +58,7 @@ class BehavioursController extends Controller
      */
     public function store(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $request->validate([
@@ -76,7 +76,7 @@ class BehavioursController extends Controller
      */
     public function show($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -89,7 +89,7 @@ class BehavioursController extends Controller
      */
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -103,7 +103,7 @@ class BehavioursController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $request->validate([
@@ -126,7 +126,7 @@ class BehavioursController extends Controller
      */
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return $this->behavioursService->destroy($id);
@@ -135,14 +135,14 @@ class BehavioursController extends Controller
 
     public function changeStatus(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return $behaviours = $this->behavioursService->changeStatus($request);
     }
     public function handleBulkAction(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $ids = $request->get('ids');
@@ -155,3 +155,4 @@ class BehavioursController extends Controller
         return response()->json(['message' => 'Bulk Action Completed Successfully']);
     }
 }
+

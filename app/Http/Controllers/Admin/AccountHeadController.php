@@ -24,7 +24,7 @@ class AccountHeadController extends Controller
 
     public function getData()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $accountHead = $this->AccountHeadService->getdata();
@@ -38,7 +38,7 @@ class AccountHeadController extends Controller
      */
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return view('admin.account_head.index');
@@ -51,7 +51,7 @@ class AccountHeadController extends Controller
      */
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -64,7 +64,7 @@ class AccountHeadController extends Controller
      */
     public function store(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $this->AccountHeadService->store($request);
@@ -81,7 +81,7 @@ class AccountHeadController extends Controller
      */
     public function show($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -94,7 +94,7 @@ class AccountHeadController extends Controller
      */
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -108,7 +108,7 @@ class AccountHeadController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return $accountHead = $this->AccountHeadService->update($request, $id);
@@ -122,7 +122,7 @@ class AccountHeadController extends Controller
      */
     public function destroy(AccountHead $AccountHead)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         try {
@@ -153,7 +153,7 @@ class AccountHeadController extends Controller
 
     public function changeStatus(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return $accountHead = $this->AccountHeadService->changeStatus($request);
@@ -161,7 +161,7 @@ class AccountHeadController extends Controller
 
     public function handleBulkAction(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $ids = $request->get('ids');
@@ -174,3 +174,4 @@ class AccountHeadController extends Controller
         return response()->json(['message' => 'Bulk Action Completed Successfully']);
     }
 }
+

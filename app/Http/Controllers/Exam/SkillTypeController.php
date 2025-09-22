@@ -30,7 +30,7 @@ class SkillTypeController extends Controller
      */
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return view('exam.skill_type.index');
@@ -43,7 +43,7 @@ class SkillTypeController extends Controller
      */
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $sessions = UserHelper::session_name();
@@ -61,7 +61,7 @@ class SkillTypeController extends Controller
      */
     public function store(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $this->skillTypeService->store($request);
@@ -76,7 +76,7 @@ class SkillTypeController extends Controller
      */
     public function show($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -89,7 +89,7 @@ class SkillTypeController extends Controller
      */
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $skillType = SkillType::find($id);
@@ -112,7 +112,7 @@ class SkillTypeController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $this->skillTypeService->update($request, $id);
@@ -127,7 +127,7 @@ class SkillTypeController extends Controller
      */
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $this->skillTypeService->destroy($id);
@@ -136,7 +136,7 @@ class SkillTypeController extends Controller
 
     public function fetchExamSubject(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $classSubjects = ClassSubject::with('subject')->where('class_id', $request->class_id)->get();
@@ -153,7 +153,7 @@ class SkillTypeController extends Controller
 
     public function getData()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return $this->skillTypeService->getData();
@@ -161,7 +161,7 @@ class SkillTypeController extends Controller
 
     public function handleBulkAction(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $ids = $request->get('ids');
@@ -172,3 +172,4 @@ class SkillTypeController extends Controller
         }
     }
 }
+

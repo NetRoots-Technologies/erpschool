@@ -16,7 +16,7 @@ class WorkShiftService
 
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -24,7 +24,7 @@ class WorkShiftService
 
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         // return Permission::with('child')->where('main', 1)->get();
@@ -33,7 +33,7 @@ class WorkShiftService
 
     public function store($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
 
@@ -57,7 +57,7 @@ class WorkShiftService
 
     public function getdata()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = WorkShift::with('workdays')->get();
@@ -95,7 +95,7 @@ class WorkShiftService
 
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         // dd(34);
@@ -106,7 +106,7 @@ class WorkShiftService
 
     public function update($request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $workShift = WorkShift::findOrFail($id);
@@ -135,7 +135,7 @@ class WorkShiftService
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $WrokShift = Workshift::findOrFail($id);
@@ -145,7 +145,7 @@ class WorkShiftService
 
     public function changeStatus($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $WorkShift = WorkShift::find($request->id);
@@ -157,3 +157,4 @@ class WorkShiftService
     }
 
 }
+

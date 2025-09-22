@@ -21,7 +21,7 @@ class GradingPoliciesController extends Controller
 
     public function getData()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $grading_policies = $this->grading_policies_service->getdata();
@@ -34,7 +34,7 @@ class GradingPoliciesController extends Controller
      */
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $acadmeic_sessions = AcademicSession::where('status', 1)->get();
@@ -49,7 +49,7 @@ class GradingPoliciesController extends Controller
      */
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -62,7 +62,7 @@ class GradingPoliciesController extends Controller
      */
     public function store(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $request->validate([
@@ -85,7 +85,7 @@ class GradingPoliciesController extends Controller
      */
     public function show($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -98,7 +98,7 @@ class GradingPoliciesController extends Controller
      */
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -112,7 +112,7 @@ class GradingPoliciesController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $request->validate([
@@ -135,7 +135,7 @@ class GradingPoliciesController extends Controller
      */
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return $this->grading_policies_service->destroy($id);
@@ -143,14 +143,14 @@ class GradingPoliciesController extends Controller
 
     public function changeStatus(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return $grading_policies = $this->grading_policies_service->changeStatus($request);
     }
     public function handleBulkAction(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $ids = $request->get('ids');
@@ -163,3 +163,4 @@ class GradingPoliciesController extends Controller
         return response()->json(['message' => 'Bulk Action Completed Successfully']);
     }
 }
+

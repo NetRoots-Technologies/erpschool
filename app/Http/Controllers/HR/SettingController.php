@@ -13,7 +13,7 @@ class SettingController extends Controller
 {
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $settings = GeneralSetting::all();
@@ -34,7 +34,7 @@ class SettingController extends Controller
 
     public function updateSetting(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         foreach ($request->except('_token') as $key => $value) {
@@ -54,3 +54,4 @@ class SettingController extends Controller
     }
 
 }
+

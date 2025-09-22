@@ -4,227 +4,253 @@ namespace App\Services;
 
 use App\Models\Fee\FeeCollection;
 use App\Models\Fee\FeeCollectionDetail;
-use App\Models\Fee\FeeStructure;
-use App\Models\Admin\Student;
-use App\Models\Admin\Branch;
-use App\Models\Admin\Company;
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Fee\FeeCategory;
+use App\Models\Fee\FeeDiscount;
+use App\Models\Student\Students;
 use Illuminate\Support\Facades\DB;
-use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Support\Facades\Auth;
 
 class FeeCollectionService
 {
-    public function store($request)
+    /**
+     * Record fee collection
+     */
+    public function recordCollection($data)
     {
-        if (!Gate::allows('FeeCollection-create')) {
-            return abort(403);
-        }
-
         DB::beginTransaction();
         try {
-            $input = $request->all();
-            $input['created_by'] = Auth::id();
-            $input['company_id'] = Auth::user()->company_id ?? $request->company_id;
-            $input['branch_id'] = Auth::user()->branch_id ?? $request->branch_id;
-            $input['collection_date'] = now();
-            $input['receipt_number'] = $this->generateReceiptNumber();
-
-            $feeCollection = FeeCollection::create($input);
-
-            // Create fee collection details
-            if ($request->has('fee_details') && is_array($request->fee_details)) {
-                foreach ($request->fee_details as $detail) {
-                    $detail['fee_collection_id'] = $feeCollection->id;
-                    FeeCollectionDetail::create($detail);
-                }
-            }
-
-            DB::commit();
-            return response()->json(['message' => 'Fee collection created successfully', 'data' => $feeCollection]);
-        } catch (\Exception $e) {
-            DB::rollback();
-            return response()->json(['error' => 'Failed to create fee collection: ' . $e->getMessage()], 500);
-        }
-    }
-
-    public function getdata()
-    {
-        if (!Gate::allows('FeeCollection-list')) {
-            return abort(403);
-        }
-        
-        $query = FeeCollection::with(['student', 'company', 'branch', 'academicSession', 'createdBy'])
-            ->orderBy('created_at', 'desc');
-
-        if (Auth::check()) {
-            $user = Auth::user();
-
-            if (!is_null($user->company_id)) {
-                $query->where('company_id', $user->company_id);
-            }
-
-            if (!is_null($user->branch_id)) {
-                $query->where('branch_id', $user->branch_id);
-            }
-        }
-
-        return Datatables::of($query)->addIndexColumn()
-            ->addColumn('student', function ($row) {
-                return $row->student ? $row->student->name : "N/A";
-            })
-            ->addColumn('receipt_number', function ($row) {
-                return $row->receipt_number;
-            })
-            ->addColumn('collection_date', function ($row) {
-                return $row->collection_date ? $row->collection_date->format('Y-m-d') : "N/A";
-            })
-            ->addColumn('total_amount', function ($row) {
-                return number_format($row->total_amount, 2);
-            })
-            ->addColumn('paid_amount', function ($row) {
-                return number_format($row->paid_amount, 2);
-            })
-            ->addColumn('company', function ($row) {
-                return $row->company ? $row->company->name : "N/A";
-            })
-            ->addColumn('branch', function ($row) {
-                return $row->branch ? $row->branch->name : "N/A";
-            })
-            ->addColumn('payment_status', function ($row) {
-                $status = $row->payment_status;
-                $class = $status == 'paid' ? 'success' : ($status == 'partial' ? 'warning' : 'danger');
-                return '<span class="badge badge-' . $class . '">' . ucfirst($status) . '</span>';
-            })
-            ->addColumn('status', function ($row) {
-                return ($row->status == 1)
-                    ? '<button type="button" class="btn btn-success btn-sm change-status" data-id="' . $row->id . '" data-status="inactive">Active</button>'
-                    : '<button type="button" class="btn btn-warning btn-sm change-status" data-id="' . $row->id . '" data-status="active">Inactive</button>';
-            })
-            ->addColumn('action', function ($row) {
-                $btn = '<form class="delete_form" data-route="' . route("fee.fee-collections.destroy", $row->id) . '" id="fee-collection-' . $row->id . '" method="POST">';
-
-                if (Gate::allows('FeeCollection-list')) {
-                    $btn .= '<a href="' . route("fee.fee-collections.receipt", $row->id) . '" class="btn btn-info text-white btn-sm" target="_blank">Receipt</a> ';
-                }
-
-                if (Gate::allows('FeeCollection-edit')) {
-                    $btn .= '<a data-id="' . $row->id . '" class="btn btn-primary text-white btn-sm fee-collection-edit" data-fee-collection-edit=\'' . $row . '\'>Edit</a> ';
-                }
-
-                if (Gate::allows('FeeCollection-delete')) {
-                    $btn .= '<button data-id="fee-collection-' . $row->id . '" type="submit" class="btn btn-danger delete btn-sm">Delete</button>';
-                    $btn .= method_field('DELETE') . csrf_field();
-                }
-
-                $btn .= '</form>';
-                return $btn;
-            })
-            ->rawColumns(['action', 'status', 'payment_status'])
-            ->make(true);
-    }
-
-    public function edit($id)
-    {
-        return FeeCollection::with(['student', 'company', 'branch', 'academicSession', 'feeCollectionDetails'])->find($id);
-    }
-
-    public function update($request, $id)
-    {
-        if (!Gate::allows('FeeCollection-edit')) {
-            return abort(403);
-        }
-        
-        DB::beginTransaction();
-        try {
-            $feeCollection = FeeCollection::find($id);
-            $input = $request->all();
-            $input['updated_by'] = Auth::id();
-            $feeCollection->update($input);
-
-            // Update fee collection details if provided
-            if ($request->has('fee_details') && is_array($request->fee_details)) {
-                // Delete existing details
-                FeeCollectionDetail::where('fee_collection_id', $id)->delete();
-                
-                // Create new details
-                foreach ($request->fee_details as $detail) {
-                    $detail['fee_collection_id'] = $feeCollection->id;
-                    FeeCollectionDetail::create($detail);
-                }
-            }
-
-            DB::commit();
-            return response()->json(['message' => 'Fee collection updated successfully', 'data' => $feeCollection]);
-        } catch (\Exception $e) {
-            DB::rollback();
-            return response()->json(['error' => 'Failed to update fee collection: ' . $e->getMessage()], 500);
-        }
-    }
-
-    public function destroy($id)
-    {
-        if (!Gate::allows('FeeCollection-delete')) {
-            return abort(403);
-        }
-        
-        DB::beginTransaction();
-        try {
-            $feeCollection = FeeCollection::findOrFail($id);
+            $totalAmount = array_sum(array_column($data['collections'], 'amount'));
             
-            // Delete related details first
-            FeeCollectionDetail::where('fee_collection_id', $id)->delete();
+            // Apply discounts if any
+            $discountedAmount = $this->applyDiscounts($data['student_id'], $totalAmount, $data['collections']);
             
-            // Delete the main record
-            $feeCollection->delete();
+            $collection = FeeCollection::create([
+                'student_id' => $data['student_id'],
+                'class_id' => $data['class_id'],
+                'session_id' => $data['session_id'],
+                'total_amount' => $totalAmount,
+                'paid_amount' => $discountedAmount,
+                'status' => 'paid',
+                'collection_date' => $data['collection_date'],
+                'payment_method' => $data['payment_method'],
+                'remarks' => $data['remarks'] ?? null,
+                'created_by' => Auth::id(),
+            ]);
+
+            // Create collection details
+            foreach ($data['collections'] as $collectionDetail) {
+                FeeCollectionDetail::create([
+                    'collection_id' => $collection->id,
+                    'category_id' => $collectionDetail['category_id'],
+                    'amount' => $collectionDetail['amount'],
+                    'created_by' => Auth::id(),
+                ]);
+            }
+
+            // Update student billing status if applicable
+            $this->updateStudentBillingStatus($data['student_id'], $collection->id);
 
             DB::commit();
-            return response()->json(['message' => 'Fee collection deleted successfully']);
+            return $collection;
         } catch (\Exception $e) {
             DB::rollback();
-            return response()->json(['error' => 'Failed to delete fee collection: ' . $e->getMessage()], 500);
+            throw $e;
         }
     }
 
-    public function changeStatus($request)
+    /**
+     * Apply discounts to collection
+     */
+    private function applyDiscounts($studentId, $totalAmount, $collections)
     {
-        $feeCollection = FeeCollection::find($request->id);
-        if ($feeCollection) {
-            $feeCollection->status = ($request->status == 'active') ? 1 : 0;
-            $feeCollection->save();
-            return $feeCollection;
-        }
-    }
-
-    public function getStudentFeeDetails($request)
-    {
-        $student = Student::find($request->student_id);
-        if (!$student) {
-            return response()->json(['error' => 'Student not found'], 404);
-        }
-
-        $feeStructures = FeeStructure::where('class_id', $student->class_id)
-            ->where('academic_session_id', $request->academic_session_id)
-            ->where('status', 1)
-            ->with(['feeCategory'])
+        $discounts = FeeDiscount::where('student_id', $studentId)
+            ->where('is_active', 1)
             ->get();
 
-        return response()->json(['student' => $student, 'fee_structures' => $feeStructures]);
+        $discountedAmount = $totalAmount;
+
+        foreach ($discounts as $discount) {
+            if ($discount->discount_type == 'percentage') {
+                $discountValue = ($totalAmount * $discount->discount_value) / 100;
+            } else {
+                $discountValue = $discount->discount_value;
+            }
+
+            $discountedAmount -= $discountValue;
+        }
+
+        return max(0, $discountedAmount); // Ensure amount doesn't go negative
     }
 
-    public function generateReceipt($id)
+    /**
+     * Update student billing status
+     */
+    private function updateStudentBillingStatus($studentId, $collectionId)
     {
-        $feeCollection = FeeCollection::with(['student', 'company', 'branch', 'academicSession', 'feeCollectionDetails.feeHead'])
-            ->findOrFail($id);
-
-        // Generate PDF or return view for receipt
-        return view('fee.fee_collection.receipt', compact('feeCollection'));
+        // Update any pending bills for this student
+        // This would depend on your billing logic
     }
 
-    private function generateReceiptNumber()
+    /**
+     * Get collection statistics
+     */
+    public function getCollectionStats($fromDate = null, $toDate = null)
     {
-        $lastReceipt = FeeCollection::orderBy('id', 'desc')->first();
-        $number = $lastReceipt ? (int)substr($lastReceipt->receipt_number, -6) + 1 : 1;
-        return 'RCP' . str_pad($number, 6, '0', STR_PAD_LEFT);
+        $query = FeeCollection::query();
+
+        if ($fromDate && $toDate) {
+            $query->whereBetween('collection_date', [$fromDate, $toDate]);
+        }
+
+        return [
+            'total_collections' => $query->count(),
+            'total_amount' => $query->sum('total_amount'),
+            'paid_amount' => $query->where('status', 'paid')->sum('paid_amount'),
+            'pending_amount' => $query->where('status', 'pending')->sum('total_amount'),
+            'cash_collections' => $query->where('payment_method', 'cash')->sum('paid_amount'),
+            'bank_transfers' => $query->where('payment_method', 'bank_transfer')->sum('paid_amount'),
+            'cheque_collections' => $query->where('payment_method', 'cheque')->sum('paid_amount'),
+        ];
+    }
+
+    /**
+     * Get daily collection report
+     */
+    public function getDailyCollectionReport($date)
+    {
+        return FeeCollection::whereDate('collection_date', $date)
+            ->with(['student', 'academicClass'])
+            ->get();
+    }
+
+    /**
+     * Get monthly collection report
+     */
+    public function getMonthlyCollectionReport($month, $year)
+    {
+        $startDate = $year . '-' . str_pad($month, 2, '0', STR_PAD_LEFT) . '-01';
+        $endDate = date('Y-m-t', strtotime($startDate));
+
+        return FeeCollection::whereBetween('collection_date', [$startDate, $endDate])
+            ->with(['student', 'academicClass'])
+            ->get();
+    }
+
+    /**
+     * Get collection by payment method
+     */
+    public function getCollectionsByPaymentMethod($fromDate, $toDate)
+    {
+        return FeeCollection::whereBetween('collection_date', [$fromDate, $toDate])
+            ->where('status', 'paid')
+            ->selectRaw('payment_method, COUNT(*) as count, SUM(paid_amount) as total')
+            ->groupBy('payment_method')
+            ->get();
+    }
+
+    /**
+     * Get student collection history
+     */
+    public function getStudentCollectionHistory($studentId, $limit = 10)
+    {
+        return FeeCollection::where('student_id', $studentId)
+            ->with(['feeCollectionDetails.category'])
+            ->orderBy('collection_date', 'desc')
+            ->limit($limit)
+            ->get();
+    }
+
+    /**
+     * Rollback collection
+     */
+    public function rollbackCollection($collectionId, $reason)
+    {
+        DB::beginTransaction();
+        try {
+            $collection = FeeCollection::findOrFail($collectionId);
+            
+            // Create adjustment record
+            $this->createCollectionRollbackAdjustment($collection, $reason);
+            
+            // Mark collection as rolled back
+            $collection->update([
+                'status' => 'rolled_back',
+                'remarks' => $collection->remarks . ' [ROLLED BACK: ' . $reason . ']',
+                'updated_by' => Auth::id(),
+            ]);
+
+            DB::commit();
+            return $collection;
+        } catch (\Exception $e) {
+            DB::rollback();
+            throw $e;
+        }
+    }
+
+    /**
+     * Create rollback adjustment
+     */
+    private function createCollectionRollbackAdjustment($collection, $reason)
+    {
+        // This would create an adjustment record to reverse the collection
+        // Implementation depends on your adjustment system
+    }
+
+    /**
+     * Get outstanding collections
+     */
+    public function getOutstandingCollections($classId = null, $sessionId = null)
+    {
+        $query = FeeCollection::where('status', 'pending');
+
+        if ($classId) {
+            $query->where('class_id', $classId);
+        }
+
+        if ($sessionId) {
+            $query->where('session_id', $sessionId);
+        }
+
+        return $query->with(['student', 'academicClass'])->get();
+    }
+
+    /**
+     * Calculate fine for overdue payment
+     */
+    public function calculateFine($dueDate, $collectionDate = null)
+    {
+        $collectionDate = $collectionDate ?: now();
+        $dueDate = \Carbon\Carbon::parse($dueDate);
+        $collectionDate = \Carbon\Carbon::parse($collectionDate);
+
+        if ($collectionDate->gt($dueDate)) {
+            return 1500; // Fixed fine amount as per requirements
+        }
+
+        return 0;
+    }
+
+    /**
+     * Get collection summary for dashboard
+     */
+    public function getCollectionSummary()
+    {
+        $today = now()->toDateString();
+        $thisMonth = now()->format('Y-m');
+
+        return [
+            'today_collections' => FeeCollection::whereDate('collection_date', $today)
+                ->where('status', 'paid')
+                ->sum('paid_amount'),
+            'monthly_collections' => FeeCollection::where('collection_date', 'like', $thisMonth . '%')
+                ->where('status', 'paid')
+                ->sum('paid_amount'),
+            'pending_collections' => FeeCollection::where('status', 'pending')
+                ->sum('total_amount'),
+            'total_students_with_dues' => FeeCollection::where('status', 'pending')
+                ->distinct('student_id')
+                ->count('student_id'),
+        ];
     }
 }
+

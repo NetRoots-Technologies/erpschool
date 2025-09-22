@@ -10,8 +10,9 @@ class MachineController extends Controller
 {
     public function genrateEmployee()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
 }
+

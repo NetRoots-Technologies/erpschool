@@ -17,7 +17,7 @@ class AllowanceController extends Controller
 
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return view('hr.allowances.index');
@@ -25,7 +25,7 @@ class AllowanceController extends Controller
 
     public function store(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return $allowance = $this->AllowanceService->store($request);
@@ -34,7 +34,7 @@ class AllowanceController extends Controller
 
     public function getData()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return $allowance = $this->AllowanceService->getData();
@@ -42,7 +42,7 @@ class AllowanceController extends Controller
 
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return $allowance = $this->AllowanceService->update($request, $id);
@@ -51,7 +51,7 @@ class AllowanceController extends Controller
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return $this->AllowanceService->destroy($id);
@@ -60,10 +60,11 @@ class AllowanceController extends Controller
 
     public function changeStatus(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return $allowance = $this->AllowanceService->changeStatus($request);
     }
 
 }
+

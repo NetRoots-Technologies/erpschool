@@ -12,7 +12,7 @@ class AssetTypeService
 {
     public function store($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return AssetType::create([
@@ -25,7 +25,7 @@ class AssetTypeService
 
     public function getdata()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = AssetType::orderBy('created_at', 'desc')->get();
@@ -68,7 +68,7 @@ class AssetTypeService
 
     public function update($request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $asset_type = AssetType::find($id);
@@ -84,7 +84,7 @@ class AssetTypeService
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $asset_type = AssetType::find($id);
@@ -94,3 +94,4 @@ class AssetTypeService
     }
 
 }
+

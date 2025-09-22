@@ -24,6 +24,7 @@ use App\Http\Controllers\Exam\SkillsController;
 
 
 
+
 use App\Exports\BranchSampleExport;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -129,4 +130,14 @@ Route::get('/print-preview/{tableName}',[PrintableController::class,'printPrevie
     Route::get('get-subjects/{classId}', [SkillsController::class, 'getsubject']);
     Route::get('get-components/{subjectId}', [SkillsController::class, 'getComponents']);
 
+
+
+// Include Admin Routes
+require __DIR__.'/admin.php';
+
+// Include DataTables Routes
+require __DIR__.'/dataTables.php';
+
+// Include Exam Routes
+require __DIR__.'/exam.php';
 

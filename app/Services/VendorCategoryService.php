@@ -13,28 +13,28 @@ class VendorCategoryService
 
     public function getCategories()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return VendorCategory::get();
     }
     public function getCategoriesLevelOne()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return VendorCategory::whereNull('parent_id')->get();
     }
     public function getData()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return VendorCategory::whereNull('parent_id')->with(['recursiveChildren', 'vendors'])->get();
     }
     public function store(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $level = VendorCategory::find($request['category'], ['level']);
@@ -52,7 +52,7 @@ class VendorCategoryService
 
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $category = VendorCategory::find($id);
@@ -63,7 +63,7 @@ class VendorCategoryService
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $category = VendorCategory::findOrFail($id);
@@ -72,7 +72,7 @@ class VendorCategoryService
 
     private function createCode($level, $parent)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         if ($level < 4)
@@ -100,7 +100,7 @@ class VendorCategoryService
     //vendorListing
     public function storeVendors($validatedDate)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $code = $this->createCode(4, $validatedDate['detail_type']);
@@ -127,3 +127,4 @@ class VendorCategoryService
         // dd($code);
     }
 }
+

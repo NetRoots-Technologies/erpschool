@@ -10,7 +10,7 @@ class BankBranchService
 {
     public function store($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $bankBranch = new BankBranch();
@@ -25,7 +25,7 @@ class BankBranchService
 
     public function getdata()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = BankBranch::with('bank')->orderby('id', 'DESC');
@@ -59,7 +59,7 @@ class BankBranchService
 
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return BankBranch::find($id);
@@ -68,7 +68,7 @@ class BankBranchService
 
     public function update($request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $bankBranch = BankBranch::find($id);
@@ -83,7 +83,7 @@ class BankBranchService
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $bankBranch = BankBranch::findOrFail($id);
@@ -93,7 +93,7 @@ class BankBranchService
 
     public function changeStatus($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $bankBranch = BankBranch::find($request->id);
@@ -104,4 +104,5 @@ class BankBranchService
         }
     }
 }
+
 

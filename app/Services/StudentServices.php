@@ -11,12 +11,10 @@ use App\Models\Admin\Course;
 use App\Models\Admin\Country;
 use App\Models\Admin\Session;
 use App\Models\HRM\Employees;
-use App\Models\Fee\StudentFee;
 use App\Models\FamilyTreeTable;
 use App\Models\Admin\CourseType;
 use App\Models\Student\Students;
 use Yajra\DataTables\DataTables;
-use App\Models\Fee\PaidStudentFee;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use App\Models\Admin\StudentDataBank;
@@ -34,7 +32,7 @@ class StudentServices
 
     public function apiindex()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return Students::all();
@@ -43,7 +41,7 @@ class StudentServices
 
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
 
@@ -61,7 +59,7 @@ class StudentServices
 
     public function store($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         DB::beginTransaction();
@@ -199,7 +197,7 @@ class StudentServices
 
     public function getData()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = Students::with('branch', 'student_siblings', 'student_schools', 'student_emergency_contacts', 'student_transports')->orderBy('created_at', 'desc')->get();
@@ -249,7 +247,7 @@ class StudentServices
 
     public function update($request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         //        dd($request->student_gender);
@@ -398,7 +396,7 @@ class StudentServices
 
     private function addNewStudentPictures($request, $student)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $studentPictures = $student->studentPictures ?: new StudentPictures();
@@ -433,7 +431,7 @@ class StudentServices
 
     private function uploadFile($file, $destinationPath)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $filename = $file->getClientOriginalName();
@@ -448,7 +446,7 @@ class StudentServices
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $student = Students::find($id);
@@ -464,7 +462,7 @@ class StudentServices
 
     public function get_state($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $html = "<option value=''> Select State </option>";
@@ -478,7 +476,7 @@ class StudentServices
 
     public function get_city($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $html = "<option value=''> Select State </option>";
@@ -492,7 +490,7 @@ class StudentServices
 
     public function StudentSiblingData()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = Students::orderBy('father_cnic')->get();
@@ -546,3 +544,4 @@ class StudentServices
     }
 
 }
+

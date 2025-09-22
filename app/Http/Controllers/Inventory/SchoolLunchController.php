@@ -25,7 +25,7 @@ class SchoolLunchController extends Controller
     //for students
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $branches = Branch::where('status', 1)->with('classes')->get();
@@ -45,7 +45,7 @@ class SchoolLunchController extends Controller
 
     public function store(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $request->validate([
@@ -136,14 +136,14 @@ class SchoolLunchController extends Controller
 
     public function view()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return view('admin.inventory_management.school_lunch.view');
     }
     public function getAssigned()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $food_batches = FoodBatch::with(['user', 'branch', 'class', 'section', 'product', 'studentBatchProducts'])
@@ -154,7 +154,7 @@ class SchoolLunchController extends Controller
 
     public function get_assigned_student($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $student_batch_products = StudentBatchProduct::where('batch_id', $id)->with(['student', 'product'])->get();
@@ -165,7 +165,7 @@ class SchoolLunchController extends Controller
     //for employees
     public function emp_index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $branches = Branch::where('status', 1)->with('department')->get();
@@ -177,7 +177,7 @@ class SchoolLunchController extends Controller
 
     public function emp_store(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $request->validate([
@@ -252,14 +252,14 @@ class SchoolLunchController extends Controller
     }
     public function emp_view()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return view('admin.inventory_management.staff_lunch.view');
     }
     public function empGetAssigned()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $food_batches = FoodBatch::with(['user', 'branch', 'department', 'product', 'studentBatchProducts'])
@@ -270,7 +270,7 @@ class SchoolLunchController extends Controller
 
     public function get_assigned_employee($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $employee_batch_products = StudentBatchProduct::where('batch_id', $id)->with(['employee', 'product'])->get();
@@ -279,7 +279,7 @@ class SchoolLunchController extends Controller
 
     public function get_quantityProducts()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $products = Inventry::whereIn('type', ['P', 'F'])
@@ -303,3 +303,4 @@ class SchoolLunchController extends Controller
     //     }
 
 }
+

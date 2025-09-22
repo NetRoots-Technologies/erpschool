@@ -38,6 +38,9 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'datatable', 'as' => 'datata
     Route::get('get-data-ledger-receivable', 'App\Http\Controllers\Admin\LedgersController@getDatareciable')->name('get-data-ledger-receivable');
     Route::post('get-data-permission', 'App\Http\Controllers\PermissionController@getData')->name('get-data-permission');
     Route::post('get-data-coursetype', 'App\Http\Controllers\Admin\CourseTypeController@getData')->name('course-type.getdata');
+    Route::post('category/getdata', 'App\Http\Controllers\Admin\CategoryController@getdata')->name('category.getdata');
+    Route::post('getExamTerm', 'App\Http\Controllers\Exam\ExamTermController@getData')->name('getExamTerm');
+    Route::post('test_type/getdata', 'App\Http\Controllers\Exam\TestTypeController@getData')->name('test_type.getdata');
     Route::post('get-data-teachers_data', [TeacherController::class, 'getData'])->name('data.getTeachers');
     Route::post('get-data-teachersData', [\App\Http\Controllers\Academic\ActiveSessionController::class, 'getData'])->name('data.getActiveSession');
     Route::post('get-data-assignClass', [\App\Http\Controllers\Academic\AssignClassController::class, 'getData'])->name('get-data-assignClass');
@@ -98,5 +101,6 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'datatable', 'as' => 'datata
     Route::post('get-vendor-category', [VendorCategoryController::class, 'getData'])->name('get-vendor-category');
     Route::post('get-vendors', [VendorController::class, 'index'])->name('get-vendors');
     Route::post('get-inventorys', [InventoryController::class, 'index'])->name('get-inventorys');
+    Route::post('skills/getdata', [\App\Http\Controllers\Exam\SkillsController::class, 'getData'])->name('skills.getdata');
 
 });

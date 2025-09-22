@@ -143,3 +143,4 @@ class StudentViewController extends Controller
     }
 
 }
+

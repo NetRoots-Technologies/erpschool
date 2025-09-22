@@ -56,7 +56,7 @@ class AccountReportsController extends Controller
      */
     public function index()
     {
-       if (!Gate::allows('students')) {
+       if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
 
@@ -70,7 +70,7 @@ class AccountReportsController extends Controller
      */
     public function accounts_chart()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
 
@@ -99,7 +99,7 @@ class AccountReportsController extends Controller
      */
     public function trial_balance()
     {
-       if (!Gate::allows('students')) {
+       if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         // Get All branches
@@ -124,7 +124,7 @@ class AccountReportsController extends Controller
      */
     public function trial_balance_report(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $start_date = date('Y-m-d', strtotime($request->start_date));
@@ -175,7 +175,7 @@ class AccountReportsController extends Controller
     public
     function trial_balance_group(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         if ($request->get('start_date') && $request->get('end_date')) {
@@ -228,7 +228,7 @@ class AccountReportsController extends Controller
     public function trialBalance_report(Request $request)
     {
 
-if (!Gate::allows('students')) {
+if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = '';
@@ -373,7 +373,7 @@ if (!Gate::allows('students')) {
 
     protected function trial_BalanceExcel($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         header('Content-Type: application/vnd.ms-excel charset=UTF-8');
@@ -552,7 +552,7 @@ if (!Gate::allows('students')) {
      */
     private function loopTrialBalanceExcel($account, $c = 0)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $counter = $c;
@@ -610,7 +610,7 @@ if (!Gate::allows('students')) {
      */
     public function load_groups(Request $request)
     {
-if (!Gate::allows('students')) {
+if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $Groups = '';
@@ -632,7 +632,7 @@ if (!Gate::allows('students')) {
      */
     public function load_ledgers(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         if ($request->get('account_type_id')) {
@@ -687,7 +687,7 @@ if (!Gate::allows('students')) {
      */
     public function balance_sheet()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return view('admin.account_reports.balance_sheet.index');
@@ -701,7 +701,7 @@ if (!Gate::allows('students')) {
 
     public function balance_sheet_report(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = '';
@@ -761,7 +761,7 @@ if (!Gate::allows('students')) {
      */
     protected function balanceSheetExcel($bsheet, $DefaultCurrency, $start_date, $end_date)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $spreadsheet = new Spreadsheet();
@@ -829,7 +829,7 @@ if (!Gate::allows('students')) {
     private function loopBalanceSheetExcel($account, $c = 0)
     {
 
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $counter = $c;
@@ -880,7 +880,7 @@ if (!Gate::allows('students')) {
     public function profit_loss()
     {
 
-if (!Gate::allows('students')) {
+if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $EntryTypes = EntryTypes::pluckActiveOnly();
@@ -896,7 +896,7 @@ if (!Gate::allows('students')) {
      */
     public function profit_loss_report(Request $request)
     {
-if (!Gate::allows('students')) {
+if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $type = "";
@@ -1009,7 +1009,7 @@ if (!Gate::allows('students')) {
 
     public function profit_loss_excel($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         header('Content-Type: application/vnd.ms-excel charset=UTF-8');
@@ -1134,7 +1134,7 @@ if (!Gate::allows('students')) {
      */
     protected function profitLossExcel($pandl, $DefaultCurrency, $start_date, $end_date)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $spreadsheet = new Spreadsheet();
@@ -1201,7 +1201,7 @@ if (!Gate::allows('students')) {
      */
     private function loopProfitLossExcel($account, $c = 0)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $counter = $c;
@@ -1250,7 +1250,7 @@ if (!Gate::allows('students')) {
      */
     public function ledger_statement()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         if (!Gate::allows('account_reports_ledger_statement')) {
@@ -1294,7 +1294,7 @@ if (!Gate::allows('students')) {
      */
     public function ledger_statement_report(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         if ($request->get('date_range')) {
@@ -1382,7 +1382,7 @@ if (!Gate::allows('students')) {
      */
     protected function ledgerStatementExcel($Entries, $start_date, $end_date, $DefaultCurrency, $op, $cl, $Ledger, $EntryTypes)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $spreadsheet = new Spreadsheet();
@@ -1462,7 +1462,7 @@ if (!Gate::allows('students')) {
     public function expense_summary()
     {
         // Get All Branches
-if (!Gate::allows('students')) {
+if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return view('admin.account_reports.expense_reports.expense');
@@ -1470,7 +1470,7 @@ if (!Gate::allows('students')) {
 
     public static function expense_summary_report(Request $request)
     {
-if (!Gate::allows('students')) {
+if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
 
@@ -1559,7 +1559,7 @@ if (!Gate::allows('students')) {
     //convert expense summary in excel foramt
     public static function expense_summary_excel($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         header('Content-Type: application/vnd.ms-excel charset=UTF-8');
@@ -1631,3 +1631,4 @@ if (!Gate::allows('students')) {
 
     }
 }
+

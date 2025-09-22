@@ -24,7 +24,7 @@ class TeacherController extends Controller
 
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         //        $session_teacher = TeacherAssignSession::get('teacher_id');
@@ -47,7 +47,7 @@ class TeacherController extends Controller
      */
     public function create()
     {
- if (!Gate::allows('students')) {
+ if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return view('hr.teacher.create');
@@ -62,7 +62,7 @@ class TeacherController extends Controller
      */
     public function store(Request $request)
     {
-         if (!Gate::allows('students')) {
+         if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $validated = $request->validate([
@@ -87,7 +87,7 @@ class TeacherController extends Controller
      */
     public function show($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -100,7 +100,7 @@ class TeacherController extends Controller
      */
     public function edit($id)
     {
-         if (!Gate::allows('students')) {
+         if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $teacher = $this->TeacherServices->edit($id);
@@ -116,7 +116,7 @@ class TeacherController extends Controller
      */
     public function update(Request $request, $id)
     {
-         if (!Gate::allows('students')) {
+         if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $validated = $request->validate([
@@ -140,7 +140,7 @@ class TeacherController extends Controller
      */
     public function getData()
     {
-         if (!Gate::allows('students')) {
+         if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $teacher = $this->TeacherServices->getdata();
@@ -149,10 +149,11 @@ class TeacherController extends Controller
 
     public function destroy($id)
     {
-         if (!Gate::allows('students')) {
+         if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $teacher = $this->TeacherServices->destroy($id);
         return 'done';
     }
 }
+

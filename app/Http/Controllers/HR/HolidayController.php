@@ -24,7 +24,7 @@ class HolidayController extends Controller
      */
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return view('hr.holidays.index');
@@ -37,7 +37,7 @@ class HolidayController extends Controller
      */
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $branches = Branch::where('status', 1)->get();
@@ -53,7 +53,7 @@ class HolidayController extends Controller
      */
     public function store(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $this->HolidayService->store($request);
@@ -71,7 +71,7 @@ class HolidayController extends Controller
      */
     public function show($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -84,7 +84,7 @@ class HolidayController extends Controller
      */
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $branches = Branch::where('status', 1)->get();
@@ -103,7 +103,7 @@ class HolidayController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $this->HolidayService->update($request, $id);
@@ -120,7 +120,7 @@ class HolidayController extends Controller
      */
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $this->HolidayService->destroy($id);
@@ -132,7 +132,7 @@ class HolidayController extends Controller
 
     public function getData()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $holiday = $this->HolidayService->getdata();
@@ -141,7 +141,7 @@ class HolidayController extends Controller
 
     public function holidayDepartment(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $departments = Departments::where('branch_id', $request->branch_id)->get();
@@ -162,7 +162,7 @@ class HolidayController extends Controller
 
     public function holidayEmployee(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $employees = Employees::where('status', 1)->where('department_id', $request->department_id)->get();
@@ -180,3 +180,4 @@ class HolidayController extends Controller
 
 
 }
+

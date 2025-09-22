@@ -27,7 +27,7 @@ class ZktecoController extends Controller
 
     public function ShowAttendance() //zkt-ShowAttendance
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         ini_set('max_execution_time', 200);
@@ -44,7 +44,7 @@ class ZktecoController extends Controller
 
     public function ShowUser() //zkt-show-user
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         ini_set('max_execution_time', 200);
@@ -77,7 +77,7 @@ class ZktecoController extends Controller
 
     public function textVoice() //zkt-test-voice
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $zk = new ZKTeco('192.168.3.201', 4370);
@@ -91,7 +91,7 @@ class ZktecoController extends Controller
 
     public function DeleteUser(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         ini_set('max_execution_time', 200);
@@ -120,7 +120,7 @@ class ZktecoController extends Controller
 
     public function DeleteAttendance(Request $request) //zkt-delete-attendance-machine
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         ini_set('max_execution_time', 200);
@@ -136,7 +136,7 @@ class ZktecoController extends Controller
 
     public function addUser() //zkt-add-user
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $zk = new ZKTeco('192.168.3.201', 4370);
@@ -161,7 +161,7 @@ class ZktecoController extends Controller
 
     public function AddDataInDataBase() //zkt-add-attendance-db
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $zk = new ZKTeco('192.168.99.222', 4370);
@@ -225,7 +225,7 @@ class ZktecoController extends Controller
 
     public function addAttendance(Request $request) //
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $user1 = HrmEmployeeAttendance::where(['user_id' => $request->user_id, 'date' => $request->date])->first();
@@ -267,7 +267,7 @@ class ZktecoController extends Controller
 
     public function DbShowAttendance() //zkt-show-attendance-db
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $attendance = HrmEmployeeAttendance::with('user_name')->get();
@@ -279,7 +279,7 @@ class ZktecoController extends Controller
 
     public function sync()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $this->CourseTypeService->sync();
@@ -287,7 +287,7 @@ class ZktecoController extends Controller
 
     public function syncdb()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $this->CourseTypeService->syncdb();
@@ -296,7 +296,7 @@ class ZktecoController extends Controller
 
     public function employeeGenerated($ids)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
 
@@ -354,7 +354,7 @@ class ZktecoController extends Controller
 
     private function generateUniqueId($users)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $total = end($users);
@@ -363,3 +363,4 @@ class ZktecoController extends Controller
     }
 
 }
+

@@ -11,7 +11,7 @@ class ExamTermService
 {
     public function store($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         //dd($request->all());
@@ -38,7 +38,7 @@ class ExamTermService
 
     public function getData()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = ExamTerm::with('AcademicSession', 'branch')->orderBy('created_at', 'desc')->get();
@@ -87,7 +87,7 @@ class ExamTermService
 
     public function update($request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $examTerm = ExamTerm::find($id);
@@ -114,7 +114,7 @@ class ExamTermService
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $examTerm = ExamTerm::find($id);
@@ -123,3 +123,4 @@ class ExamTermService
         }
     }
 }
+

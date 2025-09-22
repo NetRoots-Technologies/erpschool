@@ -6,9 +6,8 @@ use App\Models\User;
 use App\Models\Admin\Company;
 use App\Models\Admin\Branch;
 use App\Models\Student\Students;
-use App\Models\Academic\Classes;
-use App\Models\Academic\Section;
-use App\Models\Academic\AcademicSession;
+use App\Models\Academic\AcademicClass;
+use App\Models\Student\AcademicSession;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -19,27 +18,16 @@ class FeeCollection extends Model
 
     protected $table = 'fee_collections';
 
-    const STATUS_PENDING = 'pending';
-    const STATUS_PARTIAL = 'partial';
-    const STATUS_PAID = 'paid';
-    const STATUS_OVERDUE = 'overdue';
-    const STATUS_CANCELLED = 'cancelled';
-
     protected $fillable = [
-        'collection_number',
         'student_id',
-        'class_id',
-        'section_id',
+        'academic_class_id',
         'academic_session_id',
-        'fee_term_id',
-        'total_amount',
+        'fee_assignment_id',
+        'collection_date',
         'paid_amount',
-        'discount_amount',
-        'balance_amount',
-        'due_date',
-        'status',
+        'payment_method',
         'remarks',
-        'is_active',
+        'status',
         'company_id',
         'branch_id',
         'created_by',
@@ -47,15 +35,8 @@ class FeeCollection extends Model
     ];
 
     protected $casts = [
-        'total_amount' => 'decimal:2',
+        'collection_date' => 'date',
         'paid_amount' => 'decimal:2',
-        'discount_amount' => 'decimal:2',
-        'balance_amount' => 'decimal:2',
-        'due_date' => 'date',
-        'is_active' => 'boolean',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
-        'deleted_at' => 'datetime',
     ];
 
     // Relationships
@@ -64,14 +45,9 @@ class FeeCollection extends Model
         return $this->belongsTo(Students::class);
     }
 
-    public function class()
+    public function studentFeeAssignment()
     {
-        return $this->belongsTo(Classes::class);
-    }
-
-    public function section()
-    {
-        return $this->belongsTo(Section::class);
+        return $this->belongsTo(StudentFeeAssignment::class);
     }
 
     public function academicSession()
@@ -79,9 +55,9 @@ class FeeCollection extends Model
         return $this->belongsTo(AcademicSession::class);
     }
 
-    public function feeTerm()
+    public function academicClass()
     {
-        return $this->belongsTo(FeeTerm::class);
+        return $this->belongsTo(AcademicClass::class, 'academic_class_id');
     }
 
     public function company()
@@ -104,35 +80,45 @@ class FeeCollection extends Model
         return $this->belongsTo(User::class, 'updated_by');
     }
 
+    public function rollbackBy()
+    {
+        return $this->belongsTo(User::class, 'rollback_by');
+    }
+
     public function feeCollectionDetails()
     {
-        return $this->hasMany(FeeCollectionDetail::class);
+        return $this->hasMany(FeeCollectionDetail::class, 'fee_collection_id');
     }
 
-    public function feeVouchers()
+    public function details()
     {
-        return $this->hasMany(FeeVoucher::class);
+        return $this->hasMany(FeeCollectionDetail::class, 'fee_collection_id');
     }
 
-    public function feeReceipts()
+    public function feeAdjustments()
     {
-        return $this->hasMany(FeeReceipt::class);
+        return $this->hasMany(FeeAdjustment::class);
     }
 
     // Scopes
-    public function scopeActive($query)
+    public function scopePaid($query)
     {
-        return $query->where('is_active', true);
+        return $query->where('status', 'paid');
     }
 
-    public function scopeForCompany($query, $companyId)
+    public function scopePending($query)
     {
-        return $query->where('company_id', $companyId);
+        return $query->where('status', 'pending');
     }
 
-    public function scopeForBranch($query, $branchId)
+    public function scopePartial($query)
     {
-        return $query->where('branch_id', $branchId);
+        return $query->where('status', 'partial');
+    }
+
+    public function scopeOverdue($query)
+    {
+        return $query->where('status', 'overdue');
     }
 
     public function scopeForStudent($query, $studentId)
@@ -145,117 +131,47 @@ class FeeCollection extends Model
         return $query->where('class_id', $classId);
     }
 
-    public function scopeForSection($query, $sectionId)
-    {
-        return $query->where('section_id', $sectionId);
-    }
-
     public function scopeForSession($query, $sessionId)
     {
         return $query->where('academic_session_id', $sessionId);
     }
 
-    public function scopeByStatus($query, $status)
+    public function scopeForCompany($query, $companyId)
     {
-        return $query->where('status', $status);
+        return $query->where('company_id', $companyId);
     }
 
-    public function scopePending($query)
+    public function scopeForBranch($query, $branchId)
     {
-        return $query->where('status', self::STATUS_PENDING);
+        return $query->where('branch_id', $branchId);
     }
 
-    public function scopePaid($query)
+    public function scopeByPaymentMethod($query, $method)
     {
-        return $query->where('status', self::STATUS_PAID);
+        return $query->where('payment_method', $method);
     }
 
-    public function scopeOverdue($query)
+    public function scopeByDateRange($query, $startDate, $endDate)
     {
-        return $query->where('status', self::STATUS_OVERDUE)
-                    ->orWhere(function($q) {
-                        $q->where('due_date', '<', now()->toDateString())
-                          ->whereIn('status', [self::STATUS_PENDING, self::STATUS_PARTIAL]);
-                    });
+        return $query->whereBetween('collection_date', [$startDate, $endDate]);
     }
 
-    public function scopeDueOn($query, $date)
-    {
-        return $query->where('due_date', $date);
-    }
-
-    public function scopeDueBefore($query, $date)
-    {
-        return $query->where('due_date', '<', $date);
-    }
-
-    // Helper methods
-    public function getStatusOptions()
-    {
-        return [
-            self::STATUS_PENDING => 'Pending',
-            self::STATUS_PARTIAL => 'Partially Paid',
-            self::STATUS_PAID => 'Paid',
-            self::STATUS_OVERDUE => 'Overdue',
-            self::STATUS_CANCELLED => 'Cancelled',
-        ];
-    }
-
-    public function isPending()
-    {
-        return $this->status === self::STATUS_PENDING;
-    }
-
-    public function isPartiallyPaid()
-    {
-        return $this->status === self::STATUS_PARTIAL;
-    }
-
-    public function isPaid()
-    {
-        return $this->status === self::STATUS_PAID;
-    }
-
+    // Helper Methods
     public function isOverdue()
     {
-        return $this->status === self::STATUS_OVERDUE || 
-               ($this->due_date < now()->toDateString() && 
-                in_array($this->status, [self::STATUS_PENDING, self::STATUS_PARTIAL]));
+        return $this->due_date < now() && $this->status !== 'paid';
     }
 
-    public function isCancelled()
+    public function calculateFine()
     {
-        return $this->status === self::STATUS_CANCELLED;
+        if ($this->isOverdue()) {
+            return 1500; // Fixed fine amount
+        }
+        return 0;
     }
 
-    public function getPaymentPercentage()
+    public function getTotalDue()
     {
-        if ($this->total_amount <= 0) {
-            return 0;
-        }
-        
-        return ($this->paid_amount / $this->total_amount) * 100;
-    }
-
-    public function updateStatus()
-    {
-        if ($this->paid_amount >= $this->total_amount) {
-            $this->status = self::STATUS_PAID;
-            $this->balance_amount = 0;
-        } elseif ($this->paid_amount > 0) {
-            $this->status = self::STATUS_PARTIAL;
-            $this->balance_amount = $this->total_amount - $this->paid_amount;
-        } else {
-            $this->status = self::STATUS_PENDING;
-            $this->balance_amount = $this->total_amount;
-        }
-
-        // Check if overdue
-        if ($this->due_date < now()->toDateString() && 
-            in_array($this->status, [self::STATUS_PENDING, self::STATUS_PARTIAL])) {
-            $this->status = self::STATUS_OVERDUE;
-        }
-
-        $this->save();
+        return $this->total_amount + $this->fine_amount - $this->collected_amount - $this->discount_amount;
     }
 }

@@ -12,7 +12,7 @@ class TimeTableService
 {
     public function store($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $timetable = TimeTable::create([
@@ -31,7 +31,7 @@ class TimeTableService
 
     public function getdata()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $user = Auth::user();
@@ -107,7 +107,7 @@ class TimeTableService
 
     public function update($request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $timetable = TimeTable::find($id);
@@ -126,7 +126,7 @@ class TimeTableService
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $timetable = TimeTable::find($id);
@@ -135,3 +135,4 @@ class TimeTableService
         }
     }
 }
+

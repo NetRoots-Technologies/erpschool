@@ -27,7 +27,7 @@ class AdvanceController extends Controller
 
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return view('hr.advances.index');
@@ -35,7 +35,7 @@ class AdvanceController extends Controller
 
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $yearAgo = GeneralSettingsHelper::getSetting('employeeTime');
@@ -55,7 +55,7 @@ class AdvanceController extends Controller
 
     public function store(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         try {
@@ -102,7 +102,7 @@ class AdvanceController extends Controller
 
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $advance = Advance::find($id);
@@ -125,7 +125,7 @@ class AdvanceController extends Controller
 
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         try {
@@ -138,7 +138,7 @@ class AdvanceController extends Controller
 
     public function getData()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return $this->advanceService->getData();
@@ -146,7 +146,7 @@ class AdvanceController extends Controller
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $this->advanceService->destroy($id);
@@ -157,7 +157,7 @@ class AdvanceController extends Controller
 
     public function getEmployeeSalary(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $employee = Employees::find($request->emp_id);
@@ -180,3 +180,4 @@ class AdvanceController extends Controller
     }
 
 }
+

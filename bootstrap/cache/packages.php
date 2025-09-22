@@ -1,37 +1,48 @@
 <?php return array (
   'barryvdh/laravel-dompdf' => 
   array (
+    'aliases' => 
+    array (
+      'PDF' => 'Barryvdh\\DomPDF\\Facade\\Pdf',
+      'Pdf' => 'Barryvdh\\DomPDF\\Facade\\Pdf',
+    ),
     'providers' => 
     array (
       0 => 'Barryvdh\\DomPDF\\ServiceProvider',
     ),
-    'aliases' => 
-    array (
-      'Pdf' => 'Barryvdh\\DomPDF\\Facade\\Pdf',
-      'PDF' => 'Barryvdh\\DomPDF\\Facade\\Pdf',
-    ),
   ),
   'barryvdh/laravel-snappy' => 
   array (
-    'providers' => 
-    array (
-      0 => 'Barryvdh\\Snappy\\ServiceProvider',
-    ),
     'aliases' => 
     array (
       'PDF' => 'Barryvdh\\Snappy\\Facades\\SnappyPdf',
       'SnappyImage' => 'Barryvdh\\Snappy\\Facades\\SnappyImage',
     ),
+    'providers' => 
+    array (
+      0 => 'Barryvdh\\Snappy\\ServiceProvider',
+    ),
+  ),
+  'carlos-meneses/laravel-mpdf' => 
+  array (
+    'aliases' => 
+    array (
+      'PDF' => 'Mccarlosen\\LaravelMpdf\\Facades\\LaravelMpdf',
+    ),
+    'providers' => 
+    array (
+      0 => 'Mccarlosen\\LaravelMpdf\\LaravelMpdfServiceProvider',
+    ),
   ),
   'facade/ignition' => 
   array (
-    'providers' => 
-    array (
-      0 => 'Facade\\Ignition\\IgnitionServiceProvider',
-    ),
     'aliases' => 
     array (
       'Flare' => 'Facade\\Ignition\\Facades\\Flare',
+    ),
+    'providers' => 
+    array (
+      0 => 'Facade\\Ignition\\IgnitionServiceProvider',
     ),
   ),
   'fruitcake/laravel-cors' => 
@@ -97,44 +108,44 @@
   ),
   'maatwebsite/excel' => 
   array (
-    'providers' => 
-    array (
-      0 => 'Maatwebsite\\Excel\\ExcelServiceProvider',
-    ),
     'aliases' => 
     array (
       'Excel' => 'Maatwebsite\\Excel\\Facades\\Excel',
     ),
+    'providers' => 
+    array (
+      0 => 'Maatwebsite\\Excel\\ExcelServiceProvider',
+    ),
   ),
   'macsidigital/laravel-api-client' => 
   array (
+    'aliases' => 
+    array (
+    ),
     'providers' => 
     array (
       0 => 'MacsiDigital\\API\\Providers\\APIServiceProvider',
     ),
-    'aliases' => 
-    array (
-    ),
   ),
   'macsidigital/laravel-oauth2-client' => 
   array (
+    'aliases' => 
+    array (
+    ),
     'providers' => 
     array (
       0 => 'MacsiDigital\\OAuth2\\Providers\\OAuth2ServiceProvider',
     ),
-    'aliases' => 
-    array (
-    ),
   ),
   'macsidigital/laravel-zoom' => 
   array (
-    'providers' => 
-    array (
-      0 => 'MacsiDigital\\Zoom\\Providers\\ZoomServiceProvider',
-    ),
     'aliases' => 
     array (
       'Zoom' => 'MacsiDigital\\Zoom\\Facades\\Zoom',
+    ),
+    'providers' => 
+    array (
+      0 => 'MacsiDigital\\Zoom\\Providers\\ZoomServiceProvider',
     ),
   ),
   'nesbot/carbon' => 
@@ -146,13 +157,13 @@
   ),
   'nstechns/jazzcms-laravel' => 
   array (
-    'providers' => 
-    array (
-      0 => 'NsTechNs\\JazzCMS\\JazzCMSServiceProvider',
-    ),
     'aliases' => 
     array (
       'JazzCMS' => 'NsTechNs\\JazzCMS\\JazzCMSFacade',
+    ),
+    'providers' => 
+    array (
+      0 => 'NsTechNs\\JazzCMS\\JazzCMSServiceProvider',
     ),
   ),
   'nunomaduro/collision' => 
@@ -171,24 +182,24 @@
   ),
   'yajra/laravel-datatables-oracle' => 
   array (
-    'providers' => 
-    array (
-      0 => 'Yajra\\DataTables\\DataTablesServiceProvider',
-    ),
     'aliases' => 
     array (
       'DataTables' => 'Yajra\\DataTables\\Facades\\DataTables',
     ),
+    'providers' => 
+    array (
+      0 => 'Yajra\\DataTables\\DataTablesServiceProvider',
+    ),
   ),
   'zanysoft/laravel-pdf' => 
   array (
-    'providers' => 
-    array (
-      0 => 'ZanySoft\\LaravelPDF\\PdfServiceProvider',
-    ),
     'aliases' => 
     array (
       'PDF' => 'ZanySoft\\LaravelPDF\\Facades\\PDF',
+    ),
+    'providers' => 
+    array (
+      0 => 'ZanySoft\\LaravelPDF\\PdfServiceProvider',
     ),
   ),
 );

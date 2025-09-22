@@ -19,7 +19,7 @@ class BankAccountDetailsController extends Controller
      */
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = BankAccountDetail::with("bank", "bankBranch")->get();
@@ -33,7 +33,7 @@ class BankAccountDetailsController extends Controller
      */
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return view('admin.BankAccountDetail.create');
@@ -47,7 +47,7 @@ class BankAccountDetailsController extends Controller
      */
     public function store(Request $req)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $bankaccountdetail = new BankAccountDetail();
@@ -71,7 +71,7 @@ class BankAccountDetailsController extends Controller
      */
     public function show($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -84,7 +84,7 @@ class BankAccountDetailsController extends Controller
      */
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = BankAccountDetail::find($id);
@@ -100,7 +100,7 @@ class BankAccountDetailsController extends Controller
      */
     public function update(Request $req, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $bankaccountdetail = BankAccountDetail::find($req->id);
@@ -124,7 +124,7 @@ class BankAccountDetailsController extends Controller
      */
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $var = BankAccountDetail::find($id)->delete();
@@ -134,7 +134,7 @@ class BankAccountDetailsController extends Controller
     }
     public function getData()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = BankAccountDetail::with('bank', 'bankBranch');
@@ -155,3 +155,4 @@ class BankAccountDetailsController extends Controller
             ->make(true);
     }
 }
+

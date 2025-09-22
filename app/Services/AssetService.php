@@ -16,7 +16,7 @@ class AssetService
 {
     public function store($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         //dd($request->all());
@@ -60,7 +60,7 @@ class AssetService
 
     public function getdata()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = Asset::with('company', 'branch')->orderBy('created_at', 'desc')->get();
@@ -124,7 +124,7 @@ class AssetService
 
     public function update($request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $asset = Asset::find($id);
@@ -167,7 +167,7 @@ class AssetService
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $asset = Asset::find($id);
@@ -177,3 +177,4 @@ class AssetService
     }
 
 }
+

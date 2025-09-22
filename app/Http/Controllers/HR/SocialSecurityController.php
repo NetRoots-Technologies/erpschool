@@ -23,7 +23,7 @@ class SocialSecurityController extends Controller
 
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return view('hr.social_security.index');
@@ -31,7 +31,7 @@ class SocialSecurityController extends Controller
 
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $branches = Branch::where('status', 1)->get();
@@ -41,7 +41,7 @@ class SocialSecurityController extends Controller
 
     public function store(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         DB::beginTransaction();
@@ -59,7 +59,7 @@ class SocialSecurityController extends Controller
 
     public function fetchSocialEmployees(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $socialSecurity = GeneralSettingsHelper::getSetting('socialSecurity');
@@ -73,7 +73,7 @@ class SocialSecurityController extends Controller
 
     public function socialSecurityData(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = $request->all();
@@ -106,7 +106,7 @@ class SocialSecurityController extends Controller
 
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $socialSecurity = SocialSecurity::with('employee')->find($id);
@@ -121,7 +121,7 @@ class SocialSecurityController extends Controller
     public function update(Request $request, $id)
     {
 
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $this->SocialSecurityService->update($request, $id);
@@ -132,7 +132,7 @@ class SocialSecurityController extends Controller
 
     public function getData()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return $social = $this->SocialSecurityService->getdata();
@@ -141,7 +141,7 @@ class SocialSecurityController extends Controller
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $this->SocialSecurityService->destroy($id);
@@ -155,3 +155,4 @@ class SocialSecurityController extends Controller
 
 
 }
+

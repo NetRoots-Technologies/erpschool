@@ -17,7 +17,7 @@ class SignatoryAuthorityController extends Controller
 {
 
 public function index(){
-    if (!Gate::allows('students')) {
+    if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     return view('admin.approval_authorities.index');
@@ -25,7 +25,7 @@ public function index(){
 
     public function getData()
  {
-if (!Gate::allows('students')) {
+if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     
@@ -81,7 +81,7 @@ if (!Gate::allows('students')) {
 
    public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $companies = Company::all();
@@ -94,7 +94,7 @@ if (!Gate::allows('students')) {
 
    public function store(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $request->validate([
@@ -119,7 +119,7 @@ if (!Gate::allows('students')) {
 
        public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $authority = ApprovalAuthority::findOrFail($id);
@@ -133,7 +133,7 @@ if (!Gate::allows('students')) {
 
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $authority = ApprovalAuthority::findOrFail($id);
@@ -154,7 +154,7 @@ if (!Gate::allows('students')) {
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $authority = ApprovalAuthority::findOrFail($id);
@@ -164,3 +164,4 @@ if (!Gate::allows('students')) {
     }
 
 }
+

@@ -24,7 +24,7 @@ class QuoteController extends Controller
 
     public function index($type)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         // $branches = Branches::active()->with(['suppliers:id,name', 'suppliers.items:id,name,measuring_unit'])->select(['id', 'name'])->get();
@@ -61,7 +61,7 @@ class QuoteController extends Controller
     }
     public function approval()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return view('admin.inventory_management.requisition.approval');
@@ -69,7 +69,7 @@ class QuoteController extends Controller
 
     public function store(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         DB::beginTransaction();
@@ -117,7 +117,7 @@ class QuoteController extends Controller
 
     public function destroy(Quote $quote)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         try {
@@ -131,7 +131,7 @@ class QuoteController extends Controller
 
     public function getData(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $supplier = Quote::select([
@@ -156,7 +156,7 @@ class QuoteController extends Controller
     }
     public function changeStatus(Request $request, Quote $requisition)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $requisition->status = $request->status;
@@ -178,7 +178,7 @@ class QuoteController extends Controller
 
     public function getQuote(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $date = Date('Y-m-d');
@@ -258,3 +258,4 @@ class QuoteController extends Controller
 
     }
 }
+

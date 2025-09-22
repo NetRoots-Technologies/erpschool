@@ -17,7 +17,7 @@ class BranchService
 
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -25,7 +25,7 @@ class BranchService
 
     public function store($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         //dd($request->all());
@@ -56,7 +56,7 @@ class BranchService
 
     public function getdata()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         
@@ -111,7 +111,7 @@ class BranchService
 
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return Branch::find($id);
@@ -120,7 +120,7 @@ class BranchService
 
     public function update($request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $branch = Branch::find($id);
@@ -150,7 +150,7 @@ class BranchService
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $Branch = Branch::findOrFail($id);
@@ -163,7 +163,7 @@ class BranchService
 
     public function changeStatus($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $branch = Branch::find($request->id);
@@ -174,3 +174,4 @@ class BranchService
         }
     }
 }
+

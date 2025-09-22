@@ -15,10 +15,6 @@ use App\Helpers\CoreAccounts;
 use App\Models\Account\Group;
 use App\Models\Admin\Ledgers;
 use App\Models\Admin\Session;
-use App\Models\Fee\FeeCollection;
-use App\Models\Fee\FeeCollectionDetail;
-// use App\Models\Fee\StudentFee; // Removed - model no longer exists
-// use App\Models\Fee\PaidStudentFee; // Removed - model no longer exists
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
 use App\Http\Controllers\Controller;
@@ -40,7 +36,7 @@ class LedgersController extends Controller
      */
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
 
@@ -69,7 +65,7 @@ class LedgersController extends Controller
      */
     public function getData(Request $request)
     {
-if (!Gate::allows('students')) {
+if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = Ledgers::with('groups')->whereNotIn('group_id', [11, 21]);
@@ -93,7 +89,7 @@ if (!Gate::allows('students')) {
 
     public function getDataincome(Request $request)
     {
-if (!Gate::allows('students')) {
+if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = Ledgers::where('group_id', 21)->with('groups');
@@ -113,7 +109,7 @@ if (!Gate::allows('students')) {
 
     public function getDatareciable(Request $request)
     {
-if (!Gate::allows('students')) {
+if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = Ledgers::where('group_id', 11)->with('groups');
@@ -132,7 +128,7 @@ if (!Gate::allows('students')) {
 
     public function income()
     {
-if (!Gate::allows('students')) {
+if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
 
@@ -142,7 +138,7 @@ if (!Gate::allows('students')) {
 
     public function receivable()
     {
-if (!Gate::allows('students')) {
+if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
 
@@ -152,7 +148,7 @@ if (!Gate::allows('students')) {
 
     public function create()
     {
-       if (!Gate::allows('students')) {
+       if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
 
@@ -169,7 +165,7 @@ if (!Gate::allows('students')) {
      */
     public function store(Request $request): RedirectResponse
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         try {
@@ -200,7 +196,7 @@ if (!Gate::allows('students')) {
      */
     public function edit($id)
     {
-       if (!Gate::allows('students')) {
+       if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $Ledger = Ledgers::findOrFail($id);
@@ -214,7 +210,7 @@ if (!Gate::allows('students')) {
     {
 
 
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $group = Groups::where('id', $request->group_id)->first();
@@ -234,7 +230,7 @@ if (!Gate::allows('students')) {
      */
     public function update(Request $request, $id)
     {
-       if (!Gate::allows('students')) {
+       if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $response = CoreAccounts::updateLedger($request->all(), $id);
@@ -279,7 +275,7 @@ if (!Gate::allows('students')) {
      */
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         if (!Gate::allows('Ledgers-delete')) {
@@ -300,7 +296,7 @@ if (!Gate::allows('students')) {
      */
     public function massDestroy(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         if ($request->input('ids')) {
@@ -314,7 +310,7 @@ if (!Gate::allows('students')) {
 
     public function get_ledger_tree($id)
     {
-if (!Gate::allows('students')) {
+if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = '';
@@ -366,7 +362,7 @@ if (!Gate::allows('students')) {
     public function ledger_tree()
     {
         /* Create list of parent groups */
-if (!Gate::allows('students')) {
+if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $Groups2 = Groups::where('parent_id', 0)->get();
@@ -396,10 +392,11 @@ if (!Gate::allows('students')) {
 
     public function fee_collection_index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
-        $students = FeeCollection::with('student', 'academicSession')->get();
+        // Fee module removed - this needs to be updated for new fee structure
+        $students = collect([]);
         $sessions = Session::orderby('id', 'DESC')->get();
 
         return view('admin.ledgers.fee_collection_index', compact('students', 'sessions'));
@@ -408,20 +405,19 @@ if (!Gate::allows('students')) {
     public function get_data_fee_collection(Request $request)
     {
 
-if (!Gate::allows('students')) {
+if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         if (isset($request->session)) {
             if ($request->session) {
                 $session = $request->session;
-                $students = FeeCollection::where('academic_session_id', $session)->pluck('student_id');
-
-                // Updated to use new fee structure
-                $data = FeeCollection::whereIN('student_id', $students)->with('student', 'academicSession');
+                // Fee module removed - this needs to be updated for new fee structure
+                $data = collect([]);
 
             }
         } else {
-            $data = FeeCollection::with('student', 'academicSession');
+            // Fee module removed - this needs to be updated for new fee structure
+            $data = collect([]);
         }
         if ($request->student_id) {
             $data = $data->where('student_id', $request->student_id);
@@ -543,7 +539,7 @@ if (!Gate::allows('students')) {
 
     public function getGeneralLedger()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $coa = Group::where('level', 4)->get();
@@ -552,7 +548,7 @@ if (!Gate::allows('students')) {
 
     public function generalLedgerResult(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return Ledger::where('code',$request['coa'])->get();
@@ -560,7 +556,7 @@ if (!Gate::allows('students')) {
 
     public function getSubsidiaryLedger()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $vendor = Vendor::get();
@@ -568,3 +564,4 @@ if (!Gate::allows('students')) {
     }
 
 }
+

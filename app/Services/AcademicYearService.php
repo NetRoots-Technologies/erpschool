@@ -14,7 +14,7 @@ class AcademicYearService
 
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -22,7 +22,7 @@ class AcademicYearService
 
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return Company::all();
@@ -33,7 +33,7 @@ class AcademicYearService
 
     public function store($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
 
@@ -44,7 +44,7 @@ class AcademicYearService
 
     public function getdata()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = Company::orderby('id', 'DESC');
@@ -71,7 +71,7 @@ class AcademicYearService
 
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return Company::find($id);
@@ -82,7 +82,7 @@ class AcademicYearService
 
     public function update($request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = Company::find($id);
@@ -92,7 +92,7 @@ class AcademicYearService
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $Company = Company::findOrFail($id);
@@ -100,3 +100,4 @@ class AcademicYearService
             $Company->delete();
     }
 }
+

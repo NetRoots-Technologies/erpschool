@@ -12,7 +12,7 @@ class DesignationService
 
     public function store($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $designation = Designation::create(['name' => $request->name, 'department_id' => $request->selectDepartment]);
@@ -21,7 +21,7 @@ class DesignationService
 
     public function getdata()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = Designation::orderby('id', 'DESC');
@@ -53,7 +53,7 @@ class DesignationService
 
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return Designation::find($id);
@@ -62,7 +62,7 @@ class DesignationService
 
     public function update($request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = Designation::find($id);
@@ -73,7 +73,7 @@ class DesignationService
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $Designation = Designation::findOrFail($id);
@@ -83,7 +83,7 @@ class DesignationService
 
     public function changeStatus($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $designation = Designation::find($request->id);
@@ -95,3 +95,4 @@ class DesignationService
     }
 
 }
+

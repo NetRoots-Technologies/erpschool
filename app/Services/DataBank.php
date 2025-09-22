@@ -22,7 +22,7 @@ class DataBank
 
     public function index1()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return StudentDataBank::all();
@@ -30,7 +30,7 @@ class DataBank
 
     public function databank_create_student($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $StudentDataBank = StudentDataBank::find($id);
@@ -52,7 +52,7 @@ class DataBank
 
     public function student_databank_remarks($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $remarks = StudentDataBank::find($request->id);
@@ -64,7 +64,7 @@ class DataBank
 
     public function student_databank_status($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $status = StudentDataBank::find($request->id);
@@ -76,7 +76,7 @@ class DataBank
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $walkin_student = StudentDataBank::find($id);
@@ -87,7 +87,7 @@ class DataBank
 
     public function walk_in_student($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $user_id = Auth::user()->id;
@@ -104,7 +104,7 @@ class DataBank
 
     public function getdata($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $user = auth()->user();
@@ -219,7 +219,7 @@ class DataBank
 
     public function bv_form_get_data($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = BvForm::get();
@@ -239,7 +239,7 @@ class DataBank
 
     public function seminar_form_get_data($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = SeminarForm::get();
@@ -259,7 +259,7 @@ class DataBank
 
     public function onezcamp_form_get_data($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = OnezCampForm::get();
@@ -277,3 +277,4 @@ class DataBank
 
     }
 }
+

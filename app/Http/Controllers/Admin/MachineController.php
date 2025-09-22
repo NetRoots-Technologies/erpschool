@@ -13,10 +13,11 @@ class MachineController extends Controller
 {
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $zk = new ZktecoLib(config('192.168.99.124'), 4370);
         dd($zk->connect());
     }
 }
+

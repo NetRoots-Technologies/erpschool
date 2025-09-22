@@ -18,7 +18,7 @@ class BankService
 
     public function getdata()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = Bank::orderby('id', 'DESC');
@@ -48,7 +48,7 @@ class BankService
 
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return Bank::find($id);
@@ -57,7 +57,7 @@ class BankService
 
     public function update($request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $Bank = Bank::find($id);
@@ -68,7 +68,7 @@ class BankService
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $Bank = Bank::findOrFail($id);
@@ -78,7 +78,7 @@ class BankService
 
     public function changeStatus($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $Bank = Bank::find($request->id);
@@ -90,3 +90,4 @@ class BankService
     }
 
 }
+

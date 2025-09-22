@@ -19,7 +19,7 @@ class BanksBranchesController extends Controller
      */
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = BankBranch::with("bank")->paginate(5);
@@ -35,7 +35,7 @@ class BanksBranchesController extends Controller
      */
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $bank = BanksModel::all()->pluck('id', 'bank_name');
@@ -53,7 +53,7 @@ class BanksBranchesController extends Controller
      */
     public function store(Request $req)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
 
@@ -75,7 +75,7 @@ class BanksBranchesController extends Controller
      */
     public function show($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -88,7 +88,7 @@ class BanksBranchesController extends Controller
      */
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $bank = BanksModel::all()->pluck('id', 'bank_name');
@@ -106,7 +106,7 @@ class BanksBranchesController extends Controller
      */
     public function update(Request $req, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $bankbranch = BankBranch::find($req->id);
@@ -127,7 +127,7 @@ class BanksBranchesController extends Controller
      */
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $var = BankBranch::find($id)->delete();
@@ -137,7 +137,7 @@ class BanksBranchesController extends Controller
     }
     public function getData()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = BankBranch::with('bank');
@@ -159,3 +159,4 @@ class BanksBranchesController extends Controller
     }
 
 }
+

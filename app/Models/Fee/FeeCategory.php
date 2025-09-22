@@ -18,6 +18,9 @@ class FeeCategory extends Model
     protected $fillable = [
         'name',
         'description',
+        'type',
+        'is_mandatory',
+        'affects_financials',
         'is_active',
         'company_id',
         'branch_id',
@@ -26,6 +29,8 @@ class FeeCategory extends Model
     ];
 
     protected $casts = [
+        'is_mandatory' => 'boolean',
+        'affects_financials' => 'boolean',
         'is_active' => 'boolean',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
@@ -53,15 +58,20 @@ class FeeCategory extends Model
         return $this->belongsTo(User::class, 'updated_by');
     }
 
-    public function feeSections()
-    {
-        return $this->hasMany(FeeSection::class);
-    }
-
     // Scopes
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
+    }
+
+    public function scopeMandatory($query)
+    {
+        return $query->where('is_mandatory', true);
+    }
+
+    public function scopeByType($query, $type)
+    {
+        return $query->where('type', $type);
     }
 
     public function scopeForCompany($query, $companyId)

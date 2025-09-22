@@ -14,7 +14,7 @@ class SkillEvaluationKeyService
 
     public function store($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         SkillEvaluationKey::create(['key' => $request->key, 'abbr' => $request->abbr, 'user_id' => Auth::id()]);
@@ -22,7 +22,7 @@ class SkillEvaluationKeyService
 
     public function getdata()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = SkillEvaluationKey::with('user')->orderby('id', 'DESC')->get();
@@ -63,7 +63,7 @@ class SkillEvaluationKeyService
 
     public function update($request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $skillEvaluation = SkillEvaluationKey::find($id);
@@ -76,7 +76,7 @@ class SkillEvaluationKeyService
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $skillEvaluation = SkillEvaluationKey::findOrFail($id);
@@ -86,7 +86,7 @@ class SkillEvaluationKeyService
 
     public function changeStatus($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $skillEvaluation = SkillEvaluationKey::find($request->id);
@@ -99,3 +99,4 @@ class SkillEvaluationKeyService
 
 
 }
+

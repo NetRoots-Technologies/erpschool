@@ -9,11 +9,8 @@ use http\Client\Curl\User;
 use Illuminate\Http\Request;
 use App\Models\HRM\Employees;
 use NsTechNs\JazzCMS\JazzCMS;
-// use App\Models\Fee\StudentFee; // Removed - model no longer exists
 use App\Services\LedgerService;
 use App\Models\Student\Students;
-use App\Models\Fee\FeeCollection;
-use App\Models\Fee\FeeCollectionDetail;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Http;
@@ -39,17 +36,10 @@ class DashboardController extends Controller
         }
         $employees_name = Employees::latest()->limit(6)->get();
 
-        // Get today's fee collections using new fee structure
-        $today_fee_collections = FeeCollection::whereDate('created_at', today())
-            ->where('status', 'paid')
-            ->sum('paid_amount');
-
-        $today_fee = $today_fee_collections;
-
-        // Get monthly fee collections using new fee structure
-        $monthFee = FeeCollection::whereBetween('created_at', [date('Y-m-01'), date('Y-m-d')])
-            ->where('status', 'paid')
-            ->sum('paid_amount');
+        // Fee module removed - these values need to be updated for new fee structure
+        $today_fee_collections = 0;
+        $today_fee = 0;
+        $monthFee = 0;
 
         $employees = Employees::with('department')->get();
 
@@ -75,7 +65,7 @@ class DashboardController extends Controller
 
     public function sms()
     {
-if (!Gate::allows('students')) {
+if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
 
@@ -106,7 +96,7 @@ if (!Gate::allows('students')) {
      */
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -119,7 +109,7 @@ if (!Gate::allows('students')) {
      */
     public function store(Request $request)
     {
-       if (!Gate::allows('students')) {
+       if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -133,7 +123,7 @@ if (!Gate::allows('students')) {
      */
     public function show($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -146,7 +136,7 @@ if (!Gate::allows('students')) {
      */
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -160,7 +150,7 @@ if (!Gate::allows('students')) {
      */
     public function update(Request $request, $id)
     {
-       if (!Gate::allows('students')) {
+       if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -173,8 +163,9 @@ if (!Gate::allows('students')) {
      */
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
 }
+

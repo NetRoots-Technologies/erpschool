@@ -23,7 +23,7 @@ class BudgetController extends Controller
      */
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $departments = $this->budgetService->getDepartments();
@@ -38,7 +38,7 @@ class BudgetController extends Controller
      */
     public function create()
     {
-       if (!Gate::allows('students')) {
+       if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -51,7 +51,7 @@ class BudgetController extends Controller
      */
     public function store(BudgetRequest $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $this->budgetService->store($request->validated());
@@ -66,7 +66,7 @@ class BudgetController extends Controller
      */
     public function show($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -74,7 +74,7 @@ class BudgetController extends Controller
     public function getData()
     {
 
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return $this->budgetService->getData();
@@ -88,7 +88,7 @@ class BudgetController extends Controller
      */
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -102,7 +102,7 @@ class BudgetController extends Controller
      */
     public function update(BudgetRequest $request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $this->budgetService->update($request->validated(),$id);
@@ -117,7 +117,7 @@ class BudgetController extends Controller
      */
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $this->budgetService->delete($id);
@@ -125,3 +125,4 @@ class BudgetController extends Controller
     }
 
 }
+

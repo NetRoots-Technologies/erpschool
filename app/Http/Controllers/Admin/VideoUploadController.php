@@ -26,7 +26,7 @@ class VideoUploadController extends Controller
 
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return view('admin.video.index');
@@ -35,7 +35,7 @@ class VideoUploadController extends Controller
     public function getData(Request $request)
     {
 
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = $this->VideoUploadServices->getdata($request);
@@ -49,7 +49,7 @@ class VideoUploadController extends Controller
      */
     public function create(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $id = $request->id;
@@ -68,7 +68,7 @@ class VideoUploadController extends Controller
     public function store(Request $request)
     {
 
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $validated = $request->validate([
@@ -93,14 +93,14 @@ class VideoUploadController extends Controller
      */
     public function show($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
 
     public function session_videos($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return view('admin.video.index', compact('id'));
@@ -114,7 +114,7 @@ class VideoUploadController extends Controller
      */
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = $this->VideoUploadServices->edit($id);
@@ -130,7 +130,7 @@ class VideoUploadController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $validated = $request->validate([
@@ -153,7 +153,7 @@ class VideoUploadController extends Controller
      */
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $this->VideoUploadServices->destroy($id);
@@ -162,3 +162,4 @@ class VideoUploadController extends Controller
 
     }
 }
+

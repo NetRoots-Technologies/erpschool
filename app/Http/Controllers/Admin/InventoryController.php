@@ -30,7 +30,7 @@ class InventoryController extends Controller
 
        public function getDataIndex()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = Inventory::with('vendorinventoryCategorys')->orderBy('created_at', 'desc')->get();
@@ -42,7 +42,7 @@ class InventoryController extends Controller
 
       public function index(Request $request)
         {
-            if (!Gate::allows('students')) {
+            if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
             if ($request->ajax()) {
@@ -98,7 +98,7 @@ class InventoryController extends Controller
 
     public function create()
    {
-    if (!Gate::allows('students')) {
+    if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     // Level 2 categories
@@ -139,7 +139,7 @@ class InventoryController extends Controller
       
     public function store(Request $request)
       {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         // Validation rules
@@ -247,7 +247,7 @@ class InventoryController extends Controller
      */
     public function show($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -260,7 +260,7 @@ class InventoryController extends Controller
      */
 public function edit($id)
 {
-    if (!Gate::allows('students')) {
+    if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     $edit = Inventory::findOrFail($id); // renamed from $inventory to $edit
@@ -295,7 +295,7 @@ $costAccounts = Group::where('status', 1)->pluck('name', 'id');
      */
 public function update(Request $request, $id)
 {
-    if (!Gate::allows('students')) {
+    if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     $inventory = Inventory::findOrFail($id);
@@ -361,7 +361,7 @@ public function update(Request $request, $id)
      */
    public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = Inventory::findOrFail($id);
@@ -372,7 +372,7 @@ public function update(Request $request, $id)
 
 private function createCode($level, $parent)
 {
-    if (!Gate::allows('students')) {
+    if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     \Log::info("createCode called with level: $level, parent: $parent");
@@ -401,3 +401,4 @@ private function createCode($level, $parent)
 }
 
 }
+

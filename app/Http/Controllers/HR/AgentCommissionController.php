@@ -22,7 +22,7 @@ class AgentCommissionController extends Controller
     }
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = $this->AgentComissionServices->index();
@@ -36,7 +36,7 @@ class AgentCommissionController extends Controller
      */
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $agent_comission = $this->AgentComissionServices->create();
@@ -51,7 +51,7 @@ class AgentCommissionController extends Controller
      */
     public function store(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $validated = $request->validate([
@@ -71,7 +71,7 @@ class AgentCommissionController extends Controller
      */
     public function show($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -84,7 +84,7 @@ class AgentCommissionController extends Controller
      */
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $agent_type = AgentType::all();
@@ -102,7 +102,7 @@ class AgentCommissionController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $agent_comission = $this->AgentComissionServices->update($id);
@@ -117,7 +117,7 @@ class AgentCommissionController extends Controller
      */
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $agent_comission = $this->AgentComissionServices->destroy($id);
@@ -126,10 +126,11 @@ class AgentCommissionController extends Controller
 
     public function getData()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $agent_comission = $this->AgentComissionServices->getdata();
         return $agent_comission;
     }
 }
+

@@ -17,7 +17,7 @@ class EmployeeBenefitController extends Controller
      */
     public function index($type)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $currentYear = date('Y');
@@ -28,7 +28,7 @@ class EmployeeBenefitController extends Controller
 
     public function show()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $request = request();
@@ -65,3 +65,4 @@ class EmployeeBenefitController extends Controller
     }
 
 }
+

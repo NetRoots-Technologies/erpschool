@@ -23,7 +23,7 @@ class TaxSlabController extends Controller
      */
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return view('hr.tax_slabs.index');
@@ -37,7 +37,7 @@ class TaxSlabController extends Controller
      */
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $taxes = TaxSlab::where('tax_type', 'rentalTax')->get();
@@ -61,7 +61,7 @@ class TaxSlabController extends Controller
      */
     public function store(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $this->TaxSlabService->store($request);
@@ -73,10 +73,11 @@ class TaxSlabController extends Controller
 
     public function getData()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $rentalTax = $this->TaxSlabService->getdata();
         return $rentalTax;
     }
 }
+

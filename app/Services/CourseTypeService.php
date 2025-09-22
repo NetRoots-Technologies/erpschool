@@ -20,14 +20,14 @@ class CourseTypeService
 
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
 
     public function apiindex()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return Role::all();
@@ -36,7 +36,7 @@ class CourseTypeService
 
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         //return Permission::with('child')->where('main', 1)->get();
@@ -45,7 +45,7 @@ class CourseTypeService
 
     public function store($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $coursetype = CourseType::create(['name' => $request->name, 'description' => $request->description]);
@@ -55,7 +55,7 @@ class CourseTypeService
 
     public function getdata()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = CourseType::latest()->get();
@@ -87,7 +87,7 @@ class CourseTypeService
 
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return Role::find($id);
@@ -97,7 +97,7 @@ class CourseTypeService
 
     public function AllowedPermissions($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return Permission::join('role_has_permissions', 'role_has_permissions.permission_id', '=', 'permissions.id')
@@ -108,7 +108,7 @@ class CourseTypeService
 
     public function update($request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = CourseType::find($id);
@@ -118,7 +118,7 @@ class CourseTypeService
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $course_type = CourseType::findOrFail($id);
@@ -131,7 +131,7 @@ class CourseTypeService
 
     public function changeStatus($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $coursetype = CourseType::find($request->id);
@@ -144,7 +144,7 @@ class CourseTypeService
 
     public function sync()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $sync = sync::find(1);
@@ -161,7 +161,7 @@ class CourseTypeService
 
     public function syncdb()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $sync = sync::find(1);
@@ -176,3 +176,4 @@ class CourseTypeService
         $sync->resetdb();
     }
 }
+

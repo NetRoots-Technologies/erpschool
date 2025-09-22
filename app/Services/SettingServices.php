@@ -15,7 +15,7 @@ class SettingServices
 
     public function web_form_edit_post($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $banner = WebCrmSetting::where('page_name', 'web_registration_form_banner')->first();
@@ -40,4 +40,5 @@ class SettingServices
 
 
 }
+
 

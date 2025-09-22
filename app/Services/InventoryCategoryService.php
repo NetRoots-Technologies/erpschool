@@ -12,14 +12,14 @@ class InventoryCategoryService
 
     public function getCategories()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return InventoryCategory::get();
     }
     public function getData()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return InventoryCategory::whereNull('parent_id')->with('recursiveChildren')->get();
@@ -28,7 +28,7 @@ class InventoryCategoryService
 
     public function store(array $data)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $level = InventoryCategory::find($data['parent_id'], ['level']);
@@ -44,7 +44,7 @@ class InventoryCategoryService
 
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $category = InventoryCategory::find($id);
@@ -55,7 +55,7 @@ class InventoryCategoryService
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $category = InventoryCategory::findOrFail($id);
@@ -64,7 +64,7 @@ class InventoryCategoryService
 
     private function createCode($level, $parent)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         switch ($level) {
@@ -77,3 +77,4 @@ class InventoryCategoryService
         return null;
     }
 }
+

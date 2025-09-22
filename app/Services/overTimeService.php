@@ -11,7 +11,7 @@ class overTimeService
 {
     public function store($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         foreach ($request['employee_id'] as $key => $employee) {
@@ -32,7 +32,7 @@ class overTimeService
 
     public function getdata()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = OverTime::with('employee', 'branch')->orderBy('created_at', 'desc')->get();
@@ -85,7 +85,7 @@ class overTimeService
 
     public function update($request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $overtime = OverTime::find($id);
@@ -103,7 +103,7 @@ class overTimeService
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $overtime = OverTime::find($id);
@@ -113,3 +113,4 @@ class overTimeService
     }
 
 }
+

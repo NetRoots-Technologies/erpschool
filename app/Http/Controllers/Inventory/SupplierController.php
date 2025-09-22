@@ -29,7 +29,7 @@ class SupplierController extends Controller
 
     public function index($type)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
 
@@ -48,7 +48,7 @@ class SupplierController extends Controller
      */
     public function store(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
 
@@ -98,7 +98,7 @@ class SupplierController extends Controller
      */
     public function destroy(Supplier $supplier)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $supplier->delete();
@@ -107,7 +107,7 @@ class SupplierController extends Controller
 
     public function getData(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $query = Supplier::query();
@@ -123,7 +123,7 @@ class SupplierController extends Controller
     }
     public function changeStatus(Supplier $supplier)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $supplier->status = !$supplier->status;
@@ -131,3 +131,4 @@ class SupplierController extends Controller
         return response()->json(["success" => true, 'message' => 'Status Changed', 'data' => []], 200);
     }
 }
+

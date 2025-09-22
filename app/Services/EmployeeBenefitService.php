@@ -22,7 +22,7 @@ class EmployeeBenefitService
 
     public function createEmployeeBenefit($employee_id, $company_amount, $employee_amount, $type = 'EOBI')
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         try {
@@ -47,3 +47,4 @@ class EmployeeBenefitService
         }
     }
 }
+

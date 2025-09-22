@@ -20,7 +20,7 @@ class InventoryCategoryController extends Controller
 
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $categories = $this->inventoryCategoryService->getCategories();
@@ -30,7 +30,7 @@ class InventoryCategoryController extends Controller
 
     public function store(Request $request)
     { 
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $request->validate([
@@ -62,7 +62,7 @@ class InventoryCategoryController extends Controller
 
     private function createCode($level, $parent)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         switch ($level) {
@@ -77,7 +77,7 @@ class InventoryCategoryController extends Controller
 
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $category = InventoryCategory::findOrFail($id);
@@ -86,7 +86,7 @@ class InventoryCategoryController extends Controller
 
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $request->validate([
@@ -102,7 +102,7 @@ class InventoryCategoryController extends Controller
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         if ($this->inventoryCategoryService->destroy($id)) {
@@ -112,3 +112,4 @@ class InventoryCategoryController extends Controller
         return redirect()->back()->with('error', 'Failed to delete category.');
     }
 }
+

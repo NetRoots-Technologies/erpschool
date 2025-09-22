@@ -1,0 +1,5 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/erpnetroots/dev.cornerstone.erpnetroots.com/
+    - /bin/cp -R * $DEPLOYPATH

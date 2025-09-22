@@ -18,7 +18,7 @@ class EmployeeTypeServices
 
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return EmployeeTypes::all();
@@ -27,7 +27,7 @@ class EmployeeTypeServices
 
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
 
@@ -35,7 +35,7 @@ class EmployeeTypeServices
 
     public function store($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $employee_type = new EmployeeTypes();
@@ -48,7 +48,7 @@ class EmployeeTypeServices
 
     public function getdata()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = EmployeeTypes::get();
@@ -72,7 +72,7 @@ class EmployeeTypeServices
 
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return EmployeeTypes::find($id);
@@ -82,7 +82,7 @@ class EmployeeTypeServices
 
     public function update($request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $employee_type = EmployeeTypes::find($id);
@@ -94,7 +94,7 @@ class EmployeeTypeServices
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $employee_type = EmployeeTypes::findOrFail($id);
@@ -103,4 +103,5 @@ class EmployeeTypeServices
 
     }
 }
+
 

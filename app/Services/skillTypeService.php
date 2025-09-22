@@ -15,7 +15,7 @@ class skillTypeService
 {
     public function store($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         SkillType::create([
@@ -32,7 +32,7 @@ class skillTypeService
 
     public function getData()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = SkillType::with('branch', 'subject', 'AcademicClass', 'group', 'user', 'skill')->orderBy('created_at', 'desc')->get();
@@ -116,7 +116,7 @@ class skillTypeService
 
     public function update($request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $skillType = SkillType::find($id);
@@ -134,7 +134,7 @@ class skillTypeService
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $skillType = SkillType::find($id);
@@ -144,3 +144,4 @@ class skillTypeService
     }
 
 }
+

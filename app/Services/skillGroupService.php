@@ -13,7 +13,7 @@ class skillGroupService
 {
     public function store($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         SkillGroup::create([
@@ -29,7 +29,7 @@ class skillGroupService
 
     public function getdata()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = SkillGroup::with('user', 'branch')->OrderBy('created_at', 'desc');
@@ -81,7 +81,7 @@ class skillGroupService
 
     public function update($request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $skillGroup = SkillGroup::find($id);
@@ -98,7 +98,7 @@ class skillGroupService
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $skillGroup = SkillGroup::find($id);
@@ -108,7 +108,7 @@ class skillGroupService
     }
     public function changeStatus($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $skillGroup = SkillGroup::find($request->id);
@@ -121,3 +121,4 @@ class skillGroupService
 
 
 }
+

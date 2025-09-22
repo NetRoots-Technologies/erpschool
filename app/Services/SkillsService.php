@@ -10,7 +10,7 @@ class SkillsService
 {
     // public function store($request)
     // {
-    //     if (!Gate::allows('students')) {
+    //     if (!Gate::allows('Dashboard-list')) {
     //         return abort(503);
     //     }
     //     $logs = [
@@ -51,7 +51,7 @@ public function store($request)
 
     public function getdata()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
      $data = Skills::with(['class', 'subject', 'component'])->orderBy('id', 'DESC')->get();
@@ -86,7 +86,7 @@ public function store($request)
 
     public function update($request, $id, $image = null)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $skills = Skills::find($id);
@@ -109,14 +109,14 @@ public function store($request)
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
 
     public function changeStatus($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $skills = Skills::find($request->id);
@@ -137,3 +137,4 @@ public function store($request)
         return null;
     }
 }
+

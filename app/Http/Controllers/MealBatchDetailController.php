@@ -8,3 +8,4 @@ class MealBatchDetailController extends Controller
 {
     //
 }
+

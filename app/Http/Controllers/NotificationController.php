@@ -18,7 +18,7 @@ class NotificationController extends Controller
     // getCount
     public function getNotifications()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data['notifications'] = NotificationService::getAllNotifications(auth()->id());
@@ -28,7 +28,7 @@ class NotificationController extends Controller
 
     public function getUnreadCount()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data['count'] = NotificationService::getUnreadNotificationCount(auth()->id());
@@ -37,7 +37,7 @@ class NotificationController extends Controller
 
     public function approve(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $currentRequest = ApprovalRequest::findOrFail($request->id);
@@ -103,7 +103,7 @@ class NotificationController extends Controller
 
     public function pending(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         ApprovalRequest::where('id', $request->id)->update([
@@ -123,3 +123,4 @@ class NotificationController extends Controller
     }
 
 }
+

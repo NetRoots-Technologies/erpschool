@@ -13,7 +13,7 @@ class SocialSecurityService
 
     public function store($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         foreach ($request->get('employee_id') as $key => $employee) {
@@ -31,7 +31,7 @@ class SocialSecurityService
 
     public function getdata()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = SocialSecurity::with('branch', 'employee')->get();
@@ -66,7 +66,7 @@ class SocialSecurityService
 
     public function update($request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $social = SocialSecurity::find($id);
@@ -82,7 +82,7 @@ class SocialSecurityService
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $social = SocialSecurity::find($id);
@@ -92,3 +92,4 @@ class SocialSecurityService
     }
 
 }
+

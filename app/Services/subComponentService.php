@@ -13,7 +13,7 @@ class subComponentService
 {
     public function store($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         foreach ($request->get('test_type_id') as $key => $testType)
@@ -28,7 +28,7 @@ class subComponentService
 
     public function getdata()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = SubComponent::with('component', 'user', 'test_type')->orderby('id', 'DESC')->get();
@@ -116,7 +116,7 @@ class subComponentService
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $subComponent = SubComponent::findOrFail($id);
@@ -126,3 +126,4 @@ class subComponentService
     }
 
 }
+

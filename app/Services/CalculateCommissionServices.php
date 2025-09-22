@@ -8,10 +8,8 @@ use App\Models\User;
 use App\Models\HR\Agent;
 use App\Models\HR\AgentType;
 use App\Models\HRM\Employees;
-use App\Models\Fee\StudentFee;
 use App\Models\Student\Students;
 use App\Models\HRM\EmployeeTypes;
-use App\Models\Fee\PaidStudentFee;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
@@ -29,7 +27,7 @@ class CalculateCommissionServices
 
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return view('hr.calculateComission.index');
@@ -38,7 +36,7 @@ class CalculateCommissionServices
 
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $agents = Agent::all();
@@ -50,7 +48,7 @@ class CalculateCommissionServices
 
     public function store($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         //Sales Executive (Comission)
@@ -266,7 +264,7 @@ class CalculateCommissionServices
 
     public function old_commission_getdata()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = CalculateComission::with('agent', 'agent_type', 'comission_type')->get();
@@ -315,7 +313,7 @@ class CalculateCommissionServices
 
     public function get_agent_comission()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = Agent::with('agent_type')->get();
@@ -337,7 +335,7 @@ class CalculateCommissionServices
 
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $agents = Agent::all();
@@ -348,7 +346,7 @@ class CalculateCommissionServices
 
     public function update($request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $calculate_comission = CalculateComission::find($id);
@@ -364,7 +362,7 @@ class CalculateCommissionServices
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $calculate_comission = CalculateComission::findOrFail($id);
@@ -377,7 +375,7 @@ class CalculateCommissionServices
 
     public function new_incentive_post($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
 
@@ -417,7 +415,7 @@ class CalculateCommissionServices
 
     public function get_data_new_sales()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = AgentNewSaleIncentive::with('agent')->get();
@@ -442,7 +440,7 @@ class CalculateCommissionServices
 
     public function recovery_incentive_post($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         //        dd($request);
@@ -491,7 +489,7 @@ class CalculateCommissionServices
 
     public function get_data_new_recovery()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = AgentNewSaleRecovery::with('agent')->get();
@@ -514,4 +512,5 @@ class CalculateCommissionServices
     }
 
 }
+
 

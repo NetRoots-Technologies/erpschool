@@ -13,7 +13,7 @@ class TaxSlabService
 
     public function store($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         TaxSlab::truncate();
@@ -34,7 +34,7 @@ class TaxSlabService
 
     public function getData()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = TaxSlab::with('financial')->get();
@@ -54,3 +54,4 @@ class TaxSlabService
     }
 
 }
+

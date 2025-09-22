@@ -9,7 +9,7 @@ class PrintableController extends Controller
 {
     public function printPreview($tableName)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         if (!$tableName)
@@ -32,3 +32,4 @@ class PrintableController extends Controller
         return view('print-preview', compact('fields', 'data', 'tableName'));
     }
 }
+

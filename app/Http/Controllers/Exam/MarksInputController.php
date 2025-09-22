@@ -27,7 +27,7 @@ class MarksInputController extends Controller
      */
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return view('exam.marks_input.index');
@@ -40,7 +40,7 @@ class MarksInputController extends Controller
      */
     public function create()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $companies = Company::where('status', 1)->get();
@@ -56,7 +56,7 @@ class MarksInputController extends Controller
      */
    public function store(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         // try {
@@ -76,7 +76,7 @@ class MarksInputController extends Controller
      */
     public function show($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
     }
@@ -89,7 +89,7 @@ class MarksInputController extends Controller
      */
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $marksInput = MarkInput::with(['academicSession', 'company', 'branch', 'section', 'fetchClass', 'subject', 'component', 'subComponent','mark_entries'])->find($id);
@@ -109,7 +109,7 @@ class MarksInputController extends Controller
      */
    public function update(Request $request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $marksInput = MarkInput::findOrFail($id);
@@ -137,7 +137,7 @@ class MarksInputController extends Controller
      */
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $this->marksInputService->delete($id);
@@ -147,7 +147,7 @@ class MarksInputController extends Controller
 
     public function getData()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return $this->marksInputService->getData();
@@ -155,7 +155,7 @@ class MarksInputController extends Controller
 
     public function handleBulkAction(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $ids = $request->get('ids');
@@ -168,3 +168,4 @@ class MarksInputController extends Controller
         return response()->json(['message' => 'Bulk Action Completed Successfully']);
     }
 }
+

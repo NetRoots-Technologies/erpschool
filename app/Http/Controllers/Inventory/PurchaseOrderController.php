@@ -38,7 +38,7 @@ class PurchaseOrderController extends Controller
 
     public function index($type)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $mappedType = $type == 'food' ? 'F' : 'S';
@@ -58,7 +58,7 @@ class PurchaseOrderController extends Controller
     }
     public function approval()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return view('admin.inventory_management.requisition.approval');
@@ -66,7 +66,7 @@ class PurchaseOrderController extends Controller
 
     public function view($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $delivery_status = config('constants.delivery_status');
@@ -82,7 +82,7 @@ class PurchaseOrderController extends Controller
             ->pluck('id')->toArray();
 
         $ledgers = Ledger::where('parent_type', BankAccount::class)
-            ->whereIn('parent_id', $bank_account_ids)
+            ->whereIn('parent_type_id', $bank_account_ids)
             ->orWhere(function ($query) use ($cash_in_hand) {
                 $query->where('group_id', $cash_in_hand)
                     ->orWhereNull('parent_type');
@@ -94,7 +94,7 @@ class PurchaseOrderController extends Controller
 
     public function store(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         DB::beginTransaction();
@@ -145,7 +145,7 @@ class PurchaseOrderController extends Controller
 
     public function destroy(PurchaseOrder $purchaseOrder)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $purchaseOrder->delete();
@@ -155,7 +155,7 @@ class PurchaseOrderController extends Controller
 
     public function getData(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $supplier = PurchaseOrder::select([
@@ -185,7 +185,7 @@ class PurchaseOrderController extends Controller
     }
     public function changeStatus(PurchaseOrder $purchaseOrder, $status)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         DB::beginTransaction();
@@ -230,7 +230,7 @@ class PurchaseOrderController extends Controller
 
     public function changePaymentStatus(PurchaseOrder $purchaseOrder, $status)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         DB::beginTransaction();
@@ -252,7 +252,7 @@ class PurchaseOrderController extends Controller
 
     public function changePaymentMethod(PurchaseOrder $purchaseOrder, $status)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         DB::beginTransaction();
@@ -312,14 +312,14 @@ class PurchaseOrderController extends Controller
 
     public function grn($type)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return view('admin.inventory_management.purchase_order.grn', compact('type'));
     }
     public function grnDetail($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $purchaseOrder = PurchaseOrder::where('id', $id)
@@ -346,7 +346,7 @@ class PurchaseOrderController extends Controller
 
     public function uploadPurchase(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         try {
@@ -364,3 +364,4 @@ class PurchaseOrderController extends Controller
     }
 
 }
+

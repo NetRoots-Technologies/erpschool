@@ -12,7 +12,7 @@ class EmployeeAllowanceController extends Controller
 {
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $allowances = Allowance::where('status', 1)->get();
@@ -20,3 +20,4 @@ class EmployeeAllowanceController extends Controller
         return view('hr.employee_allowances.index', compact('allowances', 'employeeTypes'));
     }
 }
+

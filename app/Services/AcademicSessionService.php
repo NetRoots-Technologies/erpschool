@@ -14,7 +14,7 @@ class AcademicSessionService
 
     public function store($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         //        dd($request->all());
@@ -24,7 +24,7 @@ class AcademicSessionService
     //,'company_id'=> $request->company_id,'school_id' => $request->school_type_id
     public function getdata()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = AcademicSession::with(relations: 'company')->orderby('id', 'DESC');
@@ -69,7 +69,7 @@ class AcademicSessionService
 
     public function update($request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $data = AcademicSession::find($id);
@@ -80,7 +80,7 @@ class AcademicSessionService
 
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $academicSession = AcademicSession::findOrFail($id);
@@ -92,7 +92,7 @@ class AcademicSessionService
 
     public function changeStatus($request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $academicSession = AcademicSession::find($request->id);
@@ -103,3 +103,4 @@ class AcademicSessionService
         }
     }
 }
+

@@ -27,7 +27,7 @@ class ManageLeaveController extends Controller
      */
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return view('hr.manage_leaves.index');
@@ -35,7 +35,7 @@ class ManageLeaveController extends Controller
 
     public function getData()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $LeaveRequest = $this->ManageLeaveService->getdata();
@@ -44,7 +44,7 @@ class ManageLeaveController extends Controller
 
     public function changeStatus(Request $request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $this->ManageLeaveService->status($request, $id);
@@ -54,7 +54,7 @@ class ManageLeaveController extends Controller
 
     public function detail($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $employees = Employees::all();
@@ -66,7 +66,7 @@ class ManageLeaveController extends Controller
 
     public function leave_balance(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $result = $this->ManageLeaveService->leave_balance($request);
@@ -78,7 +78,7 @@ class ManageLeaveController extends Controller
 
     public function add_compensatory_leaves()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $this->ManageLeaveService->add_compensatory_leaves();
@@ -86,3 +86,4 @@ class ManageLeaveController extends Controller
         return 'done';
     }
 }
+

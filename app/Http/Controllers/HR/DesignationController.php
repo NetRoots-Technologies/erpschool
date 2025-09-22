@@ -30,7 +30,7 @@ class DesignationController extends Controller
 
     public function getData()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $Designation = $this->DesignationService->getdata();
@@ -39,7 +39,7 @@ class DesignationController extends Controller
 
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $departments = Department::where('status', 1)->get();
@@ -48,7 +48,7 @@ class DesignationController extends Controller
 
     public function store(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return $Designation = $this->DesignationService->store($request);
@@ -57,7 +57,7 @@ class DesignationController extends Controller
 
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return $Designation = $this->DesignationService->update($request, $id);
@@ -72,7 +72,7 @@ class DesignationController extends Controller
      */
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return $this->DesignationService->destroy($id);
@@ -81,7 +81,7 @@ class DesignationController extends Controller
 
     public function changeStatus(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return $designation = $this->DesignationService->changeStatus($request);
@@ -92,7 +92,7 @@ class DesignationController extends Controller
     public function handleBulkAction(Request $request)
     {
 
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $ids = $request->input('ids');
@@ -108,7 +108,7 @@ class DesignationController extends Controller
 
     public function exportbulkfile()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         return Excel::download(new DesignationSampleExport, 'Designation_bulk_sample.xlsx');
@@ -116,7 +116,7 @@ class DesignationController extends Controller
 
     public function importBulkFile(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         try {
@@ -140,3 +140,4 @@ class DesignationController extends Controller
     }
 
 }
+
