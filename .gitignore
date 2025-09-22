@@ -3,7 +3,7 @@ storage
 bootstrap/cache
 .htaccess
 public/.htaccess
-.env
+/.env
 public
 .idea
 node_modules
