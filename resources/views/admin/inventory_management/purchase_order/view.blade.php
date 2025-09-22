@@ -126,7 +126,7 @@
                             </select>
                         </div>
 
-                        @if ($currentStatus === 'SHIPPED')
+                        {{-- @if ($currentStatus === 'SHIPPED')
                             <div class="d-flex align-items-center">
                                 <span class="label">Select Ledger:</span>
                                 <select name="paymentMethod" id="paymentMethod" class="form-select w-100" required>
@@ -136,7 +136,19 @@
                                     @endforeach
                                 </select>
                             </div>
-                        @endif
+                        @endif --}}
+                        @if ($currentStatus === 'SHIPPED')
+    <div class="d-flex align-items-center">
+        <span class="label">Select Ledger (optional):</span>
+        <select name="paymentMethod" id="paymentMethod" class="form-select w-100">
+            <option value="" selected>-- Optional --</option>
+            @foreach ($ledgers as $ledger)
+                <option value="{{ $ledger->id }}">{{ $ledger->name }}</option>
+            @endforeach
+        </select>
+    </div>
+@endif
+
 
                         <div class="d-flex justify-content-center">
                             <button id="confirmOrder" class="btn btn-primary mt-2 ms-5" disabled>OK</button>
@@ -233,10 +245,10 @@
                 var requestUrl = deliveryStatusApi.replace(':purchase_order', purchaseOrderId).replace(':status', selectedStatus);
                 var selectedPaymentMethod = $paymentMethod.val();
 
-                if (selectedStatus === '4' && !selectedPaymentMethod) {
-                    toastr.warning("Please select a payment method before completing the order.");
-                    return;
-                }
+                // if (selectedStatus === '4' && !selectedPaymentMethod) {
+                //     toastr.warning("Please select a payment method before completing the order.");
+                //     return;
+                // }
 
                 $.ajax({
                     url: requestUrl,
@@ -248,33 +260,33 @@
                     success: function(response) {
                         toastr.success("Delivery status updated successfully.");
 
-                        if (selectedStatus === '4') {
-                            var selectedPaymentMethod = $paymentMethod.val();
-                            if (!selectedPaymentMethod) {
-                                toastr.warning("Please select a payment method.");
-                                return;
-                            }
+                        // if (selectedStatus === '4') {
+                        //     var selectedPaymentMethod = $paymentMethod.val();
+                        //     if (!selectedPaymentMethod) {
+                        //         toastr.warning("Please select a payment method.");
+                        //         return;
+                        //     }
 
-                            var paymentUrl = paymentMethodApi.replace(':purchase_order', purchaseOrderId).replace(':status', selectedPaymentMethod);
+                        //     var paymentUrl = paymentMethodApi.replace(':purchase_order', purchaseOrderId).replace(':status', selectedPaymentMethod);
 
-                            $.ajax({
-                                url: paymentUrl,
-                                type: 'POST',
-                                beforeSend: function(xhr) {
-                                    let token = $('meta[name="csrf-token"]').attr('content');
-                                    xhr.setRequestHeader('X-CSRF-TOKEN', token);
-                                },
-                                success: function(response) {
-                                    toastr.success("Payment method updated successfully.");
-                                    location.reload();
-                                },
-                                error: function(xhr) {
-                                    toastr.error("Error updating payment method.");
-                                }
-                            });
-                        } else {
-                            location.reload();
-                        }
+                        //     $.ajax({
+                        //         url: paymentUrl,
+                        //         type: 'POST',
+                        //         beforeSend: function(xhr) {
+                        //             let token = $('meta[name="csrf-token"]').attr('content');
+                        //             xhr.setRequestHeader('X-CSRF-TOKEN', token);
+                        //         },
+                        //         success: function(response) {
+                        //             toastr.success("Payment method updated successfully.");
+                        //             location.reload();
+                        //         },
+                        //         error: function(xhr) {
+                        //             toastr.error("Error updating payment method.");
+                        //         }
+                        //     });
+                        // } else {
+                        //     location.reload();
+                        // }
                     },
                     error: function(xhr) {
                         toastr.error("Error updating delivery status.");
