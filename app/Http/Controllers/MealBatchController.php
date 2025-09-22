@@ -69,8 +69,8 @@ class MealBatchController extends Controller
             "student_section_id" => 'required|array'
         ]);
 
-        DB::beginTransaction();
-        try {
+        // DB::beginTransaction();
+        // try {
             $product = Inventry::find($request->finished_goods);
 
             $existingBatch = MealBatch::where('branch_id', $request->branch)
@@ -95,16 +95,20 @@ class MealBatchController extends Controller
             $product->save();
 
 
-            $mealBatch = MealBatch::create([
+          foreach ($request->student_section_id as $index => $section_id) {
+
+                $mealBatch = MealBatch::create([
                 "creator_id" => Auth::user()->id,
                 "branch_id" => $request->branch,
                 "parent_id" => $request->class,
                 "parent_type" => AcademicClass::class,
-                "section_id" => $request->student_section_id,
+                "section_id" => $section_id,
                 "date" => $request->date,
                 "product_id" => $request->finished_goods,
                 "batch_type" => $request->batch_type,
             ]);
+            }
+
 
 
             foreach ($request->student_id as $index => $student_id) {
@@ -174,13 +178,13 @@ class MealBatchController extends Controller
                 'message' => 'Lunch assigned successfully',
             ]);
 
-        } catch (\Throwable $e) {
-            DB::rollBack();
-            return response()->json([
-                'success' => false,
-                'message' => 'Error: ' . $e->getMessage(),
-            ], 500);
-        }
+        // } catch (\Throwable $e) {
+        //     DB::rollBack();
+        //     return response()->json([
+        //         'success' => false,
+        //         'message' => 'Error: ' . $e->getMessage(),
+        //     ], 500);
+        // }
     }
 
     public function view()

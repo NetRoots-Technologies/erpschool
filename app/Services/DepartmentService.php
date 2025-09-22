@@ -106,9 +106,16 @@ class DepartmentService
                 $data->where('company_id', $company_id);
             }
 
-            if (!is_null($branch_id)) {
-                $data->where('branch_id', $branch_id);
+            // if (!is_null($branch_id)) {
+            //     $data->where('branch_id', $branch_id);
+            // }
+             foreach(Auth::user()->roles()->get() as $role){
+            if($role->name != 'Admin'){
+                if (!is_null($branch_id)) {
+                $data->where('branch_id', );
             }
+            }
+        }
 
         }
 

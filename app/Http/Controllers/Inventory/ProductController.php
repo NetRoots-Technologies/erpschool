@@ -169,10 +169,11 @@ class ProductController extends Controller
 
     public function productInventory(Request $request)
     {
+        
         if (!Gate::allows('students')) {
             return abort(503);
         }
-        DB::beginTransaction();
+        // DB::beginTransaction();
 
         $request->validate([
             'inventoryProductsName' => 'required',
@@ -180,7 +181,7 @@ class ProductController extends Controller
             'inventoryProductsMaxQuantity' => 'required|numeric|min:1',
         ]);
 
-        try {
+        // try {
             $product = Product::find($request->product_id);
             if (!$product) {
                 return response()->json(["success" => false, "message" => "Product not found"], 404);
@@ -188,7 +189,7 @@ class ProductController extends Controller
 
             $branchId = $product->branch_id;
             $productLedger = $this->ledgerService->getLedger(Product::class, $product->id);
-
+            // dd($productLedger);
             $quantityToProduce = $request->inventoryProductsQuantity;
             $itemsLedger = [];
 
@@ -205,7 +206,7 @@ class ProductController extends Controller
                 }
 
                 $totalRequired = $productItem->quantity * $quantityToProduce;
-
+                // dd($totalRequired  , $inventory->quantity);
                 // ✅ Check stock availability
                 if ($inventory->quantity < $totalRequired) {
                     return response()->json([
@@ -216,8 +217,7 @@ class ProductController extends Controller
 
                 $inventory->quantity -= $totalRequired;
                 $inventory->save();
-
-                $itemsLedger[$key] = $this->ledgerService->getLedger(Item::class, $inventory->item_id)->toArray();
+                $itemsLedger[$key] = $this->ledgerService->getLedger(Item::class, $inventory->item_id);
                 $itemsLedger[$key]['cost_price'] = $inventory->unit_price * $quantityToProduce;
             }
 
@@ -235,44 +235,44 @@ class ProductController extends Controller
             $inventory->type = $type;
             $inventory->save();
 
-            $data = [
-                "amount" => $product->cost_price,
-                "narration" => "Adding Quantity - Products $product->name",
-                "branch_id" => $branchId,
-                "entry_type_id" => 8
-            ];
+            // $data = [
+            //     "amount" => $product->cost_price,
+            //     "narration" => "Adding Quantity - Products $product->name",
+            //     "branch_id" => $branchId,
+            //     "entry_type_id" => 8
+            // ];
 
-            $entry = $this->ledgerService->createEntry($data);
+            // $entry = $this->ledgerService->createEntry($data);
 
-            $entryData = [
-                "entry_type_id" => 8,
-                "entry_id" => $entry->id,
-                "ledger_id" => $productLedger->id,
-                "amount" => $product->cost_amount,
-                "balanceType" => 'd',
-                "narration" => "Creating Products $product->name",
-            ];
-            $this->ledgerService->createEntryItems($entryData);
+            // $entryData = [
+            //     "entry_type_id" => 8,
+            //     "entry_id" => $entry->id,
+            //     "ledger_id" => $productLedger->id,
+            //     "amount" => $product->cost_amount,
+            //     "balanceType" => 'd',
+            //     "narration" => "Creating Products $product->name",
+            // ];
+            // $this->ledgerService->createEntryItems($entryData);
 
-            foreach ($itemsLedger as $itemLedger) {
-                $entryData = [
-                    "entry_type_id" => 8,
-                    "entry_id" => $entry['id'],
-                    "ledger_id" => $itemLedger['id'],
-                    "amount" => $itemLedger['cost_price'],
-                    "balanceType" => 'c',
-                    "narration" => "Creating Products $product->name",
-                ];
-                $this->ledgerService->createEntryItems($entryData);
-            }
+            // foreach ($itemsLedger as $itemLedger) {
+            //     $entryData = [
+            //         "entry_type_id" => 8,
+            //         "entry_id" => $entry['id'],
+            //         "ledger_id" => $itemLedger['id'],
+            //         "amount" => $itemLedger['cost_price'],
+            //         "balanceType" => 'c',
+            //         "narration" => "Creating Products $product->name",
+            //     ];
+            //     $this->ledgerService->createEntryItems($entryData);
+            // }
 
             DB::commit();
             return response()->json(['success' => true, 'message' => 'Product added to Inventory']);
 
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json(["success" => false, "message" => $e->getMessage()], 500);
-        }
+        // } catch (\Exception $e) {
+        //     DB::rollBack();
+        //     return response()->json(["success" => false, "message" => $e->getMessage()], 500);
+        // }
     }
 
 

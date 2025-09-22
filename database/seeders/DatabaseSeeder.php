@@ -17,8 +17,17 @@ class DatabaseSeeder extends Seeder
         // $this->call(::class);
         $this->call(CompanySeeder::class);
         $this->call(BranchSeeder::class);
+        $this->call([CategorySeeder::class]);
         $this->call(DepartmentSeeder::class);
+        $this->call(DesignationSeeder::class);
+
         $this->call(PermissionTableSeeder::class);
+        $this->call(BanksSeeder::class);
+        $this->call(BankBranchesSeeder::class);
+        $this->call(BankAccountsSeeder::class);
+        $this->call(AccountTypesSeeder::class);
+        $this->call(LedgersSeeder::class);
+        $this->call(WorkShiftsTableSeeder::class);
         // $this->call(CreateCourseTypeSeeder::class);
         // $this->call(CreateCourseSeeder::class);
         // $this->call(CountrySeeder::class);
@@ -30,6 +39,8 @@ class DatabaseSeeder extends Seeder
         // $this->call(BudgetsSeeder::class);
         //$this->call(SessionSeeder::class);
         $this->call(CreateAdminUserSeeder::class);
+        $this->call(StudentSeeder::class);
+
         // $this->call(AgentSeeder::class);
         // $this->call(AgentRole::class);
         // $this->call(TeacherRole::class);
@@ -47,7 +58,6 @@ class DatabaseSeeder extends Seeder
         // $this->call(SlabsSeeder::class);
         // $this->call([GeneralSettingSeeder::class]);
         // $this->call([GroupsTableSeeder::class]);
-        // $this->call([CategorySeeder::class]);
         // $this->call([InventoryCategorySeeder::class]);
         // $this->call([VendorCategory::class]);
         // $this->call([LoopData::class]);

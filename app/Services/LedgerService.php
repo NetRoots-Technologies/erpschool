@@ -66,8 +66,8 @@ class LedgerService
         if (!Gate::allows('students')) {
             return abort(503);
         }
-        return Ledgers::where('parent_type', $parent_type)
-            ->where('parent_type_id', $parent_type_id)
+        return Ledgers::where('parent_type', 2)
+            // ->where('parent_type_id', $parent_type_id)
             ->first();
     }
 
