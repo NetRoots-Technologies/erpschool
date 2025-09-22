@@ -20,6 +20,7 @@ class FeeCollection extends Model
 
     protected $fillable = [
         'student_id',
+        'academic_class_id',
         'academic_session_id',
         'fee_assignment_id',
         'collection_date',
@@ -56,7 +57,7 @@ class FeeCollection extends Model
 
     public function academicClass()
     {
-        return $this->belongsTo(AcademicClass::class, 'class_id');
+        return $this->belongsTo(AcademicClass::class, 'academic_class_id');
     }
 
     public function company()
@@ -86,7 +87,12 @@ class FeeCollection extends Model
 
     public function feeCollectionDetails()
     {
-        return $this->hasMany(FeeCollectionDetail::class);
+        return $this->hasMany(FeeCollectionDetail::class, 'fee_collection_id');
+    }
+
+    public function details()
+    {
+        return $this->hasMany(FeeCollectionDetail::class, 'fee_collection_id');
     }
 
     public function feeAdjustments()

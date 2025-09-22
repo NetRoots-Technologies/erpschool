@@ -37,9 +37,11 @@
                                     <select class="form-control @error('student_id') is-invalid @enderror" 
                                             id="student_id" name="student_id" required>
                                         <option value="">Select Student</option>
-                                        <option value="1">Student 1</option>
-                                        <option value="2">Student 2</option>
-                                        <option value="3">Student 3</option>
+                                        @foreach($students as $student)
+                                            <option value="{{ $student->id }}">
+                                                {{ $student->fullname }} ({{ $student->AcademicClass->name ?? 'N/A' }})
+                                            </option>
+                                        @endforeach
                                     </select>
                                     @error('student_id')
                                         <div class="invalid-feedback">{{ $message }}</div>

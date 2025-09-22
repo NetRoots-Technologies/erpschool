@@ -76,7 +76,7 @@ class FeeStructure extends Model
 
     public function feeStructureDetails()
     {
-        return $this->hasMany(FeeStructureDetail::class);
+        return $this->hasMany(FeeStructureDetail::class, 'fee_structure_id');
     }
 
     public function studentFeeAssignments()

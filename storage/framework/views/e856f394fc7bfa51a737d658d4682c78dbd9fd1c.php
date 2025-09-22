@@ -72,21 +72,22 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="billing_class_id" class="form-label">Class <span class="text-danger">*</span></label>
-                                <select class="form-control" id="billing_class_id" name="class_id" required>
+                                <select class="form-control" id="billing_class_id" name="academic_class_id" required>
                                     <option value="">Select Class</option>
-                                    <option value="1">Class 1</option>
-                                    <option value="2">Class 2</option>
-                                    <option value="3">Class 3</option>
+                                    <?php $__currentLoopData = $classes; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $class): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <option value="<?php echo e($class->id); ?>"><?php echo e($class->name); ?></option>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                 </select>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="billing_session_id" class="form-label">Session <span class="text-danger">*</span></label>
-                                <select class="form-control" id="billing_session_id" name="session_id" required>
+                                <select class="form-control" id="billing_session_id" name="academic_session_id" required>
                                     <option value="">Select Session</option>
-                                    <option value="1">2024-25</option>
-                                    <option value="2">2025-26</option>
+                                    <?php $__currentLoopData = $sessions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $session): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <option value="<?php echo e($session->id); ?>"><?php echo e($session->name); ?></option>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                 </select>
                             </div>
                         </div>
@@ -181,4 +182,33 @@
 </script>
 <?php $__env->stopSection(); ?>
 
+<?php $__env->startSection('css'); ?>
+<style>
+.badge {
+    font-size: 0.75em;
+    padding: 0.25em 0.5em;
+    border-radius: 0.25rem;
+}
+.badge-success {
+    background-color: #28a745;
+    color: white;
+}
+.badge-warning {
+    background-color: #ffc107;
+    color: #212529;
+}
+.badge-info {
+    background-color: #17a2b8;
+    color: white;
+}
+.badge-danger {
+    background-color: #dc3545;
+    color: white;
+}
+.badge-secondary {
+    background-color: #6c757d;
+    color: white;
+}
+</style>
+<?php $__env->stopSection(); ?>
 <?php echo $__env->make('admin.layouts.main', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\xampp\htdocs\erpschool\resources\views/admin/fee-management/billing/index.blade.php ENDPATH**/ ?>

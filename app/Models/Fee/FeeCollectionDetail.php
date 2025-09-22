@@ -28,7 +28,7 @@ class FeeCollectionDetail extends Model
     // Relationships
     public function feeCollection()
     {
-        return $this->belongsTo(FeeCollection::class);
+        return $this->belongsTo(FeeCollection::class, 'fee_collection_id');
     }
 
     public function feeCategory()

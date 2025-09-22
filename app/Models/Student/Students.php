@@ -10,6 +10,7 @@ use App\Models\Admin\CourseType;
 use App\Models\Admin\Session;
 use App\Models\HR\Agent;
 use App\Models\Exam\MarkEntry;
+use App\Models\Student\AcademicSession;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -121,6 +122,11 @@ class Students extends Model
 
     public function class(){ 
         return $this->belongsTo(AcademicClass::class, 'class_id'); 
+    }
+
+    public function academicSession()
+    {
+        return $this->belongsTo(AcademicSession::class, 'session_id');
     }
    
 }

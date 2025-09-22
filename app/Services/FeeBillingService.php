@@ -9,7 +9,7 @@ use App\Models\Fee\FeeCategory;
 use App\Models\Fee\FeeFactor;
 use App\Models\Student\Students;
 use App\Models\Academic\AcademicClass;
-use App\Models\Academic\AcademicSession;
+use App\Models\Student\AcademicSession;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 

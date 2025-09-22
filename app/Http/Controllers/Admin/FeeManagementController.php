@@ -16,7 +16,7 @@ use App\Models\Fee\FeeFactor;
 use App\Models\Fee\FeeBilling;
 use App\Models\Student\Students;
 use App\Models\Academic\AcademicClass;
-use App\Models\Academic\AcademicSession;
+use App\Models\Student\AcademicSession;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -103,7 +103,7 @@ class FeeManagementController extends Controller
             'is_active' => 'boolean',
         ]);
 
-        FeeCategory::create([
+        $category = FeeCategory::create([
             'name' => $request->name,
             'description' => $request->description,
             'type' => $request->type,
@@ -114,6 +114,15 @@ class FeeManagementController extends Controller
             'branch_id' => auth()->user()->branch_id ?? null,
             'created_by' => auth()->id(),
         ]);
+
+        // Check if request is AJAX (from modal)
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Fee category created successfully!',
+                'category' => $category
+            ]);
+        }
 
         return redirect()->route('admin.fee-management.categories')
             ->with('success', 'Fee category created successfully!');
@@ -185,7 +194,7 @@ class FeeManagementController extends Controller
 
     public function getStructuresData()
     {
-        $structures = FeeStructure::with(['academicClass', 'academicSession', 'createdBy'])
+        $structures = FeeStructure::with(['academicClass', 'academicSession', 'createdBy', 'feeStructureDetails'])
             ->select(['id', 'name', 'academic_class_id', 'academic_session_id', 'fee_factor_id', 'is_active', 'created_at']);
 
         return DataTables::of($structures)
@@ -200,7 +209,13 @@ class FeeManagementController extends Controller
             ->addColumn('session_name', function ($structure) {
                 return $structure->academicSession->name ?? 'N/A';
             })
-            ->rawColumns(['action'])
+            ->addColumn('total_amount', function ($structure) {
+                return $structure->feeStructureDetails->sum('amount') ?? 0;
+            })
+            ->addColumn('status', function ($structure) {
+                return $structure->is_active ? '<span class="badge badge-success">Active</span>' : '<span class="badge badge-danger">Inactive</span>';
+            })
+            ->rawColumns(['action', 'status'])
             ->make(true);
     }
 
@@ -224,13 +239,16 @@ class FeeManagementController extends Controller
             abort(403, 'Unauthorized access');
         }
 
+        // Debug: Log the request data
+        \Log::info('Fee Structure Creation Request:', $request->all());
+
         $request->validate([
             'name' => 'required|string|max:191',
-            'academic_class_id' => 'required|exists:academic_classes,id',
-            'academic_session_id' => 'required|exists:academic_sessions,id',
-            'fee_factor_id' => 'required|exists:fee_factors,id',
-            'is_active' => 'boolean',
-            'categories' => 'required|array',
+            'class_id' => 'required|exists:classes,id',
+            'session_id' => 'required|exists:acadmeic_sessions,id',
+            'factor_id' => 'required|exists:fee_factors,id',
+            'description' => 'nullable|string',
+            'categories' => 'required|array|min:1',
             'categories.*.category_id' => 'required|exists:fee_categories,id',
             'categories.*.amount' => 'required|numeric|min:0',
         ]);
@@ -239,27 +257,34 @@ class FeeManagementController extends Controller
         try {
             $structure = FeeStructure::create([
                 'name' => $request->name,
-                'academic_class_id' => $request->academic_class_id,
-                'academic_session_id' => $request->academic_session_id,
-                'fee_factor_id' => $request->fee_factor_id,
-                'is_active' => $request->has('is_active'),
+                'description' => $request->description,
+                'academic_class_id' => $request->class_id,
+                'academic_session_id' => $request->session_id,
+                'fee_factor_id' => $request->factor_id,
+                'is_active' => true,
+                'company_id' => auth()->user()->company_id ?? null,
+                'branch_id' => auth()->user()->branch_id ?? null,
                 'created_by' => auth()->id(),
             ]);
 
             foreach ($request->categories as $category) {
                 FeeStructureDetail::create([
-                    'structure_id' => $structure->id,
-                    'category_id' => $category['category_id'],
+                    'fee_structure_id' => $structure->id,
+                    'fee_category_id' => $category['category_id'],
                     'amount' => $category['amount'],
+                    'company_id' => auth()->user()->company_id ?? null,
+                    'branch_id' => auth()->user()->branch_id ?? null,
                     'created_by' => auth()->id(),
                 ]);
             }
 
             DB::commit();
+            \Log::info('Fee Structure Created Successfully:', ['structure_id' => $structure->id]);
             return redirect()->route('admin.fee-management.structures')
                 ->with('success', 'Fee structure created successfully!');
         } catch (\Exception $e) {
             DB::rollback();
+            \Log::error('Fee Structure Creation Error:', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
             return back()->with('error', 'Error creating fee structure: ' . $e->getMessage());
         }
     }
@@ -358,8 +383,8 @@ class FeeManagementController extends Controller
 
     public function getCollectionsData()
     {
-        $collections = FeeCollection::with(['student', 'academicClass', 'academicSession'])
-            ->select(['id', 'student_id', 'academic_session_id', 'fee_assignment_id', 'paid_amount', 'status', 'collection_date', 'created_at']);
+        $collections = FeeCollection::with(['student.AcademicClass', 'academicSession', 'details'])
+            ->select(['id', 'student_id', 'academic_session_id', 'fee_assignment_id', 'paid_amount', 'status', 'collection_date', 'payment_method', 'created_at']);
 
         return DataTables::of($collections)
             ->addColumn('action', function ($collection) {
@@ -368,10 +393,13 @@ class FeeManagementController extends Controller
                 return $viewBtn . ' ' . $editBtn;
             })
             ->addColumn('student_name', function ($collection) {
-                return $collection->student->name ?? 'N/A';
+                return $collection->student->fullname ?? 'N/A';
             })
             ->addColumn('class_name', function ($collection) {
-                return $collection->academicClass->name ?? 'N/A';
+                return $collection->student->AcademicClass->name ?? 'N/A';
+            })
+            ->addColumn('total_amount', function ($collection) {
+                return $collection->details->sum('amount') ?? 0;
             })
             ->addColumn('status', function ($collection) {
                 $badgeClass = $collection->status == 'paid' ? 'success' : ($collection->status == 'pending' ? 'warning' : 'danger');
@@ -381,13 +409,25 @@ class FeeManagementController extends Controller
             ->make(true);
     }
 
+    public function showCollection($id)
+    {
+        if (!Gate::allows('Dashboard-list')) {
+            abort(403, 'Unauthorized access');
+        }
+
+        $collection = FeeCollection::with(['student', 'academicClass', 'academicSession', 'details.feeCategory'])
+            ->findOrFail($id);
+
+        return view('admin.fee-management.collections.show', compact('collection'));
+    }
+
     public function createCollection()
     {
         if (!Gate::allows('Dashboard-list')) {
             abort(403, 'Unauthorized access');
         }
 
-        $students = Students::with(['academicClass', 'academicSession'])->get();
+        $students = Students::with(['AcademicClass', 'academicSession'])->get();
         $classes = AcademicClass::where('status', 1)->get();
         $sessions = AcademicSession::where('status', 1)->get();
 
@@ -402,8 +442,7 @@ class FeeManagementController extends Controller
 
         $request->validate([
             'student_id' => 'required|exists:students,id',
-            'academic_class_id' => 'required|exists:academic_classes,id',
-            'academic_session_id' => 'required|exists:academic_sessions,id',
+            'academic_session_id' => 'required|exists:acadmeic_sessions,id',
             'collection_date' => 'required|date',
             'payment_method' => 'required|in:cash,bank_transfer,cheque',
             'remarks' => 'nullable|string',
@@ -418,7 +457,7 @@ class FeeManagementController extends Controller
 
             $collection = FeeCollection::create([
                 'student_id' => $request->student_id,
-                'academic_session_id' => $request->session_id,
+                'academic_session_id' => $request->academic_session_id,
                 'fee_assignment_id' => $request->fee_assignment_id ?? 1,
                 'paid_amount' => $totalAmount,
                 'status' => 'paid',
@@ -446,6 +485,77 @@ class FeeManagementController extends Controller
         }
     }
 
+    public function editCollection($id)
+    {
+        if (!Gate::allows('Dashboard-list')) {
+            abort(403, 'Unauthorized access');
+        }
+
+        $collection = FeeCollection::with(['student', 'academicClass', 'academicSession', 'details.feeCategory'])
+            ->findOrFail($id);
+        $students = Students::with(['AcademicClass', 'academicSession'])->get();
+        $classes = AcademicClass::where('status', 1)->get();
+        $sessions = AcademicSession::where('status', 1)->get();
+        $categories = FeeCategory::where('is_active', 1)->get();
+
+        return view('admin.fee-management.collections.edit', compact('collection', 'students', 'classes', 'sessions', 'categories'));
+    }
+
+    public function updateCollection(Request $request, $id)
+    {
+        if (!Gate::allows('Dashboard-list')) {
+            abort(403, 'Unauthorized access');
+        }
+
+        $request->validate([
+            'student_id' => 'required|exists:students,id',
+            'academic_class_id' => 'required|exists:classes,id',
+            'academic_session_id' => 'required|exists:acadmeic_sessions,id',
+            'collection_date' => 'required|date',
+            'payment_method' => 'required|in:cash,bank_transfer,cheque',
+            'remarks' => 'nullable|string',
+            'collections' => 'required|array',
+            'collections.*.category_id' => 'required|exists:fee_categories,id',
+            'collections.*.amount' => 'required|numeric|min:0',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $collection = FeeCollection::findOrFail($id);
+            $totalAmount = array_sum(array_column($request->collections, 'amount'));
+
+            $collection->update([
+                'student_id' => $request->student_id,
+                'academic_session_id' => $request->academic_session_id,
+                'paid_amount' => $totalAmount,
+                'collection_date' => $request->collection_date,
+                'payment_method' => $request->payment_method,
+                'remarks' => $request->remarks,
+                'updated_by' => auth()->id(),
+            ]);
+
+            // Delete existing details
+            FeeCollectionDetail::where('fee_collection_id', $collection->id)->delete();
+
+            // Create new details
+            foreach ($request->collections as $collectionDetail) {
+                FeeCollectionDetail::create([
+                    'fee_collection_id' => $collection->id,
+                    'fee_category_id' => $collectionDetail['category_id'],
+                    'amount' => $collectionDetail['amount'],
+                    'created_by' => auth()->id(),
+                ]);
+            }
+
+            DB::commit();
+            return redirect()->route('admin.fee-management.collections')
+                ->with('success', 'Fee collection updated successfully!');
+        } catch (\Exception $e) {
+            DB::rollback();
+            return back()->with('error', 'Error updating fee collection: ' . $e->getMessage());
+        }
+    }
+
     /**
      * Fee Discounts Management
      */
@@ -470,7 +580,7 @@ class FeeManagementController extends Controller
                 return $editBtn . ' ' . $deleteBtn;
             })
             ->addColumn('student_name', function ($discount) {
-                return $discount->student->name ?? 'N/A';
+                return $discount->student->fullname ?? 'N/A';
             })
             ->addColumn('category_name', function ($discount) {
                 return $discount->category->name ?? 'N/A';
@@ -488,7 +598,7 @@ class FeeManagementController extends Controller
             abort(403, 'Unauthorized access');
         }
 
-        $students = Students::with('academicClass')->get();
+        $students = Students::with('AcademicClass')->get();
         $categories = FeeCategory::all();
         
         return view('admin.fee-management.discounts.create', compact('students', 'categories'));
@@ -530,7 +640,7 @@ class FeeManagementController extends Controller
         }
 
         $discount = FeeDiscount::findOrFail($id);
-        $students = Students::with('academicClass')->get();
+        $students = Students::with('AcademicClass')->get();
         $categories = FeeCategory::all();
         
         return view('admin.fee-management.discounts.edit', compact('discount', 'students', 'categories'));
@@ -586,12 +696,15 @@ class FeeManagementController extends Controller
             abort(403, 'Unauthorized access');
         }
 
-        return view('admin.fee-management.billing.index');
+        $classes = AcademicClass::where('status', 1)->get();
+        $sessions = AcademicSession::where('status', 1)->get();
+
+        return view('admin.fee-management.billing.index', compact('classes', 'sessions'));
     }
 
     public function getBillingData()
     {
-        $billing = FeeBilling::with(['student.academicClass', 'academicSession'])
+        $billing = FeeBilling::with(['student.AcademicClass', 'academicSession'])
             ->select(['id', 'student_id', 'academic_session_id', 'challan_number', 'total_amount', 'due_date', 'status', 'created_at']);
 
         return DataTables::of($billing)
@@ -601,14 +714,33 @@ class FeeManagementController extends Controller
                 return $viewBtn . ' ' . $printBtn;
             })
             ->addColumn('student_name', function ($bill) {
-                return $bill->student->name ?? 'N/A';
+                return $bill->student->fullname ?? 'N/A';
             })
             ->addColumn('class_name', function ($bill) {
-                return $bill->student->academicClass->name ?? 'N/A';
+                return $bill->student->AcademicClass->name ?? 'N/A';
             })
             ->addColumn('status', function ($bill) {
-                $badgeClass = $bill->status == 'paid' ? 'success' : ($bill->status == 'pending' ? 'warning' : 'overdue');
-                return '<span class="badge badge-' . $badgeClass . '">' . ucfirst($bill->status) . '</span>';
+                $status = $bill->status ?? 'pending';
+                $badgeClass = 'secondary';
+                
+                switch($status) {
+                    case 'paid':
+                        $badgeClass = 'success';
+                        break;
+                    case 'pending':
+                        $badgeClass = 'warning';
+                        break;
+                    case 'generated':
+                        $badgeClass = 'info';
+                        break;
+                    case 'overdue':
+                        $badgeClass = 'danger';
+                        break;
+                    default:
+                        $badgeClass = 'secondary';
+                }
+                
+                return '<span class="badge badge-' . $badgeClass . '">' . ucfirst($status) . '</span>';
             })
             ->rawColumns(['action', 'status'])
             ->make(true);
@@ -621,17 +753,131 @@ class FeeManagementController extends Controller
         }
 
         $request->validate([
-            'academic_class_id' => 'required|exists:academic_classes,id',
-            'academic_session_id' => 'required|exists:academic_sessions,id',
+            'academic_class_id' => 'required|exists:classes,id',
+            'academic_session_id' => 'required|exists:acadmeic_sessions,id',
             'billing_month' => 'required|date_format:Y-m',
             'exclude_arrears' => 'boolean',
         ]);
 
-        // Generate billing logic here
-        // This would involve creating FeeBilling records for all students in the class
-        
-        return redirect()->route('admin.fee-management.billing')
-            ->with('success', 'Billing generated successfully!');
+        DB::beginTransaction();
+        try {
+            \Log::info('Billing generation started', [
+                'class_id' => $request->academic_class_id,
+                'session_id' => $request->academic_session_id,
+                'billing_month' => $request->billing_month
+            ]);
+
+            // Get students in the specified class and session
+            $students = Students::where('class_id', $request->academic_class_id)
+                ->where('session_id', $request->academic_session_id)
+                ->get();
+
+            \Log::info('Students found: ' . $students->count());
+            \Log::info('Students data: ', $students->toArray());
+
+            if ($students->isEmpty()) {
+                \Log::info('No students found for class: ' . $request->academic_class_id . ' and session: ' . $request->academic_session_id);
+                return redirect()->route('admin.fee-management.billing')
+                    ->with('error', 'No students found for the selected class and session.');
+            }
+
+            // Get fee structure for the class and session
+            $feeStructure = FeeStructure::where('academic_class_id', $request->academic_class_id)
+                ->where('academic_session_id', $request->academic_session_id)
+                ->where('is_active', 1)
+                ->first();
+
+            \Log::info('Fee structure found: ' . ($feeStructure ? 'Yes' : 'No'));
+
+            if (!$feeStructure) {
+                \Log::info('No fee structure found for class: ' . $request->academic_class_id . ' and session: ' . $request->academic_session_id);
+                return redirect()->route('admin.fee-management.billing')
+                    ->with('error', 'No fee structure found for the selected class and session.');
+            }
+
+            $billingCount = 0;
+
+            \Log::info('Processing ' . $students->count() . ' students for billing');
+
+            foreach ($students as $student) {
+                \Log::info('Processing student: ' . $student->id . ' - ' . $student->fullname);
+                
+                // Check if billing already exists for this student and session
+                $existingBilling = FeeBilling::where('student_id', $student->id)
+                    ->where('academic_session_id', $request->academic_session_id)
+                    ->first();
+
+                if ($existingBilling) {
+                    \Log::info('Billing already exists for student: ' . $student->id);
+                    continue; // Skip if billing already exists
+                }
+
+                // Calculate total amount from fee structure
+                $totalAmount = $feeStructure->feeStructureDetails->sum('amount');
+                \Log::info('Total amount calculated: ' . $totalAmount);
+
+                // Generate challan number
+                $challanNumber = 'CHL-' . date('Y') . '-' . str_pad($student->id, 6, '0', STR_PAD_LEFT);
+
+                // Create billing record
+                $billing = FeeBilling::create([
+                    'student_id' => $student->id,
+                    'academic_session_id' => $request->academic_session_id,
+                    'challan_number' => $challanNumber,
+                    'total_amount' => $totalAmount,
+                    'bill_date' => now(),
+                    'due_date' => now()->addDays(30), // 30 days from now
+                    'outstanding_amount' => $totalAmount, // Initially outstanding amount equals total amount
+                    'status' => 'generated',
+                    'company_id' => auth()->user()->company_id ?? null,
+                    'branch_id' => auth()->user()->branch_id ?? null,
+                    'created_by' => auth()->id(),
+                ]);
+
+                \Log::info('Billing created for student: ' . $student->id . ' with ID: ' . $billing->id);
+                $billingCount++;
+            }
+
+            DB::commit();
+
+            if ($billingCount > 0) {
+                return redirect()->route('admin.fee-management.billing')
+                    ->with('success', "Billing generated successfully for {$billingCount} students!");
+            } else {
+                return redirect()->route('admin.fee-management.billing')
+                    ->with('warning', 'No new billing records were created. All students may already have billing for this month.');
+            }
+
+        } catch (\Exception $e) {
+            DB::rollback();
+            \Log::error('Billing generation error: ' . $e->getMessage());
+            return redirect()->route('admin.fee-management.billing')
+                ->with('error', 'Error generating billing: ' . $e->getMessage());
+        }
+    }
+
+    public function showBilling($id)
+    {
+        if (!Gate::allows('Dashboard-list')) {
+            abort(403, 'Unauthorized access');
+        }
+
+        $billing = FeeBilling::with(['student.AcademicClass', 'academicSession'])
+            ->findOrFail($id);
+
+        return view('admin.fee-management.billing.show', compact('billing'));
+    }
+
+    public function printBilling($id)
+    {
+        if (!Gate::allows('Dashboard-list')) {
+            abort(403, 'Unauthorized access');
+        }
+
+        $billing = FeeBilling::with(['student.AcademicClass', 'academicSession'])
+            ->findOrFail($id);
+
+        return view('admin.fee-management.billing.print', compact('billing'));
     }
 
     /**

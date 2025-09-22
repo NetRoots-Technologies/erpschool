@@ -39,7 +39,7 @@
                                         <option value="">Select Student</option>
                                         @foreach($students as $student)
                                             <option value="{{ $student->id }}" {{ $discount->student_id == $student->id ? 'selected' : '' }}>
-                                                {{ $student->name }} ({{ $student->academicClass->name ?? 'N/A' }})
+                                                {{ $student->fullname }} ({{ $student->AcademicClass->name ?? 'N/A' }})
                                             </option>
                                         @endforeach
                                     </select>

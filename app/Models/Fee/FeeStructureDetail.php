@@ -17,6 +17,10 @@ class FeeStructureDetail extends Model
         'amount',
         'is_mandatory',
         'is_active',
+        'company_id',
+        'branch_id',
+        'created_by',
+        'updated_by',
     ];
 
     protected $casts = [
