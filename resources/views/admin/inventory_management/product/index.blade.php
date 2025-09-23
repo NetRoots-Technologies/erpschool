@@ -90,7 +90,7 @@ Product
                         </div>
                         <div class="col-6 mb-3">
                             <label for="inventoryProductsQuantity" class="form-label">Enter Quantity</label>
-                            <input type="number" class="form-control" id="inventoryProductsQuantity" name="inventoryProductsQuantity" max = "0" min="1" value="" required>
+                            <input type="number" class="form-control" id="inventoryProductsQuantity" name="inventoryProductsQuantity" value="" required>
                         </div>
                         <div class="col-6 mb-3">
                             <label for="inventoryProductsMaxQuantity" class="form-label">Max Products Can made</label>
@@ -184,7 +184,7 @@ Product
                         <label for="itemQuantity-${item.id}" class="form-label">Quantity</label>
                         <input type="number" id="itemQuantity-${item.id}" class="form-control item-quantity"
                             data-id="${item.id}" name="quantity[${global_count}]"
-                            min="1" max="${item.quantity}" value="0" required>
+                                min="0.01" step="any" value="0" required>
                     </div>
 
                     <div class="col-2 mb-3">

@@ -38,7 +38,7 @@ class PurchaseOrderController extends Controller
 
     public function index($type)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('students')) {
             return abort(503);
         }
         $mappedType = $type == 'food' ? 'F' : 'S';
@@ -58,7 +58,7 @@ class PurchaseOrderController extends Controller
     }
     public function approval()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('students')) {
             return abort(503);
         }
         return view('admin.inventory_management.requisition.approval');
@@ -66,7 +66,7 @@ class PurchaseOrderController extends Controller
 
     public function view($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('students')) {
             return abort(503);
         }
         $delivery_status = config('constants.delivery_status');
@@ -80,9 +80,10 @@ class PurchaseOrderController extends Controller
 
         $bank_account_ids = BankAccount::where('type', 'MOA')
             ->pluck('id')->toArray();
+            
 
         $ledgers = Ledger::where('parent_type', BankAccount::class)
-            ->whereIn('parent_type_id', $bank_account_ids)
+            ->whereIn('parent_type', $bank_account_ids)
             ->orWhere(function ($query) use ($cash_in_hand) {
                 $query->where('group_id', $cash_in_hand)
                     ->orWhereNull('parent_type');
@@ -94,7 +95,7 @@ class PurchaseOrderController extends Controller
 
     public function store(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('students')) {
             return abort(503);
         }
         DB::beginTransaction();
@@ -145,7 +146,7 @@ class PurchaseOrderController extends Controller
 
     public function destroy(PurchaseOrder $purchaseOrder)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('students')) {
             return abort(503);
         }
         $purchaseOrder->delete();
@@ -155,7 +156,7 @@ class PurchaseOrderController extends Controller
 
     public function getData(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('students')) {
             return abort(503);
         }
         $supplier = PurchaseOrder::select([
@@ -183,54 +184,113 @@ class PurchaseOrderController extends Controller
 
         return response()->json(["success" => true, 'message' => 'Listing', 'data' => $supplier], 200);
     }
+    // public function changeStatus(PurchaseOrder $purchaseOrder, $status)
+    // {
+    //     if (!Gate::allows('students')) {
+    //         return abort(503);
+    //     }
+    //     DB::beginTransaction();
+
+    //     try {
+    //         $this->delivery_status = config('constants.delivery_status');
+
+    //         $purchaseOrder->delivery_status = $this->delivery_status[$status];
+    //         $purchaseOrder->save();
+
+    //         if ($this->delivery_status[$status] == 'COMPLETED') {
+    //             foreach ($purchaseOrder->purchaseOrderItems as $p) {
+    //                 $inventry = Inventry::where('item_id', $p->item_id)->where('branch_id', $purchaseOrder->branch_id)->where('measuring_unit', $p->measuring_unit)->first();
+
+    //                 if (!$inventry) {
+    //                     $inventry = new Inventry();
+    //                     $inventry->cost_price = $p->total_price;
+    //                     $inventry->unit_price = $p->unit_price;
+    //                     $inventry->quantity = $p->quantity;
+    //                 } else {
+    //                     $inventry->cost_price = $inventry->cost_price + $p->total_price;
+    //                     $inventry->unit_price = $inventry->cost_price / ($inventry->quantity + $p->quantity);
+    //                     $inventry->increment('quantity', $p->quantity);
+    //                 }
+
+    //                 $inventry->name = $p->item->name;
+    //                 $inventry->item_id = $p->item_id;
+    //                 $inventry->branch_id = $purchaseOrder->branch_id;
+    //                 $inventry->measuring_unit = $p->measuring_unit;
+    //                 $inventry->type = $purchaseOrder->type;
+    //                 $inventry->save();
+    //             }
+    //         }
+
+    //         DB::commit();
+    //         return response()->json(["success" => true, 'message' => 'Delivery Status Updated', 'data' => []], 200);
+    //     } catch (Exception $e) {
+    //         DB::rollBack();
+    //         return response()->json(["success" => false, "message" => $e->getMessage()], 500);
+    //     }
+    // }
+
     public function changeStatus(PurchaseOrder $purchaseOrder, $status)
-    {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
-        DB::beginTransaction();
-
-        try {
-            $this->delivery_status = config('constants.delivery_status');
-
-            $purchaseOrder->delivery_status = $this->delivery_status[$status];
-            $purchaseOrder->save();
-
-            if ($this->delivery_status[$status] == 'COMPLETED') {
-                foreach ($purchaseOrder->purchaseOrderItems as $p) {
-                    $inventry = Inventry::where('item_id', $p->item_id)->where('branch_id', $purchaseOrder->branch_id)->where('measuring_unit', $p->measuring_unit)->first();
-
-                    if (!$inventry) {
-                        $inventry = new Inventry();
-                        $inventry->cost_price = $p->total_price;
-                        $inventry->unit_price = $p->unit_price;
-                        $inventry->quantity = $p->quantity;
-                    } else {
-                        $inventry->cost_price = $inventry->cost_price + $p->total_price;
-                        $inventry->unit_price = $inventry->cost_price / ($inventry->quantity + $p->quantity);
-                        $inventry->increment('quantity', $p->quantity);
-                    }
-
-                    $inventry->name = $p->item->name;
-                    $inventry->item_id = $p->item_id;
-                    $inventry->branch_id = $purchaseOrder->branch_id;
-                    $inventry->measuring_unit = $p->measuring_unit;
-                    $inventry->type = $purchaseOrder->type;
-                    $inventry->save();
-                }
-            }
-
-            DB::commit();
-            return response()->json(["success" => true, 'message' => 'Delivery Status Updated', 'data' => []], 200);
-        } catch (Exception $e) {
-            DB::rollBack();
-            return response()->json(["success" => false, "message" => $e->getMessage()], 500);
-        }
+{
+    if (!Gate::allows('students')) {
+        return abort(503);
     }
+    DB::beginTransaction();
+
+    try {
+        $this->delivery_status = config('constants.delivery_status');
+
+        $purchaseOrder->delivery_status = $this->delivery_status[$status];
+        $purchaseOrder->save();
+
+        if ($this->delivery_status[$status] == 'COMPLETED') {
+            foreach ($purchaseOrder->purchaseOrderItems as $p) {
+                $inventry = Inventry::where('item_id', $p->item_id)
+                    ->where('branch_id', $purchaseOrder->branch_id)
+                    ->where('measuring_unit', $p->measuring_unit)
+                    ->first();
+
+                if (!$inventry) {
+                    // 🔹 First time item aa raha hai → direct assign
+                    $inventry = new Inventry();
+                    $inventry->cost_price = $p->total_price;
+                    $inventry->unit_price = $p->unit_price;
+                    $inventry->quantity = $p->quantity;
+                } else {
+                    // 🔹 Old values
+                    $oldQuantity = $inventry->quantity;
+                    $oldCost     = $inventry->cost_price;
+
+                    // 🔹 New values
+                    $newQuantity = $oldQuantity + $p->quantity;
+                    $newCost     = $oldCost + $p->total_price;
+
+                    // 🔹 Weighted Average
+                    $inventry->quantity   = $newQuantity;
+                    $inventry->cost_price = $newCost;
+                    $inventry->unit_price = $newCost / $newQuantity;
+                }
+
+                // 🔹 Common fields update
+                $inventry->name           = $p->item->name;
+                $inventry->item_id        = $p->item_id;
+                $inventry->branch_id      = $purchaseOrder->branch_id;
+                $inventry->measuring_unit = $p->measuring_unit;
+                $inventry->type           = $purchaseOrder->type;
+                $inventry->save();
+            }
+        }
+
+        DB::commit();
+        return response()->json(["success" => true, 'message' => 'Delivery Status Updated', 'data' => []], 200);
+    } catch (Exception $e) {
+        DB::rollBack();
+        return response()->json(["success" => false, "message" => $e->getMessage()], 500);
+    }
+}
 
     public function changePaymentStatus(PurchaseOrder $purchaseOrder, $status)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('students')) {
             return abort(503);
         }
         DB::beginTransaction();
@@ -252,20 +312,22 @@ class PurchaseOrderController extends Controller
 
     public function changePaymentMethod(PurchaseOrder $purchaseOrder, $status)
     {
-        if (!Gate::allows('Dashboard-list')) {
+
+        // dd($status,$purchaseOrder);
+        if (!Gate::allows('students')) {
             return abort(503);
         }
-        DB::beginTransaction();
-        try {
+        // DB::beginTransaction();
+        // try {
             $paymentLedger = Ledger::find($status);
             $supplierLedger = Ledger::where([
                 'branch_id' => $purchaseOrder->branch_id,
-                "parent_type_id" => $purchaseOrder->supplier_id,
+                "parent_id" => $purchaseOrder->supplier_id,
                 "parent_type" => Supplier::class
             ])->first();
 
             $supplier_name = Supplier::where('id',$purchaseOrder->supplier_id)->value('name');
-
+            
             $data = [
                 "amount" => $purchaseOrder->total_amount,
                 "narration" => "Paying Supplier $supplier_name",
@@ -302,24 +364,42 @@ class PurchaseOrderController extends Controller
 
             $purchaseOrder->save();
 
-            DB::commit();
+            // DB::commit();
             return response()->json(["success" => true, 'message' => 'Payment Method Updated', 'data' => []], 200);
-        } catch (Exception $e) {
-            DB::rollBack();
-            return response()->json(["success" => false, "message" => $e->getMessage()], 500);
-        }
+        // } catch (Exception $e) {
+        //     DB::rollBack();
+        //     return response()->json(["success" => false, "message" => $e->getMessage()], 500);
+        // }
     }
 
     public function grn($type)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('students')) {
             return abort(503);
         }
-        return view('admin.inventory_management.purchase_order.grn', compact('type'));
+
+         $mappedType = $type == 'food' ? 'F' : 'S';
+        //  dd($mappedType);
+
+        $branches = Branches::active()
+            ->with([
+                'suppliers' => function ($query) use ($mappedType) {
+                    $query->where('type', $mappedType);
+                },
+                'suppliers.items:id,name'
+            ])
+            ->select(['id', 'name'])
+            ->get();
+            // dd($branches);
+
+        $delivery_status = config('constants.delivery_status');
+        // dd($delivery_status);
+        return view('admin.inventory_management.purchase_order.grn', compact('branches', 'delivery_status', 'type'));
+        // return view('admin.inventory_management.purchase_order.grn', compact('type'));
     }
     public function grnDetail($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('students')) {
             return abort(503);
         }
         $purchaseOrder = PurchaseOrder::where('id', $id)
@@ -346,7 +426,7 @@ class PurchaseOrderController extends Controller
 
     public function uploadPurchase(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('students')) {
             return abort(503);
         }
         try {
@@ -364,4 +444,3 @@ class PurchaseOrderController extends Controller
     }
 
 }
-

@@ -100,7 +100,8 @@
                 <div class="col-md-6">
                     <div class="info-box">
                         <div><span class="label">Branch Name:</span> <span class="value"
-                                id="{{ $purchase_order->branch->branch_id }}">{{ $purchase_order->branch->name }}</span></div>
+                                id="{{ $purchase_order->branch->branch_id }}">{{ $purchase_order->branch->name }}</span>
+                        </div>
                         <div><span class="label">Supplier Name:</span> <span class="value"
                                 id="{{ $purchase_order->supplier_id }}">{{ $purchase_order->supplier->name }}</span></div>
 
@@ -128,15 +129,16 @@
 
                         @if ($currentStatus === 'SHIPPED')
                             <div class="d-flex align-items-center">
-                                <span class="label">Select Ledger:</span>
-                                <select name="paymentMethod" id="paymentMethod" class="form-select w-100" required>
-                                    <option value="" disabled selected>Select Ledger</option>
+                                <span class="label">Select Ledger (optional):</span>
+                                <select name="paymentMethod" id="paymentMethod" class="form-select w-100">
+                                    <option value="" selected>-- Optional --</option>
                                     @foreach ($ledgers as $ledger)
                                         <option value="{{ $ledger->id }}">{{ $ledger->name }}</option>
                                     @endforeach
                                 </select>
                             </div>
                         @endif
+
 
                         <div class="d-flex justify-content-center">
                             <button id="confirmOrder" class="btn btn-primary mt-2 ms-5" disabled>OK</button>
@@ -209,84 +211,85 @@
 
     @section('js')
         <script type="text/javascript" defer>
-        $(document).ready(function() {
-            'use strict';
+            $(document).ready(function() {
+                'use strict';
 
-            $("#deliveryStatus, #paymentMethod").select2();
-            var $deliveryStatus = $('#deliveryStatus');
-            var $paymentMethod = $('#paymentMethod');
-            var $confirmOrder = $('#confirmOrder');
+                $("#deliveryStatus, #paymentMethod").select2();
+                var $deliveryStatus = $('#deliveryStatus');
+                var $paymentMethod = $('#paymentMethod');
+                var $confirmOrder = $('#confirmOrder');
 
-            var currentStatus = @json($purchase_order->delivery_status);
-            var purchaseOrderId = @json($purchase_order->id);
+                var currentStatus = @json($purchase_order->delivery_status);
+                var purchaseOrderId = @json($purchase_order->id);
 
-            const deliveryStatusApi = @json(route('inventory.purchase_order.change.status', ['purchase_order' => ':purchase_order', 'status' => ':status']));
-            const paymentMethodApi = @json(route('inventory.purchase_order.change.pMethod', ['purchase_order' => ':purchase_order', 'status' => ':status']));
+                const deliveryStatusApi = @json(route('inventory.purchase_order.change.status', ['purchase_order' => ':purchase_order', 'status' => ':status']));
+                const paymentMethodApi = @json(route('inventory.purchase_order.change.pMethod', ['purchase_order' => ':purchase_order', 'status' => ':status']));
 
 
 
-            $deliveryStatus.on('change', updateButtonState);
-            $paymentMethod.on('change', updateButtonState);
+                $deliveryStatus.on('change', updateButtonState);
+                $paymentMethod.on('change', updateButtonState);
 
-            $confirmOrder.on('click', function() {
-                var selectedStatus = $deliveryStatus.val();
-                var requestUrl = deliveryStatusApi.replace(':purchase_order', purchaseOrderId).replace(':status', selectedStatus);
-                var selectedPaymentMethod = $paymentMethod.val();
+                $confirmOrder.on('click', function() {
+                    var selectedStatus = $deliveryStatus.val();
+                    var requestUrl = deliveryStatusApi.replace(':purchase_order', purchaseOrderId).replace(
+                        ':status', selectedStatus);
+                    var selectedPaymentMethod = $paymentMethod.val();
 
-                if (selectedStatus === '4' && !selectedPaymentMethod) {
-                    toastr.warning("Please select a payment method before completing the order.");
-                    return;
+                    // if (selectedStatus === '4' && !selectedPaymentMethod) {
+                    //     toastr.warning("Please select a payment method before completing the order.");
+                    //     return;
+                    // }
+
+                    $.ajax({
+                        url: requestUrl,
+                        type: 'POST',
+                        beforeSend: function(xhr) {
+                            let token = $('meta[name="csrf-token"]').attr('content');
+                            xhr.setRequestHeader('X-CSRF-TOKEN', token);
+                        },
+                        success: function(response) {
+                            toastr.success("Delivery status updated successfully.");
+
+                            // if (selectedStatus === '4') {
+                            //     var selectedPaymentMethod = $paymentMethod.val();
+                            //     if (!selectedPaymentMethod) {
+                            //         toastr.warning("Please select a payment method.");
+                            //         return;
+                            //     }
+
+                            //     var paymentUrl = paymentMethodApi.replace(':purchase_order', purchaseOrderId).replace(':status', selectedPaymentMethod);
+
+                            //     $.ajax({
+                            //         url: paymentUrl,
+                            //         type: 'POST',
+                            //         beforeSend: function(xhr) {
+                            //             let token = $('meta[name="csrf-token"]').attr('content');
+                            //             xhr.setRequestHeader('X-CSRF-TOKEN', token);
+                            //         },
+                            //         success: function(response) {
+                            //             toastr.success("Payment method updated successfully.");
+                            //             location.reload();
+                            //         },
+                            //         error: function(xhr) {
+                            //             toastr.error("Error updating payment method.");
+                            //         }
+                            //     });
+                            // } else {
+                            //     location.reload();
+                            // }
+                        },
+                        error: function(xhr) {
+                            toastr.error("Error updating delivery status.");
+                        }
+                    });
+                });
+
+                function updateButtonState() {
+                    $confirmOrder.prop('disabled', !$deliveryStatus.val());
                 }
 
-                $.ajax({
-                    url: requestUrl,
-                    type: 'POST',
-                    beforeSend: function(xhr) {
-                        let token = $('meta[name="csrf-token"]').attr('content');
-                        xhr.setRequestHeader('X-CSRF-TOKEN', token);
-                    },
-                    success: function(response) {
-                        toastr.success("Delivery status updated successfully.");
-
-                        if (selectedStatus === '4') {
-                            var selectedPaymentMethod = $paymentMethod.val();
-                            if (!selectedPaymentMethod) {
-                                toastr.warning("Please select a payment method.");
-                                return;
-                            }
-
-                            var paymentUrl = paymentMethodApi.replace(':purchase_order', purchaseOrderId).replace(':status', selectedPaymentMethod);
-
-                            $.ajax({
-                                url: paymentUrl,
-                                type: 'POST',
-                                beforeSend: function(xhr) {
-                                    let token = $('meta[name="csrf-token"]').attr('content');
-                                    xhr.setRequestHeader('X-CSRF-TOKEN', token);
-                                },
-                                success: function(response) {
-                                    toastr.success("Payment method updated successfully.");
-                                    location.reload();
-                                },
-                                error: function(xhr) {
-                                    toastr.error("Error updating payment method.");
-                                }
-                            });
-                        } else {
-                            location.reload();
-                        }
-                    },
-                    error: function(xhr) {
-                        toastr.error("Error updating delivery status.");
-                    }
-                });
+                updateButtonState();
             });
-
-            function updateButtonState() {
-                $confirmOrder.prop('disabled', !$deliveryStatus.val());
-            }
-
-            updateButtonState();
-        });
         </script>
     @endsection

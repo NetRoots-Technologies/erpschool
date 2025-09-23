@@ -19,7 +19,7 @@ class BranchSeeder extends Seeder
 
          DB::table('branches')->insert([
             'company_id' => 1, // Ensure this matches an existing company
-            'name' => 'PTCHS CAMPUS',
+            'name' => 'PTCHS Campus',
             'address' => 'Lahore, Pakistan',
             'created_at' => now(),
             'updated_at' => now(),
