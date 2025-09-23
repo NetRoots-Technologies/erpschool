@@ -1,9 +1,9 @@
-vendor
-storage
-bootstrap/cache
-.htaccess
-public/.htaccess
+/vendor
+/storage
+/bootstrap/cache
 /.env
-public
-.idea
-node_modules
+/public/.htaccess
+/.htaccess
+/public
+/node_modules
+/.idea
