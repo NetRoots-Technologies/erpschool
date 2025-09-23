@@ -26,11 +26,12 @@ class BudgetRequest extends FormRequest
         return [
             'title' => 'required|string|max:100',
             'timeFrame'=>'required|string',
-            'costCenter' => 'required|exists:departments,id',
-            'category' => 'required|exists:b_category,id',
-            'startDate'=>'required|date|after_or_equal:today',
-            'endDate'     => 'nullable|required_if:timeFrame,custom|date|after_or_equal:startDate',
+            // 'costCenter' => 'required|exists:departments,id',
+            // 'category' => 'required|exists:b_category,id',
+            'startDate'=>'required',
+            'endDate'     => 'required',
             'amount' => 'required|numeric|min:0',
+            'description' => 'nullable',
         ];
     }
 }

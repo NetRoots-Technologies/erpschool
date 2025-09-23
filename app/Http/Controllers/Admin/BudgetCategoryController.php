@@ -23,11 +23,11 @@ class BudgetCategoryController extends Controller
 
     public function index()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('students')) {
             return abort(503);
         }
-        $categories = BCategory::all(); // Fetch all categories
-        // dd($categories); // Debugging line to check categories
+        $categories = BCategory::whereNull('parent_id')->get(); // Fetch all categories
+    
         return view('admin.inventory_management.budgetcategory.index', compact('categories'));
     }
 
@@ -35,16 +35,29 @@ class BudgetCategoryController extends Controller
        public function store(CategoryRpequest $request)
     {
 
-        if (!Gate::allows('Dashboard-list')) {
+        // dd($request->all());
+        if (!Gate::allows('students')) {
             return abort(503);
         }
         $this->BcategoryService->store($request->validated());
         return redirect()->route('inventory.category.index');
     }
 
+
+    public function edit(BCategory $Bcategory , $id){
+         if (!Gate::allows('students')) {
+            return abort(503);
+        }
+        $categories = BCategory::whereNull('parent_id')->get(); // Fetch all categories
+        $bCategoryId = BCategory::where('id', $id)->first();
+
+        
+
+        return view('admin.inventory_management.budgetcategory.edit', compact('categories','bCategoryId'));
+    }
      public function getData()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('students')) {
             return abort(503);
         }
         return $this->BcategoryService->getData();
@@ -52,23 +65,21 @@ class BudgetCategoryController extends Controller
 
       public function update(CategoryRpequest $request, $id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('students')) {
             return abort(503);
         }
         $this->BcategoryService->update($request->validated(),$id);
-        return response()->json(['message' => 'Category updated successfully']);
+       return redirect()
+        ->route('inventory.category.index')
+        ->with('success', 'Category updated successfully');
     }
-
-
-
 
         public function destroy($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('students')) {
             return abort(503);
         }
         $this->BcategoryService->delete($id);
         return response()->json(['success' => 'Budget deleted successfully.']);
     }
 }
-

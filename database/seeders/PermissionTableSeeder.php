@@ -271,6 +271,8 @@ class PermissionTableSeeder extends Seeder
             ],
 
             'maintainer' => ['manage maintainer' , 'create maintainer' , 'edit maintainer' , 'delete maintainer'],
+            'supplementory' => ['supplementory create' , 'supplementory edit' , 'supplementory list' , 'supplementory list' , 'supplementory request'],
+            'expense' => ['expense create' , 'expense edit' , 'expense list' , 'expense list' ],
         ];
 
        foreach ($permissions as $mainPermission => $subPermissions) {

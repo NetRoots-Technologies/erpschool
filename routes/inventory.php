@@ -1,24 +1,27 @@
 <?php
 
-use App\Http\Controllers\Admin\VendorCategoryController;
-use App\Http\Controllers\admin\VendorController;
+use Mpdf\Tag\B;
+use App\Models\Inventry;
 use App\Models\Supplier;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\MealBatchController;
 use App\Http\Controllers\RequisitionController;
+use App\Http\Controllers\Admin\BudgetController;
+use App\Http\Controllers\admin\VendorController;
 use App\Http\Controllers\Inventory\ItemController;
+use App\Http\Controllers\Admin\InventoryController;
 use App\Http\Controllers\Inventory\QuoteController;
 use App\Http\Controllers\Inventory\ProductController;
 use App\Http\Controllers\Inventory\InventryController;
 use App\Http\Controllers\Inventory\SupplierController;
-use App\Http\Controllers\Inventory\StaffLunchController;
-use App\Http\Controllers\Inventory\PurchaseOrderController;
-use App\Http\Controllers\Admin\BudgetController;
+use App\Http\Controllers\Admin\BudgetExpenseController;
 use App\Http\Controllers\Admin\BudgetCategoryController;
-use App\Models\Inventry;
-use Mpdf\Tag\B;
+use App\Http\Controllers\Admin\VendorCategoryController;
+use App\Http\Controllers\Inventory\StaffLunchController;
 use App\Http\Controllers\Admin\InventoryCategoryController;
-use App\Http\Controllers\Admin\InventoryController;
+use App\Http\Controllers\Inventory\PurchaseOrderController;
+use App\Http\Controllers\Admin\SuppliementaryBudgetController;
+
 
 
 
@@ -100,7 +103,37 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'inventory', 'as' => 'invent
     Route::get('/product/details', [MealBatchController::class, 'get_quantityProducts'])->name('products');
 
     //budget
+     //budget
     Route::resource('/budget', BudgetController::class);
+    Route::get('/budget/{budget}/assign-department', [BudgetController::class, 'assignDepartment'])->name('budget.assignDepartment');
+    Route::post('/budget/{budget}/assign-department', [BudgetController::class, 'storeDepartmentBudget'])->name('budget.storeDepartment');
+    Route::get('/assign-to-department', [BudgetController::class, 'listOfAssignDepartment'])->name('List.ofAssignDepartment');
+    Route::get('/get-subcategories/{parentId}', [BudgetController::class, 'getSubcategories'])->name('get.subcategories');
+
+    // Budget Export and Import
+     Route::get('/download-budget-template', [BudgetController::class, 'downloadTemplate'])->name('budget.template.download');
+     Route::post('/budget/import', [BudgetController::class, 'import'])->name('budget.import');
+
+    
+
+
+    Route::resource('/expense', BudgetExpenseController::class);
+    Route::get('/get-categories-by-budget', [BudgetExpenseController::class, 'getCategories'])->name('get.categories.by.budget');
+    Route::get('/get-subcategories-by-category', [BudgetExpenseController::class, 'getSubcategories'])->name('get.subcategories.by.category');
+    Route::get('/get-allowed-amount', [BudgetExpenseController::class, 'getAllowedAmount'])->name('get.allowed.amount');
+
+    Route::resource('/supplementory', SuppliementaryBudgetController::class);
+    Route::get('/supplementory/requests/list', [SuppliementaryBudgetController::class , 'requestList'])->name('supplimentary.requests.list');
+    Route::post('/supplementory/approved/{id}', [SuppliementaryBudgetController::class , 'approvedStatus'])->name('supplimentary.approved.status');
+    Route::post('/supplementory/reject/{id}', [SuppliementaryBudgetController::class , 'rejectedStatus'])->name('supplimentary.reject.status');
+//  supplimentory Reports
+
+    Route::get('/supplimentory/budget/report', [SuppliementaryBudgetController::class, 'varianceReport'])->name('supplimentory.budget.report');
+    Route::get('/reports/supplementory/details', [SuppliementaryBudgetController::class, 'supplementoryDetails'])->name('reports.suppliementory.details');
+
+
+
+
     Route::resource('/category', BudgetCategoryController::class);
     //Inventory
     Route::resource('/inventory-center', InventoryCategoryController::class);

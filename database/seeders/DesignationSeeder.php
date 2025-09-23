@@ -16,18 +16,22 @@ class DesignationSeeder extends Seeder
     {
         $designations = [
             [
+
                 'name' => 'Head Coordinate',
                 'status' => 1,
+                'department_id' => 1,
                 'created_at' => now(),
             ],
             [
                 'name' => 'Academic',
                 'status' => 1,
+                'department_id' => 2,
                 'created_at' => now(),
             ],
             [
                 'name' => 'Teacher',
                 'status' => 1,
+                'department_id' => 3,
                 'created_at' => now(),
             ],
 

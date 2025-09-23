@@ -40,7 +40,6 @@ class CreateCurrenciesTable extends Migration
             $table->string('is_default')->default(1)->nullable();
             $table->timestamps();
         });
-
     }
 
 
