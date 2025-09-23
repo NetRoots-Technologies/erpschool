@@ -817,8 +817,9 @@
                     </li>
                 {{-- @endif --}}
 
-                @canany(['Budget', 'InventoryCategory', 'Vendor', 'VendorCategory', 'CafeInventory', 'StationeryInventory', 'POS'])
-                    <li class="side-item side-item-category">Inventory Management</li>
+
+                 @canany(['Budget'])
+                    <li class="side-item side-item-category">Budegt Management</li>
                     @can('Budget')
                         <li class="slide">
                             <a class="side-menu__item {{ request()->routeIs('inventory.budget.index') ? 'active' : '' }}"
@@ -828,7 +829,18 @@
                             </a>
                         </li>
                     @endcan
-                    @can('InventoryCategory')
+
+                    {{-- @can('Budget') --}}
+                        <li class="slide">
+                            <a class="side-menu__item {{ request()->routeIs('inventory.List.ofAssignDepartment') ? 'active' : '' }}"
+                                href="{{ route('inventory.List.ofAssignDepartment') }}">
+                                <i class="fas fa-users icons8 icon-style me-3"></i>
+                                <span class="side-menu__label">Assign Department List</span>
+                            </a>
+                        </li>
+                    {{-- @endcan --}}
+
+                     @can('InventoryCategory')
                         <li class="slide">
                             <a class="side-menu__item {{ request()->routeIs('inventory.category.index') ? 'active' : '' }}"
                                 href="{{ route('inventory.category.index') }}">
@@ -837,6 +849,49 @@
                             </a>
                         </li>
                     @endcan
+
+                    {{-- Expense  --}}
+                     @can('expense')
+                    
+                    <li class="slide">
+                            <a class="side-menu__item {{ request()->routeIs('inventory.expense.index') ? 'active' : '' }}"
+                                href="{{ route('inventory.expense.index') }}">
+                                <i class="fas fa-tags icons8 icon-style me-3"></i>
+                                <span class="side-menu__label">Budget Expense</span>
+                            </a>
+                        </li>
+                    @endcan
+
+                        <li class="slide">
+                            <a class="side-menu__item {{ request()->routeIs('inventory.supplementory.index') ? 'active' : '' }}"
+                                href="{{ route('inventory.supplementory.index') }}">
+                                <i class="fas fa-tags icons8 icon-style me-3"></i>
+                                <span class="side-menu__label">Supplementory Budget</span>
+                            </a>
+                        </li>
+
+                        <li class="slide">
+                            <a class="side-menu__item {{ request()->routeIs('inventory.supplimentary.requests.list') ? 'active' : '' }}"
+                                href="{{ route('inventory.supplimentary.requests.list') }}">
+                                <i class="fas fa-tags icons8 icon-style me-3"></i>
+                                <span class="side-menu__label">Request List</span>
+                            </a>
+                        </li>
+
+                        <li class="slide">
+                            <a class="side-menu__item {{ request()->routeIs('inventory.supplimentory.budget.report') ? 'active' : '' }}"
+                                href="{{ route('inventory.supplimentory.budget.report') }}">
+                                <i class="fas fa-tags icons8 icon-style me-3"></i>
+                                <span class="side-menu__label">Supplementory Report</span>
+                            </a>
+                        </li>
+
+                 
+                @endcanany
+
+                @canany(['InventoryCategory', 'Vendor', 'VendorCategory', 'CafeInventory', 'StationeryInventory', 'POS'])
+                    <li class="side-item side-item-category">Inventory Management</li>
+                    
                     @can('Vendor')
                         <li class="slide">
                             <a class="side-menu__item {{ request()->routeIs('inventory.vendor-management.index') ? 'active' : '' }}"

@@ -9,6 +9,15 @@ class BCategory extends Model
     protected $table = 'b_category';
 
     protected $fillable = [
-        'title'
+        'title',
+        'parent_id',
+        'user_id',
+        'description',
     ];
+
+    public function parent()
+{
+    return $this->belongsTo(BCategory::class, 'parent_id');
+}
+
 }

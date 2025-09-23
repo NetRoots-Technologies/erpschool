@@ -9,12 +9,17 @@ class BCategoryService
 
     public function store($validatedData)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        
+        if (!Gate::allows('students')) {
             return abort(503);
         }
+
         // dd($validatedData);
         return BCategory::create([
             'title' => $validatedData['title'],
+            'description'=> $validatedData['description'],
+            'parent_id' => $validatedData['parent_id'],
+            'user_id' => auth()->user()->id,
         ]);
 
     }
@@ -22,24 +27,28 @@ class BCategoryService
 
     public function getData()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('students')) {
             return abort(503);
         }
-        $data = BCategory::all();
-
+        $data = BCategory::with('parent');
         return \Yajra\DataTables\DataTables::of($data)
             ->addIndexColumn()
-
-            ->addColumn('title', fn($row) => $row->title ?? 'N/A')
-
+            ->addColumn('title', function ($row) {
+            if ($row->parent_id == null && empty($row->parent->title)) {
+                return $row->title;
+            }else {
+                return " -- " .''.$row->title;
+            }
+        })
             ->addColumn('action', function ($row) {
-                $btn = '<form class="delete_form" data-route="' . route("inventory.category.destroy", $row->id) . '" id="category-' . $row->id . '" method="POST">';
-                $btn .= '<a data-id="' . $row->id . '" class="btn btn-primary me-2 btn-sm text-white category_edit" data-category-edit=\'' . $row . '\'>Edit</a>';
-                $btn .= '<button data-id="category-' . $row->id . '" type="button" class="btn btn-danger delete btn-sm">Delete</button>';
-                $btn .= method_field('DELETE') . csrf_field();
-                $btn .= '</form>';
+            $btn  = '<form class="delete_form d-inline" data-route="' . route("inventory.category.destroy", $row->id) . '" id="category-' . $row->id . '" method="POST">';
+            $btn .= '<a href="' . route("inventory.category.edit", $row->id) . '"class="btn btn-primary me-2 btn-sm text-white">Edit</a>';
+            $btn .= '<button data-id="category-' . $row->id . '" type="button" class="btn btn-danger delete btn-sm">Delete</button>';
+            $btn .= method_field('DELETE') . csrf_field();
+            $btn .= '</form>';
                 return $btn;
             })
+
 
             ->rawColumns(['action'])
             ->make(true);
@@ -47,17 +56,19 @@ class BCategoryService
 
     public function update($validatedData, $id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        
+        if (!Gate::allows('students')) {
             return abort(503);
         }
         $data = BCategory::findOrFail($id);
-        return $data->update([
-            'title' => $validatedData['title'],
-        ]);
+        $data->update($validatedData);
+
+        return true;
+        
     }
     public function delete($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('students')) {
             return abort(503);
         }
         $bcategory = BCategory::findOrFail($id);
@@ -66,4 +77,3 @@ class BCategoryService
 
 
 }
-

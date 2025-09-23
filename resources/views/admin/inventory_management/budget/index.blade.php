@@ -5,11 +5,20 @@
     <div class="container-fluid">
         <div class="row w-100 text-center">
             @if (Gate::allows('Budget-create'))
+                <div class="col-auto mb-3">
+                    <a href="{{ route('inventory.budget.create') }}" class="btn btn-primary">Add Budget</a>
+                    {{-- <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createModal">Create New
+                    Budget</button> --}}
 
-            <div class="col-auto mb-3">
-                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createModal">Create New
-                    Budget</button>
-            </div>
+                    <a href="{{ route('inventory.budget.template.download') }}" class="btn btn-success">
+                        <i class="fa fa-download"></i> Download Budget Template
+                    </a>
+
+                    <!-- Button trigger modal -->
+                    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#exampleModal">
+                        Budget Import
+                    </button>
+                </div>
             @endif
             <div class="col-12">
                 <div class="card basic-form">
@@ -21,9 +30,9 @@
                                     <tr>
                                         <th>No</th>
                                         <th class="heading_style">Title</th>
-                                        <th class="heading_style">Category</th>
-                                        <th class="heading_style">Budget Duration</th>
-                                        <th class="heading_style">Cost Center</th>
+                                        <th class="heading_style">TimeFirm</th>
+                                        <th class="heading_style">Start Date</th>
+                                        <th class="heading_style">End Date</th>
                                         <th class="heading_style">Amount</th>
                                         <th class="heading_style">Action</th>
                                     </tr>
@@ -49,7 +58,8 @@
                 </div>
                 <!-- Modal body -->
                 <div class="modal-body">
-                    <form id="createform" method="POST" action="{{ route('inventory.budget.store') }}">
+                    {{-- <form id="createform" method="POST" action="{{ route('inventory.budget.store') }}"> --}}
+                    <form>
                         @csrf
                         <div class="row">
                             <div class="col-md-6">
@@ -89,7 +99,8 @@
                             <div class="col-12">
                                 <div class="form-group">
                                     <label class="department_create_label">Amount</label>
-                                    <input type="number" required class="form-control" id="amount" name="amount" min="0">
+                                    <input type="number" required class="form-control" id="amount" name="amount"
+                                        min="0">
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -133,7 +144,7 @@
     </div>
 
     <!-- Modal for Edit -->
-    <div class="modal" id="myModal">
+    {{-- <div class="modal" id="myModal">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
                 <!-- Modal Header -->
@@ -221,24 +232,52 @@
                 </div>
             </div>
         </div>
+    </div> --}}
+
+
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <form action="{{ route('inventory.budget.import') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="importModalLabel">Import Excel File</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="file" class="form-label">Select File</label>
+                            <input type="file" name="file" id="file" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-success">Upload</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+
+                
+            </div>
+        </div>
     </div>
 @endsection
 
 @section('js')
     <script>
-        $(document).ready(function () {
+        $(document).ready(function() {
             // DataTable initialization
             var tableData = $('#file-datatable').DataTable({
                 processing: true,
                 serverSide: true,
                 pageLength: 10,
                 dom: 'Bfrtip',
-                buttons: [
-                    {
+                buttons: [{
                         extend: 'collection',
                         text: 'Export',
-                        buttons: [
-                            {
+                        buttons: [{
                                 extend: 'excel',
                                 exportOptions: {
                                     columns: ':visible'
@@ -263,24 +302,47 @@
                 ajax: {
                     url: "{{ route('datatable.get-data-budget') }}",
                     type: "POST",
-                    data: { _token: "{{ csrf_token() }}" }
+                    data: {
+                        _token: "{{ csrf_token() }}"
+                    }
                 },
-                columns: [
-                    { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
-                    { data: 'title', name: 'title' },
-                    { data: 'category', name: 'category' },
-                    {
-                        data: 'timeFrame', name: 'timeFrame', render: function (data, type, row, meta) {
-                            return data ? data.toUpperCase() : '';
-                        }
+                columns: [{
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex',
+                        orderable: false,
+                        searchable: false
                     },
-                    { data: 'cost_center', name: 'cost_center' },
-                    { data: 'amount', name: 'amount', orderable: true },
-                    { data: 'action', name: 'action', orderable: false, searchable: false },
+                    {
+                        data: 'title',
+                        name: 'title'
+                    },
+                    {
+                        data: 'timeFrame',
+                        name: 'timeFrame'
+                    },
+                    {
+                        data: 'startDate',
+                        name: 'startDate'
+                    },
+                    {
+                        data: 'endDate',
+                        name: 'endDate'
+                    },
+                    {
+                        data: 'amount',
+                        name: 'amount',
+                        orderable: true
+                    },
+                    {
+                        data: 'action',
+                        name: 'action',
+                        orderable: false,
+                        searchable: false
+                    },
                 ],
-                columnDefs: [
-                    { "visible": false }
-                ]
+                columnDefs: [{
+                    "visible": false
+                }]
             });
 
             // Check for validation errors and show create modal if needed
@@ -295,10 +357,10 @@
 
             //form submission
 
-            $('#create-form-submit').on('click', function (e) {
+            $('#create-form-submit').on('click', function(e) {
                 e.preventDefault();
                 $(this).closest('form').find('.modalclose').trigger('click');
-                var url = "{{ route('inventory.budget.store') }}";
+                var url = "";
                 if (!$('#createform').valid()) {
                     return false;
                 }
@@ -307,20 +369,22 @@
                     type: "post",
                     "url": url,
                     data: $('#createform').serialize(),
-                    success: function (response) {
+                    success: function(response) {
                         loader.remove();
                         $('#createform').trigger("reset");
                         tableData.ajax.reload();
                         toastr.success('Department Added successfully.');
                     },
-                    error: function (xhr) {
+                    error: function(xhr) {
                         loader.remove();
                         if (xhr.status === 422) {
                             // Laravel validation error response
                             const errors = xhr.responseJSON.errors;
                             for (const field in errors) {
                                 if (errors.hasOwnProperty(field)) {
-                                    toastr.error(errors[field][0]); // Show first error for each field
+                                    toastr.error(errors[field][
+                                        0
+                                    ]); // Show first error for each field
                                 }
                             }
                         } else {
@@ -332,70 +396,70 @@
             });
 
             // Populate modal fields for edit
-            $(document).on('click', '.budget_edit', function () {
-                const budget = $(this).data('budget-edit');
-                // console.log('Editing budget:', budget);
+            // $(document).on('click', '.budget_edit', function () {
+            //     const budget = $(this).data('budget-edit');
+            //     // console.log('Editing budget:', budget);
 
-                if (!budget || !budget.id) {
-                    Swal.fire('Error', 'Invalid budget data.', 'error');
-                    return;
-                }
+            //     if (!budget || !budget.id) {
+            //         Swal.fire('Error', 'Invalid budget data.', 'error');
+            //         return;
+            //     }
 
-                $('#edit_id').val(budget.id);
-                $('#edit_title').val(budget.title);
-                $('#edit_timeFrame').val(budget.timeFrame);
-                $('#edit_amount').val(budget.amount);
-                $('#edit_startDate').val(budget.startDate);
-                $('#edit_endDate').val(budget.endDate);
-                $('#edit_category').val(budget.b_category_id);
-                $('#edit_costCenter').val(budget.department_id);
-                $('#editform').attr('action', '{{ route("inventory.budget.update", ":id") }}'.replace(':id', budget.id));
+            //     $('#edit_id').val(budget.id);
+            //     $('#edit_title').val(budget.title);
+            //     $('#edit_timeFrame').val(budget.timeFrame);
+            //     $('#edit_amount').val(budget.amount);
+            //     $('#edit_startDate').val(budget.startDate);
+            //     $('#edit_endDate').val(budget.endDate);
+            //     $('#edit_category').val(budget.b_category_id);
+            //     $('#edit_costCenter').val(budget.department_id);
+            //     // $('#editform').attr('action', '{{ route('inventory.budget.update', ':id') }}'.replace(':id', budget.id));
 
-                // Show modal
-                const editModal = new bootstrap.Modal(document.getElementById('myModal'));
-                editModal.show();
+            //     // Show modal
+            //     const editModal = new bootstrap.Modal(document.getElementById('myModal'));
+            //     editModal.show();
 
-                // Initialize endDate and readonly state based on current edit_timeFrame
-                handleTimeFrameChange($('#edit_timeFrame'));
-            });
+            //     // Initialize endDate and readonly state based on current edit_timeFrame
+            //     handleTimeFrameChange($('#edit_timeFrame'));
+            // });
 
             // Submit the edit form
-            $('#editform').on('submit', function (e) {
-                e.preventDefault();
-                $(this).closest("form").find('.edit-cancel').trigger('click');
+            // $('#editform').on('submit', function (e) {
+            //     e.preventDefault();
+            //     $(this).closest("form").find('.edit-cancel').trigger('click');
 
-                const form = $(this);
-                const url = form.attr('action');
-                const formData = form.serialize() + '&_method=PUT';
-                $.ajax({
-                    url: url,
-                    type: 'POST',
-                    data: formData,
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    success: function (response) {
-                        Swal.fire('Updated!', response.message, 'success');
-                        $('#file-datatable').DataTable().ajax.reload();
-                    },
-                    error: function (xhr) {
-                        // console.log(xhr.responseJSON);
-                        let errorMessage = 'Failed to update budget.';
-                        if (xhr.status === 422) {
-                            const errors = xhr.responseJSON.errors;
-                            errorMessage = Object.values(errors).flat().join('<br>');
-                        } else if (xhr.status === 419) {
-                            errorMessage = 'CSRF token mismatch. Please refresh the page.';
-                        } else if (xhr.status === 404) {
-                            errorMessage = 'Budget not found.';
-                        }
-                        Swal.fire('Error', errorMessage, 'error');
-                    }
-                });
-            });
+            //     const form = $(this);
+            //     const url = form.attr('action');
+            //     const formData = form.serialize() + '&_method=PUT';
+            //     $.ajax({
+            //         url: url,
+            //         type: 'POST',
+            //         data: formData,
+            //         headers: {
+            //             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            //         },
+            //         success: function (response) {
+            //             Swal.fire('Updated!', response.message, 'success');
+            //             $('#file-datatable').DataTable().ajax.reload();
+            //         },
+            //         error: function (xhr) {
+            //             // console.log(xhr.responseJSON);
+            //             let errorMessage = 'Failed to update budget.';
+            //             if (xhr.status === 422) {
+            //                 const errors = xhr.responseJSON.errors;
+            //                 errorMessage = Object.values(errors).flat().join('<br>');
+            //             } else if (xhr.status === 419) {
+            //                 errorMessage = 'CSRF token mismatch. Please refresh the page.';
+            //             } else if (xhr.status === 404) {
+            //                 errorMessage = 'Budget not found.';
+            //             }
+            //             Swal.fire('Error', errorMessage, 'error');
+            //         }
+            //     });
+            // });
 
             // Delete functionality
-            $(document).on('click', '.delete', function () {
+            $(document).on('click', '.delete', function() {
                 const formId = $(this).data('id');
                 const route = $('#' + formId).data('route');
 
@@ -410,16 +474,16 @@
                     if (result.isConfirmed) {
                         $.ajax({
                             url: route,
-                            type: 'POST',
+                            type: 'DELETE',
                             data: {
                                 _method: 'DELETE',
                                 _token: '{{ csrf_token() }}'
                             },
-                            success: function (response) {
+                            success: function(response) {
                                 Swal.fire('Deleted!', response.success, 'success');
                                 $('#file-datatable').DataTable().ajax.reload();
                             },
-                            error: function (xhr) {
+                            error: function(xhr) {
                                 Swal.fire('Error', 'Something went wrong!', 'error');
                             }
                         });
@@ -428,103 +492,102 @@
             });
 
             // Function to calculate end date based on time frame and start date
-            function calculateEndDate(startDate, timeFrame) {
-                if (!startDate) return '';
+            // function calculateEndDate(startDate, timeFrame) {
+            //     if (!startDate) return '';
 
-                const start = new Date(startDate);
-                const end = new Date(start);
+            //     const start = new Date(startDate);
+            //     const end = new Date(start);
 
-                switch (timeFrame) {
-                    case "monthly":
-                        end.setMonth(end.getMonth() + 1);
-                        end.setDate(end.getDate() - 1); // Last day of the month
-                        break;
-                    case "quarterly":
-                        end.setMonth(end.getMonth() + 3);
-                        end.setDate(end.getDate() - 1); // Last day of the quarter
-                        break;
-                    case "biAnnual":
-                        end.setMonth(end.getMonth() + 6);
-                        end.setDate(end.getDate() - 1); // Last day of the 6-month period
-                        break;
-                    case "annual":
-                        end.setFullYear(end.getFullYear() + 1);
-                        end.setDate(end.getDate() - 1); // Last day of the year
-                        break;
-                    default:
-                        return '';
-                }
+            //     switch (timeFrame) {
+            //         case "monthly":
+            //             end.setMonth(end.getMonth() + 1);
+            //             end.setDate(end.getDate() - 1); // Last day of the month
+            //             break;
+            //         case "quarterly":
+            //             end.setMonth(end.getMonth() + 3);
+            //             end.setDate(end.getDate() - 1); // Last day of the quarter
+            //             break;
+            //         case "biAnnual":
+            //             end.setMonth(end.getMonth() + 6);
+            //             end.setDate(end.getDate() - 1); // Last day of the 6-month period
+            //             break;
+            //         case "annual":
+            //             end.setFullYear(end.getFullYear() + 1);
+            //             end.setDate(end.getDate() - 1); // Last day of the year
+            //             break;
+            //         default:
+            //             return '';
+            //     }
 
-                return end.toISOString().split('T')[0];
-            }
+            //     return end.toISOString().split('T')[0];
+            // }
 
-            // Function to handle time frame change
-            function handleTimeFrameChange($form) {
-                const timeFrame = $form.val();
-                const $startDate = $form.closest('form').find('.startDate');
-                const $endDate = $form.closest('form').find('.endDate');
+            // // Function to handle time frame change
+            // function handleTimeFrameChange($form) {
+            //     const timeFrame = $form.val();
+            //     const $startDate = $form.closest('form').find('.startDate');
+            //     const $endDate = $form.closest('form').find('.endDate');
 
-                switch (timeFrame) {
-                    case "custom":
-                        $endDate.closest('div[class*="col"]').slideDown();
-                        $startDate.closest('div[class*="col"]').addClass('col-md-6');
-                        $endDate.prop('readonly', false);
-                        break;
-                    case "monthly":
-                    case "quarterly":
-                    case "biAnnual":
-                    case "annual":
-                        $endDate.closest('div[class*="col"]').slideDown();
-                        $startDate.closest('div[class*="col"]').addClass('col-md-6');
-                        $endDate.prop('readonly', true);
+            //     switch (timeFrame) {
+            //         case "custom":
+            //             $endDate.closest('div[class*="col"]').slideDown();
+            //             $startDate.closest('div[class*="col"]').addClass('col-md-6');
+            //             $endDate.prop('readonly', false);
+            //             break;
+            //         case "monthly":
+            //         case "quarterly":
+            //         case "biAnnual":
+            //         case "annual":
+            //             $endDate.closest('div[class*="col"]').slideDown();
+            //             $startDate.closest('div[class*="col"]').addClass('col-md-6');
+            //             $endDate.prop('readonly', true);
 
-                        // Calculate and set end date if start date is available
-                        const startDateValue = $startDate.val();
-                        if (startDateValue) {
-                            const endDateValue = calculateEndDate(startDateValue, timeFrame);
-                            $endDate.val(endDateValue);
-                        }
-                        break;
-                    default:
-                        $endDate.closest('div[class*="col"]').slideUp(function () {
-                            $startDate.closest('div[class*="col"]').removeClass('col-md-6');
-                        });
-                        $endDate.prop('readonly', false);
-                }
-            }
+            //             // Calculate and set end date if start date is available
+            //             const startDateValue = $startDate.val();
+            //             if (startDateValue) {
+            //                 const endDateValue = calculateEndDate(startDateValue, timeFrame);
+            //                 $endDate.val(endDateValue);
+            //             }
+            //             break;
+            //         default:
+            //             $endDate.closest('div[class*="col"]').slideUp(function () {
+            //                 $startDate.closest('div[class*="col"]').removeClass('col-md-6');
+            //             });
+            //             $endDate.prop('readonly', false);
+            //     }
+            // }
 
-            $('#createform #timeFrame,#editform #edit_timeFrame').on('change', function () {
-                handleTimeFrameChange($(this));
-            });
+            // $('#createform #timeFrame,#editform #edit_timeFrame').on('change', function () {
+            //     handleTimeFrameChange($(this));
+            // });
 
-            // Handle start date change to update end date for non-custom time frames
-            $('#createform #startDate,#editform #edit_startDate').on('change', function () {
-                const $form = $(this).closest('form');
-                const timeFrame = $form.find('select[id*="timeFrame"]').val();
-                const startDate = $(this).val();
-                const $endDate = $form.find('.endDate');
+            // // Handle start date change to update end date for non-custom time frames
+            // $('#createform #startDate,#editform #edit_startDate').on('change', function () {
+            //     const $form = $(this).closest('form');
+            //     const timeFrame = $form.find('select[id*="timeFrame"]').val();
+            //     const startDate = $(this).val();
+            //     const $endDate = $form.find('.endDate');
 
-                if (timeFrame && timeFrame !== 'custom' && startDate) {
-                    const endDateValue = calculateEndDate(startDate, timeFrame);
-                    $endDate.val(endDateValue);
-                }
-            });
+            //     if (timeFrame && timeFrame !== 'custom' && startDate) {
+            //         const endDateValue = calculateEndDate(startDate, timeFrame);
+            //         $endDate.val(endDateValue);
+            //     }
+            // });
 
             //select 2
-            $('#createModal').on('shown.bs.modal', function () {
+            $('#createModal').on('shown.bs.modal', function() {
                 $('.select2').select2({
                     dropdownParent: $('#createModal')
                 });
             });
 
-            $('#myModal').on('shown.bs.modal', function () {
+            $('#myModal').on('shown.bs.modal', function() {
                 $('.select2').select2({
                     dropdownParent: $('#myModal')
                 });
             });
 
         });
-
     </script>
 @endsection
 @section('css')
