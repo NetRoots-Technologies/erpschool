@@ -2,153 +2,53 @@
 
 namespace Database\Seeders;
 
-use App\Models\Admin\City;
-use App\Models\Student\StudentDetail;
 use App\Models\Student\Students;
 use Illuminate\Database\Seeder;
+use Faker\Factory as Faker;
 
 class StudentSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     *
-     * @return void
-     */
     public function run()
     {
-        $student = Students::create([
-            'name' => 'Umar Rasheed',
-            'email' => 'umar@gmail.com',
-            'mobile_no' => '03164225320',
-            'agent_id' => '1',
-        ]);
-        StudentDetail::create([
-            'student_id' => $student->id,
-            'gender' => 'male',
-            'marital_status' => 'single',
-            'student_dob' => '27-09-1997',
-            'nationality' => 'Pakistan',
-            'passport_cnic' => '123456789',
-            'pass_cnic_expiry' => '27-09-2022',
-            'address_country' => 'Pakistan',
-            'address_state' => 'Punjab',
-            'address_city' => 'Lahore',
-            'address' => 'Davis Road',
-            'guardian_name' => 'Rasheed Ahmed',
-            'guardian_occupation' => 'Businessmen',
-            'guardian_mobile_no' => '12345678',
-            'guardian_relation_with_student' => 'Father',
-        ]);
-        $student = Students::create([
-            'name' => 'ashar Rasheed',
-            'email' => 'ashar@gmail.com',
-            'mobile_no' => '03164225320',
-            'agent_id' => '1',
-        ]);
-        StudentDetail::create([
-            'student_id' => $student->id,
-            'gender' => 'male',
-            'marital_status' => 'single',
-            'student_dob' => '27-09-1997',
-            'nationality' => 'Pakistan',
-            'passport_cnic' => '123456789',
-            'pass_cnic_expiry' => '27-09-2022',
-            'address_country' => 'Pakistan',
-            'address_state' => 'Punjab',
-            'address_city' => 'Lahore',
-            'address' => 'Davis Road',
-            'guardian_name' => 'Rasheed Ahmed',
-            'guardian_occupation' => 'Businessmen',
-            'guardian_mobile_no' => '12345678',
-            'guardian_relation_with_student' => 'Father',
-        ]);
-        $student = Students::create([
-            'name' => 'test Rasheed',
-            'email' => 'ashar@gmail.com',
-            'mobile_no' => '03164225320',
+        $faker = Faker::create();
 
-        ]);
-        StudentDetail::create([
-            'student_id' => $student->id,
-            'gender' => 'male',
-            'marital_status' => 'single',
-            'student_dob' => '27-09-1997',
-            'nationality' => 'Pakistan',
-            'passport_cnic' => '123456789',
-            'pass_cnic_expiry' => '27-09-2022',
-            'address_country' => 'Pakistan',
-            'address_state' => 'Punjab',
-            'address_city' => 'Lahore',
-            'address' => 'Davis Road',
-            'guardian_name' => 'Rasheed Ahmed',
-            'guardian_occupation' => 'Businessmen',
-            'guardian_mobile_no' => '12345678',
-            'guardian_relation_with_student' => 'Father',
-        ]);
-
-        $student = Students::create([
-            'name' => 'ashar Rasheed',
-            'email' => 'ashar@gmail.com',
-            'mobile_no' => '03164225320',
-            'agent_id' => '1',
-        ]);
-
-        $student = Students::create([
-            'name' => 'ashar Rasheed',
-            'email' => 'ashar@gmail.com',
-            'mobile_no' => '03164225320',
-            'agent_id' => '1',
-        ]);
-
-        $student = Students::create([
-            'name' => 'ashar Rasheed',
-            'email' => 'ashar@gmail.com',
-            'mobile_no' => '03164225320',
-            'agent_id' => '1',
-        ]);
-
-        $student = Students::create([
-            'name' => 'ashar Rasheed',
-            'email' => 'ashar@gmail.com',
-            'mobile_no' => '03164225320',
-            'agent_id' => '1',
-        ]);
-
-        $student = Students::create([
-            'name' => 'ashar Rasheed',
-            'email' => 'ashar@gmail.com',
-            'mobile_no' => '03164225320',
-            'agent_id' => '1',
-        ]);
-
-        $student = Students::create([
-            'name' => 'ashar Rasheed',
-            'email' => 'ashar@gmail.com',
-            'mobile_no' => '03164225320',
-            'agent_id' => '1',
-        ]);
-
-        $student = Students::create([
-            'name' => 'ashar Rasheed',
-            'email' => 'ashar@gmail.com',
-            'mobile_no' => '03164225320',
-            'agent_id' => '1',
-        ]);
-
-        $student = Students::create([
-            'name' => 'ashar Rasheed',
-            'email' => 'ashar@gmail.com',
-            'mobile_no' => '03164225320',
-            'agent_id' => '1',
-        ]);
-
-        $student = Students::create([
-            'name' => 'ashar Rasheed',
-            'email' => 'ashar@gmail.com',
-            'mobile_no' => '03164225320',
-            'agent_id' => '1',
-        ]);
-
-
+        for ($i = 1; $i <= 10; $i++) {
+            Students::create([
+                'admission_class' => $faker->randomElement(['Nursery', 'Prep', '1', '2', '3', '4']),
+                'admission_date' => $faker->date(),
+                'campus' => $faker->randomElement(['Global Campus', 'PTCHS Campus']),
+                'special_child' => $faker->randomElement(['Yes', 'No']),
+                'special_needs' => $faker->randomElement(['Yes', 'No']),
+                'first_name' => $faker->firstName,
+                'last_name' => $faker->lastName,
+                'father_name' => $faker->name('male'),
+                'father_cnic' => $faker->bothify('#####-#######-#'),
+                'is_guardian' => $faker->boolean(20), // 20% chance true
+                'guardian_name' => $faker->name,
+                'guardian_cnic' => $faker->bothify('#####-#######-#'),
+                'gender' => $faker->randomElement(['male', 'female']),
+                'student_dob' => $faker->date('Y-m-d', '2005-01-01'),
+                'student_current_address' => $faker->address,
+                'student_permanent_address' => $faker->address,
+                'city' => $faker->city,
+                'country' => $faker->country,
+                'cell_no' => $faker->phoneNumber,
+                'landline' => $faker->phoneNumber,
+                'student_email' => $faker->unique()->safeEmail,
+                'native_language' => $faker->languageCode,
+                'first_language' => $faker->languageCode,
+                'second_language' => $faker->languageCode,
+                'meal_option' => $faker->randomElement(['Veg', 'Non-Veg', 'None']),
+                'easy_urdu' => $faker->boolean(10), // 10% chance
+                'student_id' => $faker->unique()->bothify('STU-#####'),
+                'class_id' => rand(1, 5), // Assuming you have classes seeded
+                'session_id' => rand(1, 3), // Assuming sessions seeded
+                'section_id' => rand(1, 3), // Assuming sections seeded
+                'branch_id' => rand(1, 2), // Assuming branches seeded
+                'company_id' => 1, // Assuming single company for now
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
     }
 }

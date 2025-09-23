@@ -120,7 +120,7 @@ Purchase Order
         const getQuote = @json(route('inventory.get.quote'));
         const branches = @json($branches);
         const delivery_status = @json($delivery_status);
-        const viewPath = @json(route('inventory.purchase_order.view'));
+        // const viewPath = @json(route('inventory.purchase_order.view'));
         const type = @json($type);
 
         $("#upload").on("change", function() {
@@ -336,7 +336,7 @@ Purchase Order
                 {
                     data: null, title: 'Action', width: "10%", orderable: false,
                     render: function (data, type, row, meta) {
-                        return `<a href="${viewPath}/${row.id}" class="btn btn-sm btn-primary view-item" data-id="${row.id}" "><i class="fa fa-eye"></i></a>
+                        return `
                         <span data-uri="${deleteUri}/${row.id}" class="btn btn-sm btn-danger delete-item"><i class="fa fa-trash"></i></span>`;
                     }
                 },

@@ -31,7 +31,7 @@ class ProductController extends Controller
 
     public function index($type)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('students')) {
             return abort(503);
         }
         $query = Inventry::query();
@@ -49,7 +49,7 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('students')) {
             return abort(503);
         }
         // dd($request->all());
@@ -88,8 +88,8 @@ class ProductController extends Controller
             } else {
                 $group_id = config('constants.FixedGroups.Stationery_Inventory_Items');
             }
-            
-            if(!$request->get('id')){
+
+            if (!$request->get('id')) {
                 $this->ledgerService->createAutoLedgers([$group_id], $request->product_name, 0, Product::class, $product->id);
             }
 
@@ -103,7 +103,7 @@ class ProductController extends Controller
 
     public function getData(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('students')) {
             return abort(503);
         }
         $query = Product::query()->with(['ProductItems', 'ProductItems.inventoryItems', 'branch']);
@@ -116,7 +116,7 @@ class ProductController extends Controller
 
     public function destroy(Product $product)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('students')) {
             return abort(503);
         }
         $product->delete();
@@ -126,7 +126,7 @@ class ProductController extends Controller
 
     public function calculate(Product $product)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('students')) {
             return abort(503);
         }
         $maxProductsForItem = PHP_INT_MAX;
@@ -169,10 +169,11 @@ class ProductController extends Controller
 
     public function productInventory(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+
+        if (!Gate::allows('students')) {
             return abort(503);
         }
-        DB::beginTransaction();
+        // DB::beginTransaction();
 
         $request->validate([
             'inventoryProductsName' => 'required',
@@ -180,105 +181,104 @@ class ProductController extends Controller
             'inventoryProductsMaxQuantity' => 'required|numeric|min:1',
         ]);
 
-        try {
-            $product = Product::find($request->product_id);
-            if (!$product) {
-                return response()->json(["success" => false, "message" => "Product not found"], 404);
-            }
-
-            $branchId = $product->branch_id;
-            $productLedger = $this->ledgerService->getLedger(Product::class, $product->id);
-
-            $quantityToProduce = $request->inventoryProductsQuantity;
-            $itemsLedger = [];
-
-            foreach ($product->ProductItems as $key => $productItem) {
-                $inventory = Inventry::where('id', $productItem->inventory_id)
-                    ->where('branch_id', $branchId)
-                    ->first();
-
-                if (!$inventory) {
-                    return response()->json([
-                        "success" => false,
-                        "message" => "Inventory item {$productItem->inventory_id} not found in branch {$branchId}"
-                    ], 404);
-                }
-
-                $totalRequired = $productItem->quantity * $quantityToProduce;
-
-                // ✅ Check stock availability
-                if ($inventory->quantity < $totalRequired) {
-                    return response()->json([
-                        "success" => false,
-                        "message" => "Not enough stock for item: $inventory->name in branch {$branchId}"
-                    ], 400);
-                }
-
-                $inventory->quantity -= $totalRequired;
-                $inventory->save();
-
-                $itemsLedger[$key] = $this->ledgerService->getLedger(Item::class, $inventory->item_id)->toArray();
-                $itemsLedger[$key]['cost_price'] = $inventory->unit_price * $quantityToProduce;
-            }
-
-            $type = $request->type_product == 'food' ? 'P' : 'SP';
-            $inventory = Inventry::firstOrNew([
-                "product_id" => $request->product_id,
-                "branch_id" => $branchId,
-            ]);
-
-            $inventory->name = $request->inventoryProductsName;
-            $inventory->product_id = $request->product_id;
-            $inventory->cost_price = $product->cost_amount;
-            $inventory->sale_price = $product->sale_price;
-            $inventory->quantity += $quantityToProduce;
-            $inventory->type = $type;
-            $inventory->save();
-
-            $data = [
-                "amount" => $product->cost_price,
-                "narration" => "Adding Quantity - Products $product->name",
-                "branch_id" => $branchId,
-                "entry_type_id" => 8
-            ];
-
-            $entry = $this->ledgerService->createEntry($data);
-
-            $entryData = [
-                "entry_type_id" => 8,
-                "entry_id" => $entry->id,
-                "ledger_id" => $productLedger->id,
-                "amount" => $product->cost_amount,
-                "balanceType" => 'd',
-                "narration" => "Creating Products $product->name",
-            ];
-            $this->ledgerService->createEntryItems($entryData);
-
-            foreach ($itemsLedger as $itemLedger) {
-                $entryData = [
-                    "entry_type_id" => 8,
-                    "entry_id" => $entry['id'],
-                    "ledger_id" => $itemLedger['id'],
-                    "amount" => $itemLedger['cost_price'],
-                    "balanceType" => 'c',
-                    "narration" => "Creating Products $product->name",
-                ];
-                $this->ledgerService->createEntryItems($entryData);
-            }
-
-            DB::commit();
-            return response()->json(['success' => true, 'message' => 'Product added to Inventory']);
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json(["success" => false, "message" => $e->getMessage()], 500);
+        // try {
+        $product = Product::find($request->product_id);
+        if (!$product) {
+            return response()->json(["success" => false, "message" => "Product not found"], 404);
         }
+
+        $branchId = $product->branch_id;
+        $productLedger = $this->ledgerService->getLedger(Product::class, $product->id);
+        // dd($productLedger);
+        $quantityToProduce = $request->inventoryProductsQuantity;
+        $itemsLedger = [];
+
+        foreach ($product->ProductItems as $key => $productItem) {
+            $inventory = Inventry::where('id', $productItem->inventory_id)
+                ->where('branch_id', $branchId)
+                ->first();
+
+            if (!$inventory) {
+                return response()->json([
+                    "success" => false,
+                    "message" => "Inventory item {$productItem->inventory_id} not found in branch {$branchId}"
+                ], 404);
+            }
+
+            $totalRequired = $productItem->quantity * $quantityToProduce;
+            // dd($totalRequired  , $inventory->quantity);
+            // ✅ Check stock availability
+            if ($inventory->quantity < $totalRequired) {
+                return response()->json([
+                    "success" => false,
+                    "message" => "Not enough stock for item: $inventory->name in branch {$branchId}"
+                ], 400);
+            }
+
+            $inventory->quantity -= $totalRequired;
+            $inventory->save();
+            $itemsLedger[$key] = $this->ledgerService->getLedger(Item::class, $inventory->item_id);
+            $itemsLedger[$key]['cost_price'] = $inventory->unit_price * $quantityToProduce;
+        }
+
+        $type = $request->type_product == 'food' ? 'P' : 'SP';
+        $inventory = Inventry::firstOrNew([
+            "product_id" => $request->product_id,
+            "branch_id" => $branchId,
+        ]);
+
+        $inventory->name = $request->inventoryProductsName;
+        $inventory->product_id = $request->product_id;
+        $inventory->cost_price = $product->cost_amount;
+        $inventory->sale_price = $product->sale_price;
+        $inventory->quantity += $quantityToProduce;
+        $inventory->type = $type;
+        $inventory->save();
+
+        // $data = [
+        //     "amount" => $product->cost_price,
+        //     "narration" => "Adding Quantity - Products $product->name",
+        //     "branch_id" => $branchId,
+        //     "entry_type_id" => 8
+        // ];
+
+        // $entry = $this->ledgerService->createEntry($data);
+
+        // $entryData = [
+        //     "entry_type_id" => 8,
+        //     "entry_id" => $entry->id,
+        //     "ledger_id" => $productLedger->id,
+        //     "amount" => $product->cost_amount,
+        //     "balanceType" => 'd',
+        //     "narration" => "Creating Products $product->name",
+        // ];
+        // $this->ledgerService->createEntryItems($entryData);
+
+        // foreach ($itemsLedger as $itemLedger) {
+        //     $entryData = [
+        //         "entry_type_id" => 8,
+        //         "entry_id" => $entry['id'],
+        //         "ledger_id" => $itemLedger['id'],
+        //         "amount" => $itemLedger['cost_price'],
+        //         "balanceType" => 'c',
+        //         "narration" => "Creating Products $product->name",
+        //     ];
+        //     $this->ledgerService->createEntryItems($entryData);
+        // }
+
+        DB::commit();
+        return response()->json(['success' => true, 'message' => 'Product added to Inventory']);
+
+        // } catch (\Exception $e) {
+        //     DB::rollBack();
+        //     return response()->json(["success" => false, "message" => $e->getMessage()], 500);
+        // }
     }
 
 
     public function productCompleted()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('students')) {
             return abort(503);
         }
         $goods = Inventry::where('type', 'p')->get();
@@ -288,7 +288,7 @@ class ProductController extends Controller
 
     public function getCompleted()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('students')) {
             return abort(503);
         }
         $query = Inventry::where('type', 'p')->get();
@@ -296,4 +296,3 @@ class ProductController extends Controller
         return response()->json(["success" => true, 'data' => $query]);
     }
 }
-
