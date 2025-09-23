@@ -12,7 +12,7 @@ class AddParentIdToLedgersTable extends Migration
     public function up()
     {
         Schema::table('ledgers', function (Blueprint $table) {
-            $table->unsignedBigInteger('parent_id')->nullable()->after('parent_type');
+           // $table->unsignedBigInteger('parent_id')->nullable()->after('parent_type');
         });
     }
 
@@ -22,7 +22,7 @@ class AddParentIdToLedgersTable extends Migration
     public function down()
     {
         Schema::table('ledgers', function (Blueprint $table) {
-            $table->dropColumn('parent_id');
+            // $table->dropColumn('parent_id');
         });
     }
 }
