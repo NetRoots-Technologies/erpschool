@@ -1,5 +1,5 @@
 @extends('admin.layouts.main')
-@section('title', 'Update Budget Expense')
+@section('title', 'Add Supplementory Budget Request')
 
 @section('content')
     <div class="container">
@@ -7,87 +7,65 @@
             <div class="col-12">
                 <div class="card basic-form">
                     <div class="card-body">
-                        <h3 class="text-22 text-midnight text-bold mb-4"> Update Expense</h3>
+                        <h3 class="text-22 text-midnight text-bold mb-4"> Supplementory Budeget Request </h3>
 
                         <div class="w-100">
-                            <form action="{{ route('inventory.expense.update', $expense->id) }}" method="POST">
+                            <form action="{{ route('inventory.supplementory.store') }}" method="POST">
                                 @csrf
-                                @method('PUT')
                                 <div class="row">
 
                                     <div class="col-md-3">
                                         <div class="mb-3">
                                             <label for="budgetSelect">Budget</label>
                                             <select name="budget_id" id="budgetSelect" class="form-control">
+                                                <option value="">-- Select Budget --</option>
                                                 @foreach ($budgets as $budget)
-                                                    @if ($budget->id == $expense->budget_id)
-                                                    <option value="{{ $budget->id  }}" selected>{{ $budget->title }}</option>
-                                                        
-                                                    @else
-                                                    <option value="{{ $budget->id  }}">{{ $budget->title }}</option>
-                                                        
-                                                    @endif
-                                                    
-                                                        
-                                                   
+                                                    <option value="{{ $budget->id }}">{{ $budget->title }}</option>
                                                 @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                     <div class="col-md-3">
-                                        <div class="mb-3">
-                                            <label>Category</label>
-                                            <select name="category_id" id="categorySelect" class="form-control">
-                                                <option value="">-- Select Category --</option>
-                                                @foreach ($categories as $cat)
-                                                <option value="{{ $cat->id }}" 
-                                                    {{ $expense->category_id == $cat->id ? 'selected' : '' }}>
-                                                    {{ $cat->title }}
-                                                </option>
-                                            @endforeach
-
-                                            </select>
-                                        </div>
-                                    </div>
-
-
-                                   <div class="col-md-3">
-                                        <div class="mb-3">
-                                            <label>Subcategory</label>
-                                            <select name="subcategory_id" id="subcategorySelect" class="form-control">
-                                                <option value="">-- Select Category --</option>
-                                                 @foreach ($subcategoy as $cat)
-                                                <option value="{{ $cat->id }}" 
-                                                    {{ $expense->subcategory_id == $cat->id ? 'selected' : '' }}>
-                                                    {{ $cat->title }}
-                                                </option>
-                                            @endforeach
                                             </select>
                                         </div>
                                     </div>
 
                                     <div class="col-md-3">
                                         <div class="mb-3">
+                                            <label>Category</label>
+                                            <select name="category_id" id="categorySelect" class="form-control"></select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <div class="mb-3">
+                                            <label>Subcategory</label>
+                                            <select name="sub_category_id" id="subcategorySelect"
+                                                class="form-control"></select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <div class="mb-3">
                                             <label>Allowed Amount</label>
-                                            <input type="text" id="allowedAmount" class="form-control" readonly value="{{$allocatedAmount}}">
-                                            <span class="text-danger remaningAmount"> Remaining Amount: {{$allocatedAmount - $expense->expense_amount}}</span>
+                                            <input type="text" id="allowedAmount" class="form-control" readonly>
+                                            <span class="text-danger remaningAmount"></span>
                                         </div>
                                     </div>
+
                                 </div>
+
+
 
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="mb-3">
-                                            <label>Expense Date</label>
-                                            <input type="date" name="expense_date" class="form-control" required value="{{$expense->expense_date}}">
+                                            <label>Request Date</label>
+                                            <input type="date" name="month" class="form-control" required>
                                         </div>
                                     </div>
+
                                     <div class="col-md-6">
                                         <div class="mb-3">
-                                            <label>Expense Amount</label>
-                                            <input type="number" name="expense_amount" id="expenseAmount"
-                                                class="form-control" required value="{{$expense->expense_amount}}">
+                                            <label>Requested Amount</label>
+                                            <input type="number" name="requested_amount" id="requested_amount"
+                                                class="form-control" required>
                                         </div>
                                     </div>
                                 </div>
@@ -95,15 +73,14 @@
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="mb-3">
-                                            <label>Remarks</label>
-                                            <textarea name="description" class="form-control"> {{$expense->description}}</textarea>
+                                            <label>Reason</label>
+                                            <textarea name="reason" class="form-control"></textarea>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="row">
-
                                     <div class="col-md-12">
-                                        <button type="submit" class="btn btn-primary text-right">Update Expense</button>
+                                        <button type="submit" class="btn btn-primary text-right">Send Request</button>
                                     </div>
                                 </div>
                             </form>
@@ -187,27 +164,22 @@
                             subcategory_id: subcategoryId,
                         },
                         success: function(response) {
-
+                            
                             $("#allowedAmount").val(response.allowed_amount);
-                            $(".remaningAmount").html('Remaining Amount: ' + response.rem_amount);
+                            $(".remaningAmount").html('Remaining Amount ' + response.rem_amount);
                         }
                     });
                 }
             });
 
-            $("#expenseAmount").on("input", function() {
-                var remainingAmount = parseFloat($(".remaningAmount").text().replace(/[^0-9.-]/g, "")) || 0;
-                var expenseVal = parseFloat($(this).val()) || 0;
-                $(".remaningAmountError").remove();
 
-                if (expenseVal > remainingAmount) {
-                    $("#expenseAmount").after(
-                        "<p class='text-danger remaningAmountError'>Expense Amount is greater than to Remaining Amount</p>"
-                    );
-                    $(this).val(remainingAmount);
-                }
-            });
 
+
+
+
+            // Delete functionality
+            
+              
         });
     </script>
 @endsection

@@ -5,7 +5,7 @@
 @section('content')
 <div class="card">
     <div class="card-header bg-primary text-white">
-        <h3>Supplementary Report Details - {{ \Carbon\Carbon::createFromDate($year, $month, 1)->format('M-Y') }}</h3>
+        <h3>Expence Report Details - {{ \Carbon\Carbon::createFromDate($year, $month, 1)->format('M-Y') }}</h3>
     </div>
     <div class="card-body">
         <div class="mt-4 table-responsive">

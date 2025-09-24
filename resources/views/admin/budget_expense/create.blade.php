@@ -164,9 +164,10 @@
                             subcategory_id: subcategoryId,
                         },
                         success: function(response) {
-                            
+
                             $("#allowedAmount").val(response.allowed_amount);
-                            $(".remaningAmount").html('Remaining Amount : ' + response.rem_amount);
+                            $(".remaningAmount").html('Remaining Amount : ' + response
+                                .rem_amount);
                         }
                     });
                 }
@@ -175,11 +176,18 @@
 
 
 
+            $("#expenseAmount").on("input", function() {
+                var remainingAmount = parseFloat($(".remaningAmount").text().replace(/[^0-9.-]/g, "")) || 0;
+                var expenseVal = parseFloat($(this).val()) || 0;
+                $(".remaningAmountError").remove();
 
-
-            // Delete functionality
-            
-              
+                if (expenseVal > remainingAmount) {
+                    $("#expenseAmount").after(
+                        "<p class='text-danger remaningAmountError'>Expense Amount is greater than to Remaining Amount</p>"
+                    );
+                    $(this).val(remainingAmount);
+                }
+            });
         });
     </script>
 @endsection
