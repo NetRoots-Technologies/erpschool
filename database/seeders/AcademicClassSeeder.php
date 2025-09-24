@@ -4,53 +4,66 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\Admin\Company;
-use App\Models\Admin\Session;
+use App\Models\Admin\Branch;
+use Illuminate\Support\Facades\DB;
 use App\Models\Academic\SchoolType;
 use App\Models\Academic\AcademicClass;
+use Carbon\Carbon;
 
 class AcademicClassSeeder extends Seeder
 {
     public function run()
     {
-        // ✅ Get the first company
         $company = Company::first();
         if (!$company) {
             echo "❌ No company found.\n";
             return;
         }
 
-        // ✅ Get the latest session
-        $session = Session::latest()->first();
+        $branch = Branch::where('company_id', $company->id)->where('id', 1)->first();
+        if (!$branch) {
+            echo "❌ Branch with ID 1 not found for company {$company->id}\n";
+            return;
+        }
+
+        $session = DB::table('acadmeic_sessions')->orderBy('id', 'desc')->first();
         if (!$session) {
             echo "❌ No session found.\n";
             return;
         }
 
-        // ✅ Get all school types for the company
-        $schoolTypes = SchoolType::where('company_id', $company->id)->get();
+        $schoolTypes = SchoolType::where([
+            'company_id' => $company->id,
+            'branch_id' => $branch->id,
+        ])->get();
 
-        if ($schoolTypes->isEmpty()) {
-            echo "❌ No school types found for company.\n";
-            return;
-        }
+        foreach ($schoolTypes as $i => $schoolType) {
+            // 🔹 Create class
+            $class = AcademicClass::create([
+                'name' => 'Class-' . ($i + 1),
+                'school_type_id' => $schoolType->id,
+                'branch_id' => $branch->id,
+                'company_id' => $company->id,
+                'session_id' => $session->id,
+            ]);
 
-        foreach ($schoolTypes as $schoolType) {
-            // Count existing classes
-            $existingCount = AcademicClass::where('school_type_id', $schoolType->id)->count();
+            // 🔹 Create sections for that class
+            $sections = ['A', 'B']; // Add more if needed
 
-            $needed = max(0, 10 - $existingCount); // Ensure at least 10
-
-            for ($i = 1; $i <= $needed; $i++) {
-                AcademicClass::create([
-                    'name' => 'Class ' . $i,
-                    'school_type_id' => $schoolType->id,
-                    'branch_id' => $schoolType->branch_id,
-                    'company_id' => $schoolType->company_id,
+            foreach ($sections as $sectionName) {
+                DB::table('sections')->insert([
+                    'name' => 'Section ' . $sectionName,
+                    'class_id' => $class->id,
                     'session_id' => $session->id,
+                    'active_session_id' => $session->id,
+                    'branch_id' => $branch->id,
+                    'company_id' => $company->id,
+                    'status' => 1,
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now(),
                 ]);
             }
-
-            echo "✅ Created $needed classes for SchoolType ID: {$schoolType->id} (Branch: {$schoolType->branch_id})\n";
         }
+
     }
 }

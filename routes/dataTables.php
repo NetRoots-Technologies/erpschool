@@ -101,6 +101,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'datatable', 'as' => 'datata
     Route::post('get-vendor-category', [VendorCategoryController::class, 'getData'])->name('get-vendor-category');
     Route::post('get-vendors', [VendorController::class, 'index'])->name('get-vendors');
     Route::post('get-inventorys', [InventoryController::class, 'index'])->name('get-inventorys');
+    Route::post('get_data_employee', 'App\Http\Controllers\HR\EmployeeController@getData')->name('get_data_employee');
     Route::post('skills/getdata', [\App\Http\Controllers\Exam\SkillsController::class, 'getData'])->name('skills.getdata');
 
 });

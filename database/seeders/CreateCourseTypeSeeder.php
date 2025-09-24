@@ -15,24 +15,20 @@ class CreateCourseTypeSeeder extends Seeder
     public function run()
     {
         CourseType::create([
-            'name' => 'AMAZON TRAINING',
-            'description' => 'AMAZON TRAINING',
-
+            'name' => 'MATRICULATION',
+            'description' => 'Matriculation Course',
         ]);
         CourseType::create([
-            'name' => 'DIGITAL MARKETING',
-            'description' => 'DIGITAL MARKETING',
+            'name' => 'SCIENCE',
+            'description' => 'Science Course',
         ]);
         CourseType::create([
-            'name' => 'DEVELOPMENT',
-            'description' => 'DEVELOPMENT',
+            'name' => 'COMMERCE',
+            'description' => 'Commerce Course',
         ]);
-        CourseType::create(
-            [
-                'name' => 'GRAPHICS',
-                'description' => 'GRAPHICS',
-
-            ]
-        );
+        CourseType::create([
+            'name' => 'ARTS',
+            'description' => 'Arts Course',
+        ]);
     }
 }

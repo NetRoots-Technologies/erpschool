@@ -1,75 +1,47 @@
 <?php
 
 namespace Database\Seeders;
-use App\Models\Admin\Course;
+
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class CreateCourseSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     *
-     * @return void
-     */
-    public function run()
+      public function run()
     {
-        Course::create([
-            'course_type_id' => '1',
-            'name' => 'AMAZON PL FBA',
-            //'course_duration' => '2 months',
-            'fee' => '10000',
+        $companyId = 1;
+        $branchId = 1;
+        $sessionId = null; // ✅ Set to 1 as per your request
 
-        ]);
-        Course::create([
-            'course_type_id' => '1',
-            'name' => 'DROPSHIPPING',
-            //'course_duration' => '2 months',
-            'fee' => '15000',
+        $courses = [
+            ['course_type_id' => 1, 'name' => 'Math'],
+            ['course_type_id' => 1, 'name' => 'English'],
+            ['course_type_id' => 1, 'name' => 'Urdu'],
+            ['course_type_id' => 1, 'name' => 'Science'],
+            ['course_type_id' => 1, 'name' => 'Islamiyat'],
+            ['course_type_id' => 2, 'name' => 'Computer'],
+            ['course_type_id' => 2, 'name' => 'Physics'],
+            ['course_type_id' => 2, 'name' => 'Chemistry'],
+            ['course_type_id' => 2, 'name' => 'Biology'],
+            ['course_type_id' => 3, 'name' => 'Economics'],
+            ['course_type_id' => 3, 'name' => 'Statistics'],
+            ['course_type_id' => 3, 'name' => 'Accounting'],
+        ];
 
-        ]);
-        Course::create([
-            'course_type_id' => '1',
-            'name' => 'AMAZON WHOLESALE FBA',
-            //'course_duration' => '2 months',
-            'fee' => '12000',
+        foreach ($courses as $course) {
+            DB::table('courses')->insert([
+                'name' => $course['name'],
+                'course_type_id' => $course['course_type_id'],
+                'company_id' => $companyId,
+                'branch_id' => $branchId,
+                'session_id' => $sessionId,           // ✅ Fixed
+                'active_session_id' => $sessionId,    // ✅ Fixed
+                'status' => 1,                         // ✅ Always active
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
 
-        ]);
-        Course::create([
-            'course_type_id' => '2',
-            'name' => 'SEO',
-            //'course_duration' => '2 months',
-            'fee' => '20000',
-
-        ]);
-        Course::create([
-
-            'course_type_id' => '2',
-            'name' => 'SMM',
-            //'course_duration' => '2 months',
-            'fee' => '50000',
-
-        ]);
-        Course::create([
-            'course_type_id' => '2',
-            'name' => 'SEM',
-            //'course_duration' => '2 months',
-            'fee' => '10000',
-
-        ]);
-        Course::create([
-            'course_type_id' => '3',
-            'name' => 'WEBSITE DEVELOPMENT',
-            //'course_duration' => '2 months',
-            'fee' => '35000',
-
-        ]);
-        Course::create([
-            'course_type_id' => '4',
-            'name' => 'GRAPHIC DESIGNING',
-            //'course_duration' => '2 months',
-            'fee' => '15000',
-
-        ]);
-
+        echo "✅ Courses inserted successfully with session_id, active_session_id, and status.\n";
     }
 }

@@ -43,9 +43,9 @@ class DatabaseSeeder extends Seeder
         //  $this->call(HRUserSeeder::class);
         //  $this->call(HODUserSeeder::class);
         //  $this->call(TeamLeadUserSeeder::class);
+         $this->call(WorkShiftSeeder::class);
         $this->call(EntryTypeSeeder::class);
         $this->call(EmployeeTypeSeeder::class);
-        $this->call(EmployeeSeeder::class);
         $this->call(VideoSeeder::class);
         $this->call(VideoCategorySeeder::class);
         $this->call(AgentTypeSeeder::class);
