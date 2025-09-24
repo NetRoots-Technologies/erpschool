@@ -50,7 +50,7 @@
                             <th>Month</th>
                             <th>Allocated Budget</th>
                             <th>Supplementary Budget</th>
-                            <th>Total Allowed</th>
+                            {{-- <th>Total Allowed</th> --}}
                             <th>Actual Expense</th>
                             <th>Variance</th>
                         </tr>
@@ -90,10 +90,10 @@
                         data: 'supplementary_budget',
                         name: 'supplementary_budget'
                     },
-                    {
-                        data: 'total_allowed',
-                        name: 'total_allowed'
-                    },
+                    // {
+                    //     data: 'total_allowed',
+                    //     name: 'total_allowed'
+                    // },
                     {
                         data: 'actual_expense',
                         name: 'actual_expense'
