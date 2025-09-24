@@ -59,5 +59,14 @@ class DatabaseSeeder extends Seeder
         $this->call([VendorCategory::class]);
         $this->call([LoopData::class]);
         $this->call(CompleteSystemSeeder::class);
+
+        // for cafe inventory
+        $this->call(RawMaterialCafe::class);
+        $this->call(SupplierCafe::class);
+        $this->call(RequisitionCafe::class);
+        $this->call(QuoteCafe::class);
+        
+
+        
     }
 }

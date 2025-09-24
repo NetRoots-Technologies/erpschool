@@ -42,7 +42,7 @@
 @endsection
 @php
     $company = \App\Models\Admin\Company::where('status', 1)->first();
-    $logoUrl = $company ? asset($company->logo) : 'https://www.netrootstech.com/wp-content/uploads/2022/08/Netroots-logo-tm-transparent.png';
+    $logoUrl = !empty($company->logo) ? asset($company->logo) : 'https://www.netrootstech.com/wp-content/uploads/2022/08/Netroots-logo-tm-transparent.png';
 @endphp
 
 <div class="app-sidebar__overlay" data-bs-toggle="sidebar"></div>
