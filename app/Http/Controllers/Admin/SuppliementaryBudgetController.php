@@ -13,6 +13,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 
 
+
 class SuppliementaryBudgetController extends Controller
 {
 
@@ -218,20 +219,19 @@ class SuppliementaryBudgetController extends Controller
 
     public function varianceReport(Request $request)
     {
-        $query = $this->buildVarianceQuery(); // jo upar query bnai hai
-        // dd($query->get());
+        $query = $this->buildVarianceQuery();
+        // dd($query);
         if ($request->ajax()) {
             return DataTables::of($query)
 
                 ->editColumn('month', function ($row) {
                     $url = route('inventory.reports.suppliementory.details', [
-                        'budget_id' => $row->budget_id,
-                        'category_id' => $row->category_id,
-                        'sub_category_id' => $row->sub_category_id,
-                        'month' => $row->month,
+                        'month' => $row['month'],
                     ]);
-                    return '<a href="' . $url . '" target="_blank">' . date("M-Y", strtotime($row->month)) . '</a>';
+                    $date = Carbon::createFromFormat('m-Y', $row['month']);
+                    return '<a href="' . $url . '" target="_blank">' . $date->format('M-Y') . '</a>';
                 })
+
 
                 ->rawColumns(['month'])
                 ->make(true);
@@ -239,55 +239,83 @@ class SuppliementaryBudgetController extends Controller
         return view("reports.suppliementory_report");
     }
 
+
     public function buildVarianceQuery()
     {
-        return DB::table('supplementary_budgets as sb')
-            ->leftJoin('department_budgets as db', function ($join) {
-                $join->on('db.budget_id', '=', 'sb.budget_id')
-                    ->on('db.category_id', '=', 'sb.category_id')
-                    ->on('db.sub_category_id', '=', 'sb.sub_category_id');
-            })
-            ->leftJoin('budget_expenses as be', function ($join) {
-                $join->on('be.budget_id', '=', 'sb.budget_id')
-                    ->on('be.category_id', '=', 'sb.category_id')
-                    ->on('be.subcategory_id', '=', 'sb.sub_category_id');
-            })
-            // ->select([
-            //     DB::raw("DATE_FORMAT(sb.month, '%Y-%m') as month"),
-            //     'sb.budget_id',
-            //     'sb.category_id',
-            //     'sb.sub_category_id',
-            //     DB::raw('(db.amount - sb.requested_amount) as allocated_budget'),
-            //     DB::raw('sb.requested_amount as supplementary_budget'),
-            //     DB::raw('db.amount  as total_allowed'),
-            //     DB::raw('IFNULL(SUM(be.expense_amount),0) as actual_expense'),
-            //     DB::raw('((db.amount - IFNULL(sb.requested_amount,0)) - IFNULL(SUM(be.expense_amount),0)) as variance')
-            // ])
+        // 1) Department Budgets (month => allocated_budget)
+        $allocated = DB::table('department_budgets')
+            ->select(
+                "month",
+                DB::raw("SUM(amount) as allocated_budget")
+            )
+            ->whereNotNull('month')
+            ->groupBy(DB::raw("DATE_FORMAT(month, '%m-%Y')"))
+            ->pluck('allocated_budget', 'month')
+            ->map(fn($v) => (float) $v);
 
+        // 2) Supplementary Budgets (month => supplementary_budget)
+        $supplementary = DB::table('supplementary_budgets')
+            ->select(
+                DB::raw("DATE_FORMAT(month, '%m-%Y') as month"),
+                DB::raw("SUM(requested_amount) as supplementary_budget")
+            )
+            ->whereNotNull('month')
+            ->where('status', 'approved')
+            ->groupBy(DB::raw("DATE_FORMAT(month, '%m-%Y')"))
+            ->pluck('supplementary_budget', 'month')
+            ->map(fn($v) => (float) $v);
 
-            ->select([
-                'sb.budget_id',
-                'sb.category_id',
-                'sb.sub_category_id',
-                DB::raw("DATE_FORMAT(sb.month, '%Y-%m') as month"),
-                DB::raw("SUM(db.amount - sb.requested_amount) as allocated_budget"),
-                DB::raw("SUM(sb.requested_amount) as supplementary_budget"),
-                DB::raw("SUM(db.amount) as total_allowed"),
-                DB::raw("IFNULL(SUM(be.expense_amount), 0) as actual_expense"),
-                DB::raw("SUM((db.amount - IFNULL(sb.requested_amount,0)) - IFNULL(be.expense_amount,0)) as variance")
-            ])
-            ->where('sb.status', 'approved')
+        // 3) Expenses (month => actual_expense)
+        $expenses = DB::table('budget_expenses')
+            ->select(
+                DB::raw("DATE_FORMAT(expense_date, '%m-%Y') as month"),
+                DB::raw("SUM(expense_amount) as actual_expense")
+            )
+            ->whereNotNull('expense_date')
+            ->groupBy(DB::raw("DATE_FORMAT(expense_date, '%m-%Y')"))
+            ->pluck('actual_expense', 'month')
+            ->map(fn($v) => (float) $v);
 
+        // 4) Collect all months from keys of each result
+        $allMonths = $allocated->keys()
+            ->merge($supplementary->keys())
+            ->merge($expenses->keys())
+            ->unique()
+            ->sort()
+            ->values();
 
-            ->groupBy(DB::raw("DATE_FORMAT(sb.month, '%Y-%m')"));
+        // dd( $allocated , $supplementary,  $expenses , $allMonths);
+        // 5) Final result
+        $result = $allMonths->map(function ($month) use ($allocated, $supplementary, $expenses) {
+            $allocated_budget     = $allocated->get($month, 0);
+            $supplementary_budget = $supplementary->get($month, 0);
+            $actual_expense       = $expenses->get($month, 0);
+
+            // Formula: Allocated - Supplementary - Expense
+            $variance = $allocated_budget - $supplementary_budget - $actual_expense;
+
+            return [
+                'month'                => $month,
+                'allocated_budget'     => number_format($allocated_budget, 2, '.', ''),
+                'supplementary_budget' => number_format($supplementary_budget, 2, '.', ''),
+                'actual_expense'       => number_format($actual_expense, 2, '.', ''),
+                'variance'             => number_format($variance, 2, '.', ''),
+            ];
+        });
+
+        return $result->values();
     }
+
+
+
+
 
     public function supplementoryDetails(Request $request)
     {
 
-        $budgetId = $request->budget_id;
-        $categoryId = $request->category_id;
-        $subCategoryId = $request->sub_category_id;
+        // $budgetId = $request->budget_id;
+        // $categoryId = $request->category_id;
+        // $subCategoryId = $request->sub_category_id;
         // $month = $request->month;
         $date = Carbon::parse($request->month);
 
@@ -313,6 +341,6 @@ class SuppliementaryBudgetController extends Controller
 
             ->paginate(20);
 
-        return view('reports.supplementory_details', compact('details', 'budgetId', 'categoryId', 'subCategoryId', 'month', 'year'));
+        return view('reports.supplementory_details', compact('details', 'month', 'year'));
     }
 }
