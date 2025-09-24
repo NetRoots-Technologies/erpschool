@@ -19,7 +19,10 @@ class DatabaseSeeder extends Seeder
         $this->call([CategorySeeder::class]);
         $this->call(DepartmentSeeder::class);
         $this->call(DesignationSeeder::class);
+        $this->call(AcademicSessionSeeder::class);
 
+        $this->call(SchoolTypeSeeder::class);
+        $this->call(AcademicClassSeeder::class);        
         $this->call(PermissionTableSeeder::class);
         $this->call(CreateCourseTypeSeeder::class);
         $this->call(CreateCourseSeeder::class);
@@ -48,6 +51,9 @@ class DatabaseSeeder extends Seeder
         $this->call(AgentTypeSeeder::class);
         $this->call(SlabsSeeder::class);
         $this->call([GeneralSettingSeeder::class]);
+        $this->call([EmployeeSeeder::class]);
+
+        
         // $this->call([GroupsTableSeeder::class]);
         $this->call([InventoryCategorySeeder::class]);
         $this->call([VendorCategory::class]);
