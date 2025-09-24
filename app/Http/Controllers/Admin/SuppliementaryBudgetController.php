@@ -312,17 +312,10 @@ class SuppliementaryBudgetController extends Controller
 
     public function supplementoryDetails(Request $request)
     {
-
-        // $budgetId = $request->budget_id;
-        // $categoryId = $request->category_id;
-        // $subCategoryId = $request->sub_category_id;
-        // $month = $request->month;
-        $date = Carbon::parse($request->month);
-
-        $month = $date->month;
-        $year  = $date->year;
-
-
+        $date       = $request->month;
+        $carbonDate = Carbon::createFromFormat('m-Y', $date);
+        $month      = $carbonDate->month;
+        $year       = $carbonDate->year;
 
         $details = DB::table("budget_expenses")
             ->Join("sub_budgets", "sub_budgets.id", "=", "budget_expenses.budget_id")
