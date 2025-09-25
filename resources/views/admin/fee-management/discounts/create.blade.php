@@ -54,10 +54,11 @@
                                     <select class="form-control @error('category_id') is-invalid @enderror" 
                                             id="category_id" name="category_id" required>
                                         <option value="">Select Category</option>
-                                        <option value="1">Monthly Tuition</option>
-                                        <option value="2">Admission Fee</option>
-                                        <option value="3">Security</option>
-                                        <option value="4">Books & Stationery</option>
+                                        @foreach($categories as $category)
+                                            <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>
+                                                {{ $category->name }}
+                                            </option>
+                                        @endforeach
                                     </select>
                                     @error('category_id')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -114,16 +115,30 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="is_active" 
-                                               name="is_active" value="1" {{ old('is_active', true) ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="is_active">
-                                            Active Discount
-                                        </label>
-                                    </div>
+                                    <label for="valid_from_month" class="form-label">Valid From Month <span class="text-danger">*</span></label>
+                                    <input type="month" class="form-control @error('valid_from_month') is-invalid @enderror" 
+                                           id="valid_from_month" name="valid_from_month" 
+                                           value="{{ old('valid_from_month') }}" required>
+                                    <small class="form-text text-muted">Select start month for discount validity</small>
+                                    @error('valid_from_month')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="valid_to_month" class="form-label">Valid To Month <span class="text-danger">*</span></label>
+                                    <input type="month" class="form-control @error('valid_to_month') is-invalid @enderror" 
+                                           id="valid_to_month" name="valid_to_month" 
+                                           value="{{ old('valid_to_month') }}" required>
+                                    <small class="form-text text-muted">Select end month for discount validity</small>
+                                    @error('valid_to_month')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
                             </div>
                         </div>
+
 
                         <div class="row">
                             <div class="col-12">

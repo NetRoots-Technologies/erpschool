@@ -40,7 +40,7 @@
                                             id="academic_class_id" name="academic_class_id" required>
                                         <option value="">Select Class</option>
                                         @foreach($classes as $class)
-                                            <option value="{{ $class->id }}" {{ old('academic_class_id', $collection->academic_class_id) == $class->id ? 'selected' : '' }}>
+                                            <option value="{{ $class->id }}" {{ old('academic_class_id', $collection->student->class_id ?? '') == $class->id ? 'selected' : '' }}>
                                                 {{ $class->name }}
                                             </option>
                                         @endforeach
@@ -54,8 +54,13 @@
                                 <div class="form-group">
                                     <label for="student_id" class="form-label">Student <span class="text-danger">*</span></label>
                                     <select class="form-control @error('student_id') is-invalid @enderror" 
-                                            id="student_id" name="student_id" required disabled>
-                                        <option value="">First select a class</option>
+                                            id="student_id" name="student_id" required>
+                                        <option value="">Select Student</option>
+                                        @if($collection->student)
+                                            <option value="{{ $collection->student->id }}" selected>
+                                                {{ $collection->student->fullname }} ({{ $collection->student->AcademicClass->name ?? '' }})
+                                            </option>
+                                        @endif
                                     </select>
                                     @error('student_id')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -66,8 +71,13 @@
                                 <div class="form-group">
                                     <label for="academic_session_id" class="form-label">Session <span class="text-danger">*</span></label>
                                     <select class="form-control @error('academic_session_id') is-invalid @enderror" 
-                                            id="academic_session_id" name="academic_session_id" required disabled>
-                                        <option value="">Auto-filled when student is selected</option>
+                                            id="academic_session_id" name="academic_session_id" required>
+                                        <option value="">Select Session</option>
+                                        @if($collection->academicSession)
+                                            <option value="{{ $collection->academicSession->id }}" selected>
+                                                {{ $collection->academicSession->name }}
+                                            </option>
+                                        @endif
                                     </select>
                                     @error('academic_session_id')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -534,57 +544,9 @@
             }
         });
 
-        // Initialize with existing data
-        function initializeForm() {
-            const classId = $('#academic_class_id').val();
-            if (classId) {
-                // Load students for the selected class
-                $.ajax({
-                    url: '{{ route("admin.fee-management.collections.students-by-class", ":classId") }}'.replace(':classId', classId),
-                    type: 'GET',
-                    success: function(response) {
-                        const studentSelect = $('#student_id');
-                        studentSelect.html('<option value="">Select Student</option>');
-                        
-                        if (response.students.length > 0) {
-                            response.students.forEach(function(student) {
-                                const isSelected = student.id == {{ $collection->student_id ?? 'null' }};
-                                studentSelect.append(
-                                    '<option value="' + student.id + '" ' +
-                                    'data-session-id="' + (student.session_id || '') + '" ' +
-                                    'data-session-name="' + student.session_name + '" ' +
-                                    (isSelected ? 'selected' : '') + '>' +
-                                    student.name + ' (' + student.class_name + ')' +
-                                    '</option>'
-                                );
-                            });
-                            studentSelect.prop('disabled', false);
-                            
-                            // Auto-fill session if student is selected
-                            const selectedStudent = studentSelect.find('option:selected');
-                            if (selectedStudent.length && selectedStudent.val()) {
-                                const sessionId = selectedStudent.data('session-id');
-                                const sessionName = selectedStudent.data('session-name');
-                                const sessionSelect = $('#academic_session_id');
-                                
-                                if (sessionId && sessionName) {
-                                    sessionSelect.html('<option value="' + sessionId + '">' + sessionName + '</option>');
-                                    sessionSelect.prop('disabled', false);
-                                }
-                            }
-                        }
-                    },
-                    error: function() {
-                        $('#student_id').html('<option value="">Error loading students</option>');
-                    }
-                });
-            }
-        }
-
         // Initialize
         updateRemoveButtons();
         calculateTotal();
-        initializeForm();
     });
 </script>
 @endsection

@@ -8,6 +8,7 @@ use App\Models\Admin\Branch;
 use App\Models\Academic\AcademicClass;
 use App\Models\Student\AcademicSession;
 use App\Models\Student\Students;
+use App\Models\Fee\FeeDiscount;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -132,6 +133,65 @@ class FeeBilling extends Model
     public function generateBillingSeries($campusCode, $year, $month, $billNumber)
     {
         return $campusCode . $year . $month . str_pad($billNumber, 4, '0', STR_PAD_LEFT);
+    }
+
+    // Discount Integration Methods
+    public function getApplicableDiscounts()
+    {
+        // Check if billing month falls within discount validity period
+        if ($this->billing_month) {
+            $billingMonth = $this->billing_month; // Format: YYYY-MM
+            
+            $discounts = FeeDiscount::where('student_id', $this->student_id)
+                ->where(function($query) use ($billingMonth) {
+                    // Extract year-month from valid_from and valid_to dates
+                    $query->whereRaw("DATE_FORMAT(valid_from, '%Y-%m') <= ?", [$billingMonth])
+                          ->whereRaw("DATE_FORMAT(valid_to, '%Y-%m') >= ?", [$billingMonth]);
+                })
+                ->get();
+        } else {
+            // Fallback to current date if no billing month
+            $today = now()->toDateString();
+            $discounts = FeeDiscount::where('student_id', $this->student_id)
+                ->where('valid_from', '<=', $today)
+                ->where('valid_to', '>=', $today)
+                ->get();
+        }
+            
+        // Log for debugging
+        \Log::info('Applicable discounts for student ' . $this->student_id, [
+            'billing_month' => $this->billing_month,
+            'discounts_count' => $discounts->count(),
+            'discounts' => $discounts->toArray()
+        ]);
+        
+        return $discounts;
+    }
+
+    public function calculateTotalDiscount()
+    {
+        $discounts = $this->getApplicableDiscounts();
+        $totalDiscount = 0;
+        
+        foreach($discounts as $discount) {
+            $totalDiscount += $discount->calculateDiscount($this->total_amount);
+        }
+        
+        return $totalDiscount;
+    }
+
+    public function getFinalAmount()
+    {
+        $discount = $this->calculateTotalDiscount();
+        return $this->total_amount - $discount;
+    }
+
+    public function applyDiscounts()
+    {
+        $discount = $this->calculateTotalDiscount();
+        $this->outstanding_amount = $this->getFinalAmount();
+        $this->save();
+        return $this;
     }
 
     public function isDraft()

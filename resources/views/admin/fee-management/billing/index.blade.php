@@ -31,6 +31,17 @@
                     <h3 class="card-title">Billing Records</h3>
                 </div>
                 <div class="card-body">
+                    <!-- Filter Section -->
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label for="filter_month" class="form-label">Filter by Month</label>
+                                <input type="month" class="form-control" id="filter_month" 
+                                       value="{{ date('Y-m') }}">
+                                <small class="form-text text-muted">Filter will apply automatically</small>
+                            </div>
+                        </div>
+                    </div>
                     <div class="table-responsive">
                         <table class="table table-bordered table-striped" id="billingTable">
                             <thead>
@@ -39,10 +50,8 @@
                                     <th>Challan No</th>
                                     <th>Student</th>
                                     <th>Class</th>
-                                    <th>Total Amount</th>
-                                    <th>Due Date</th>
+                                    <th>Billing Month</th>
                                     <th>Status</th>
-                                    <th>Created At</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -125,12 +134,15 @@
 @section('js')
 <script>
     $(document).ready(function() {
-        $('#billingTable').DataTable({
+        var billingTable = $('#billingTable').DataTable({
             processing: true,
             serverSide: true,
             ajax: {
                 url: "{{ route('admin.fee-management.billing.data') }}",
-                type: 'GET'
+                type: 'GET',
+                data: function(d) {
+                    d.filter_month = $('#filter_month').val();
+                }
             },
             columns: [
                 { data: 'id', name: 'id' },
@@ -138,32 +150,23 @@
                 { data: 'student_name', name: 'student_name' },
                 { data: 'class_name', name: 'class_name' },
                 { 
-                    data: 'total_amount', 
-                    name: 'total_amount',
+                    data: 'billing_month', 
+                    name: 'billing_month',
                     render: function(data, type, row) {
-                        return 'Rs. ' + parseFloat(data).toLocaleString();
-                    }
-                },
-                { 
-                    data: 'due_date', 
-                    name: 'due_date',
-                    render: function(data, type, row) {
-                        return new Date(data).toLocaleDateString();
+                        return data ? new Date(data + '-01').toLocaleDateString('en-US', { year: 'numeric', month: 'long' }) : 'N/A';
                     }
                 },
                 { data: 'status', name: 'status' },
-                { 
-                    data: 'created_at', 
-                    name: 'created_at',
-                    render: function(data, type, row) {
-                        return new Date(data).toLocaleDateString();
-                    }
-                },
                 { data: 'action', name: 'action', orderable: false, searchable: false }
             ],
             order: [[0, 'desc']],
             pageLength: 25,
             responsive: true
+        });
+        
+        // Auto apply filter when month changes
+        $('#filter_month').change(function() {
+            billingTable.ajax.reload();
         });
         
         // Generate billing form validation

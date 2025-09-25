@@ -641,7 +641,8 @@ class CompleteSystemSeeder extends Seeder
                     'discount_type' => $faker->randomElement(['percentage', 'fixed']),
                     'discount_value' => $faker->numberBetween(5, 50), // 5-50% or 5-5000 fixed
                     'reason' => $faker->sentence,
-                    'is_active' => 1,
+                    'valid_from' => now()->subMonths(2)->format('Y-m-d'),
+                    'valid_to' => now()->addMonths(6)->format('Y-m-d'),
                     'company_id' => $company->id,
                     'branch_id' => $ptchsBranch->id,
                     'created_by' => $admin->id,

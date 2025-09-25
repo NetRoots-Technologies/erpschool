@@ -63,20 +63,6 @@
                                     <td><span class="text-success font-weight-bold">Rs. {{ number_format($collection->paid_amount ?? 0, 2) }}</span></td>
                                 </tr>
                                 <tr>
-                                    <td><strong>Status:</strong></td>
-                                    <td>
-                                        @if($collection->status == 'paid')
-                                            <span class="badge badge-success">Paid</span>
-                                        @elseif($collection->status == 'pending')
-                                            <span class="badge badge-warning">Pending</span>
-                                        @elseif($collection->status)
-                                            <span class="badge badge-info">{{ ucfirst($collection->status) }}</span>
-                                        @else
-                                            <span class="badge badge-secondary">Not Set</span>
-                                        @endif
-                                    </td>
-                                </tr>
-                                <tr>
                                     <td><strong>Collection Date:</strong></td>
                                     <td><span class="text-info">{{ $collection->collection_date ? \Carbon\Carbon::parse($collection->collection_date)->format('d M Y') : 'N/A' }}</span></td>
                                 </tr>
@@ -99,12 +85,8 @@
                             <td><span class="badge badge-info">{{ ucfirst($collection->payment_method ?? 'N/A') }}</span></td>
                         </tr>
                         <tr>
-                            <td><strong>Reference:</strong></td>
-                            <td><span class="text-dark">{{ $collection->reference_number ?? 'N/A' }}</span></td>
-                        </tr>
-                        <tr>
                             <td><strong>Remarks:</strong></td>
-                            <td><span class="text-dark">{{ $collection->remarks ?? 'N/A' }}</span></td>
+                            <td><span class="text-dark">{{ $collection->remarks ?: 'N/A' }}</span></td>
                         </tr>
                         <tr>
                             <td><strong>Created:</strong></td>
@@ -115,6 +97,68 @@
             </div>
         </div>
     </div>
+
+    @if($collection->billing)
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-info" style="color: #212529 !important;">
+                    <h3 class="card-title" style="color: #212529 !important;">Challan Details</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td><strong>Challan Number:</strong></td>
+                                    <td><span class="badge badge-primary">{{ $collection->billing->challan_number }}</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Billing Month:</strong></td>
+                                    <td><span class="text-info">{{ \Carbon\Carbon::parse($collection->billing->billing_month . '-01')->format('F Y') }}</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Due Date:</strong></td>
+                                    <td><span class="text-warning">{{ \Carbon\Carbon::parse($collection->billing->due_date)->format('d M Y') }}</span></td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td><strong>Total Amount:</strong></td>
+                                    <td><span class="text-primary font-weight-bold">Rs. {{ number_format($collection->billing->total_amount, 2) }}</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Paid Amount:</strong></td>
+                                    <td><span class="text-success font-weight-bold">Rs. {{ number_format($collection->billing->paid_amount ?? 0, 2) }}</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Outstanding:</strong></td>
+                                    <td><span class="text-danger font-weight-bold">Rs. {{ number_format($collection->billing->outstanding_amount ?? 0, 2) }}</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Status:</strong></td>
+                                    <td>
+                                        @if($collection->billing->status == 'paid')
+                                            <span class="badge badge-success">Paid</span>
+                                        @elseif($collection->billing->status == 'partial')
+                                            <span class="badge badge-warning">Partial</span>
+                                        @elseif($collection->billing->status == 'overdue')
+                                            <span class="badge badge-danger">Overdue</span>
+                                        @else
+                                            <span class="badge badge-info">{{ ucfirst($collection->billing->status) }}</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
 
     @if($collection->details && $collection->details->count() > 0)
     <div class="row">
@@ -130,7 +174,6 @@
                                 <tr>
                                     <th>Category</th>
                                     <th>Amount</th>
-                                    <th>Status</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -138,17 +181,6 @@
                                 <tr>
                                     <td><span class="text-primary font-weight-bold">{{ $detail->feeCategory->name ?? 'N/A' }}</span></td>
                                     <td><span class="text-success font-weight-bold">Rs. {{ number_format($detail->amount, 2) }}</span></td>
-                                    <td>
-                                        @if(isset($detail->status) && $detail->status == 'paid')
-                                            <span class="badge badge-success">Paid</span>
-                                        @elseif(isset($detail->status) && $detail->status == 'pending')
-                                            <span class="badge badge-warning">Pending</span>
-                                        @elseif(isset($detail->status) && $detail->status)
-                                            <span class="badge badge-info">{{ ucfirst($detail->status) }}</span>
-                                        @else
-                                            <span class="badge badge-success">Paid</span>
-                                        @endif
-                                    </td>
                                 </tr>
                                 @endforeach
                             </tbody>
@@ -156,7 +188,6 @@
                                 <tr>
                                     <th class="text-right">Total Amount:</th>
                                     <th class="text-success">Rs. {{ number_format($collection->details->sum('amount'), 2) }}</th>
-                                    <th></th>
                                 </tr>
                             </tfoot>
                         </table>
