@@ -17,9 +17,9 @@ class RawMaterialCafe extends Seeder
             ['name' => 'Butter', 'status' => 1, 'type' => 'F', 'measuring_unit' => 'kg'],
             ['name' => 'Eggs', 'status' => 1, 'type' => 'F', 'measuring_unit' => 'tray'],
             ['name' => 'Chocolate Syrup', 'status' => 1, 'type' => 'F', 'measuring_unit' => 'bottle'],
-            ['name' => 'Whipping Cream', 'status' => 1, 'type' => 'F', 'measuring_unit' => 'litre'],
-            ['name' => 'Vanilla Extract', 'status' => 1, 'type' => 'F', 'measuring_unit' => 'bottle'],
-            ['name' => 'Paper Cups', 'status' => 1, 'type' => 'S', 'measuring_unit' => 'pack'],
+            // ['name' => 'Whipping Cream', 'status' => 1, 'type' => 'F', 'measuring_unit' => 'litre'],
+            // ['name' => 'Vanilla Extract', 'status' => 1, 'type' => 'F', 'measuring_unit' => 'bottle'],
+            // ['name' => 'Paper Cups', 'status' => 1, 'type' => 'F', 'measuring_unit' => 'pack'],
         ];
 
         foreach ($items as $item) {

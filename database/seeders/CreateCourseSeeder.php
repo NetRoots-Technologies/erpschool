@@ -42,6 +42,5 @@ class CreateCourseSeeder extends Seeder
             ]);
         }
 
-        echo "✅ Courses inserted successfully with session_id, active_session_id, and status.\n";
     }
 }
