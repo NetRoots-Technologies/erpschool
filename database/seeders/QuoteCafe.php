@@ -21,7 +21,6 @@ class Quotecafe extends Seeder
                 'type' => 'F',
                 'items' => [
                     ['item_id' => 1, 'quantity' => 10, 'unit_price' => 250],
-                    ['item_id' => 2, 'quantity' => 5,  'unit_price' => 150],
                 ],
             ],
             [
@@ -32,8 +31,8 @@ class Quotecafe extends Seeder
                 'comments' => 'Second quote for food items',
                 'type' => 'F',
                 'items' => [
-                    ['item_id' => 3, 'quantity' => 20, 'unit_price' => 50],
-                    ['item_id' => 4, 'quantity' => 15, 'unit_price' => 40],
+                   ['item_id' => 2, 'quantity' => 5,  'unit_price' => 150],
+
                 ],
             ],
             [
@@ -44,8 +43,7 @@ class Quotecafe extends Seeder
                 'comments' => 'Third quote: milk and sugar order',
                 'type' => 'F',
                 'items' => [
-                    ['item_id' => 5, 'quantity' => 8, 'unit_price' => 120],
-                    ['item_id' => 6, 'quantity' => 10, 'unit_price' => 90],
+                    ['item_id' => 3, 'quantity' => 12, 'unit_price' => 120],
                 ],
             ],
             [
@@ -56,8 +54,7 @@ class Quotecafe extends Seeder
                 'comments' => 'Fourth quote: new stock for bakery',
                 'type' => 'F',
                 'items' => [
-                    ['item_id' => 7, 'quantity' => 12, 'unit_price' => 200],
-                    ['item_id' => 8, 'quantity' => 6,  'unit_price' => 180],
+                    ['item_id' => 4, 'quantity' => 12, 'unit_price' => 200],
                 ],
             ],
             [
@@ -68,8 +65,8 @@ class Quotecafe extends Seeder
                 'comments' => 'Fifth quote: weekly vegetables and fruits',
                 'type' => 'F',
                 'items' => [
-                    ['item_id' => 9, 'quantity' => 30, 'unit_price' => 60],
-                    ['item_id' => 10, 'quantity' => 20, 'unit_price' => 70],
+                    ['item_id' => 5, 'quantity' => 30, 'unit_price' => 600],
+                    ['item_id' => 6, 'quantity' => 24, 'unit_price' => 400],
                 ],
             ],
         ];

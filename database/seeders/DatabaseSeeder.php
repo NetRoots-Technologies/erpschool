@@ -65,7 +65,17 @@ class DatabaseSeeder extends Seeder
         $this->call(SupplierCafe::class);
         $this->call(RequisitionCafe::class);
         $this->call(QuoteCafe::class);
-        
+
+        // for cafe Stationary
+        $this->call(RawMaterialStationary::class);
+        $this->call(SupplierStationery::class);
+        $this->call(RequisitionStationery::class);
+        $this->call(QuoteStationery::class);
+
+
+
+
+
 
         
     }
