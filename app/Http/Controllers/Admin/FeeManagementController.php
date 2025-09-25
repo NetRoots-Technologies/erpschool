@@ -932,6 +932,7 @@ class FeeManagementController extends Controller
             // Get students in the specified class and session
             $students = Students::where('class_id', $request->academic_class_id)
                 ->where('session_id', $request->academic_session_id)
+                ->where('is_active', 1)
                 ->get();
 
             \Log::info('Students found: ' . $students->count());
@@ -976,7 +977,7 @@ class FeeManagementController extends Controller
                 }
 
                 // Calculate total amount from fee structure
-                $totalAmount = $feeStructure->feeStructureDetails->sum('amount');
+                $totalAmount = $feeStructure->feeStructureDetails()->sum('amount');
                 \Log::info('Total amount calculated: ' . $totalAmount);
 
                 // Generate unique challan number
