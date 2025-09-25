@@ -21,7 +21,8 @@ class FeeDiscount extends Model
         'discount_type',
         'discount_value',
         'reason',
-        'is_active',
+        'valid_from',
+        'valid_to',
         'company_id',
         'branch_id',
         'created_by',
@@ -30,7 +31,8 @@ class FeeDiscount extends Model
 
     protected $casts = [
         'discount_value' => 'decimal:2',
-        'is_active' => 'boolean',
+        'valid_from' => 'date',
+        'valid_to' => 'date',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
@@ -111,6 +113,14 @@ class FeeDiscount extends Model
 
     public function isCurrentlyValid()
     {
-        return $this->is_active;
+        if (!$this->is_active) return false;
+        
+        $today = now()->toDateString();
+        
+        // Check if discount is within validity period
+        if ($this->valid_from && $this->valid_from > $today) return false;
+        if ($this->valid_to && $this->valid_to < $today) return false;
+        
+        return true;
     }
 }

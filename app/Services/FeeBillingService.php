@@ -78,17 +78,23 @@ class FeeBillingService
         $challanNumber = $this->generateChallanNumber($class, $billingMonth);
 
         // Create billing record
-        return FeeBilling::create([
+        $billing = FeeBilling::create([
             'student_id' => $student->id,
             'class_id' => $class->id,
             'session_id' => $session->id,
             'challan_number' => $challanNumber,
             'total_amount' => $totalAmount,
+            'outstanding_amount' => $totalAmount, // Initially same as total
             'due_date' => $this->calculateDueDate($billingMonth),
             'status' => 'pending',
             'billing_month' => $billingMonth,
             'created_by' => Auth::id(),
         ]);
+
+        // Apply discounts with validity check
+        $billing->applyDiscounts();
+        
+        return $billing;
     }
 
     /**

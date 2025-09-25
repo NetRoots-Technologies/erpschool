@@ -40,8 +40,8 @@
                                     <th>Category</th>
                                     <th>Discount Type</th>
                                     <th>Discount Value</th>
-                                    <th>Reason</th>
-                                    <th>Status</th>
+                                    <th>Valid From Month</th>
+                                    <th>Valid To Month</th>
                                     <th>Created At</th>
                                     <th>Actions</th>
                                 </tr>
@@ -86,8 +86,32 @@
                         return row.discount_type == 'percentage' ? data + '%' : 'Rs. ' + parseFloat(data).toLocaleString();
                     }
                 },
-                { data: 'reason', name: 'reason' },
-                { data: 'status', name: 'status' },
+                { 
+                    data: 'valid_from', 
+                    name: 'valid_from',
+                    render: function(data, type, row) {
+                        if (data) {
+                            var date = new Date(data);
+                            var month = date.toLocaleDateString('en-US', { month: 'long' });
+                            var year = date.getFullYear();
+                            return month + ' ' + year;
+                        }
+                        return 'N/A';
+                    }
+                },
+                { 
+                    data: 'valid_to', 
+                    name: 'valid_to',
+                    render: function(data, type, row) {
+                        if (data) {
+                            var date = new Date(data);
+                            var month = date.toLocaleDateString('en-US', { month: 'long' });
+                            var year = date.getFullYear();
+                            return month + ' ' + year;
+                        }
+                        return 'N/A';
+                    }
+                },
                 { 
                     data: 'created_at', 
                     name: 'created_at',
