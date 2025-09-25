@@ -146,6 +146,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'admin', 'as' => 'admin.'], 
     //     return 'hello';
     // });
 
+
     // Fee Management Routes
     Route::group(['prefix' => 'fee-management', 'as' => 'fee-management.'], function () {
         // Dashboard
@@ -175,8 +176,13 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'admin', 'as' => 'admin.'], 
         Route::get('/collections/create', [FeeManagementController::class, 'createCollection'])->name('collections.create');
         Route::get('/collections/students-by-class/{classId}', [FeeManagementController::class, 'getStudentsByClass'])->name('collections.students-by-class');
         Route::post('/collections', [FeeManagementController::class, 'storeCollection'])->name('collections.store');
+        Route::get('/collections/pay-challan', [FeeManagementController::class, 'payChallan'])->name('collections.pay-challan');
+        Route::get('/collections/challans-by-student/{studentId}', [FeeManagementController::class, 'getChallansByStudent'])->name('collections.challans-by-student');
+        Route::get('/collections/challan-discounts/{challanId}', [FeeManagementController::class, 'getChallanDiscounts'])->name('collections.challan-discounts');
+        Route::post('/collections/store-challan-payment', [FeeManagementController::class, 'storeChallanPayment'])->name('collections.store-challan-payment');
         Route::get('/collections/{id}', [FeeManagementController::class, 'showCollection'])->name('collections.show');
         Route::get('/collections/{id}/edit', [FeeManagementController::class, 'editCollection'])->name('collections.edit');
+        Route::put('/collections/{id}/update-challan', [FeeManagementController::class, 'updateChallanCollection'])->name('collections.update-challan');
         Route::put('/collections/{id}', [FeeManagementController::class, 'updateCollection'])->name('collections.update');
         
         // Discounts

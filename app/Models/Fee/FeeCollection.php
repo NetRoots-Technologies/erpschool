@@ -22,6 +22,7 @@ class FeeCollection extends Model
         'student_id',
         'academic_class_id',
         'academic_session_id',
+        'billing_id',
         'fee_assignment_id',
         'collection_date',
         'paid_amount',
@@ -53,6 +54,11 @@ class FeeCollection extends Model
     public function academicSession()
     {
         return $this->belongsTo(AcademicSession::class);
+    }
+
+    public function billing()
+    {
+        return $this->belongsTo(FeeBilling::class, 'billing_id');
     }
 
     public function academicClass()

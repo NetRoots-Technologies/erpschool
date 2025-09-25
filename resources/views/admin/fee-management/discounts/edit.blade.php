@@ -107,18 +107,28 @@
                         </div>
 
                         <div class="row">
-                            <div class="col-md-12">
+                            <div class="col-md-6">
                                 <div class="form-group">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="is_active" name="is_active" 
-                                               {{ $discount->is_active ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="is_active">
-                                            Active
-                                        </label>
-                                    </div>
+                                    <label for="valid_from_month">Valid From Month <span class="text-danger">*</span></label>
+                                    <input type="month" class="form-control" id="valid_from_month" name="valid_from_month" 
+                                           value="{{ $discount->valid_from ? $discount->valid_from->format('Y-m') : '' }}" required>
+                                    @error('valid_from_month')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="valid_to_month">Valid To Month <span class="text-danger">*</span></label>
+                                    <input type="month" class="form-control" id="valid_to_month" name="valid_to_month" 
+                                           value="{{ $discount->valid_to ? $discount->valid_to->format('Y-m') : '' }}" required>
+                                    @error('valid_to_month')
+                                        <span class="text-danger">{{ $message }}</span>
+                                    @enderror
                                 </div>
                             </div>
                         </div>
+
 
                         <div class="row">
                             <div class="col-md-12">

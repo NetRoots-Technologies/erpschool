@@ -19,6 +19,9 @@
                     <a href="{{ route('admin.fee-management.collections.create') }}" class="btn btn-primary">
                         <i class="fa fa-plus"></i> Record Collection
                     </a>
+                    <a href="{{ route('admin.fee-management.collections.pay-challan') }}" class="btn btn-success ml-2">
+                        <i class="fa fa-credit-card"></i> Pay Challan
+                    </a>
                 </div>
             </div>
         </div>
@@ -38,9 +41,8 @@
                                     <th>ID</th>
                                     <th>Student</th>
                                     <th>Class</th>
-                                    <th>Total Amount</th>
+                                    <th>Challan No</th>
                                     <th>Paid Amount</th>
-                                    <th>Status</th>
                                     <th>Collection Date</th>
                                     <th>Payment Method</th>
                                     <th>Actions</th>
@@ -73,10 +75,10 @@
                 { data: 'student_name', name: 'student_name' },
                 { data: 'class_name', name: 'class_name' },
                 { 
-                    data: 'total_amount', 
-                    name: 'total_amount',
+                    data: 'challan_number', 
+                    name: 'challan_number',
                     render: function(data, type, row) {
-                        return 'Rs. ' + parseFloat(data).toLocaleString();
+                        return data || 'N/A';
                     }
                 },
                 { 
@@ -86,7 +88,6 @@
                         return 'Rs. ' + parseFloat(data).toLocaleString();
                     }
                 },
-                { data: 'status', name: 'status' },
                 { 
                     data: 'collection_date', 
                     name: 'collection_date',
