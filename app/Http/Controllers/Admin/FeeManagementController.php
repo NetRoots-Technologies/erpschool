@@ -38,12 +38,38 @@ class FeeManagementController extends Controller
             abort(403, 'Unauthorized access');
         }
 
+        // Calculate total collected amount from all paid collections
+        $totalCollected = FeeCollection::where('status', 'paid')->sum('paid_amount');
+        
+        // Calculate pending/outstanding amount from billing records
+        $pendingBillings = FeeBilling::whereIn('status', ['generated', 'partial'])->get();
+        $pendingAmount = 0;
+        
+        foreach ($pendingBillings as $billing) {
+            $finalAmount = $billing->getFinalAmount();
+            $paidAmount = $billing->paid_amount ?? 0;
+            $outstanding = $finalAmount - $paidAmount;
+            if ($outstanding > 0) {
+                $pendingAmount += $outstanding;
+            }
+        }
+
+        // Additional statistics
+        $totalBillings = FeeBilling::count();
+        $paidBillings = FeeBilling::where('status', 'paid')->count();
+        $partialBillings = FeeBilling::where('status', 'partial')->count();
+        $pendingBillings = FeeBilling::where('status', 'generated')->count();
+        
         $data = [
             'title' => 'Fee Management Dashboard',
             'total_categories' => FeeCategory::count(),
             'total_structures' => FeeStructure::count(),
-            'total_collections' => FeeCollection::where('status', 'paid')->sum('paid_amount'),
-            'pending_amount' => FeeCollection::where('status', 'pending')->sum('paid_amount'),
+            'total_collections' => $totalCollected,
+            'pending_amount' => $pendingAmount,
+            'total_billings' => $totalBillings,
+            'paid_billings' => $paidBillings,
+            'partial_billings' => $partialBillings,
+            'pending_billings' => $pendingBillings,
             'recent_collections' => FeeCollection::with(['student.AcademicClass', 'academicSession'])
                 ->orderBy('created_at', 'desc')
                 ->limit(5)
