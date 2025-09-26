@@ -117,6 +117,11 @@ Purchase Order
         const uri = @json(route('datatable.data.purchaseOrder'));
         const changeStatusUri = @json(route('inventory.quotes.change.status'));
         const deleteUri = @json(route('inventory.purchase_order.destroy'));
+        
+        const pdfUri = @json(route('inventory.purchase_order.pdf'));
+        const printUri = @json(route('inventory.purchase_order.print'));
+
+
         const getQuote = @json(route('inventory.get.quote'));
         const branches = @json($branches);
         const delivery_status = @json($delivery_status);
@@ -220,6 +225,17 @@ Purchase Order
             e.preventDefault();
             $(this).parent().parent().remove();
         })
+
+        $('#data_table').on('click', '.generate-pdf', function () {
+        const url = $(this).data('uri');
+        window.open(url, '_blank');
+        });
+
+        $('#data_table').on('click', '.print-item', function () {
+            const url = $(this).data('uri');
+            window.open(url, '_blank');
+        });
+
 
         $(`#items`).on('keyup', '.quantity,.item_price', function () {
             let closestQuantity = $(this).parent().parent().find('.quantity').val();
@@ -339,7 +355,18 @@ Purchase Order
                     data: null, title: 'Action', width: "10%", orderable: false,
                     render: function (data, type, row, meta) {
                         return `
-                        <span data-uri="${deleteUri}/${row.id}" class="btn btn-sm btn-danger delete-item"><i class="fa fa-trash"></i></span>`;
+                      <span data-uri="${deleteUri}/${row.id}" class="btn btn-sm btn-danger delete-item">
+                        <i class="fa fa-trash"></i>
+                        </span>
+
+                        <span data-uri="${pdfUri}/${row.id}" class="btn btn-sm btn-secondary generate-pdf">
+                        <i class="fa fa-file-pdf-o"></i>
+                        </span>
+
+                        <span data-uri="${printUri}/${row.id}" class="btn btn-sm btn-info print-item">
+                        <i class="fa fa-print"></i>
+                        </span>
+                        `;
                     }
                 },
             ],

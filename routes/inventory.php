@@ -62,6 +62,9 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'inventory', 'as' => 'invent
     Route::get('/grn/Detail/{id?}', [PurchaseOrderController::class, 'grnDetail'])->name('grn.Detail');
     Route::post('/purchase_orders/store', [PurchaseOrderController::class, 'store'])->name('purchase_order.store');
     Route::get('/purchase_orders/destroy/{purchase_order?}', [PurchaseOrderController::class, 'destroy'])->name('purchase_order.destroy');
+    Route::get('/purchase_orders/pdf/{purchase_order?}', [PurchaseOrderController::class, 'pdf'])->name('purchase_order.pdf');
+    Route::get('/purchase_orders/print/{purchase_order?}', [PurchaseOrderController::class, 'print'])->name('purchase_order.print');
+
 
     Route::post('/purchase_orders/change-status/{purchase_order?}/{status?}', [PurchaseOrderController::class, 'changeStatus'])->name('purchase_order.change.status');
     Route::post('/purchase_orders/change-pStatus/{purchase_order?}/{status?}', [PurchaseOrderController::class, 'changePaymentStatus'])->name('purchase_order.change.pStatus');

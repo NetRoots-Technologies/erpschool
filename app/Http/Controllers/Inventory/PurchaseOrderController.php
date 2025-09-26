@@ -20,6 +20,7 @@ use App\Http\Controllers\Controller;
 use App\Imports\PurchaseOrderImport;
 use Illuminate\Support\Facades\Gate;
 use Maatwebsite\Excel\Facades\Excel;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class PurchaseOrderController extends Controller
 {
@@ -155,6 +156,27 @@ class PurchaseOrderController extends Controller
         $purchaseOrder->purchaseOrderItems()->delete();
         return response()->json(["success" => true, 'message' => 'Deleted Successfully', 'data' => []], 200);
     }
+
+    
+    public function pdf($id)
+    {
+        $purchaseOrder = PurchaseOrder::with(['supplier', 'branch', 'purchaseOrderItems.item'])->findOrFail($id);
+        // dd($purchaseOrder->purchaseOrderItems); 
+
+        $pdf = Pdf::loadView('admin.inventory_management.purchase_order.pdf', compact('purchaseOrder'));
+
+        return $pdf->download('purchase_order_' . $purchaseOrder->id . '.pdf');
+    }
+
+
+    public function print($id)
+    {
+        $purchaseOrder = PurchaseOrder::with(['supplier', 'branch', 'purchaseOrderItems.item'])->findOrFail($id);
+
+        return view('admin.inventory_management.purchase_order.print', compact('purchaseOrder'));
+    }
+
+
 
     public function getData(Request $request)
     {
