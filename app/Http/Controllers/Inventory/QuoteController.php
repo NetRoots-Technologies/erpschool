@@ -59,6 +59,25 @@ class QuoteController extends Controller
 
         return view('admin.inventory_management.quote.index', compact('branches', 'type'));
     }
+
+        public function show($id)
+        {
+            $quote = Quote::with([
+                'supplier:id,name',
+                'branch:id,name',
+                'quoteItems' => function ($q) {
+                    $q->with('item:id,name,measuring_unit');
+                }
+            ])->findOrFail($id);
+
+                dd($quote); // <----- Check if data is coming
+
+        // return view('admin.inventory_management.quote.show', compact('quote'));
+        }
+
+
+
+
     public function approval()
     {
         if (!Gate::allows('Dashboard-list')) {

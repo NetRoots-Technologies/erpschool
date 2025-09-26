@@ -104,6 +104,12 @@ Quote
                     suppliers[y.id]={name: y.name,items: y.items}
                 })
             });
+  
+               //for view  display
+               $('#data_table').on('click', '.view-item', function () {
+                    const id = $(this).data('id');
+                    window.location.href = `/inventory/quotes/${id}`;
+                });
 
             $(`#item, #branch, #supplier`).select2().val('').trigger('change');
 
@@ -236,9 +242,13 @@ Quote
                             return nData
                         }
                     },
-                    { data: null, title: 'Action', width: "10%", orderable: false,
+                    { data: null, title: 'Action', width: "15%", orderable: false,
                         render: function (data, type, row, meta) {
-                            return `<span class="btn btn-sm btn-warning edit-item" data-id="${row.id}" "><i class="fa fa-pencil"></i></span> <span data-uri="${deleteUri}/${row.id}" class="btn btn-sm btn-danger delete-item"><i class="fa fa-trash"></i></span>`;
+return `
+    <span class="btn btn-sm btn-warning edit-item" data-id="${row.id}"><i class="fa fa-pencil"></i></span> 
+    <span data-uri="${deleteUri}/${row.id}" class="btn btn-sm btn-danger delete-item"><i class="fa fa-trash"></i></span> 
+    <span class="btn btn-sm btn-info view-item" data-id="${row.id}"><i class="fa fa-eye"></i></span>
+`;
                         }
                     },
                 ],
