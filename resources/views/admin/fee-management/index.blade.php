@@ -73,8 +73,72 @@
                             <i class="fa fa-clock-o"></i>
                         </div>
                         <div>
-                            <h6 class="mb-1">Pending Amount</h6>
+                            <h6 class="mb-1">Outstanding Amount</h6>
                             <h3 class="mb-0">Rs. {{ number_format($data['pending_amount']) }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Additional Statistics Row -->
+    <div class="row">
+        <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="icon-box icon-box-sm bg-success me-3" style="color: #212529 !important;">
+                            <i class="fa fa-check-circle"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-1">Paid Bills</h6>
+                            <h3 class="mb-0">{{ $data['paid_billings'] }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="icon-box icon-box-sm bg-warning me-3" style="color: #212529 !important;">
+                            <i class="fa fa-exclamation-triangle"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-1">Partial Bills</h6>
+                            <h3 class="mb-0">{{ $data['partial_billings'] }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="icon-box icon-box-sm bg-danger me-3" style="color: #212529 !important;">
+                            <i class="fa fa-times-circle"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-1">Pending Bills</h6>
+                            <h3 class="mb-0">{{ $data['pending_billings'] }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="icon-box icon-box-sm bg-secondary me-3" style="color: #212529 !important;">
+                            <i class="fa fa-file-text"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-1">Total Bills</h6>
+                            <h3 class="mb-0">{{ $data['total_billings'] }}</h3>
                         </div>
                     </div>
                 </div>

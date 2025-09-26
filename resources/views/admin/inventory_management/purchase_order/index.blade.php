@@ -203,6 +203,8 @@ Purchase Order
                 success: function (response) {
                     $(`#items`).empty();
                     const items = response.data;
+
+                    console.log(items);
                     if (items)
                         renderItems(items)
                 },

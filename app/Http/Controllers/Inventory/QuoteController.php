@@ -197,29 +197,12 @@ class QuoteController extends Controller
 
     public function getQuote(Request $request)
     {
+
         if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $date = Date('Y-m-d');
-
-        $items = Item::select(
-            "items.id",
-            "items.name",
-            "items.measuring_unit",
-            "quote_items.unit_price",
-            "quote_items.id as quote_item_id",
-            "quotes.id as quote_id"
-        )
-            ->leftJoin('supplier_items', 'items.id', '=', 'supplier_items.item_id')
-            ->leftJoin('quote_items', function ($join) use ($date, $request) {
-                $join->on('items.id', '=', 'quote_items.item_id')
-                    ->join('quotes', 'quote_items.quote_id', '=', 'quotes.id')
-                    ->whereDate('quotes.quote_date', '<=', $date)
-                    ->where('quotes.branch_id', $request['branch_id'])
-                    ->whereDate('quotes.due_date', '>=', $date);
-            })
-            ->where('supplier_items.supplier_id', $request['supplier_id'])
-            ->get();
+        // dd($request->all() ,  $date);
 
         // $items = Item::select(
         //     "items.id",
@@ -229,21 +212,17 @@ class QuoteController extends Controller
         //     "quote_items.id as quote_item_id",
         //     "quotes.id as quote_id"
         // )
-        // ->join('supplier_items', function ($join) use ($request) {
-        //     $join->on('items.id', '=', 'supplier_items.item_id')
-        //         ->where('supplier_items.supplier_id', $request['supplier_id']);
-        // })
-        // ->leftJoin('quote_items', function ($join) {
-        //     $join->on('items.id', '=', 'quote_items.item_id');
-        // })
-        // ->leftJoin('quotes', function ($join) use ($date, $request) {
-        //     $join->on('quote_items.quote_id', '=', 'quotes.id')
-        //         ->where('quotes.supplier_id', $request['supplier_id'])
-        //         ->where('quotes.branch_id', $request['branch_id'])
-        //         ->whereDate('quotes.quote_date', '<=', $date)
-        //         ->whereDate('quotes.due_date', '>=', $date);
-        // })
-        // ->get();
+        //     ->join('supplier_items', 'items.id', '=', 'supplier_items.item_id')
+        //     ->join('quote_items', function ($join) use ($date, $request) {
+        //         $join->on('items.id', '=', 'quote_items.item_id')
+        //             ->join('quotes', 'quote_items.quote_id', '=', 'quotes.id')
+        //             ->whereDate('quotes.quote_date', '<=', $date)
+        //             ->where('quotes.branch_id', $request['branch_id'])
+        //             ->whereDate('quotes.due_date', '>=', $date);
+        //     })
+        //     ->where('supplier_items.supplier_id', $request['supplier_id'])
+        //     ->get();
+
 
         $items = Item::select(
             "items.id",
@@ -253,23 +232,49 @@ class QuoteController extends Controller
             "quote_items.id as quote_item_id",
             "quotes.id as quote_id"
         )
-            ->join('supplier_items', function ($join) use ($request) {
-                $join->on('items.id', '=', 'supplier_items.item_id')
-                    ->where('supplier_items.supplier_id', $request['supplier_id']);
-            })
-            ->leftJoin('quotes', function ($join) use ($date, $request) {
-                $join->on('items.id', '=', 'items.id')
-                    ->where('quotes.supplier_id', $request['supplier_id'])
-                    ->where('quotes.branch_id', $request['branch_id'])
-                    ->whereDate('quotes.quote_date', '<=', $date)
-                    ->whereDate('quotes.due_date', '>=', $date);
-            })
-            ->leftJoin('quote_items', function ($join) {
-                $join->on('items.id', '=', 'quote_items.item_id')
-                    ->whereNotNull('quotes.id');
-            })
-            ->orderByDesc('quotes.id')
-            ->get();
+        ->join('supplier_items', function ($join) use ($request) {
+            $join->on('items.id', '=', 'supplier_items.item_id')
+                ->where('supplier_items.supplier_id', $request['supplier_id']);
+        })
+        ->leftJoin('quote_items', function ($join) {
+            $join->on('items.id', '=', 'quote_items.item_id');
+        })
+        ->leftJoin('quotes', function ($join) use ($date, $request) {
+            $join->on('quote_items.quote_id', '=', 'quotes.id')
+                ->where('quotes.supplier_id', $request['supplier_id'])
+                ->where('quotes.branch_id', $request['branch_id']);
+                // ->whereDate('quotes.quote_date', '<=', $date)
+                // ->whereDate('quotes.due_date', '>=', $date);
+        })
+        ->get();
+
+        dd( $items->toArray() );
+
+        // $items = Item::select(
+        //     "items.id",
+        //     "items.name",
+        //     "items.measuring_unit",
+        //     "quote_items.unit_price",
+        //     "quote_items.id as quote_item_id",
+        //     "quotes.id as quote_id"
+        // )
+        //     ->join('supplier_items', function ($join) use ($request) {
+        //         $join->on('items.id', '=', 'supplier_items.item_id')
+        //             ->where('supplier_items.supplier_id', $request['supplier_id']);
+        //     })
+        //     ->leftJoin('quotes', function ($join) use ($date, $request) {
+        //         $join->on('items.id', '=', 'items.id')
+        //             ->where('quotes.supplier_id', $request['supplier_id'])
+        //             ->where('quotes.branch_id', $request['branch_id'])
+        //             ->whereDate('quotes.quote_date', '<=', $date)
+        //             ->whereDate('quotes.due_date', '>=', $date);
+        //     })
+        //     ->leftJoin('quote_items', function ($join) {
+        //         $join->on('items.id', '=', 'quote_items.item_id')
+        //             ->whereNotNull('quotes.id');
+        //     })
+        //     ->orderByDesc('quotes.id')
+        //     ->get();
 
 
 

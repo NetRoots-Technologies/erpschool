@@ -59,7 +59,8 @@ class Students extends Model
         'company_id',
         'meal_option',
         'easy_urdu',
-        'status'
+        'status',
+        'is_active'
     ];
 
     public function getfullnameAttribute()
