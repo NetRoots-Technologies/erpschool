@@ -52,7 +52,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'inventory', 'as' => 'invent
     Route::post('/quotes/store', [QuoteController::class, 'store'])->name('quotes.store');
     Route::get('/quotes/destroy/{quote?}', [QuoteController::class, 'destroy'])->name('quotes.destroy');
     Route::post('/get/quotes/', [QuoteController::class, 'getQuote'])->name('get.quote');
-    Route::get('/quotes/{id}', [QuoteController::class, 'show'])->name('quotes.show');
+    Route::get('/quotes/food/{id}', [QuoteController::class, 'show'])->name('quotes.food.show');
 
 
     // Purchase Order
