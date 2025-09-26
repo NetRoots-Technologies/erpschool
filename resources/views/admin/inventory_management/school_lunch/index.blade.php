@@ -121,7 +121,7 @@
                             xhr.setRequestHeader('X-CSRF-TOKEN', token);
                 },
                 success: function(response) {
-                        console.log("🚀 ~ response>>", response)
+                        console.log(response.data)
                         let products = response.data;
                         let productHtml = "";
 
@@ -290,6 +290,7 @@
             });
 
             $("#finished_goods").on('change', function(e) {
+              
                 var selectedId = $(this).val();
                 var selectedText = $(this).find("option:selected").text().trim();
 

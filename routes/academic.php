@@ -132,6 +132,9 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'academic', 'as' => 'academi
     Route::get('student-attendance/{id}/pdf', [AttendanceController::class, 'generatePdf'])->name('student_attendance.pdf');
     Route::get('student_attendance/monthly/pdf', [AttendanceController::class, 'generateMonthlyPdf'])
     ->name('student_attendance.monthly.pdf');
+    Route::get('student_attendance/{id}', [AttendanceController::class, 'show'])->name('academic.student_attendance.show');
+
+
 
     Route::post('/import-studentAttendance', [AttendanceController::class, 'import'])->name('import.studentAttendance');
 

@@ -205,7 +205,6 @@ class MealBatchController extends Controller
         //     ->get();
 
 
-
         if (!Gate::allows('students')) {
             return abort(503);
         }

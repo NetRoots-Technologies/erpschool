@@ -97,7 +97,9 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'inventory', 'as' => 'invent
 
     //School Lunch
     Route::get('/student_lunch', [MealBatchController::class, 'index'])->name('school_lunch.school_lunch');
+
     Route::post('/student_lunch/store', [MealBatchController::class, 'store'])->name('school_lunch.store');
+
     Route::get('/student_lunch/view', [MealBatchController::class, 'view'])->name('school_lunch.view');
 
     Route::get('inventory/student/lunch/view/{class_id}/{section_id}', [MealBatchController::class, 'get_assigned_student'])->name('school_lunch.get_assigned_student');
