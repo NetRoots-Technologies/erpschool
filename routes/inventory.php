@@ -65,6 +65,9 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'inventory', 'as' => 'invent
     Route::get('/purchase_orders/pdf/{purchase_order?}', [PurchaseOrderController::class, 'pdf'])->name('purchase_order.pdf');
     Route::get('/purchase_orders/print/{purchase_order?}', [PurchaseOrderController::class, 'print'])->name('purchase_order.print');
 
+    // Zaheer
+    Route::get('/purchase_orders/show/{purchase_order?}', [PurchaseOrderController::class, 'showData'])->name('purchase_order.show');
+
 
     Route::post('/purchase_orders/change-status/{purchase_order?}/{status?}', [PurchaseOrderController::class, 'changeStatus'])->name('purchase_order.change.status');
     Route::post('/purchase_orders/change-pStatus/{purchase_order?}/{status?}', [PurchaseOrderController::class, 'changePaymentStatus'])->name('purchase_order.change.pStatus');
@@ -96,8 +99,8 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'inventory', 'as' => 'invent
     Route::get('/student_lunch', [MealBatchController::class, 'index'])->name('school_lunch.school_lunch');
     Route::post('/student_lunch/store', [MealBatchController::class, 'store'])->name('school_lunch.store');
     Route::get('/student_lunch/view', [MealBatchController::class, 'view'])->name('school_lunch.view');
-    Route::get('student_lunch/view/{id}', [MealBatchController::class, 'get_assigned_student'])->name('school_lunch.get_assigned_student');
 
+    Route::get('inventory/student/lunch/view/{class_id}/{section_id}', [MealBatchController::class, 'get_assigned_student'])->name('school_lunch.get_assigned_student');
     //staff lunch
     Route::get('/staff_lunch', [MealBatchController::class, 'emp_index'])->name('staff_lunch.emp_index');
     Route::post('/staff_lunch/store', [MealBatchController::class, 'emp_store'])->name('staff_lunch.emp_store');

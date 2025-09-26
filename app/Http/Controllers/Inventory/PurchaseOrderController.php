@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Inventory;
 
 use Exception;
 use Carbon\Carbon;
+use App\Models\Item;
 use App\Models\Inventry;
 use App\Models\Supplier;
 use App\Models\Admin\Branch;
@@ -13,6 +14,7 @@ use App\Models\PurchaseOrder;
 use App\Models\Account\Ledger;
 use App\Models\Admin\Branches;
 use App\Services\LedgerService;
+use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Admin\BankAccount;
 use App\Models\PurchaseOrderItem;
 use Illuminate\Support\Facades\DB;
@@ -20,7 +22,6 @@ use App\Http\Controllers\Controller;
 use App\Imports\PurchaseOrderImport;
 use Illuminate\Support\Facades\Gate;
 use Maatwebsite\Excel\Facades\Excel;
-use Barryvdh\DomPDF\Facade\Pdf;
 
 class PurchaseOrderController extends Controller
 {
@@ -465,6 +466,32 @@ class PurchaseOrderController extends Controller
         } catch (Exception $e) {
             return redirect()->back()->with('success', $e->getMessage());
         }
+    }
+
+    public function showData($id){
+    
+        $purchaseOrder = PurchaseOrder::where('id', $id)
+            ->select([
+                "id",
+                "supplier_id",
+                "branch_id",
+                "order_date",
+                "delivery_status",
+                "delivery_date",
+            ])
+            ->has('supplier')
+            ->has('branch')
+            ->has('purchaseOrderItems')
+            ->with([
+                "supplier:id,name",
+                "branch:id,name",
+                "purchaseOrderItems:id,item_id,purchase_order_id,quantity,unit_price,total_price,quote_item_price,measuring_unit",
+                "purchaseOrderItems.item:id,name",
+            ])->first();
+
+           
+        return view('admin.inventory_management.purchase_order.show', compact('purchaseOrder'));
+
     }
 
 }

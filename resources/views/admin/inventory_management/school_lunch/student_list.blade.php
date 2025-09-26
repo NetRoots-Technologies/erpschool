@@ -5,10 +5,9 @@ Served Students
 @stop
 
 @section('content')
-
 <div class="container-fluid">
-
     <a href="{{ route('inventory.school_lunch.view') }}" class="btn btn-primary my-3">Back</a>
+
     <div class="row justify-content-center my-4">
         <div class="col-12">
             <div class="card basic-form shadow-sm">
@@ -21,32 +20,33 @@ Served Students
                         <div class="col-md-4 fs-5">Served</div>
                     </div>
 
-                    @foreach ($student_batch_products as $student_batch_product)
-                    <div class="row py-2 border-bottom text-center">
-                        <div class="col-md-4">{{ $student_batch_product->student->first_name }} {{ $student_batch_product->student->last_name }}</div>
-                        <div class="col-md-4">{{ $student_batch_product->product->name }}</div>
-                        <div class="col-md-4 {{ $student_batch_product->assigned == 1 ? 'text-success' : 'text-danger' }}">
-                            <i class="fa fa-{{ $student_batch_product->assigned == 1 ? 'check' : 'times' }}"></i>
-                        </div>
-                    </div>
-                @endforeach
-
+                    @forelse ($student_batch_products as $batch)
+                        @foreach ($batch->mealBatchDetails as $detail)
+                            <div class="row py-2 border-bottom text-center">
+                                <div class="col-md-4">
+                                    {{ optional($detail->student)->first_name }} {{ optional($detail->student)->last_name }}
+                                </div>
+                                <div class="col-md-4">
+                                    {{ optional($batch->product)->name }}
+                                </div>
+                                <div class="col-md-4 {{ ($detail->assigned ?? 0) == 1 ? 'text-success' : 'text-danger' }}">
+                                    <i class="fa fa-{{ ($detail->assigned ?? 0) == 1 ? 'check' : 'times' }}"></i>
+                                </div>
+                            </div>
+                        @endforeach
+                    @empty
+                        <div class="py-3 text-center text-muted">No served students found.</div>
+                    @endforelse
 
                 </div>
             </div>
         </div>
     </div>
-
 </div>
-
 @endsection
 
 @section('js')
 <script>
-  $(document).ready(function () {
-    'use strict';
-
-});
-
+$(function(){ 'use strict'; });
 </script>
 @endsection

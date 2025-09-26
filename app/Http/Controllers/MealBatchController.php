@@ -24,10 +24,11 @@ use App\Models\Academic\StudentAttendance;
 class MealBatchController extends Controller
 {
     protected $ledgerService;
-    public function __construct(LedgerService $ledgerService) {
+    public function __construct(LedgerService $ledgerService)
+    {
         $this->ledgerService = $ledgerService;
     }
-    
+
     public function index()
     {
         if (!Gate::allows('students')) {
@@ -71,33 +72,33 @@ class MealBatchController extends Controller
 
         // DB::beginTransaction();
         // try {
-            $product = Inventry::find($request->finished_goods);
+        $product = Inventry::find($request->finished_goods);
 
-            $existingBatch = MealBatch::where('branch_id', $request->branch)
-                ->where('parent_id', $request->class)
-                ->where('date', $request->date)
-                ->where('batch_type', $request->batch_type)
-                ->exists();
+        $existingBatch = MealBatch::where('branch_id', $request->branch)
+            ->where('parent_id', $request->class)
+            ->where('date', $request->date)
+            ->where('batch_type', $request->batch_type)
+            ->exists();
 
-            if ($existingBatch) {
-                throw new \Exception("Already assigned");
-            }
+        if ($existingBatch) {
+            throw new \Exception("Already assigned");
+        }
 
-            $assigned_count = collect($request->assigned)->filter(function ($value) {
-                return $value == 1;
-            })->count();
+        $assigned_count = collect($request->assigned)->filter(function ($value) {
+            return $value == 1;
+        })->count();
 
-            if ($product->quantity < $assigned_count) {
-                throw new \Exception("Not enough products in inventory");
-            }
+        if ($product->quantity < $assigned_count) {
+            throw new \Exception("Not enough products in inventory");
+        }
 
-            $product->decrement('quantity', $assigned_count);
-            $product->save();
+        $product->decrement('quantity', $assigned_count);
+        $product->save();
 
 
-          foreach ($request->student_section_id as $index => $section_id) {
+        foreach ($request->student_section_id as $index => $section_id) {
 
-                $mealBatch = MealBatch::create([
+            $mealBatch = MealBatch::create([
                 "creator_id" => Auth::user()->id,
                 "branch_id" => $request->branch,
                 "parent_id" => $request->class,
@@ -107,76 +108,76 @@ class MealBatchController extends Controller
                 "product_id" => $request->finished_goods,
                 "batch_type" => $request->batch_type,
             ]);
-            }
+        }
 
 
 
-            foreach ($request->student_id as $index => $student_id) {
+        foreach ($request->student_id as $index => $student_id) {
 
-                MealBatchDetail::create([
-                    "batch_id" => $mealBatch->id,
-                    "parent_id" => $student_id,
-                    "parent_type" => Students::class,
-                    "product_id" => $request->finished_goods,
-                    "assigned" => $request->assigned[$index],
-                ]);
-
-                // $studentName = Ledger::where('ledgers.id', $request->ledger_id)
-                //     ->join('students', 'students.id', '=', 'ledgers.parent_type_id')
-                //     ->join('classes', 'classes.id', '=', 'students.class_id')
-                //     ->join('sections', 'sections.id', '=', 'students.section_id')
-                //     ->select(
-                //         'ledgers.id',
-                //         'ledgers.parent_type_id',
-                //         'students.id as student_id',
-                //         'students.first_name',
-                //         'students.last_name',
-                //         'classes.name as class_name',
-                //         'sections.name as section_name'
-                //     )
-                //     ->first();
-
-                // $name = "$studentName->first_name $studentName->last_name[$studentName->class_name - $studentName->section_name]";
-
-                // $sudentLedger = Ledger::where('id', $request->ledger_id)->first();
-
-                // $data = [
-                //     "amount" => $request->total_price,
-                //     "narration" => "Student Canteen Transaction $name",
-                //     "branch_id" => $sudentLedger->branch_id,
-                //     "entry_type_id" => 8,
-                // ];
-                // $entry = $this->ledgerService->createEntry($data);
-
-                // $dataitem = [
-                //     "entry_type_id" => 8,
-                //     "entry_id" => $entry->id,
-                //     "ledger_id" => $sudentLedger->id,
-                //     "amount" => $request->total_price,
-                //     "balanceType" => 'c',
-                //     "narration" => $data['narration'],
-                // ];
-
-                // $this->ledgerService->createEntryItems($dataitem);
-
-                // $dataitem = [
-                //     "entry_type_id" => 8,
-                //     "entry_id" => $entry->id,
-                //     "ledger_id" => 1,//cash ledger is 1 
-                //     "amount" => $request->total_price,
-                //     "balanceType" => 'd',
-                //     "narration" => $data['narration'],
-                // ];
-
-                // $this->ledgerService->createEntryItems($dataitem);
-
-            }
-
-            DB::commit();
-            return response()->json([
-                'success' => true,
-                'message' => 'Lunch assigned successfully',
+            MealBatchDetail::create([
+                "batch_id" => $mealBatch->id,
+                "parent_id" => $student_id,
+                "parent_type" => Students::class,
+                "product_id" => $request->finished_goods,
+                "assigned" => $request->assigned[$index],
             ]);
+
+            // $studentName = Ledger::where('ledgers.id', $request->ledger_id)
+            //     ->join('students', 'students.id', '=', 'ledgers.parent_type_id')
+            //     ->join('classes', 'classes.id', '=', 'students.class_id')
+            //     ->join('sections', 'sections.id', '=', 'students.section_id')
+            //     ->select(
+            //         'ledgers.id',
+            //         'ledgers.parent_type_id',
+            //         'students.id as student_id',
+            //         'students.first_name',
+            //         'students.last_name',
+            //         'classes.name as class_name',
+            //         'sections.name as section_name'
+            //     )
+            //     ->first();
+
+            // $name = "$studentName->first_name $studentName->last_name[$studentName->class_name - $studentName->section_name]";
+
+            // $sudentLedger = Ledger::where('id', $request->ledger_id)->first();
+
+            // $data = [
+            //     "amount" => $request->total_price,
+            //     "narration" => "Student Canteen Transaction $name",
+            //     "branch_id" => $sudentLedger->branch_id,
+            //     "entry_type_id" => 8,
+            // ];
+            // $entry = $this->ledgerService->createEntry($data);
+
+            // $dataitem = [
+            //     "entry_type_id" => 8,
+            //     "entry_id" => $entry->id,
+            //     "ledger_id" => $sudentLedger->id,
+            //     "amount" => $request->total_price,
+            //     "balanceType" => 'c',
+            //     "narration" => $data['narration'],
+            // ];
+
+            // $this->ledgerService->createEntryItems($dataitem);
+
+            // $dataitem = [
+            //     "entry_type_id" => 8,
+            //     "entry_id" => $entry->id,
+            //     "ledger_id" => 1,//cash ledger is 1 
+            //     "amount" => $request->total_price,
+            //     "balanceType" => 'd',
+            //     "narration" => $data['narration'],
+            // ];
+
+            // $this->ledgerService->createEntryItems($dataitem);
+
+        }
+
+        DB::commit();
+        return response()->json([
+            'success' => true,
+            'message' => 'Lunch assigned successfully',
+        ]);
 
         // } catch (\Throwable $e) {
         //     DB::rollBack();
@@ -199,20 +200,83 @@ class MealBatchController extends Controller
         if (!Gate::allows('students')) {
             return abort(503);
         }
-        $food_batches = MealBatch::with(['user', 'branch', 'class', 'product', 'section', 'mealBatchDetails'])
-            ->where('parent_type', AcademicClass::class)
-            ->get();
-        return response()->json(["success" => true, 'data' => $food_batches]);
-    }
+        // $food_batches = MealBatch::with(['user', 'branch', 'class', 'product', 'section', 'mealBatchDetails'])
+        //     ->where('parent_type', AcademicClass::class)
+        //     ->get();
 
-    public function get_assigned_student($id)
-    {
+
+
         if (!Gate::allows('students')) {
             return abort(503);
         }
-        $student_batch_products = MealBatchDetail::where('batch_id', $id)->with(['student', 'product'])->get();
 
-        return view('admin.inventory_management.school_lunch.student_list', compact('student_batch_products'));
+        // $food_batches = MealBatch::with(['user', 'branch', 'class', 'product', 'section', 'mealBatchDetails'])
+        //     ->where('parent_type', AcademicClass::class)
+        //     ->get();
+
+        $food_batches = MealBatch::query()
+            ->where('meal_batches.parent_type', AcademicClass::class)
+            ->leftJoin('classes', function ($join) {
+                $join->on('classes.id', '=', 'meal_batches.parent_id')
+                    ->where('meal_batches.parent_type', AcademicClass::class);
+            })
+            ->leftJoin('sections', 'sections.id', '=', 'meal_batches.section_id')
+            ->leftJoin('branches', 'branches.id', '=', 'meal_batches.branch_id')
+            ->leftJoin('products', 'products.id', '=', 'meal_batches.product_id')
+            ->leftJoin('users', 'users.id', '=', 'meal_batches.creator_id')
+            ->selectRaw('
+                classes.id     as class_id,
+                classes.name   as class_name,
+                sections.id    as section_id,
+                sections.name  as section_name,
+                meal_batches.date as assign_date,
+                branches.name  as branch_name,
+                users.name as user_name,
+                products.name as pname,
+                meal_batches.batch_type as type
+            ')
+            ->groupBy(
+                'classes.id',
+                'classes.name',
+                'sections.id',
+                'sections.name',
+                'meal_batches.date',
+                'branches.name',
+            )
+            ->orderBy('classes.name')
+            ->orderBy('sections.name')
+            ->orderBy('assign_date')
+            ->get();
+
+        return response()->json(["success" => true, 'data' => $food_batches]);
+    }
+
+    public function get_assigned_student(Request $request, $classId, $sectionId, $date = null)
+    {
+        if (!Gate::allows('students')) {
+            abort(503);
+        }
+
+        $student_batch_products = MealBatch::query()
+            ->where('parent_type', AcademicClass::class)
+            ->where('parent_id', $classId)
+            ->where('section_id', $sectionId)
+            ->when($date, fn($q) => $q->whereDate('assign_date', $date))
+            ->with([
+                'branch:id,name',
+                'product:id,name',
+                'mealBatchDetails' => function ($q) use ($date) {
+                    // if you store date on detail instead:
+                    $q->when($date, fn($qq) => $qq->whereDate('assign_date', $date));
+                    $q->with(['student:id,first_name,last_name']);
+                },
+            ])
+            ->get();
+
+
+        return view('admin.inventory_management.school_lunch.student_list',
+            compact('student_batch_products')
+        );
     }
 
     //for employees
