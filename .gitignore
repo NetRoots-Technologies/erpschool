@@ -1,3 +1,8 @@
+# Never delete local env or storage symlink
+!.env
+!/public/storage
+
+
 /vendor
 /node_modules
 /storage/*.key

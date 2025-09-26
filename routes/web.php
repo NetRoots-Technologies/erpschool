@@ -131,7 +131,6 @@ Route::get('/print-preview/{tableName}',[PrintableController::class,'printPrevie
     Route::get('get-components/{subjectId}', [SkillsController::class, 'getComponents']);
 
 
-
 // Include Admin Routes
 require __DIR__.'/admin.php';
 
