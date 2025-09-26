@@ -47,13 +47,16 @@ Product
                             <input type="number" class="form-control" name="sale_price" id="sale_price" required>
                         </div>
                         <div class="addProducts d-flex justify-content-end">
-                            <select id="addItem" name="addItem" class="form-select">
-                                <option value="" selected disabled>Select Item</option>
-                                @foreach ($ingredients as $ingredient)
-                                <option value="{{ $ingredient->id }}">{{ "$ingredient->name
-                                    ($ingredient->measuring_unit)" }}</option>
-                                @endforeach
-                            </select>
+                          <select id="addItem" name="addItem" class="form-select">
+                            <option value="" selected disabled>Select Item</option>
+                            @foreach ($ingredients as $ingredient)
+                                <option value="{{ $ingredient->id }}" 
+                                        data-quantity="{{ $ingredient->quantity }}">
+                                    {{ "$ingredient->name ($ingredient->measuring_unit) - Available: $ingredient->quantity" }}
+                                </option>
+                            @endforeach
+                        </select>
+
                         </div>
                     </div>
                     <div id="productItems" class="row p-2 m-1"></div>
@@ -185,7 +188,8 @@ Product
                         <input type="number" id="itemQuantity-${item.id}" class="form-control item-quantity"
                             data-id="${item.id}" name="quantity[${global_count}]"
                                 min="0.01" step="any" value="0" required>
-                    </div>
+                               
+                    </div>        
 
                     <div class="col-2 mb-3">
                         <label for="unit-${item.id}" class="form-label">Unit Price</label>

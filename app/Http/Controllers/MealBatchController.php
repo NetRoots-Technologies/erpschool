@@ -199,9 +199,44 @@ class MealBatchController extends Controller
         if (!Gate::allows('students')) {
             return abort(503);
         }
-        $food_batches = MealBatch::with(['user', 'branch', 'class', 'product', 'section', 'mealBatchDetails'])
-            ->where('parent_type', AcademicClass::class)
-            ->get();
+
+        // $food_batches = MealBatch::with(['user', 'branch', 'class', 'product', 'section', 'mealBatchDetails'])
+        //     ->where('parent_type', AcademicClass::class)
+        //     ->get();
+
+         $food_batches = MealBatch::query()
+    ->where('meal_batches.parent_type', AcademicClass::class)
+    // join the "class" table by mapping parent_id -> classes.id, but only for this type
+    ->leftJoin('classes', function ($join) {
+        $join->on('classes.id', '=', 'meal_batches.parent_id')
+             ->where('meal_batches.parent_type', AcademicClass::class);
+    })
+    ->leftJoin('sections', 'sections.class_id', '=', 'classes.id')
+    ->leftJoin('branches', 'branches.id', '=', 'meal_batches.branch_id')
+    ->leftJoin('products', 'products.id', '=', 'meal_batches.product_id')
+    ->selectRaw('
+        classes.id     as class_id,
+        classes.name   as class_name,
+        sections.id    as section_id,
+        sections.name  as section_name,
+        meal_batches.date as assign_date,
+        branches.name  as branch_name,
+        GROUP_CONCAT(DISTINCT products.name ORDER BY products.name SEPARATOR ", ") as lunches,
+        COUNT(*)       as records_count,
+        MIN(meal_batches.id) as any_id
+    ')
+    ->groupBy(
+        'classes.id','classes.name',
+        'sections.id','sections.name',
+        'meal_batches.date',
+        'branches.name',
+    )
+    ->orderBy('classes.name')
+    ->orderBy('sections.name')
+    ->orderBy('assign_date')
+    ->get();
+
+        
         return response()->json(["success" => true, 'data' => $food_batches]);
     }
 

@@ -51,22 +51,36 @@ class StudentAttendanceService
             ->addColumn('branch', fn($row) => $row->branch->name ?? 'N/A')
             ->addColumn('AcademicClass', fn($row) => $row->AcademicClass->name ?? 'N/A')
             ->addColumn('section', fn($row) => $row->section->name ?? 'N/A')
-            ->addColumn('action', function ($row) {
-                $btn = '<div style="display: flex;">';
-                if (Gate::allows('AttendanceReport-edit')) {
-                $btn .= '<a href="' . route("academic.student_attendance.edit", $row->id) . '" class="btn btn-primary btn-sm" style="margin-right: 4px;">Edit</a>';
-                }
-                if (Gate::allows('AttendanceReport-delete')) {
+           ->addColumn('action', function ($row) {
+        $btn = '<div style="display: flex; gap: 4px;">';
 
-                $btn .= '<form method="POST" action="' . route("academic.student_attendance.destroy", $row->id) . '" style="margin-right: 4px;">';
-                $btn .= '<button type="submit" data-id="' . $row->id . '" data-url="' . route("academic.student_attendance.destroy", $row->id) . '" class="btn btn-danger btn-sm deleteBtn">Delete</button>';
-                $btn .= method_field('DELETE') . csrf_field();
-                $btn .= '</form>';
-                }
-                $btn .= '<a href="' . route("academic.student_attendance.pdf", $row->id) . '" class="btn btn-warning btn-sm">PDF</a>';
-                $btn .= '</div>';
-                return $btn;
-            })
+        $btn .= '<a href="' . route("academic.student_attendance.show", $row->id) . '" class="btn btn-info btn-sm" title="View">
+                    <i class="fa fa-eye"></i>
+                </a>';
+
+            if (Gate::allows('AttendanceReport-edit')) {
+                $btn .= '<a href="' . route("academic.student_attendance.edit", $row->id) . '" class="btn btn-primary btn-sm" title="Edit">
+                            <i class="fa fa-edit"></i>
+                        </a>';
+            }
+
+            if (Gate::allows('AttendanceReport-delete')) {
+                $btn .= '<form method="POST" action="' . route("academic.student_attendance.destroy", $row->id) . '">
+                            <button type="submit" data-id="' . $row->id . '" data-url="' . route("academic.student_attendance.destroy", $row->id) . '" class="btn btn-danger btn-sm deleteBtn" title="Delete">
+                                <i class="fa fa-trash"></i>
+                            </button>'
+                            . method_field('DELETE') . csrf_field() .
+                        '</form>';
+            }
+
+            $btn .= '<a href="' . route("academic.student_attendance.pdf", $row->id) . '" class="btn btn-warning btn-sm" title="Download PDF">
+                        <i class="fa fa-file-pdf"></i>
+                    </a>';
+
+            $btn .= '</div>';
+            return $btn;
+        })
+
             ->rawColumns(['action', 'branch', 'section', 'AcademicClass'])
             ->make(true);
     }

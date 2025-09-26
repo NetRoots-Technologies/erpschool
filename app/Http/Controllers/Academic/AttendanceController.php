@@ -118,10 +118,14 @@ class AttendanceController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
-    {
+   public function show($id)
+{
+    $attendance = StudentAttendance::with(['attendanceData.student', 'AcademicClass', 'section'])->findOrFail($id);
+    $attendanceData = $attendance->attendanceData;
 
-    }
+    return view('acadmeic.attendance.show', compact('attendance', 'attendanceData'));
+}
+
 
     /**
      * Show the form for editing the specified resource.

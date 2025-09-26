@@ -79,6 +79,8 @@ class InventryController extends Controller
 
     public function listing(Request $request)
     {
+
+       
         if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
@@ -94,13 +96,16 @@ class InventryController extends Controller
             'type'
         ]);
         if ($request->type == "food") {
+
             $inventory = $inventory->Canteen();
         }
         if ($request->type == "uniform") {
             $inventory = $inventory->where('name', 'like', "%uniform%");
         }
-        $inventory = $inventory->latest()->get();
 
+        
+        $inventory = $inventory->where('type','p')->latest()->get();
+      
         return response()->json(["success" => true, "message" => "Message", "data" => $inventory], 200);
 
     }
