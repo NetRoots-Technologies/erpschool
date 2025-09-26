@@ -53,6 +53,18 @@ class SuppliementaryBudgetController extends Controller
                 ->addColumn('approved_by_user', function ($row) {
                     return $row->approvedByUser->name ?? '-';
                 })
+
+                ->addColumn('reason', function ($row) {
+                    return '
+                        <button type="button" 
+                                class="btn btn-info btn-sm view-reason" 
+                                data-reason="' . e($row->reason ?? 'No reason') . '" 
+                                data-toggle="modal" 
+                                data-target="#exampleModal">
+                            View Reason
+                        </button>';
+                                })
+
                 // ->addColumn('action', function ($row) {
                 //     return '
                 //         <a href="' . route('inventory.supplementory.edit', $row->id) . '" class="btn btn-sm btn-primary">Edit</a>
@@ -62,7 +74,7 @@ class SuppliementaryBudgetController extends Controller
                 //         </form>
                 //     ';
                 // })
-                ->rawColumns(['budget_name', 'category_name', 'subcatgory_name', 'status', 'requested_by_user', 'approved_by_user'])
+                ->rawColumns(['budget_name', 'category_name', 'subcatgory_name', 'status', 'requested_by_user', 'approved_by_user', 'reason'])
                 ->make(true);
         }
         return view('admin.supplementary_budgets.index');
@@ -141,6 +153,17 @@ class SuppliementaryBudgetController extends Controller
                     return $row->subcategory->title ?? '-';
                 })
 
+                ->addColumn('reason', function ($row) {
+                    return '
+                        <button type="button" 
+                                class="btn btn-info btn-sm view-reason" 
+                                data-reason="' . e($row->reason ?? 'No reason') . '" 
+                                data-toggle="modal" 
+                                data-target="#exampleModal">
+                            View Reason
+                        </button>';
+                                })
+
                 ->addColumn('status', function ($row) {
                     if ($row->status == 'rejected') {
                         return '<span style = "font-size: 14px; background: #ff0000; color: white;">' . ucfirst($row->status) . '</span>';
@@ -173,7 +196,7 @@ class SuppliementaryBudgetController extends Controller
                 })
 
 
-                ->rawColumns(['action', 'budget_name', 'category_name', 'subcatgory_name', 'status', 'requested_by_user', 'approved_by_user'])
+                ->rawColumns(['action', 'budget_name', 'category_name', 'subcatgory_name', 'status', 'requested_by_user', 'approved_by_user' , 'reason'])
                 ->make(true);
         }
         return view('admin.supplementary_budgets.request_list');
@@ -293,10 +316,10 @@ class SuppliementaryBudgetController extends Controller
 
             // Formula: Allocated - Supplementary - Expense
             $variance = $allocated_budget - $supplementary_budget - $actual_expense;
-
+            $assignBudget = $allocated_budget - $supplementary_budget;
             return [
                 'month'                => $month,
-                'allocated_budget'     => number_format($allocated_budget, 2, '.', ''),
+                'allocated_budget'     => number_format($assignBudget, 2, '.', ''),
                 'supplementary_budget' => number_format($supplementary_budget, 2, '.', ''),
                 'actual_expense'       => number_format($actual_expense, 2, '.', ''),
                 'variance'             => number_format($variance, 2, '.', ''),

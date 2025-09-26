@@ -2,96 +2,94 @@
 @section('title', 'Edit Budget')
 
 @section('content')
-<div class="container-fluid">
+    <div class="container-fluid">
 
-    <div class="card">
-        <div class="card-header">
-            Edit Budget
-        </div>
-        <div class="card-body">
-            <form id="budgetForm">
-                @csrf
-                @method('PUT')
-                <input type="hidden" id="budgetId" value="{{ $budget->id }}">
+        <div class="card">
+            <div class="card-header">
+                Edit Budget
+            </div>
+            <div class="card-body">
+                <form id="budgetForm">
+                    @csrf
+                    @method('PUT')
+                    <input type="hidden" id="budgetId" value="{{ $budget->id }}">
 
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label>Budget Name</label>
-                        <input type="text" name="title" class="form-control" 
-                               value="{{ $budget->title }}" required>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label>Budget Name</label>
+                            <input type="text" name="title" class="form-control" value="{{ $budget->title }}" required>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label>Plan(Year)</label>
+                            <input type="text" class="form-control" value="{{ $budget->timeFrame }}" name="timeFrame"
+                                id="timeFrame" readonly>
+                        </div>
+
+                        <div class="col-md-12 mb-3">
+                            <label>Annual Amount</label>
+                            <input type="number" name="amount" id="annualAmount" class="form-control"
+                                value="{{ $budget->amount }}" required>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label>Start Date</label>
+                            <input type="date" name="startDate" id="startDate" class="form-control"
+                                value="{{ $budget->startDate }}" required>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label>End Date</label>
+                            <input type="date" name="endDate" id="endDate" class="form-control"
+                                value="{{ $budget->endDate }}" required>
+                        </div>
+
+                        <div class="col-md-12 mb-3">
+                            <label>Description</label>
+                            <textarea name="description" id="description" class="form-control">{{ $budget->description }}</textarea>
+                        </div>
+
+                        <div class="col-md-12 text-end">
+                            <button type="button" id="generateTable" class="btn btn-primary">Next</button>
+                        </div>
                     </div>
-
-                    <div class="col-md-6 mb-3">
-                        <label>Plan(Year)</label>
-                        <input type="text" class="form-control" value="{{ $budget->timeFrame }}" 
-                               name="timeFrame" id="timeFrame" readonly>
-                    </div>
-
-                    <div class="col-md-12 mb-3">
-                        <label>Annual Amount</label>
-                        <input type="number" name="amount" id="annualAmount" class="form-control" 
-                               value="{{ $budget->amount }}" required>
-                    </div>
-
-                    <div class="col-md-6 mb-3">
-                        <label>Start Date</label>
-                        <input type="date" name="startDate" id="startDate" class="form-control" 
-                               value="{{ $budget->startDate }}" required>
-                    </div>
-
-                    <div class="col-md-6 mb-3">
-                        <label>End Date</label>
-                        <input type="date" name="endDate" id="endDate" class="form-control" 
-                               value="{{ $budget->endDate }}" required>
-                    </div>
-
-                    <div class="col-md-12 mb-3">
-                        <label>Description</label>
-                        <textarea name="description" id="description" class="form-control">{{ $budget->description }}</textarea>
-                    </div>
-
-                    <div class="col-md-12 text-end">
-                        <button type="button" id="generateTable" class="btn btn-primary">Next</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    {{-- Monthly Breakdown Table --}}
-    <div class="card mt-4 d-none" id="monthlyCard">
-        <div class="card-header">Monthly Breakdown</div>
-        <div class="card-body">
-            <div id="monthlyTable"></div>
-            <div class="text-end mt-3">
-                <button class="btn btn-success" id="finalSave">Update</button>
+                </form>
             </div>
         </div>
-    </div>
 
-</div>
+        {{-- Monthly Breakdown Table --}}
+        <div class="card mt-4 d-none" id="monthlyCard">
+            <div class="card-header">Monthly Breakdown</div>
+            <div class="card-body">
+                <div id="monthlyTable"></div>
+                <div class="text-end mt-3">
+                    <button class="btn btn-success" id="finalSave">Update</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
 @endsection
 
 @section('js')
-<script>
+    <script>
+        // Step 1: Generate breakdown table on Next click
+        $('#generateTable').on('click', function() {
+            let name = $('input[name="title"]').val();
+            let amount = parseFloat($('#annualAmount').val());
+            let start_date = $('#startDate').val();
+            let end_date = $('#endDate').val();
+            let description = $('#description').val();
+            let timeFrame = $('#timeFrame').val();
 
-    // Step 1: Generate breakdown table on Next click
-    $('#generateTable').on('click', function() {
-        let name = $('input[name="title"]').val();
-        let amount = parseFloat($('#annualAmount').val());
-        let start_date = $('#startDate').val();
-        let end_date = $('#endDate').val();
-        let description = $('#description').val();
-        let timeFrame = $('#timeFrame').val();
+            if (!name || !amount || !start_date || !end_date) {
+                alert("Please fill all required fields");
+                return;
+            }
 
-        if (!name || !amount || !start_date || !end_date) {
-            alert("Please fill all required fields");
-            return;
-        }
+            let allowed_spend = (amount / 12).toFixed(2);
 
-        let allowed_spend = (amount / 12).toFixed(2);
-
-         let table = `
+            let table = `
             <table class="table table-bordered">
                 <thead>
                     <tr>
@@ -126,8 +124,8 @@
             $('#monthlyCard').removeClass('d-none');
         });
 
-    // Step 2: Final Save - Send all data with breakdown
-    $('#finalSave').on('click', function() {
+        // Step 2: Final Save - Send all data with breakdown
+        $('#finalSave').on('click', function() {
             let budgetData = {
                 _token: "{{ csrf_token() }}",
                 name: $('input[name="title"]').val(),
@@ -147,7 +145,7 @@
                 });
             });
 
-         var url = "{{ route('inventory.budget.update', $budget->id) }}";
+            var url = "{{ route('inventory.budget.update', $budget->id) }}";
 
             $.ajax({
                 url: url,
@@ -162,27 +160,28 @@
                     }
                 }
             });
-    });
+        });
 
-    $('#startDate').on('change', function () {
-    let startDate = new Date($(this).val());
+        $('#startDate').on('change', function() {
+            const raw = $(this).val();
+            if (!raw) return;
 
-    if (!isNaN(startDate.getTime())) {
-        // Ek saal add karo
-        let endDate = new Date(startDate);
-        endDate.setFullYear(endDate.getFullYear() + 1);
+            const [y, m, d] = raw.split('-').map(Number);
+            const start = new Date(Date.UTC(y, m - 1, d));
 
-        // Format yyyy-mm-dd banana hai
-        let day = ("0" + endDate.getDate()).slice(-2);
-        let month = ("0" + (endDate.getMonth() + 1)).slice(-2);
-        let year = endDate.getFullYear();
 
-        let formattedDate = `${year}-${month}-${day}`;
-        $('#endDate').val(formattedDate);
-    }
-    });
+            const end = new Date(start);
+            end.setUTCFullYear(end.getUTCFullYear() + 1);
+            end.setUTCDate(end.getUTCDate() - 1);
 
-    $(document).on('input', '.allocated_amount', function() {
+            const yyyy = end.getUTCFullYear();
+            const mm = String(end.getUTCMonth() + 1).padStart(2, '0');
+            const dd = String(end.getUTCDate()).padStart(2, '0');
+
+            $('#endDate').val(`${yyyy}-${mm}-${dd}`);
+        });
+
+        $(document).on('input', '.allocated_amount', function() {
             let value = parseFloat($(this).val()) || 0;
             let row = $(this).closest('tr');
             row.find('.allowed-spend').val(value);
@@ -211,5 +210,5 @@
             let value = parseFloat($(this).val()) || 0;
             row.find('.allowed-spend').val(value);
         });
-</script>
+    </script>
 @endsection

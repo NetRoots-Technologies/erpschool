@@ -139,7 +139,7 @@
                 });
             });
 
-            
+
 
             $.ajax({
                 url: "{{ route('inventory.budget.store') }}",
@@ -157,22 +157,24 @@
         });
 
         $('#startDate').on('change', function() {
-            let startDate = new Date($(this).val());
+            const raw = $(this).val(); 
+            if (!raw) return;
 
-            if (!isNaN(startDate.getTime())) {
-                // Ek saal add karo
-                let endDate = new Date(startDate);
-                endDate.setFullYear(endDate.getFullYear() + 1);
+            const [y, m, d] = raw.split('-').map(Number);
+            const start = new Date(Date.UTC(y, m - 1, d));
 
-                // Format yyyy-mm-dd banana hai
-                let day = ("0" + endDate.getDate()).slice(-2);
-                let month = ("0" + (endDate.getMonth() + 1)).slice(-2);
-                let year = endDate.getFullYear();
+        
+            const end = new Date(start);
+            end.setUTCFullYear(end.getUTCFullYear() + 1);
+            end.setUTCDate(end.getUTCDate() - 1);
 
-                let formattedDate = `${year}-${month}-${day}`;
-                $('#endDate').val(formattedDate);
-            }
+            const yyyy = end.getUTCFullYear();
+            const mm = String(end.getUTCMonth() + 1).padStart(2, '0');
+            const dd = String(end.getUTCDate()).padStart(2, '0');
+
+            $('#endDate').val(`${yyyy}-${mm}-${dd}`);
         });
+
 
 
 
