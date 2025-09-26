@@ -55,25 +55,15 @@ class QuoteController extends Controller
             ])
             ->select(['id', 'name'])
             ->get();
-        // dd($branches->toArray());
 
         return view('admin.inventory_management.quote.index', compact('branches', 'type'));
     }
 
-        public function show($id)
-        {
-            $quote = Quote::with([
-                'supplier:id,name',
-                'branch:id,name',
-                'quoteItems' => function ($q) {
-                    $q->with('item:id,name,measuring_unit');
-                }
-            ])->findOrFail($id);
-
-                dd($quote); // <----- Check if data is coming
-
-        // return view('admin.inventory_management.quote.show', compact('quote'));
-        }
+    public function show($id)
+    {
+        $quote = Quote::with(['quoteItems.item', 'branch', 'supplier'])->findOrFail($id);
+        return view('admin.inventory_management.quote.show', compact('quote'));
+    }
 
 
 
@@ -88,6 +78,8 @@ class QuoteController extends Controller
 
     public function store(Request $request)
     {
+
+
         if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
@@ -142,14 +134,15 @@ class QuoteController extends Controller
         try {
             $quote->delete();
             return response()->json(["success" => true, 'message' => 'Deleted Successfully', 'data' => []], 200);
-        }
-        catch (\Exception $ex) {
+        } catch (\Exception $ex) {
             return response()->json(["success" => false, "message" => $ex->getMessage()], 500);
         }
     }
 
     public function getData(Request $request)
     {
+
+
         if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
@@ -166,11 +159,15 @@ class QuoteController extends Controller
                 "branch:id,name",
                 "items:id,name,measuring_unit",
                 "items.quoteItem:id,quote_id,item_id,quantity,unit_price,total_price",
+                "quoteItems.item",
             ]);
 
         $supplier = $request->type == 'food' ? $supplier->food() : $supplier->stationary();
 
         $supplier = $supplier->get();
+
+
+
         return response()->json(["success" => true, 'message' => 'Listing', 'data' => $supplier], 200);
     }
     public function changeStatus(Request $request, Quote $requisition)
@@ -202,8 +199,7 @@ class QuoteController extends Controller
             return abort(503);
         }
         $date = Date('Y-m-d');
-        // dd($request->all() ,  $date);
-
+    
         // $items = Item::select(
         //     "items.id",
         //     "items.name",
@@ -212,74 +208,56 @@ class QuoteController extends Controller
         //     "quote_items.id as quote_item_id",
         //     "quotes.id as quote_id"
         // )
-        //     ->join('supplier_items', 'items.id', '=', 'supplier_items.item_id')
-        //     ->join('quote_items', function ($join) use ($date, $request) {
-        //         $join->on('items.id', '=', 'quote_items.item_id')
-        //             ->join('quotes', 'quote_items.quote_id', '=', 'quotes.id')
-        //             ->whereDate('quotes.quote_date', '<=', $date)
-        //             ->where('quotes.branch_id', $request['branch_id'])
-        //             ->whereDate('quotes.due_date', '>=', $date);
-        //     })
-        //     ->where('supplier_items.supplier_id', $request['supplier_id'])
-        //     ->get();
-
+        // ->join('supplier_items', function ($join) use ($request) {
+        //     $join->on('items.id', '=', 'supplier_items.item_id')
+        //         ->where('supplier_items.supplier_id', $request['supplier_id']);
+        // })
+        // ->leftJoin('quote_items', function ($join) {
+        //     $join->on('items.id', '=', 'quote_items.item_id');
+        // })
+        // ->leftJoin('quotes', function ($join) use ($date, $request) {
+        //     $join->on('quote_items.quote_id', '=', 'quotes.id')
+        //         ->where('quotes.supplier_id', $request['supplier_id'])
+        //         ->where('quotes.branch_id', $request['branch_id']);
+        //         // ->whereDate('quotes.quote_date', '<=', $date)
+        //         // ->whereDate('quotes.due_date', '>=', $date);
+        // })
+        // ->get();
 
         $items = Item::select(
-            "items.id",
-            "items.name",
-            "items.measuring_unit",
-            "quote_items.unit_price",
-            "quote_items.id as quote_item_id",
-            "quotes.id as quote_id"
+            'items.id',
+            'items.name',
+            'items.measuring_unit',
+            'qi.unit_price',
+            'qi.id as quote_item_id',
+            'q.id as quote_id'
         )
-        ->join('supplier_items', function ($join) use ($request) {
-            $join->on('items.id', '=', 'supplier_items.item_id')
-                ->where('supplier_items.supplier_id', $request['supplier_id']);
-        })
-        ->leftJoin('quote_items', function ($join) {
-            $join->on('items.id', '=', 'quote_items.item_id');
-        })
-        ->leftJoin('quotes', function ($join) use ($date, $request) {
-            $join->on('quote_items.quote_id', '=', 'quotes.id')
-                ->where('quotes.supplier_id', $request['supplier_id'])
-                ->where('quotes.branch_id', $request['branch_id']);
-                // ->whereDate('quotes.quote_date', '<=', $date)
-                // ->whereDate('quotes.due_date', '>=', $date);
-        })
-        ->get();
-
-        dd( $items->toArray() );
-
-        // $items = Item::select(
-        //     "items.id",
-        //     "items.name",
-        //     "items.measuring_unit",
-        //     "quote_items.unit_price",
-        //     "quote_items.id as quote_item_id",
-        //     "quotes.id as quote_id"
-        // )
-        //     ->join('supplier_items', function ($join) use ($request) {
-        //         $join->on('items.id', '=', 'supplier_items.item_id')
-        //             ->where('supplier_items.supplier_id', $request['supplier_id']);
-        //     })
-        //     ->leftJoin('quotes', function ($join) use ($date, $request) {
-        //         $join->on('items.id', '=', 'items.id')
-        //             ->where('quotes.supplier_id', $request['supplier_id'])
-        //             ->where('quotes.branch_id', $request['branch_id'])
-        //             ->whereDate('quotes.quote_date', '<=', $date)
-        //             ->whereDate('quotes.due_date', '>=', $date);
-        //     })
-        //     ->leftJoin('quote_items', function ($join) {
-        //         $join->on('items.id', '=', 'quote_items.item_id')
-        //             ->whereNotNull('quotes.id');
-        //     })
-        //     ->orderByDesc('quotes.id')
-        //     ->get();
-
-
+            
+            ->join('supplier_items', function ($join) use ($request) {
+                $join->on('items.id', '=', 'supplier_items.item_id')
+                    ->where('supplier_items.supplier_id', $request['supplier_id']);
+            })
+            
+            ->leftJoin('quote_items as qi', function ($join) use ($request) {
+                $join->on('qi.item_id', '=', 'items.id')
+                    ->whereExists(function ($q) use ($request) {
+                        $q->select(DB::raw(1))
+                            ->from('quotes as qx')
+                            ->whereColumn('qx.id', 'qi.quote_id')
+                            ->where('qx.supplier_id', $request['supplier_id'])
+                            ->where('qx.branch_id', $request['branch_id']);
+                        // ->whereDate('qx.quote_date', '<=', $date)
+                        // ->whereDate('qx.due_date', '>=', $date);
+                    });
+            })
+            
+            ->leftJoin('quotes as q', function ($join) use ($request) {
+                $join->on('q.id', '=', 'qi.quote_id')
+                    ->where('q.supplier_id', $request['supplier_id'])
+                    ->where('q.branch_id', $request['branch_id']);
+            })
+            ->get();
 
         return response()->json(["success" => true, 'message' => "Items Found", 'data' => $items], 200);
-
     }
 }
-

@@ -95,6 +95,8 @@ class PurchaseOrderController extends Controller
 
     public function store(Request $request)
     {
+
+        // dd($request);
         if (!Gate::allows('students')) {
             return abort(503);
         }
