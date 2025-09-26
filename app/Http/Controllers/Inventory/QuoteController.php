@@ -248,7 +248,7 @@ class QuoteController extends Controller
         })
         ->get();
 
-        dd( $items->toArray() );
+        // dd( $items->toArray() );
 
         // $items = Item::select(
         //     "items.id",
