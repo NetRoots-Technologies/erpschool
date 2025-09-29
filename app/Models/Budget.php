@@ -12,7 +12,7 @@ class Budget extends Model
 
    protected $guarded = [];
 
-    protected $table = "Sub_budgets";
+    protected $table = "sub_budgets";
     
     public function details() {
         return $this->hasMany(BudgetDetail::class);
