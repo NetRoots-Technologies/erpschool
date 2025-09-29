@@ -30,7 +30,6 @@ use App\Models\Category;
 use App\Models\Currency;
 use Faker\Factory as Faker;
 use Illuminate\Support\Facades\Schema;
-\DB::table('categories')->truncate();
 
 
 class CompleteSystemSeeder extends Seeder
