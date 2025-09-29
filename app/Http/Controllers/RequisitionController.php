@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Exception;
 use Carbon\Carbon;
 use App\Models\Item;
+use App\Models\Inventry;
 use App\Models\Supplier;
 use App\Models\Requisition;
 use Illuminate\Http\Request;
@@ -35,7 +36,6 @@ class RequisitionController extends Controller
         $query = $type == 'food' ? $query->food() : $query->stationary();
         $items = $query->get();
 
-
         $statuses = config('constants.status');
         $priorities = config('constants.priority');
         $requisition = Requisition::with('item')->get();
@@ -46,6 +46,8 @@ class RequisitionController extends Controller
         if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
+
+
         return view('admin.inventory_management.requisition.approval', compact('type'));
     }
 
@@ -95,6 +97,8 @@ class RequisitionController extends Controller
 
     public function getData(Request $request)
     {
+
+        // dd($request);
         if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
@@ -103,12 +107,15 @@ class RequisitionController extends Controller
                 "employee",
                 "item:id,name",
                 "branch:id,name",
+                "item.inventory",
             ]);
 
+       
         $query = $request->type == 'food' ? $query->food() : $query->stationary();
 
         $query = $query->get();
 
+        
         return response()->json(["success" => true, 'message' => 'Listing', 'data' => $query], 200);
 
     }
@@ -118,6 +125,14 @@ class RequisitionController extends Controller
             return abort(503);
         }
         $requisition->status = $request->status;
+
+        $inv =  Inventry::where('item_id' , $requisition->item_id)->first();
+            if ($inv) {
+                $inv->quantity =$inv->quantity - $requisition->quantity;
+                $inv->save();
+            }
+
+            
         $msg = '';
         if ($request->status == "APPROVED") {
             $requisition->is_approved = true;
@@ -130,6 +145,9 @@ class RequisitionController extends Controller
         }
         $requisition->approved_by = auth()->id();
         $requisition->save();
+
+
+       
 
         NotificationService::sendNotification(auth()->id(), $requisition->requester_id, "Request Status", "Your request Have been $request->status");
 
