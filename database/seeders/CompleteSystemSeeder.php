@@ -30,6 +30,8 @@ use App\Models\Category;
 use App\Models\Currency;
 use Faker\Factory as Faker;
 use Illuminate\Support\Facades\Schema;
+\DB::table('categories')->truncate();
+
 
 class CompleteSystemSeeder extends Seeder
 {
@@ -44,13 +46,8 @@ class CompleteSystemSeeder extends Seeder
 
         // Create Categories first (required for departments)
         $categories = [
-            ['name' => 'Executive'],
-            ['name' => 'Central'],
-            ['name' => 'Consultant'],
-            ['name' => 'Finance'],
-            ['name' => 'Academic'],
             ['name' => 'Administration'],
-            ['name' => 'HR'],
+            ['name' => 'Academics'],
         ];
 
         foreach ($categories as $category) {
@@ -104,31 +101,7 @@ class CompleteSystemSeeder extends Seeder
             ]
         );
 
-        // Create Departments (simplified version)
-        $categories = Category::pluck('id', 'name');
-
-        $board = Department::firstOrCreate(
-            ['name' => 'Board of Management'],
-            ['name' => 'Board of Management']
-        );
-
-        $cssDirector = Department::firstOrCreate(
-            ['name' => 'CSS Director'],
-            [
-                'name' => 'CSS Director',
-                'parent_id' => $board->id,
-                'category_id' => $categories['Executive'] ?? null,
-            ]
-        );
-
-        $finance = Department::firstOrCreate(
-            ['name' => 'Finance'],
-            [
-                'name' => 'Finance',
-                'parent_id' => $cssDirector->id,
-                'category_id' => $categories['Finance'] ?? null,
-            ]
-        );
+        
 
         // Create All Permissions from PermissionTableSeeder
         $permissions = [
@@ -369,7 +342,7 @@ class CompleteSystemSeeder extends Seeder
                 'active' => 1,
                 'email_verified_at' => now(),
                 'role_id' => json_encode([$adminRole->id]),
-                'branch_id' => $ptchsBranch->id,
+                'branch_id' => null,
                 'company_id' => $company->id,
             ]
         );
@@ -396,74 +369,74 @@ class CompleteSystemSeeder extends Seeder
         );
 
         // Create School Types (required for classes)
-        DB::table('school_types')->insertOrIgnore([
-            ['id' => 1, 'name' => 'Primary School', 'created_at' => now(), 'updated_at' => now()],
-            ['id' => 2, 'name' => 'Middle School', 'created_at' => now(), 'updated_at' => now()],
-            ['id' => 3, 'name' => 'High School', 'created_at' => now(), 'updated_at' => now()],
-        ]);
+        // DB::table('school_types')->insertOrIgnore([
+        //     ['id' => 1, 'name' => 'Primary School', 'created_at' => now(), 'updated_at' => now()],
+        //     ['id' => 2, 'name' => 'Middle School', 'created_at' => now(), 'updated_at' => now()],
+        //     ['id' => 3, 'name' => 'High School', 'created_at' => now(), 'updated_at' => now()],
+        // ]);
 
         // Create Academic Classes
-        $classes = [
-            ['name' => 'Class 1', 'school_type_id' => 1],
-            ['name' => 'Class 2', 'school_type_id' => 1],
-            ['name' => 'Class 3', 'school_type_id' => 1],
-            ['name' => 'Class 4', 'school_type_id' => 1],
-            ['name' => 'Class 5', 'school_type_id' => 2],
-            ['name' => 'Class 6', 'school_type_id' => 2],
-            ['name' => 'Class 7', 'school_type_id' => 2],
-            ['name' => 'Class 8', 'school_type_id' => 2],
-            ['name' => 'Class 9', 'school_type_id' => 3],
-            ['name' => 'Class 10', 'school_type_id' => 3],
-        ];
+        // $classes = [
+        //     ['name' => 'Class 1', 'school_type_id' => 1],
+        //     ['name' => 'Class 2', 'school_type_id' => 1],
+        //     ['name' => 'Class 3', 'school_type_id' => 1],
+        //     ['name' => 'Class 4', 'school_type_id' => 1],
+        //     ['name' => 'Class 5', 'school_type_id' => 2],
+        //     ['name' => 'Class 6', 'school_type_id' => 2],
+        //     ['name' => 'Class 7', 'school_type_id' => 2],
+        //     ['name' => 'Class 8', 'school_type_id' => 2],
+        //     ['name' => 'Class 9', 'school_type_id' => 3],
+        //     ['name' => 'Class 10', 'school_type_id' => 3],
+        // ];
 
-        $createdClasses = [];
-        foreach ($classes as $classData) {
-            $createdClasses[] = AcademicClass::firstOrCreate(
-                ['name' => $classData['name']],
-                [
-                    'name' => $classData['name'],
-                    'school_type_id' => $classData['school_type_id'],
-                    'branch_id' => $ptchsBranch->id,
-                    'session_id' => $session->id,
-                    'company_id' => $company->id,
-                    'status' => 1,
-                ]
-            );
-        }
+        // $createdClasses = [];
+        // foreach ($classes as $classData) {
+        //     $createdClasses[] = AcademicClass::firstOrCreate(
+        //         ['name' => $classData['name']],
+        //         [
+        //             'name' => $classData['name'],
+        //             'school_type_id' => $classData['school_type_id'],
+        //             'branch_id' => $ptchsBranch->id,
+        //             'session_id' => $session->id,
+        //             'company_id' => $company->id,
+        //             'status' => 1,
+        //         ]
+        //     );
+        // }
 
         // Create Active Sessions (required for sections)
-        DB::table('active_sessions')->insertOrIgnore([
-            [
-                'id' => 1, 
-                'session_id' => $session->id,
-                'company_id' => $company->id,
-                'branch_id' => $ptchsBranch->id,
-                'class_id' => 1,
-                'status' => 1,
-                'created_at' => now(), 
-                'updated_at' => now()
-            ],
-        ]);
+        // DB::table('active_sessions')->insertOrIgnore([
+        //     [
+        //         'id' => 1, 
+        //         'session_id' => $session->id,
+        //         'company_id' => $company->id,
+        //         'branch_id' => $ptchsBranch->id,
+        //         'class_id' => 1,
+        //         'status' => 1,
+        //         'created_at' => now(), 
+        //         'updated_at' => now()
+        //     ],
+        // ]);
 
         // Create Sections
-        $sections = ['A', 'B', 'C'];
-        $createdSections = [];
-        foreach ($createdClasses as $class) {
-            foreach ($sections as $sectionName) {
-                $createdSections[] = Section::firstOrCreate(
-                    ['name' => $sectionName, 'class_id' => $class->id],
-                    [
-                        'name' => $sectionName,
-                        'class_id' => $class->id,
-                        'session_id' => $session->id,
-                        'branch_id' => $ptchsBranch->id,
-                        'company_id' => $company->id,
-                        'active_session_id' => 1,
-                        'status' => 1,
-                    ]
-                );
-            }
-        }
+        // $sections = ['A', 'B', 'C'];
+        // $createdSections = [];
+        // foreach ($createdClasses as $class) {
+        //     foreach ($sections as $sectionName) {
+        //         $createdSections[] = Section::firstOrCreate(
+        //             ['name' => $sectionName, 'class_id' => $class->id],
+        //             [
+        //                 'name' => $sectionName,
+        //                 'class_id' => $class->id,
+        //                 'session_id' => $session->id,
+        //                 'branch_id' => $ptchsBranch->id,
+        //                 'company_id' => $company->id,
+        //                 'active_session_id' => 1,
+        //                 'status' => 1,
+        //             ]
+        //         );
+        //     }
+        // }
 
         // Create Fee Categories
         $feeCategoriesData = [
@@ -517,6 +490,10 @@ class CompleteSystemSeeder extends Seeder
             );
         }
 
+    $createdClasses = DB::table('classes')->get();
+    $createdSections = DB::table('sections')->get();
+
+
         // Create Fee Structures
         $feeStructures = [];
         foreach ($createdClasses as $class) {
@@ -559,7 +536,12 @@ class CompleteSystemSeeder extends Seeder
         $students = [];
         for ($i = 0; $i < 10; $i++) {
             $randomClass = $faker->randomElement($createdClasses);
-            $randomSection = $faker->randomElement(array_filter($createdSections, fn($s) => $s->class_id == $randomClass->id));
+            // $randomSection = $faker->randomElement(array_filter($createdSections, fn($s) => $s->class_id == $randomClass->id));
+            $randomSection = $faker->randomElement(array_filter(
+                $createdSections->all(),
+                fn($s) => $s->class_id == $randomClass->id
+            ));
+
 
             $student = Students::create([
                 'first_name' => $faker->firstName,
