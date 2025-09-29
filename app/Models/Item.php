@@ -2,9 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Inventry;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Item extends Model
 {
@@ -50,4 +51,9 @@ class Item extends Model
             });
         });
     }
+
+
+            public function inventory(){
+                return $this->hasOne(Inventry::class  ,'item_id', 'id');
+            }
 }
