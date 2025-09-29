@@ -23,8 +23,6 @@ class CreateAdminUserSeeder extends Seeder
     public function run()
     {
 
-
-        
         $categories = [
             ['name' => 'Administration'],
             ['name' => 'Academics'],
