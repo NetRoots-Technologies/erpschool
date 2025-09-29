@@ -21,7 +21,7 @@ class CreateAdminUserSeeder extends Seeder
      */
     public function run()
     {
-        $role = Role::create(['name' => 'Admin']);
+        $role = Role::create(['name' => 'Super Admin']);
 
         $permissions = Permission::pluck('id', 'id')->all();
 
@@ -32,13 +32,14 @@ class CreateAdminUserSeeder extends Seeder
 
         $role->syncPermissions($permissions);
         $user = User::create([
-            'name' => 'netroots',
-            'email' => 'admin@admin.com',
+            'name' => 'Super Admin',
+            'email' => 'superadmin@admin.com',
             'role_id' => json_encode([$role->id]),
-            'branch_id' => $branch->id,
-            'department_id' => $department->id,
+            'branch_id' => NULL,
+            'department_id' => NULL,
             'password' => bcrypt('12345678')
         ]);
+        
         $user->assignRole([$role->id]);
 
     }
