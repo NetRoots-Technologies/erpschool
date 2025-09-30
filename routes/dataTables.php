@@ -104,4 +104,16 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'datatable', 'as' => 'datata
     Route::post('get_data_employee', 'App\Http\Controllers\HR\EmployeeController@getData')->name('get_data_employee');
     Route::post('skills/getdata', [\App\Http\Controllers\Exam\SkillsController::class, 'getData'])->name('skills.getdata');
 
+    
+    Route::post('get-examDetail', [\App\Http\Controllers\Exam\ExamDetailController::class, 'getData'])->name('getExamDetail');
+    Route::post('get-componentDetail', [\App\Http\Controllers\Exam\ComponentController::class, 'getData'])->name('component.getdata');
+    Route::post('get-subComponentDetail', [\App\Http\Controllers\Exam\SubComponentController::class, 'getData'])->name('sub-component.getdata');
+    Route::post('get-skillGroup', [\App\Http\Controllers\Exam\SkillGroupController::class, 'getData'])->name('skill-group.getData');
+    Route::post('get-skillType', [\App\Http\Controllers\Exam\SkillTypeController::class, 'getData'])->name('data.skillTypeData');
+    Route::post('get-skillGroup', [\App\Http\Controllers\Exam\SkillGroupController::class, 'getData'])->name('skill-group.getData');
+    Route::post('get-classSubject', [\App\Http\Controllers\Exam\ClassSubjectController::class, 'getData'])->name('classSubject.getdata');
+    Route::post('get-grading_policies', [GradingPoliciesController::class, 'getData'])->name('grading_policies.getdata');
+    Route::post('get-marksInput', [\App\Http\Controllers\Exam\MarksInputController::class, 'getData'])->name('getMarksInput');
+
+
 });
