@@ -31,7 +31,7 @@
                                     <th>Student Name</th>
                                     <th>Class</th>
                                     <th>Session</th>
-                                    <th>Transport Required</th>
+                                    <th>Transport Fee</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -43,14 +43,12 @@
                                         <strong>{{ $student->first_name }} {{ $student->last_name }}</strong><br>
                                         <small class="text-muted">{{ $student->student_id }}</small>
                                     </td>
-                                    <td>{{ $student->academicClass ? $student->academicClass->class_name : 'N/A' }}</td>
-                                    <td>{{ $student->academicSession ? $student->academicSession->session_name : 'N/A' }}</td>
+                                    <td>{{ $student->AcademicClass ? $student->AcademicClass->name : 'N/A' }}</td>
+                                    <td>{{ $student->academicSession ? $student->academicSession->name : 'N/A' }}</td>
                                     <td>
-                                        @if($student->transport_required)
-                                            <span class="badge badge-success" style="color: #000 !important;">Yes</span>
-                                        @else
-                                            <span class="badge badge-secondary" style="color: #000 !important;">No</span>
-                                        @endif
+                                        <span class="badge badge-info" style="color: #000 !important;">
+                                            Rs. {{ $student->transport_fee ?? '0' }}
+                                        </span>
                                     </td>
                                     <td>
                                         <div class="btn-group" role="group">

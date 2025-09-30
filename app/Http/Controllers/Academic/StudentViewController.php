@@ -42,7 +42,7 @@ class StudentViewController extends Controller
          if (!Gate::allows('ViewStudents-list')) {
         return abort(403);
     }
-        $data = Students::with('AcademicClass', 'branch', 'student_siblings', 'student_schools', 'student_emergency_contacts', 'student_transports')->orderBy('created_at', 'desc')->get();
+        $data = Students::with('AcademicClass', 'branch', 'student_siblings', 'student_schools', 'student_emergency_contacts')->orderBy('created_at', 'desc')->get();
 
         return Datatables::of($data)->addIndexColumn()
             ->addColumn('action', function ($row) {
@@ -89,8 +89,8 @@ class StudentViewController extends Controller
  if (!Gate::allows('ViewStudents-list')) {
         return abort(403);
     }
-        $student = Students::with('student_schools', 'studentPictures', 'student_emergency_contacts', 'student_transports', 'AcademicClass')->find($id);
-        $siblings = Students::with('student_schools', 'studentPictures', 'student_emergency_contacts', 'student_transports', 'AcademicClass')->where('father_cnic', $student->father_cnic)->get();
+        $student = Students::with('student_schools', 'studentPictures', 'student_emergency_contacts', 'AcademicClass')->find($id);
+        $siblings = Students::with('student_schools', 'studentPictures', 'student_emergency_contacts', 'AcademicClass')->where('father_cnic', $student->father_cnic)->get();
         $companies = Company::where('status', 1)->get();
         $branches = Branch::where('status', 1)->get();
 
@@ -112,7 +112,7 @@ class StudentViewController extends Controller
         ini_set('max_execution_time', '300');
         $studentId = $request->query('student_id');
 
-        $student = Students::with('student_siblings', 'student_schools', 'studentPictures', 'student_emergency_contacts', 'student_transports', 'AcademicClass')->find($studentId);
+        $student = Students::with('student_siblings', 'student_schools', 'studentPictures', 'student_emergency_contacts', 'AcademicClass')->find($studentId);
 
         $companies = Company::where('status', 1)->get();
         $branches = Branch::where('status', 1)->get();

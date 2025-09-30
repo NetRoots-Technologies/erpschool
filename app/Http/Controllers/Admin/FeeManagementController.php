@@ -17,6 +17,7 @@ use App\Models\Fee\FeeBilling;
 use App\Models\Student\Students;
 use App\Models\Academic\AcademicClass;
 use App\Models\Student\AcademicSession;
+use App\Models\Academic\ActiveSession;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -492,6 +493,39 @@ class FeeManagementController extends Controller
         ]);
     }
 
+    public function getSessionsByClass($classId)
+    {
+        if (!Gate::allows('Dashboard-list')) {
+            abort(403, 'Unauthorized access');
+        }
+
+        // Get sessions assigned to this class through ActiveSession table
+        $sessions = ActiveSession::with('academicSession')
+            ->where('class_id', $classId)
+            ->where('status', 1)
+            ->whereHas('academicSession', function($query) {
+                $query->where('status', 1);
+            })
+            ->get()
+            ->pluck('academicSession')
+            ->unique('id')
+            ->values();
+
+        // If no sessions found from ActiveSession table, return all active sessions as fallback
+        if ($sessions->isEmpty()) {
+            $sessions = AcademicSession::where('status', 1)->get();
+        }
+
+        return response()->json([
+            'sessions' => $sessions->map(function($session) {
+                return [
+                    'id' => $session->id,
+                    'name' => $session->name
+                ];
+            })
+        ]);
+    }
+
     public function storeCollection(Request $request)
     {
         if (!Gate::allows('Dashboard-list')) {
@@ -955,9 +989,20 @@ class FeeManagementController extends Controller
                 'billing_month' => $request->billing_month
             ]);
 
-            // Get students in the specified class and session
-            $students = Students::where('class_id', $request->academic_class_id)
+            // Check if the class-session combination is active
+            $activeSession = ActiveSession::where('class_id', $request->academic_class_id)
                 ->where('session_id', $request->academic_session_id)
+                ->where('status', 1)
+                ->first();
+
+            if (!$activeSession) {
+                \Log::info('No active session found for class: ' . $request->academic_class_id . ' and session: ' . $request->academic_session_id);
+                return redirect()->route('admin.fee-management.billing')
+                    ->with('error', 'No active session found for the selected class and session combination.');
+            }
+
+            // Get students in the specified class (session relationship is managed through ActiveSession)
+            $students = Students::where('class_id', $request->academic_class_id)
                 ->where('is_active', 1)
                 ->get();
 

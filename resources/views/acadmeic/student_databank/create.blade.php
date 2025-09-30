@@ -112,6 +112,24 @@
                                 </div>
                             </div>
 
+                            <div class="row mt-4">
+                                <div class="col-md-6">
+                                    <label for="academic_session_id"><b>Academic Session *</b></label>
+                                    <select class="form-select select2 basic-single" id="academic_session_id" name="academic_session_id" required>
+                                        <option value="">Select Session</option>
+                                        @foreach($sessions as $session)
+                                            <option value="{{ $session->id }}" {{ old('academic_session_id') == $session->id ? 'selected' : '' }}>
+                                                {{ $session->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <!-- Empty column for spacing -->
+                                </div>
+                            </div>
+
                             <div class="row mt-4 resason_for_leaving"  style="display: none">
                                 <div class="col-md-12">
                                 <label for="reason"><b>If yes then please state the reason and year of leaving </b></label>

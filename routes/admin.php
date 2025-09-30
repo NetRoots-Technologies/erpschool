@@ -175,6 +175,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'admin', 'as' => 'admin.'], 
         Route::get('/collections/data', [FeeManagementController::class, 'getCollectionsData'])->name('collections.data');
         Route::get('/collections/create', [FeeManagementController::class, 'createCollection'])->name('collections.create');
         Route::get('/collections/students-by-class/{classId}', [FeeManagementController::class, 'getStudentsByClass'])->name('collections.students-by-class');
+        Route::get('/collections/sessions-by-class/{classId}', [FeeManagementController::class, 'getSessionsByClass'])->name('collections.sessions-by-class');
         Route::post('/collections', [FeeManagementController::class, 'storeCollection'])->name('collections.store');
         Route::get('/collections/pay-challan', [FeeManagementController::class, 'payChallan'])->name('collections.pay-challan');
         Route::get('/collections/challans-by-student/{studentId}', [FeeManagementController::class, 'getChallansByStudent'])->name('collections.challans-by-student');
