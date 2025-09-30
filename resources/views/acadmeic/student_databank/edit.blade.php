@@ -48,20 +48,26 @@
                             </div>
 
                             <div class="row mt-4">
+                                <div class="col-md-12">
+                                    <label for="reference_no"><b>Reference Number </b></label>
+                                    <input type="text" class="form-control" name="reference_no" value="{!! $studentDatabank->reference_no !!}" readonly>
+                                </div>
+                            </div>
 
+                            <div class="row mt-4">
+                                @php
+                                    $nameParts = explode(' ', $studentDatabank->student_name ?? '', 2);
+                                    $firstName = $nameParts[0] ?? '';
+                                    $lastName = $nameParts[1] ?? '';
+                                @endphp
                                 <div class="col-md-6">
                                     <label for="student_name"><b>First Name </b></label>
-                                    <input type="text" class="form-control" name="first_name"  value="{!! $studentDatabank->first_name !!}" >
+                                    <input type="text" class="form-control" name="first_name" value="{!! $firstName !!}" >
                                 </div>
                                 <div class="col-md-6">
                                     <label for="student_name"><b>Last Name </b></label>
-                                    <input type="text" class="form-control" name="last_name" value="{!! $studentDatabank->last_name !!}">
+                                    <input type="text" class="form-control" name="last_name" value="{!! $lastName !!}">
                                 </div>
-{{--                                <div class="col-md-12">--}}
-{{--                                    <label for="student_name"><b>Student Name  *</b></label>--}}
-{{--                                    <input type="text" class="form-control" value="{!! $studentDatabank->student_name !!}" name="student_name">--}}
-{{--                                </div>--}}
-
                             </div>
 
                             <div class="row mt-4">
@@ -153,15 +159,7 @@
                                 </div>
                             </div>
 
-                            <div class="row mt-4">
-                                <div class="col-md-12">
-                                    <label for="b_form_no"><b>Student B-Form Number *</b></label>
-                                    <input type="text" id="b_form_no" name="b_form_no"
-                                        class="form-control bform_card"
-                                        data-inputmask="'mask': '99999-9999999-9'" placeholder="XXXXX-XXXXXXX-X"
-                                        required onchange="checkBForm(this)" value="{!! $studentDatabank->b_form_no !!}">
-                                </div>
-                            </div>
+                            {{-- B-Form Number field removed as it doesn't exist in database --}}
 
                             <div class="row mt-4">
                                 <div class="col-md-12">

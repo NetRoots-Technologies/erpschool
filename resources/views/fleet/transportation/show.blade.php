@@ -29,20 +29,18 @@
                                 </tr>
                                 <tr>
                                     <th>Class:</th>
-                                    <td>{{ $student->academicClass ? $student->academicClass->class_name : 'N/A' }}</td>
+                                    <td>{{ $student->AcademicClass ? $student->AcademicClass->name : 'N/A' }}</td>
                                 </tr>
                                 <tr>
                                     <th>Session:</th>
-                                    <td>{{ $student->academicSession ? $student->academicSession->session_name : 'N/A' }}</td>
+                                    <td>{{ $student->academicSession ? $student->academicSession->name : 'Not Assigned' }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Transport Required:</th>
+                                    <th>Transportation Fee:</th>
                                     <td>
-                                        @if($student->transport_required)
-                                            <span class="badge badge-success" style="color: #000 !important;">Yes</span>
-                                        @else
-                                            <span class="badge badge-secondary" style="color: #000 !important;">No</span>
-                                        @endif
+                                        <span class="badge badge-info" style="color: #000 !important;">
+                                            Rs. {{ $student->transport_fee ?? '0' }} / Month
+                                        </span>
                                     </td>
                                 </tr>
                             </table>
@@ -51,15 +49,15 @@
                             <table class="table table-borderless">
                                 <tr>
                                     <th width="40%">Phone:</th>
-                                    <td>{{ $student->phone ?? 'N/A' }}</td>
+                                    <td>{{ $student->cell_no ?? 'Not Available' }}</td>
                                 </tr>
                                 <tr>
                                     <th>Email:</th>
-                                    <td>{{ $student->email ?? 'N/A' }}</td>
+                                    <td>{{ $student->student_email ?? 'Not Available' }}</td>
                                 </tr>
                                 <tr>
                                     <th>Address:</th>
-                                    <td>{{ $student->address ?? 'N/A' }}</td>
+                                    <td>{{ $student->student_current_address ?? 'Not Available' }}</td>
                                 </tr>
                                 <tr>
                                     <th>Created:</th>
@@ -73,9 +71,9 @@
                     <div class="row mt-4">
                         <div class="col-12">
                             <h5>Transportation Assignment:</h5>
-                            <div class="alert alert-info">
-                                <i class="fa fa-info-circle"></i>
-                                Transportation assignment details will be managed here once the student_transportations table is created.
+                            <div class="alert alert-warning">
+                                <i class="fa fa-exclamation-triangle"></i>
+                                No transportation assignment found for this student. Click "Edit" to assign transportation.
                             </div>
                         </div>
                     </div>

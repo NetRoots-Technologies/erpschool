@@ -18,8 +18,7 @@ class StudentDataBankService
         }
         $studentDatabank = StudentDataBank::create([
             'reference_no' => $request->get('reference_no'),
-            'first_name' => $request->get('first_name'),
-            'last_name' => $request->get('last_name'),
+            'student_name' => trim($request->get('first_name') . ' ' . $request->get('last_name')),
             'student_email' => $request->get('student_email'),
             'student_age' => $request->get('student_age'),
             'gender' => $request->get('gender'),
@@ -31,11 +30,11 @@ class StudentDataBankService
             'present_address' => $request->get('present_address'),
             'mother_name' => $request->get('mother_name'),
             'mother_cnic' => $request->get('mother_cnic'),
-            'b_form_no' => $request->get('b_form_no'),
             'landline_number' => $request->get('landline_number'),
             'previous_school' => $request->get('previous_school'),
             'admission_for' => $request->get('admission_for'),
             'reason_of_switch' => $request->get('reason_of_switch'),
+            'academic_session_id' => $request->get('academic_session_id'),
         ]);
 
         return $studentDatabank;
@@ -76,8 +75,8 @@ class StudentDataBankService
                 }
             })->addColumn('name', function ($row) {
 
-                if ($row->first_name && $row->last_name) {
-                    return $row->first_name . ' ' . $row->last_name;
+                if ($row->student_name) {
+                    return $row->student_name;
                 } else {
                     return 'N/A';
 
@@ -98,8 +97,7 @@ class StudentDataBankService
 
         $studentDatabank->update([
             'reference_no' => $request->get('reference_no'),
-            'first_name' => $request->get('first_name'),
-            'last_name' => $request->get('last_name'),
+            'student_name' => trim($request->get('first_name') . ' ' . $request->get('last_name')),
             'student_email' => $request->get('student_email'),
             'student_age' => $request->get('student_age'),
             'gender' => $request->get('gender'),
@@ -111,11 +109,11 @@ class StudentDataBankService
             'present_address' => $request->get('present_address'),
             'mother_name' => $request->get('mother_name'),
             'mother_cnic' => $request->get('mother_cnic'),
-            'b_form_no' => $request->get('b_form_no'),
             'landline_number' => $request->get('landline_number'),
             'previous_school' => $request->get('previous_school'),
             'admission_for' => $request->get('admission_for'),
             'reason_of_switch' => $request->get('reason_of_switch'),
+            'academic_session_id' => $request->get('academic_session_id'),
         ]);
         return $studentDatabank;
     }

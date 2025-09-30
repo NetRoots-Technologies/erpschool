@@ -14,6 +14,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Gate;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\Admin\StudentDataBank;
+use App\Models\Student\AcademicSession;
 use App\Services\StudentDataBankService;
 use Maatwebsite\Excel\Validators\ValidationException;
 
@@ -52,7 +53,11 @@ class StudentDataBankController extends Controller
         $branchCode = 'LHR';
         $regNo = str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
         $referenceNo = "CSS-$year-$branchCode-$regNo";
-        return view('acadmeic.student_databank.create', compact('referenceNo'));
+        
+        // Get active academic sessions
+        $sessions = AcademicSession::where('status', 1)->get();
+        
+        return view('acadmeic.student_databank.create', compact('referenceNo', 'sessions'));
 
     }
 
