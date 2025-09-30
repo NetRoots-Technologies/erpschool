@@ -34,6 +34,7 @@ class DatabaseSeeder extends Seeder
         // $this->call(BudgetsSeeder::class);
         //$this->call(SessionSeeder::class);
         $this->call(CreateAdminUserSeeder::class);
+        $this->call(FleetSeeder::class);
         // $this->call(AgentSeeder::class);
         // $this->call(AgentRole::class);
         // $this->call(TeacherRole::class);

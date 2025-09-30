@@ -10,6 +10,9 @@ use App\Models\Admin\Department;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Fee\FeeFactor;
+use Faker\Factory as Faker;
+
 
 
 
@@ -22,6 +25,8 @@ class CreateAdminUserSeeder extends Seeder
      */
     public function run()
     {
+
+        $faker = Faker::create();
 
         $categories = [
             ['name' => 'Administration'],
@@ -54,6 +59,29 @@ class CreateAdminUserSeeder extends Seeder
             ]);
 
             $user->assignRole([$role->id]);
+        }
+
+        // Create Fee Factors
+        $feeFactorsData = [
+            ['name' => '12 Months Billing', 'factor_value' => 1.0],
+            ['name' => '10 Months (Aug-May)', 'factor_value' => 1.2],
+            ['name' => '6 Months Billing', 'factor_value' => 2.0],
+            ['name' => 'A-Level/College Installments', 'factor_value' => 2.4],
+        ];
+
+        $feeFactors = [];
+        foreach ($feeFactorsData as $factorData) {
+            $feeFactors[] = FeeFactor::firstOrCreate(
+                ['name' => $factorData['name']],
+                array_merge($factorData, [
+                    'description' => $faker->sentence,
+                    'is_active' => 1,
+                    'company_id' => 1,
+                    'branch_id' => 1,
+                    'created_by' => 1,
+                    'updated_by' => 1,
+                ])
+            );
         }
     }
 }

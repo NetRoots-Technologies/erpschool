@@ -140,4 +140,8 @@ require __DIR__.'/dataTables.php';
 // Include Exam Routes
 require __DIR__.'/exam.php';
 
+// Include Fleet Routes
+require __DIR__.'/fleet.php';
+
+
 

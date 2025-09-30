@@ -661,6 +661,35 @@
                     </ul>
                 </li>
 
+                {{-- Fleet Management Section --}}
+                <li class="side-item side-item-category">Fleet Management</li>
+                <li class="slide">
+                    <a class="side-menu__item {{ request()->is('fleet*') ? 'active' : '' }}"
+                        data-bs-toggle="slide" href="javascript:void(0);">
+                        <i class="fa fa-bus icons8 icon-style" aria-hidden="true"></i>
+                        <span class="side-menu__label">Fleet Management</span>
+                        <i class="angle fe fe-chevron-down"></i>
+                    </a>
+                    <ul class="slide-menu" style="display: {{ request()->is('fleet*') ? 'block' : 'none' }}">
+                        <li><a class="slide-item {{ request()->is('fleet/dashboard') ? 'active' : '' }}"
+                                href="{{ route('fleet.dashboard') }}">Dashboard</a></li>
+                        <li><a class="slide-item {{ request()->is('fleet/vehicles*') ? 'active' : '' }}"
+                                href="{{ route('fleet.vehicles.index') }}">Vehicles</a></li>
+                        <li><a class="slide-item {{ request()->is('fleet/drivers*') ? 'active' : '' }}"
+                                href="{{ route('fleet.drivers.index') }}">Drivers</a></li>
+                        <li><a class="slide-item {{ request()->is('fleet/routes*') ? 'active' : '' }}"
+                                href="{{ route('fleet.routes.index') }}">Routes</a></li>
+                        <li><a class="slide-item {{ request()->is('fleet/maintenance*') ? 'active' : '' }}"
+                                href="{{ route('fleet.maintenance.index') }}">Maintenance</a></li>
+                        <li><a class="slide-item {{ request()->is('fleet/fuel*') ? 'active' : '' }}"
+                                href="{{ route('fleet.fuel.index') }}">Fuel Records</a></li>
+                        <li><a class="slide-item {{ request()->is('fleet/expenses*') ? 'active' : '' }}"
+                                href="{{ route('fleet.expenses.index') }}">Expenses</a></li>
+                        <li><a class="slide-item {{ request()->is('fleet/transportation*') ? 'active' : '' }}"
+                                href="{{ route('fleet.transportation.index') }}">Student Transportation</a></li>
+                    </ul>
+                </li>
+
                 @canany(['Accounts', 'AccountReports', 'Assets'])
                     <li class="side-item side-item-category">Accounts Management</li>
                     @can('Accounts')

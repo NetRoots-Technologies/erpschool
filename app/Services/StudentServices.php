@@ -173,15 +173,11 @@ class StudentServices
                 }
             }
 
-            if ($request->has('pickup_dropoff')) {
-                $studentTransport = StudentTransport::create([
-                    'pickup_dropoff' => $request->get('pickup_dropoff'),
-                    'transport_facility' => $request->get('transport_facility'),
-                    'pick_address' => $request->get('pick_address'),
-                    'picture_permission' => $request->get('picture_permission'),
-                    'student_id' => $student->id,
-
-                ]);
+            // Handle transport required checkbox
+            if ($request->has('transport_required')) {
+                $student->update(['transport_required' => true]);
+            } else {
+                $student->update(['transport_required' => false]);
             }
 
             $this->addNewStudentPictures($request, $student);
@@ -200,7 +196,7 @@ class StudentServices
         if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
-        $data = Students::with('branch', 'student_siblings', 'student_schools', 'student_emergency_contacts', 'student_transports')->orderBy('created_at', 'desc')->get();
+        $data = Students::with('branch', 'student_siblings', 'student_schools', 'student_emergency_contacts')->orderBy('created_at', 'desc')->get();
 
 
         return Datatables::of($data)->addIndexColumn()
