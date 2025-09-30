@@ -588,58 +588,19 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="travelling-div">
+                            <!-- Simple Transport Checkbox -->
+                            <div class="transport-div">
                                 <div class="row mt-4">
                                     <div class="col-md-12">
-                                        <label for="pickup_dropoff"><b>What mode of transport will your child normally
-                                                use?</b></label>
-                                        <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="radio" name="pickup_dropoff"
-                                                id="self_pickup" value="Self Pickup" {!! @$student->student_transports->pickup_dropoff == 'Self Pickup' ? 'checked' : '' !!}>
-                                            <label class="form-check-label" for="self_pickup">Self
-                                                Pickup</label>
-                                        </div>
-
-                                        <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="radio" name="pickup_dropoff"
-                                                id="bike_cycle_pickup" value="Bike/Cycle Pickup" {!! @$student->student_transports->pickup_dropoff == 'Bike/Cycle Pickup' ? 'checked' : '' !!}>
-                                            <label class="form-check-label" for="bike_cycle_pickup">Bike/Cycle
-                                                Pickup</label>
-                                        </div>
-
-                                        <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="radio" name="pickup_dropoff"
-                                                id="other_pickup" value="Other Pickup" {!! @$student->student_transports->pickup_dropoff == 'Other Pickup' ? 'checked' : '' !!}>
-                                            <label class="form-check-label" for="other_pickup">Other
-                                                Pickup</label>
-                                        </div>
-                                    </div>
-
-                                </div>
-
-                                <div class="row mt-4">
-                                    <div class="col-md-12">
-                                        <label for="transport_facility"><b>Do you require school transport? (charges
-                                                applied if selected)</b></label>
                                         <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="transport_facility"
-                                                id="transport_yes" value="yes" {!! @$student->student_transports->transport_facility == 'yes' ? 'checked' : '' !!}>
-                                            <label class="form-check-label" for="transport_yes">Yes</label>
+                                            <input class="form-check-input" type="checkbox" name="transport_required" 
+                                                id="transport_required" value="1" 
+                                                {{ @$student->transport_required ? 'checked' : '' }}>
+                                            <label class="form-check-label" for="transport_required">
+                                                <strong>Transport Required</strong> (Will be assigned by school administration)
+                                            </label>
                                         </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="transport_facility"
-                                                id="transport_no" value="no" {!! @$student->student_transports->transport_facility == 'no' ? 'checked' : '' !!}>
-                                            <label class="form-check-label" for="transport_no">No</label>
-                                        </div>
-                                    </div>
-
-                                </div>
-
-                                <div class="row mt-4 pick_address_container" style="display: none">
-                                    <div class="col-md-12">
-                                        <label for="Work Address "><b>Add address below from where the child will be picked
-                                                and drop</b></label>
-                                        <textarea name="pick_address" class="form-control">{!! @$student->student_transports->pick_address !!}</textarea>
+                                        <small class="text-muted">Check this if the student requires school transport. Route and charges will be assigned later.</small>
                                     </div>
                                 </div>
                             </div>

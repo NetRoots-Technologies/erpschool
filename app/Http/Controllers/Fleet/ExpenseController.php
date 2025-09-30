@@ -1,0 +1,123 @@
+<?php
+
+namespace App\Http\Controllers\Fleet;
+
+use App\Http\Controllers\Controller;
+use App\Models\Fleet\Expense;
+use App\Models\Fleet\Vehicle;
+use App\Models\Fleet\Driver;
+use Illuminate\Http\Request;
+
+class ExpenseController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index()
+    {
+        $expenses = Expense::with(['vehicle', 'driver', 'company', 'branch'])->paginate(10);
+        return view('fleet.expenses.index', compact('expenses'));
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create()
+    {
+        return view('fleet.expenses.create');
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request)
+    {
+        $request->validate([
+            'vehicle_id' => 'required|exists:fleet_vehicles,id',
+            'driver_id' => 'nullable|exists:fleet_drivers,id',
+            'expense_type' => 'required|in:fuel,maintenance,toll,parking,repair,other',
+            'expense_date' => 'required|date',
+            'amount' => 'required|numeric|min:0',
+            'description' => 'nullable|string',
+            'receipt_number' => 'nullable|string|max:255',
+            'status' => 'required|in:pending,approved,rejected',
+            'notes' => 'nullable|string',
+        ]);
+
+        Expense::create($request->all());
+
+        return redirect()->route('fleet.expenses.index')
+            ->with('success', 'Expense created successfully.');
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  \App\Models\Fleet\Expense  $expense
+     * @return \Illuminate\Http\Response
+     */
+    public function show(Expense $expense)
+    {
+        $expense->load(['vehicle', 'driver', 'company', 'branch']);
+        return view('fleet.expenses.show', compact('expense'));
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  \App\Models\Fleet\Expense  $expense
+     * @return \Illuminate\Http\Response
+     */
+    public function edit(Expense $expense)
+    {
+        return view('fleet.expenses.edit', compact('expense'));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Models\Fleet\Expense  $expense
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, Expense $expense)
+    {
+        $request->validate([
+            'vehicle_id' => 'required|exists:fleet_vehicles,id',
+            'driver_id' => 'nullable|exists:fleet_drivers,id',
+            'expense_type' => 'required|in:fuel,maintenance,toll,parking,repair,other',
+            'expense_date' => 'required|date',
+            'amount' => 'required|numeric|min:0',
+            'description' => 'nullable|string',
+            'receipt_number' => 'nullable|string|max:255',
+            'status' => 'required|in:pending,approved,rejected',
+            'notes' => 'nullable|string',
+        ]);
+
+        $expense->update($request->all());
+
+        return redirect()->route('fleet.expenses.index')
+            ->with('success', 'Expense updated successfully.');
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \App\Models\Fleet\Expense  $expense
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy(Expense $expense)
+    {
+        $expense->delete();
+
+        return redirect()->route('fleet.expenses.index')
+            ->with('success', 'Expense deleted successfully.');
+    }
+}

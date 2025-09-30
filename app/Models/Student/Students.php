@@ -60,7 +60,8 @@ class Students extends Model
         'meal_option',
         'easy_urdu',
         'status',
-        'is_active'
+        'is_active',
+        'transport_required'
     ];
 
     public function getfullnameAttribute()
@@ -92,10 +93,7 @@ class Students extends Model
         return $this->hasMany(StudentEmergencyContact::class, 'student_id');
     }
 
-    public function student_transports()
-    {
-        return $this->hasOne(StudentTransport::class, 'student_id');
-    }
+    // Transportation removed - using simple checkbox approach
     public function studentPictures()
     {
         return $this->hasOne(StudentPictures::class, 'student_id');
