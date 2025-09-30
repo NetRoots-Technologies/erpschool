@@ -13,7 +13,7 @@ class CreateBudgetsTable extends Migration
      */
     public function up()
     {
-        Schema::create('Sub_budgets', function (Blueprint $table) {
+        Schema::create('sub_budgets', function (Blueprint $table) {
                 $table->id();
                 $table->string('title');
                 $table->text('description')->nullable();

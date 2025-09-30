@@ -16,18 +16,18 @@ class CreateDepartmentBudgetsTable extends Migration
         Schema::create('department_budgets', function (Blueprint $table) {
             // $table->id();
              $table->increments('id');
-        
+
             // Budget relation
             $table->unsignedBigInteger('budget_id');
             $table->foreign('budget_id')
                   ->references('id')
-                  ->on('sub_budgets')   
+                  ->on('sub_budgets')
                   ->onDelete('cascade');
 
                 //   $table->unsignedBigInteger('budget_detail_id');
                 //   $table->foreign('budget_detail_id')
                 //   ->references('id')
-                //   ->on('budget_details')   
+                //   ->on('budget_details')
                 //   ->onDelete('cascade');
 
                 // Department relation
@@ -44,8 +44,8 @@ class CreateDepartmentBudgetsTable extends Migration
                   ->on('b_category')
                   ->onDelete('cascade');
 
-            
-            $table->string('month'); 
+
+            $table->string('month');
             $table->decimal('amount', 15, 2);
             $table->timestamps();
         });

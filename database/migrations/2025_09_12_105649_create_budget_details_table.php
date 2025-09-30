@@ -19,7 +19,7 @@ class CreateBudgetDetailsTable extends Migration
             $table->string('month')->nullable();
             $table->decimal('allocated_amount' , 22,2)->nullable();
             $table->decimal('allowed_spend' , 22 ,2)->nullable();
-            $table->foreign('budget_id')->references('id')->on('Sub_budgets')->onDelete('cascade');
+            $table->foreign('budget_id')->references('id')->on('sub_budgets')->onDelete('cascade');
             $table->timestamps();
         });
     }
