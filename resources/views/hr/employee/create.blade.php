@@ -9,6 +9,8 @@
     @php
         //    for welfare
     $employeeWelfareValue = \App\Helpers\GeneralSettingsHelper::getSetting('employeeWelfare');
+
+          $employeeWelfare = 0;
         if ($employeeWelfareValue != null){
            $employeeWelfare = floatval($employeeWelfareValue['value']);
         }
