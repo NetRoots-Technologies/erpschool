@@ -199,7 +199,7 @@
                 });
             });
 
-            $.get('{{ route("academic.fetchSubjects") }}', { class_id: classId }, function (data) {
+            $.get('{{ route("academic.fetchSubject") }}', { class_id: classId }, function (data) {
                 let subjectDropdown = $('.select_course').empty().append('<option value="">Select Subject</option>');
                 data.forEach(subject => {
                     let selected = subject.id == selectedFields.subject_id ? 'selected' : '';
