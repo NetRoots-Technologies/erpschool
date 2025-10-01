@@ -133,7 +133,9 @@ class StudentServices
                             'sibling_dob' => $request->get('sibling_dob')[$key],
                             'sibling_gender' => $request->get('sibling_gender')[$key],
                             'student_id' => $student->id,
-                            'class_id' => $studied == 'yes' ? $request->get('sibling_class')[$key] : null,
+                            // 'class_id' => $studied == 'yes' ? $request->get('sibling_class')[$key] : null,
+                            'class_id' =>  $request->get('sibling_class')[$key] ,
+
                             'studied' => $studied,
                         ]);
                     }
