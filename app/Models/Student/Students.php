@@ -127,5 +127,10 @@ class Students extends Model
     {
         return $this->belongsTo(AcademicSession::class, 'session_id');
     }
+
+    public function transportations()
+    {
+        return $this->hasMany(\App\Models\Fleet\Transportation::class, 'student_id');
+    }
    
 }

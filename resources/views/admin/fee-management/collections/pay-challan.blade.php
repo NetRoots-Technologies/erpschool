@@ -150,8 +150,25 @@
                                         </div>
                                         <div class="mt-2">
                                             <p><strong>Total Discount:</strong> <span id="totalDiscount" class="text-success">Rs. 0</span></p>
-                                            <p><strong>Final Amount:</strong> <span id="finalAmount" class="text-primary font-weight-bold">Rs. 0</span></p>
                                         </div>
+                                    </div>
+
+                                    <!-- Transport Fees Section -->
+                                    <div id="transportSection" style="display: none;">
+                                        <hr>
+                                        <h6 class="text-info"><i class="fa fa-bus"></i> Transport Fees</h6>
+                                        <div id="transportList">
+                                            <!-- Transport fees will be loaded here -->
+                                        </div>
+                                        <div class="mt-2">
+                                            <p><strong>Transport Fee:</strong> <span id="transportFee" class="text-info">Rs. 0</span></p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Final Amount Section -->
+                                    <div class="mt-3">
+                                        <hr>
+                                        <p><strong>Final Amount (After Discounts & Transport):</strong> <span id="finalAmount" class="text-primary font-weight-bold">Rs. 0</span></p>
                                     </div>
                                 </div>
                             </div>
@@ -222,6 +239,7 @@
                                 <p><strong>Challan Amount:</strong> <span id="summaryChallanAmount"></span></p>
                                 <p><strong>Already Paid:</strong> <span id="summaryAlreadyPaid">Rs. 0</span></p>
                                 <p id="summaryDiscountRow" style="display: none;"><strong>Total Discount:</strong> <span id="summaryTotalDiscount" class="text-success">Rs. 0</span></p>
+                                <p id="summaryTransportRow" style="display: none;"><strong>Transport Fee:</strong> <span id="summaryTransportFee" class="text-info">Rs. 0</span></p>
                                 <p><strong>Final Amount:</strong> <span id="summaryFinalAmount"></span></p>
                                 <p><strong>Amount to Pay:</strong> <span id="summaryPaidAmount">Rs. 0</span></p>
                                 <p><strong>Remaining Balance:</strong> <span id="summaryRemainingAmount"></span></p>
@@ -439,12 +457,21 @@
             $('#summaryChallanAmount').text('Rs. ' + parseFloat(challan.total_amount).toLocaleString());
             $('#summaryFinalAmount').text('Rs. ' + parseFloat(challan.total_amount).toLocaleString());
             
-            // Reset discount variables
+            // Reset discount and transport variables
             window.totalDiscountAmount = 0;
+            window.totalTransportFee = 0;
             window.finalAmount = 0;
             
             // Load discounts for this challan
             loadChallanDiscounts(challan.id);
+            
+            // Load transport fees for this student
+            const studentId = $('#student_id').val();
+            if (studentId) {
+                loadStudentTransportFees(studentId);
+            } else {
+                hideTransportSection();
+            }
             
             $('#challanDetails').show();
         }
@@ -485,38 +512,113 @@
             
             $('#discountList').html(discountHtml);
             $('#totalDiscount').text('Rs. ' + parseFloat(totalDiscount).toLocaleString());
-            $('#finalAmount').text('Rs. ' + parseFloat(finalAmount).toLocaleString());
             $('#discountSection').show();
             
             // Update payment summary
             $('#summaryTotalDiscount').text('Rs. ' + parseFloat(totalDiscount).toLocaleString());
-            $('#summaryFinalAmount').text('Rs. ' + parseFloat(finalAmount).toLocaleString());
             $('#summaryDiscountRow').show();
             
             // Store discount data for payment calculation
             window.totalDiscountAmount = parseFloat(totalDiscount);
-            window.finalAmount = parseFloat(finalAmount);
             
-            // Update payment summary with new final amount
+            // Calculate final amount with transport fees
+            calculateFinalAmount();
+        }
+        
+        function loadStudentTransportFees(studentId) {
+            $.ajax({
+                url: '{{ route("admin.fee-management.collections.student-transport-fees", ":studentId") }}'.replace(':studentId', studentId),
+                type: 'GET',
+                success: function(response) {
+                    if (response.transportFees && response.transportFees.length > 0) {
+                        displayTransportFees(response.transportFees, response.totalTransportFee);
+                    } else {
+                        hideTransportSection();
+                    }
+                },
+                error: function() {
+                    hideTransportSection();
+                }
+            });
+        }
+        
+        function displayTransportFees(transportFees, totalTransportFee) {
+            let transportHtml = '';
+            transportFees.forEach(function(transport) {
+                transportHtml += `
+                    <div class="row mb-2">
+                        <div class="col-md-8">
+                            <span class="text-muted">${transport.vehicle_number} - ${transport.route_name}</span>
+                        </div>
+                        <div class="col-md-4 text-right">
+                            <span class="text-info font-weight-bold">
+                                Rs. ${parseFloat(transport.monthly_charges).toLocaleString()}
+                            </span>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            $('#transportList').html(transportHtml);
+            $('#transportFee').text('Rs. ' + parseFloat(totalTransportFee).toLocaleString());
+            $('#transportSection').show();
+            
+            // Update payment summary
+            $('#summaryTransportFee').text('Rs. ' + parseFloat(totalTransportFee).toLocaleString());
+            $('#summaryTransportRow').show();
+            
+            // Store transport data for payment calculation
+            window.totalTransportFee = parseFloat(totalTransportFee);
+            
+            // Calculate final amount with transport fees
+            calculateFinalAmount();
+        }
+        
+        function hideTransportSection() {
+            $('#transportSection').hide();
+            $('#transportFee').text('Rs. 0');
+            
+            // Update payment summary
+            $('#summaryTransportFee').text('Rs. 0');
+            $('#summaryTransportRow').hide();
+            
+            // Clear transport data
+            window.totalTransportFee = 0;
+            
+            // Calculate final amount without transport fees
+            calculateFinalAmount();
+        }
+        
+        function calculateFinalAmount() {
+            const originalAmount = parseFloat(selectedChallan.total_amount);
+            const discountAmount = window.totalDiscountAmount || 0;
+            const transportFee = window.totalTransportFee || 0;
+            
+            const finalAmount = originalAmount - discountAmount + transportFee;
+            
+            $('#finalAmount').text('Rs. ' + finalAmount.toLocaleString());
+            $('#summaryFinalAmount').text('Rs. ' + finalAmount.toLocaleString());
+            
+            // Store final amount for payment calculation
+            window.finalAmount = finalAmount;
+            
+            // Update payment summary
             updatePaymentSummary();
         }
         
         function hideDiscountSection() {
             $('#discountSection').hide();
             $('#totalDiscount').text('Rs. 0');
-            $('#finalAmount').text('Rs. 0');
             
             // Update payment summary
             $('#summaryTotalDiscount').text('Rs. 0');
-            $('#summaryFinalAmount').text($('#summaryChallanAmount').text());
             $('#summaryDiscountRow').hide();
             
             // Clear discount data
             window.totalDiscountAmount = 0;
-            window.finalAmount = 0;
             
-            // Update payment summary with cleared discount data
-            updatePaymentSummary();
+            // Calculate final amount without discounts
+            calculateFinalAmount();
         }
         
         function updatePaymentSummary() {

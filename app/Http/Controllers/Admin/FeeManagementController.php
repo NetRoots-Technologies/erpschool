@@ -452,7 +452,29 @@ class FeeManagementController extends Controller
         $collection = FeeCollection::with(['student.AcademicClass', 'academicClass', 'academicSession', 'details.feeCategory', 'billing'])
             ->findOrFail($id);
 
-        return view('admin.fee-management.collections.show', compact('collection'));
+        // Load transport fees for the student
+        $transportFees = [];
+        $totalTransportFee = 0;
+        if ($collection->student) {
+            $transportFees = $collection->student->transportations()
+                ->where('status', 'active')
+                ->with(['vehicle', 'route'])
+                ->get();
+            
+            $totalTransportFee = $transportFees->sum('monthly_charges');
+        }
+
+        // Load discounts if billing exists
+        $discounts = [];
+        $totalDiscount = 0;
+        if ($collection->billing) {
+            $discounts = $collection->billing->getApplicableDiscounts()->load('category');
+            $totalDiscount = $discounts->sum(function($discount) use ($collection) {
+                return $discount->calculateDiscount($collection->billing->total_amount);
+            });
+        }
+
+        return view('admin.fee-management.collections.show', compact('collection', 'transportFees', 'totalTransportFee', 'discounts', 'totalDiscount'));
     }
 
     public function createCollection()
@@ -611,9 +633,31 @@ class FeeManagementController extends Controller
         $collection = FeeCollection::with(['student.AcademicClass', 'academicClass', 'academicSession', 'details.feeCategory', 'billing'])
             ->findOrFail($id);
         
+        // Load transport fees for the student
+        $transportFees = [];
+        $totalTransportFee = 0;
+        if ($collection->student) {
+            $transportFees = $collection->student->transportations()
+                ->where('status', 'active')
+                ->with(['vehicle', 'route'])
+                ->get();
+            
+            $totalTransportFee = $transportFees->sum('monthly_charges');
+        }
+
+        // Load discounts if billing exists
+        $discounts = [];
+        $totalDiscount = 0;
+        if ($collection->billing) {
+            $discounts = $collection->billing->getApplicableDiscounts()->load('category');
+            $totalDiscount = $discounts->sum(function($discount) use ($collection) {
+                return $discount->calculateDiscount($collection->billing->total_amount);
+            });
+        }
+        
         // If this is a challan-based collection, redirect to a different edit page
         if ($collection->billing_id) {
-            return view('admin.fee-management.collections.edit-challan', compact('collection'));
+            return view('admin.fee-management.collections.edit-challan', compact('collection', 'transportFees', 'totalTransportFee', 'discounts', 'totalDiscount'));
         }
         
         // Otherwise, use the old edit system for non-challan collections
@@ -622,7 +666,7 @@ class FeeManagementController extends Controller
         $sessions = AcademicSession::where('status', 1)->get();
         $categories = FeeCategory::where('is_active', 1)->get();
 
-        return view('admin.fee-management.collections.edit', compact('collection', 'students', 'classes', 'sessions', 'categories'));
+        return view('admin.fee-management.collections.edit', compact('collection', 'students', 'classes', 'sessions', 'categories', 'transportFees', 'totalTransportFee', 'discounts', 'totalDiscount'));
     }
 
     /**
@@ -935,9 +979,8 @@ class FeeManagementController extends Controller
 
         return DataTables::of($billing)
             ->addColumn('action', function ($bill) {
-                $viewBtn = '<a href="' . route('admin.fee-management.billing.show', $bill->id) . '" class="btn btn-sm btn-info">View</a>';
                 $printBtn = '<a href="' . route('admin.fee-management.billing.print', $bill->id) . '" class="btn btn-sm btn-success" target="_blank">Print</a>';
-                return $viewBtn . ' ' . $printBtn;
+                return $printBtn;
             })
             ->addColumn('student_name', function ($bill) {
                 return $bill->student->fullname ?? 'N/A';
@@ -1095,22 +1138,6 @@ class FeeManagementController extends Controller
         }
     }
 
-    public function showBilling($id)
-    {
-        if (!Gate::allows('Dashboard-list')) {
-            abort(403, 'Unauthorized access');
-        }
-
-        $billing = FeeBilling::with(['student.AcademicClass', 'academicSession'])
-            ->findOrFail($id);
-
-        // Get discount information
-        $discounts = $billing->getApplicableDiscounts();
-        $totalDiscount = $billing->calculateTotalDiscount();
-        $finalAmount = $billing->getFinalAmount();
-
-        return view('admin.fee-management.billing.show', compact('billing', 'discounts', 'totalDiscount', 'finalAmount'));
-    }
 
     public function printBilling($id)
     {
@@ -1124,7 +1151,19 @@ class FeeManagementController extends Controller
         // Load applicable discounts for this billing
         $applicableDiscounts = $billing->getApplicableDiscounts()->load('category');
 
-        return view('admin.fee-management.billing.print', compact('billing', 'applicableDiscounts'));
+        // Load transport fees for the student
+        $transportFees = [];
+        $totalTransportFee = 0;
+        if ($billing->student) {
+            $transportFees = $billing->student->transportations()
+                ->where('status', 'active')
+                ->with(['vehicle', 'route'])
+                ->get();
+            
+            $totalTransportFee = $transportFees->sum('monthly_charges');
+        }
+
+        return view('admin.fee-management.billing.print', compact('billing', 'applicableDiscounts', 'transportFees', 'totalTransportFee'));
     }
 
     /**
@@ -1223,6 +1262,46 @@ class FeeManagementController extends Controller
         } catch (\Exception $e) {
             \Log::error('Error loading challan discounts: ' . $e->getMessage());
             return response()->json(['discounts' => [], 'totalDiscount' => 0, 'finalAmount' => 0]);
+        }
+    }
+
+    /**
+     * Get student transport fees for fee collection
+     */
+    public function getStudentTransportFees($studentId)
+    {
+        if (!Gate::allows('Dashboard-list')) {
+            abort(403, 'Unauthorized access');
+        }
+
+        try {
+            $student = Students::findOrFail($studentId);
+            $transportFees = $student->transportations()
+                ->where('status', 'active')
+                ->with(['vehicle', 'route'])
+                ->get();
+            
+            $totalTransportFee = 0;
+            $transportData = [];
+            
+            foreach($transportFees as $transport) {
+                $totalTransportFee += $transport->monthly_charges;
+                
+                $transportData[] = [
+                    'vehicle_number' => $transport->vehicle->vehicle_number ?? 'N/A',
+                    'route_name' => $transport->route->route_name ?? 'N/A',
+                    'monthly_charges' => $transport->monthly_charges
+                ];
+            }
+            
+            return response()->json([
+                'transportFees' => $transportData,
+                'totalTransportFee' => $totalTransportFee
+            ]);
+            
+        } catch (\Exception $e) {
+            \Log::error('Error loading student transport fees: ' . $e->getMessage());
+            return response()->json(['transportFees' => [], 'totalTransportFee' => 0]);
         }
     }
 

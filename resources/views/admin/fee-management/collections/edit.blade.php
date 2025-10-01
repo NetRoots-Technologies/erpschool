@@ -216,9 +216,34 @@
                                 </div>
                                 <div class="mt-3">
                                     <div class="alert alert-info">
-                                        <strong>Total Amount: Rs. <span id="totalAmount">{{ $collection->paid_amount ?? 0 }}</span></strong>
+                                        <h6 class="text-primary mb-3">
+                                            <i class="fa fa-calculator mr-2"></i>Payment Summary
+                                        </h6>
+                                        <table class="table table-borderless table-sm mb-0">
+                                            <tr>
+                                                <td><strong>Fee Amount:</strong></td>
+                                                <td class="text-right">Rs. {{ number_format($collection->paid_amount ?? 0, 2) }}</td>
+                                            </tr>
+                                            @if(isset($totalTransportFee) && $totalTransportFee > 0)
+                                            <tr>
+                                                <td class="text-info"><strong>Transport Fee:</strong></td>
+                                                <td class="text-right text-info">+ Rs. {{ number_format($totalTransportFee, 2) }}</td>
+                                            </tr>
+                                            @endif
+                                            @if(isset($totalDiscount) && $totalDiscount > 0)
+                                            <tr>
+                                                <td class="text-success"><strong>Discount Applied:</strong></td>
+                                                <td class="text-right text-success">- Rs. {{ number_format($totalDiscount, 2) }}</td>
+                                            </tr>
+                                            @endif
+                                            <tr class="border-top">
+                                                <td><strong>Total Amount:</strong></td>
+                                                <td class="text-right"><strong>Rs. {{ number_format(($collection->paid_amount ?? 0) + (isset($totalTransportFee) ? $totalTransportFee : 0) - (isset($totalDiscount) ? $totalDiscount : 0), 2) }}</strong></td>
+                                            </tr>
+                                        </table>
                                     </div>
                                 </div>
+
                             </div>
                         </div>
 

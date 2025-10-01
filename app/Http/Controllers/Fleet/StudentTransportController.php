@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Student\Students;
 use App\Models\Fleet\Vehicle;
 use App\Models\Fleet\Route;
+use App\Models\Fleet\Transportation;
 use Illuminate\Http\Request;
 
 class StudentTransportController extends Controller
@@ -17,14 +18,13 @@ class StudentTransportController extends Controller
      */
     public function index()
     {
-        $students = Students::where('is_active', 1)
-            ->with(['AcademicClass', 'academicSession'])
+        $transportations = Transportation::with(['student.AcademicClass', 'student.academicSession', 'vehicle', 'route'])
             ->paginate(10);
         
         $vehicles = Vehicle::where('status', 'active')->get();
         $routes = Route::where('status', 'active')->get();
         
-        return view('fleet.transportation.index', compact('students', 'vehicles', 'routes'));
+        return view('fleet.transportation.index', compact('transportations', 'vehicles', 'routes'));
     }
 
     /**
@@ -34,7 +34,11 @@ class StudentTransportController extends Controller
      */
     public function create()
     {
-        $students = Students::where('is_active', 1)->get();
+        $students = Students::where('is_active', 1)
+            ->whereDoesntHave('transportations')
+            ->with(['AcademicClass', 'academicSession'])
+            ->get();
+        
         $vehicles = Vehicle::where('status', 'active')->get();
         $routes = Route::where('status', 'active')->get();
         
@@ -60,9 +64,43 @@ class StudentTransportController extends Controller
             'notes' => 'nullable|string',
         ]);
 
+        // Check if student already has an active transportation assignment
+        $existingTransportation = Transportation::where('student_id', $request->student_id)
+            ->where('status', 'active')
+            ->first();
+
+        if ($existingTransportation) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'This student already has an active transportation assignment.');
+        }
+
+        // Check vehicle capacity
+        $vehicle = Vehicle::findOrFail($request->vehicle_id);
+        $currentAssignments = Transportation::where('vehicle_id', $request->vehicle_id)
+            ->where('status', 'active')
+            ->count();
+
+        if ($currentAssignments >= $vehicle->capacity) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Vehicle capacity exceeded. Please select another vehicle.');
+        }
+
         // Create transportation assignment
-        // This would typically create a record in a student_transportations table
-        // For now, we'll just show success message
+        Transportation::create([
+            'student_id' => $request->student_id,
+            'vehicle_id' => $request->vehicle_id,
+            'route_id' => $request->route_id,
+            'pickup_point' => $request->pickup_point,
+            'dropoff_point' => $request->dropoff_point,
+            'monthly_charges' => $request->monthly_charges,
+            'status' => $request->status,
+            'start_date' => now(),
+            'notes' => $request->notes,
+            'company_id' => auth()->user()->company_id ?? 1,
+            'branch_id' => auth()->user()->branch_id ?? 1,
+        ]);
         
         return redirect()->route('fleet.transportation.index')
             ->with('success', 'Transportation assignment created successfully.');
@@ -76,8 +114,9 @@ class StudentTransportController extends Controller
      */
     public function show($id)
     {
-        $student = Students::with(['AcademicClass', 'academicSession'])->findOrFail($id);
-        return view('fleet.transportation.show', compact('student'));
+        $transportation = Transportation::with(['student.AcademicClass', 'student.academicSession', 'vehicle', 'route'])
+            ->findOrFail($id);
+        return view('fleet.transportation.show', compact('transportation'));
     }
 
     /**
@@ -88,11 +127,12 @@ class StudentTransportController extends Controller
      */
     public function edit($id)
     {
-        $student = Students::with(['AcademicClass', 'academicSession'])->findOrFail($id);
+        $transportation = Transportation::with(['student.AcademicClass', 'student.academicSession', 'vehicle', 'route'])
+            ->findOrFail($id);
         $vehicles = Vehicle::where('status', 'active')->get();
         $routes = Route::where('status', 'active')->get();
         
-        return view('fleet.transportation.edit', compact('student', 'vehicles', 'routes'));
+        return view('fleet.transportation.edit', compact('transportation', 'vehicles', 'routes'));
     }
 
     /**
@@ -105,13 +145,25 @@ class StudentTransportController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'transport_fee' => 'required|numeric|min:0',
+            'vehicle_id' => 'required|exists:fleet_vehicles,id',
+            'route_id' => 'required|exists:fleet_routes,id',
+            'pickup_point' => 'required|string|max:255',
+            'dropoff_point' => 'required|string|max:255',
+            'monthly_charges' => 'required|numeric|min:0',
+            'status' => 'required|in:active,inactive',
+            'notes' => 'nullable|string',
         ]);
 
-        // Update student's transport fee only
-        $student = Students::findOrFail($id);
-        $student->update([
-            'transport_fee' => $request->transport_fee,
+        // Update transportation assignment
+        $transportation = Transportation::findOrFail($id);
+        $transportation->update([
+            'vehicle_id' => $request->vehicle_id,
+            'route_id' => $request->route_id,
+            'pickup_point' => $request->pickup_point,
+            'dropoff_point' => $request->dropoff_point,
+            'monthly_charges' => $request->monthly_charges,
+            'status' => $request->status,
+            'notes' => $request->notes,
         ]);
 
         return redirect()->route('fleet.transportation.index')
@@ -127,7 +179,8 @@ class StudentTransportController extends Controller
     public function destroy($id)
     {
         // Delete transportation assignment
-        // This would typically delete a record from a student_transportations table
+        $transportation = Transportation::findOrFail($id);
+        $transportation->delete();
         
         return redirect()->route('fleet.transportation.index')
             ->with('success', 'Transportation assignment deleted successfully.');

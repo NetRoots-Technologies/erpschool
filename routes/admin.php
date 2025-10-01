@@ -180,6 +180,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'admin', 'as' => 'admin.'], 
         Route::get('/collections/pay-challan', [FeeManagementController::class, 'payChallan'])->name('collections.pay-challan');
         Route::get('/collections/challans-by-student/{studentId}', [FeeManagementController::class, 'getChallansByStudent'])->name('collections.challans-by-student');
         Route::get('/collections/challan-discounts/{challanId}', [FeeManagementController::class, 'getChallanDiscounts'])->name('collections.challan-discounts');
+        Route::get('/collections/student-transport-fees/{studentId}', [FeeManagementController::class, 'getStudentTransportFees'])->name('collections.student-transport-fees');
         Route::post('/collections/store-challan-payment', [FeeManagementController::class, 'storeChallanPayment'])->name('collections.store-challan-payment');
         Route::get('/collections/{id}', [FeeManagementController::class, 'showCollection'])->name('collections.show');
         Route::get('/collections/{id}/edit', [FeeManagementController::class, 'editCollection'])->name('collections.edit');
@@ -199,7 +200,6 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'admin', 'as' => 'admin.'], 
         Route::get('/billing', [FeeManagementController::class, 'billing'])->name('billing');
         Route::get('/billing/data', [FeeManagementController::class, 'getBillingData'])->name('billing.data');
         Route::post('/billing/generate', [FeeManagementController::class, 'generateBilling'])->name('billing.generate');
-        Route::get('/billing/{id}', [FeeManagementController::class, 'showBilling'])->name('billing.show');
         Route::get('/billing/{id}/print', [FeeManagementController::class, 'printBilling'])->name('billing.print');
         
         // Reports

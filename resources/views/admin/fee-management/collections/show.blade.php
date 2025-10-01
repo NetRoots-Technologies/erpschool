@@ -24,11 +24,16 @@
         </div>
     </div>
 
+
+
+    <!-- Payment Summary -->
     <div class="row">
-        <div class="col-md-8">
+        <div class="col-12">
             <div class="card">
-                <div class="card-header bg-primary" style="color: #212529 !important;">
-                    <h3 class="card-title" style="color: #212529 !important;">Collection Information</h3>
+                <div class="card-header bg-success" style="color: white !important;">
+                    <h3 class="card-title" style="color: white !important;">
+                        <i class="fa fa-calculator"></i> Payment Summary
+                    </h3>
                 </div>
                 <div class="card-body">
                     <div class="row">
@@ -48,155 +53,81 @@
                                 </tr>
                                 <tr>
                                     <td><strong>Session:</strong></td>
-                                    <td><span class="badge badge-info">{{ $collection->academicSession->name ?? 'N/A' }}</span></td>
+                                    <td><span class="text-info">{{ $collection->academicSession->name ?? $collection->student->academicSession->name ?? 'N/A' }}</span></td>
                                 </tr>
-                            </table>
-                        </div>
-                        <div class="col-md-6">
-                            <table class="table table-borderless">
                                 <tr>
                                     <td><strong>Total Amount:</strong></td>
-                                    <td><span class="text-success font-weight-bold">Rs. {{ number_format($collection->paid_amount ?? 0, 2) }}</span></td>
+                                    <td><span class="text-primary font-weight-bold">Rs. {{ number_format($collection->total_amount ?? $collection->paid_amount, 2) }}</span></td>
                                 </tr>
+                                @if($totalTransportFee > 0)
                                 <tr>
+                                    <td><strong>Transport Fee:</strong></td>
+                                    <td><span class="text-info font-weight-bold">Rs. {{ number_format($totalTransportFee, 2) }}</span></td>
+                                </tr>
+                                @endif
+                                @if($totalDiscount > 0)
+                                <tr>
+                                    <td><strong>Discount Applied:</strong></td>
+                                    <td><span class="text-success font-weight-bold">- Rs. {{ number_format($totalDiscount, 2) }}</span></td>
+                                </tr>
+                                @endif
+                                <tr class="border-top">
                                     <td><strong>Paid Amount:</strong></td>
-                                    <td><span class="text-success font-weight-bold">Rs. {{ number_format($collection->paid_amount ?? 0, 2) }}</span></td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Collection Date:</strong></td>
-                                    <td><span class="text-info">{{ $collection->collection_date ? \Carbon\Carbon::parse($collection->collection_date)->format('d M Y') : 'N/A' }}</span></td>
-                                </tr>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-header bg-success" style="color: #212529 !important;">
-                    <h3 class="card-title" style="color: #212529 !important;">Payment Details</h3>
-                </div>
-                <div class="card-body">
-                    <table class="table table-borderless">
-                        <tr>
-                            <td><strong>Payment Method:</strong></td>
-                            <td><span class="badge badge-info">{{ ucfirst($collection->payment_method ?? 'N/A') }}</span></td>
-                        </tr>
-                        <tr>
-                            <td><strong>Remarks:</strong></td>
-                            <td><span class="text-dark">{{ $collection->remarks ?: 'N/A' }}</span></td>
-                        </tr>
-                        <tr>
-                            <td><strong>Created:</strong></td>
-                            <td><span class="text-info">{{ $collection->created_at->format('d M Y H:i') }}</span></td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    @if($collection->billing)
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header bg-info" style="color: #212529 !important;">
-                    <h3 class="card-title" style="color: #212529 !important;">Challan Details</h3>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <table class="table table-borderless">
-                                <tr>
-                                    <td><strong>Challan Number:</strong></td>
-                                    <td><span class="badge badge-primary">{{ $collection->billing->challan_number }}</span></td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Billing Month:</strong></td>
-                                    <td><span class="text-info">{{ \Carbon\Carbon::parse($collection->billing->billing_month . '-01')->format('F Y') }}</span></td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Due Date:</strong></td>
-                                    <td><span class="text-warning">{{ \Carbon\Carbon::parse($collection->billing->due_date)->format('d M Y') }}</span></td>
+                                    <td><span class="text-success font-weight-bold">Rs. {{ number_format($collection->paid_amount, 2) }}</span></td>
                                 </tr>
                             </table>
                         </div>
                         <div class="col-md-6">
-                            <table class="table table-borderless">
-                                <tr>
-                                    <td><strong>Total Amount:</strong></td>
-                                    <td><span class="text-primary font-weight-bold">Rs. {{ number_format($collection->billing->total_amount, 2) }}</span></td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Paid Amount:</strong></td>
-                                    <td><span class="text-success font-weight-bold">Rs. {{ number_format($collection->billing->paid_amount ?? 0, 2) }}</span></td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Outstanding:</strong></td>
-                                    <td><span class="text-danger font-weight-bold">Rs. {{ number_format($collection->billing->outstanding_amount ?? 0, 2) }}</span></td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Status:</strong></td>
-                                    <td>
-                                        @if($collection->billing->status == 'paid')
-                                            <span class="badge badge-success">Paid</span>
-                                        @elseif($collection->billing->status == 'partial')
-                                            <span class="badge badge-warning">Partial</span>
-                                        @elseif($collection->billing->status == 'overdue')
-                                            <span class="badge badge-danger">Overdue</span>
-                                        @else
-                                            <span class="badge badge-info">{{ ucfirst($collection->billing->status) }}</span>
-                                        @endif
-                                    </td>
-                                </tr>
+                            @if($transportFees && $transportFees->count() > 0)
+                            <h6 class="text-info"><i class="fa fa-bus"></i> Transport Details</h6>
+                            <table class="table table-sm table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Vehicle</th>
+                                        <th>Route</th>
+                                        <th>Charges</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($transportFees as $transport)
+                                    <tr>
+                                        <td>{{ $transport->vehicle->vehicle_number ?? 'N/A' }}</td>
+                                        <td>{{ $transport->route->route_name ?? 'N/A' }}</td>
+                                        <td>Rs. {{ number_format($transport->monthly_charges, 2) }}</td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
                             </table>
+                            @endif
+                            
+                            @if($discounts && $discounts->count() > 0)
+                            <h6 class="text-success mt-3"><i class="fa fa-gift"></i> Applied Discounts</h6>
+                            <table class="table table-sm table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Category</th>
+                                        <th>Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($discounts as $discount)
+                                    @php
+                                        $discountAmount = $discount->calculateDiscount($collection->billing->total_amount);
+                                    @endphp
+                                    <tr>
+                                        <td>{{ $discount->category->name ?? 'General' }}</td>
+                                        <td>Rs. {{ number_format($discountAmount, 2) }}</td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                            @endif
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    @endif
-
-    @if($collection->details && $collection->details->count() > 0)
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header bg-secondary" style="color: #212529 !important;">
-                    <h3 class="card-title" style="color: #212529 !important;">Fee Breakdown</h3>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-striped">
-                            <thead class="thead-light">
-                                <tr>
-                                    <th>Category</th>
-                                    <th>Amount</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($collection->details as $detail)
-                                <tr>
-                                    <td><span class="text-primary font-weight-bold">{{ $detail->feeCategory->name ?? 'N/A' }}</span></td>
-                                    <td><span class="text-success font-weight-bold">Rs. {{ number_format($detail->amount, 2) }}</span></td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                            <tfoot class="bg-light">
-                                <tr>
-                                    <th class="text-right">Total Amount:</th>
-                                    <th class="text-success">Rs. {{ number_format($collection->details->sum('amount'), 2) }}</th>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    @endif
 </div>
 @endsection
 

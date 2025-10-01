@@ -162,8 +162,36 @@
                             </h6>
                             <div class="row">
                                 <div class="col-md-6">
-                                    <p><strong>Challan Amount:</strong> Rs. {{ number_format($collection->billing->total_amount ?? 0, 2) }}</p>
-                                    <p><strong>Current Payment:</strong> Rs. {{ number_format($collection->paid_amount, 2) }}</p>
+                                    <table class="table table-borderless table-sm">
+                                        <tr>
+                                            <td><strong>Challan Amount:</strong></td>
+                                            <td class="text-right">Rs. {{ number_format($collection->billing->total_amount ?? 0, 2) }}</td>
+                                        </tr>
+                                        @if(isset($totalTransportFee) && $totalTransportFee > 0)
+                                        <tr>
+                                            <td class="text-info"><strong>Transport Fee:</strong></td>
+                                            <td class="text-right text-info">+ Rs. {{ number_format($totalTransportFee, 2) }}</td>
+                                        </tr>
+                                        @endif
+                                        @if(isset($totalDiscount) && $totalDiscount > 0)
+                                        <tr>
+                                            <td class="text-success"><strong>Discount Applied:</strong></td>
+                                            <td class="text-right text-success">- Rs. {{ number_format($totalDiscount, 2) }}</td>
+                                        </tr>
+                                        @endif
+                                        <tr class="border-top">
+                                            <td><strong>Total Amount:</strong></td>
+                                            <td class="text-right"><strong>Rs. {{ number_format(($collection->billing->total_amount ?? 0) + (isset($totalTransportFee) ? $totalTransportFee : 0) - (isset($totalDiscount) ? $totalDiscount : 0), 2) }}</strong></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Current Payment:</strong></td>
+                                            <td class="text-right">Rs. {{ number_format($collection->paid_amount, 2) }}</td>
+                                        </tr>
+                                        <tr class="border-top">
+                                            <td><strong>Outstanding:</strong></td>
+                                            <td class="text-right text-danger"><strong>Rs. {{ number_format((($collection->billing->total_amount ?? 0) + (isset($totalTransportFee) ? $totalTransportFee : 0) - (isset($totalDiscount) ? $totalDiscount : 0)) - $collection->paid_amount, 2) }}</strong></td>
+                                        </tr>
+                                    </table>
                                 </div>
                                 <div class="col-md-6">
                                     <p><strong>Challan Status:</strong> 

@@ -14,7 +14,7 @@
         body {
             font-family: Arial, sans-serif;
             background: #f5f5f5;
-            padding: 20px;
+            padding: 10px;
         }
         
         .bill-container {
@@ -29,36 +29,36 @@
         .bill-header {
             background: #2c3e50;
             color: white;
-            padding: 20px;
+            padding: 15px;
             text-align: center;
         }
         
         .school-name {
-            font-size: 24px;
+            font-size: 20px;
             font-weight: bold;
-            margin-bottom: 5px;
+            margin-bottom: 3px;
         }
         
         .school-address {
-            font-size: 14px;
+            font-size: 12px;
             opacity: 0.9;
         }
         
         .bill-title {
-            font-size: 18px;
-            margin-top: 15px;
+            font-size: 16px;
+            margin-top: 10px;
             font-weight: 600;
         }
         
         .bill-content {
-            padding: 30px;
+            padding: 15px;
         }
         
         .bill-info {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 30px;
-            gap: 30px;
+            margin-bottom: 15px;
+            gap: 15px;
         }
         
         .info-section {
@@ -118,22 +118,22 @@
         .discount-section {
             background: #d4edda;
             border: 1px solid #28a745;
-            border-radius: 8px;
-            padding: 15px;
-            margin: 15px 0;
+            border-radius: 6px;
+            padding: 8px;
+            margin: 8px 0;
         }
         
         .discount-title {
             color: #155724;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 600;
-            margin-bottom: 10px;
+            margin-bottom: 6px;
         }
         
         .discount-item {
             display: flex;
             justify-content: space-between;
-            padding: 5px 0;
+            padding: 2px 0;
             border-bottom: 1px solid #c3e6cb;
         }
         
@@ -149,6 +149,59 @@
         .discount-value {
             color: #155724;
             font-weight: 600;
+        }
+        
+        .transport-section {
+            background: #e3f2fd;
+            border: 1px solid #2196f3;
+            border-radius: 6px;
+            padding: 8px;
+            margin: 8px 0;
+        }
+        
+        .transport-title {
+            color: #0d47a1;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .transport-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 1px 0;
+            border-bottom: 1px solid #bbdefb;
+        }
+        
+        .transport-item:last-child {
+            border-bottom: none;
+        }
+        
+        .transport-name {
+            color: #0d47a1;
+            font-weight: 500;
+        }
+        
+        .transport-value {
+            color: #0d47a1;
+            font-weight: 600;
+        }
+        
+        .transport-total {
+            display: flex;
+            justify-content: space-between;
+            padding: 3px 0;
+            border-top: 2px solid #2196f3;
+            margin-top: 3px;
+            font-weight: 600;
+        }
+        
+        .transport-total-label {
+            color: #0d47a1;
+        }
+        
+        .transport-total-value {
+            color: #0d47a1;
         }
         
         .print-button {
@@ -195,6 +248,7 @@
             body {
                 background: white;
                 padding: 0;
+                font-size: 12px;
             }
             
             .print-button {
@@ -212,18 +266,38 @@
                 background: #2c3e50 !important;
                 -webkit-print-color-adjust: exact;
                 color-adjust: exact;
+                padding: 10px;
             }
             
             .bill-content {
-                padding: 20px;
+                padding: 10px;
             }
             
             .bill-info {
-                gap: 20px;
+                gap: 10px;
+                margin-bottom: 10px;
+            }
+            
+            .discount-section, .transport-section {
+                padding: 6px;
+                margin: 6px 0;
+            }
+            
+            .discount-title, .transport-title {
+                font-size: 10px;
+                margin-bottom: 3px;
+            }
+            
+            .discount-item, .transport-item {
+                padding: 1px 0;
+            }
+            
+            .amount-row {
+                padding: 2px 0;
             }
             
             .amount-section {
-                padding: 15px;
+                padding: 10px;
             }
             
             .discount-section {
@@ -323,10 +397,26 @@
                         @endforeach
                     </div>
                 @endif
+
+                @if($transportFees && $transportFees->count() > 0)
+                    <div class="transport-section">
+                        <div class="transport-title">Transport Fees</div>
+                        @foreach($transportFees as $transport)
+                            <div class="transport-item">
+                                <span class="transport-name">{{ $transport->vehicle->vehicle_number ?? 'N/A' }} - {{ $transport->route->route_name ?? 'N/A' }}</span>
+                                <span class="transport-value">Rs. {{ number_format($transport->monthly_charges, 2) }}</span>
+                            </div>
+                        @endforeach
+                        <div class="transport-total">
+                            <span class="transport-total-label">Total Transport Fee:</span>
+                            <span class="transport-total-value">Rs. {{ number_format($totalTransportFee, 2) }}</span>
+                        </div>
+                    </div>
+                @endif
                 
                 @php
                     $paidAmount = $billing->paid_amount ?? 0;
-                    $finalAmount = $billing->getFinalAmount();
+                    $finalAmount = $billing->getFinalAmount() + (isset($totalTransportFee) ? $totalTransportFee : 0);
                     $outstandingAmount = $finalAmount - $paidAmount;
                 @endphp
                 
