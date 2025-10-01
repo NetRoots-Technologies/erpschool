@@ -288,7 +288,7 @@
                 }
                 $.ajax({
                     type: 'GET',
-                    url: '{{ route('academic.fetchSubjects') }}',
+                    url: '{{ route('academic.fetchSubject') }}',
                     data: {
                         class_id: class_id
                     },
