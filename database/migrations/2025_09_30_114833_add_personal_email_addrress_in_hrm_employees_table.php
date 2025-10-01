@@ -15,6 +15,9 @@ class AddPersonalEmailAddrressInHrmEmployeesTable extends Migration
     {
         Schema::table('hrm_employees', function (Blueprint $table) {
             $table->string('personal_email_address')->nullable()->after('email');
+            $table->string('gendar')->nullable()->after('personal_email_address');
+            $table->string('specialization_subject')->nullable()->after('gendar');
+            $table->string('machine_status')->default(0)->after('specialization_subject');
         });
     }
 
@@ -27,6 +30,9 @@ class AddPersonalEmailAddrressInHrmEmployeesTable extends Migration
     {
         Schema::table('hrm_employees', function (Blueprint $table) {
             $table->dropColumn('personal_email_address');
+            $table->dropColumn('gender');
+            $table->dropColumn('specialization_subject');
+            $table->dropColumn('machine_status');
         });
     }
 }
