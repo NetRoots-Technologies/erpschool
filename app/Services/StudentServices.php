@@ -23,7 +23,7 @@ use App\Models\Student\StudentDetail;
 use App\Models\Student\StudentSibling;
 
 use App\Models\Student\StudentPictures;
-use App\Models\Student\StudentTransport;
+// use App\Models\Student\StudentTransport; // Transportation module not fully implemented
 use App\Models\Student\StudentPerviousSchool;
 use App\Models\Student\StudentEmergencyContact;
 
@@ -367,19 +367,19 @@ class StudentServices
             }
         }
 
-        $student->student_transports()->delete();
+        // $student->student_transports()->delete(); // Transportation module not fully implemented
 
 
-        if ($request->has('pickup_dropoff')) {
-            $studentTransport = StudentTransport::create([
-                'pickup_dropoff' => $request->get('pickup_dropoff'),
-                'transport_facility' => $request->get('transport_facility'),
-                'pick_address' => $request->get('pick_address'),
-                'picture_permission' => $request->get('picture_permission'),
-                'student_id' => $student->id,
-
-            ]);
-        }
+        // Transportation module not fully implemented
+        // if ($request->has('pickup_dropoff')) {
+        //     $studentTransport = StudentTransport::create([
+        //         'pickup_dropoff' => $request->get('pickup_dropoff'),
+        //         'transport_facility' => $request->get('transport_facility'),
+        //         'pick_address' => $request->get('pick_address'),
+        //         'picture_permission' => $request->get('picture_permission'),
+        //         'student_id' => $student->id,
+        //     ]);
+        // }
 
         $student->studentPictures()->delete();
 
@@ -446,7 +446,7 @@ class StudentServices
             return abort(503);
         }
         $student = Students::find($id);
-        $student->student_transports()->delete();
+        // $student->student_transports()->delete(); // Transportation module not fully implemented
         $student->student_siblings()->delete();
         $student->student_schools()->delete();
         $student->student_emergency_contacts()->delete();

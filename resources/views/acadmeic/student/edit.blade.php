@@ -81,6 +81,18 @@
                                     </select>
                                 </div>
 
+                                <div class="col-md-4">
+                                    <label for="academic_session_id"><b>Academic Session:</b></label>
+                                    <select name="session_id" class="form-select select2 basic-single mt-3"
+                                        aria-label=".form-select-lg example">
+                                        <option value="">Select Session</option>
+                                        @foreach($sessions as $session)
+                                            <option value="{{ $session->id }}" {{ $student->session_id == $session->id ? 'selected' : '' }}>
+                                                {{ $session->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
 
                                 <div class="col-md-4">
                                     <label for="branches"><b>Section:</b></label>

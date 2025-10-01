@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Exam;
 
 use App\Http\Controllers\Controller;
 use App\Models\Exam\SkillEvaluationKey;
-use App\Services\SkillEvaluationKeyService;
+use App\Services\skillEvaluationKeyService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
@@ -12,7 +12,7 @@ class SkillEvaluationKeyController extends Controller
 {
 
     public $skillEvaluationKeyService;
-    public function __construct(SkillEvaluationKeyService $skillEvaluationKeyService)
+    public function __construct(skillEvaluationKeyService $skillEvaluationKeyService)
     {
         $this->skillEvaluationKeyService = $skillEvaluationKeyService;
     }

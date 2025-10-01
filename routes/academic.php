@@ -168,7 +168,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'academic', 'as' => 'academi
 
     // for Academic  designation
     Route::get('/export-file-designation',[DesignationController::class,'exportbulkfile'])->name('designation.export-file');
-    Route::post('/import-file-designation',[designationController::class,'importBulkFile'])->name('designation.import-file');
+    Route::post('/import-file-designation',[DesignationController::class,'importBulkFile'])->name('designation.import-file');
 
      // for Academic  Department
     Route::get('/export-file-department',[DepartmentController::class,'exportbulkfile'])->name('department.export-file');

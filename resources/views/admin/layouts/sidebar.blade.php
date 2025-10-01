@@ -920,126 +920,130 @@
                  
                 @endcanany
 
-                @canany(['Vendor', 'VendorCategory', 'CafeInventory', 'StationeryInventory', 'POS'])
-                    <li class="side-item side-item-category">Inventory Management</li>
-                
-                    @can('Vendor')
-                        <li class="slide">
-                            <a class="side-menu__item {{ request()->routeIs('inventory.vendor-management.index') ? 'active' : '' }}"
-                                href="{{ route('inventory.vendor-management.index') }}">
-                                <i class="fas fa-users icons8 icon-style me-3"></i>
-                                <span class="side-menu__label">Vendors</span>
-                            </a>
-                        </li>
-                    @endcan
-                    @can('VendorCategory')
-                        <li class="slide">
-                            <a class="side-menu__item {{ request()->routeIs('inventory.vendor-category.index') ? 'active' : '' }}"
-                                href="{{ route('inventory.vendor-category.index') }}">
-                                <i class="fas fa-users icons8 icon-style me-3"></i>
-                                <span class="side-menu__label">Vendor Categories</span>
-                            </a>
-                        </li>
-                    @endcan
-                    @can('CafeInventory')
-                        <li class="slide">
-                            <a class="side-menu__item {{ request()->routeIs('inventory.items.index', 'inventory.suppliers.index', 'inventory.requisitions.index', 'inventory.quotes.index', 'inventory.requisitions.approval', 'inventory.purchase_order.index', 'inventory.inventry.index', 'inventory.product.index', 'inventory.product.productCompleted', 'inventory.school_lunch.school_lunch', 'inventory.school_lunch.view', 'inventory.staff_lunch.emp_index', 'inventory.staff_lunch.emp_view', 'inventory.grn') && in_array(request()->query('type'), ['food']) ? 'active' : '' }}"
-                                data-bs-toggle="slide" href="javascript:void(0);">
-                                <i class="fas fa-box icons8 icon-style me-3"></i>
-                                <span class="side-menu__label">Cafe Inventory</span>
-                                <i class="angle fe fe-chevron-down"></i>
-                            </a>
-                            <ul class="slide-menu"
-                                style="display: {{ request()->routeIs('inventory.items.index', 'inventory.suppliers.index', 'inventory.requisitions.index', 'inventory.quotes.index', 'inventory.requisitions.approval', 'inventory.purchase_order.index', 'inventory.inventry.index', 'inventory.product.index', 'inventory.product.productCompleted', 'inventory.school_lunch.school_lunch', 'inventory.school_lunch.view', 'inventory.staff_lunch.emp_index', 'inventory.staff_lunch.emp_view', 'inventory.grn') && in_array(request()->query('type'), ['food']) ? 'block' : 'none' }}">
-                                <li><a class="slide-item {{ request()->routeIs('inventory.items.index') && request()->query('type') === 'food' ? 'active' : '' }}"
-                                        href="{{ route('inventory.items.index', ['type' => 'food']) }}">Raw Material & Items</a>
-                                </li>
-                                <li><a class="slide-item {{ request()->routeIs('inventory.suppliers.index') && request()->query('type') === 'food' ? 'active' : '' }}"
-                                        href="{{ route('inventory.suppliers.index', ['type' => 'food']) }}">Suppliers</a></li>
-                                <li><a class="slide-item {{ request()->routeIs('inventory.requisitions.index') && request()->query('type') === 'food' ? 'active' : '' }}"
-                                        href="{{ route('inventory.requisitions.index', ['type' => 'food']) }}">Requisitions</a>
-                                </li>
-                                <li><a class="slide-item {{ request()->routeIs('inventory.requisitions.approval') && request()->query('type') === 'food' ? 'active' : '' }}"
-                                        href="{{ route('inventory.requisitions.approval', ['type' => 'food']) }}">Requisition
-                                        Approval</a></li>
-                                <li><a class="slide-item {{ request()->routeIs('inventory.quotes.index') && request()->query('type') === 'food' ? 'active' : '' }}"
-                                        href="{{ route('inventory.quotes.index', ['type' => 'food']) }}">Quotes</a></li>
-                                <li><a class="slide-item {{ request()->routeIs('inventory.purchase_order.index') && request()->query('type') === 'food' ? 'active' : '' }}"
-                                        href="{{ route('inventory.purchase_order.index', ['type' => 'food']) }}">Purchase
-                                        Order</a></li>
-                                <li><a class="slide-item {{ request()->routeIs('inventory.grn') && request()->query('type') === 'food' ? 'active' : '' }}"
-                                        href="{{ route('inventory.grn', ['type' => 'food']) }}">GRN</a></li>
-                                <li><a class="slide-item {{ request()->routeIs('inventory.inventry.index') && request()->query('type') === 'food' ? 'active' : '' }}"
-                                        href="{{ route('inventory.inventry.index', ['type' => 'food']) }}">Inventory</a></li>
-                                <li><a class="slide-item {{ request()->routeIs('inventory.product.index') && request()->query('type') === 'food' ? 'active' : '' }}"
-                                        href="{{ route('inventory.product.index', ['type' => 'food']) }}">Products</a></li>
-                                <li><a class="slide-item {{ request()->routeIs('inventory.product.productCompleted') ? 'active' : '' }}"
-                                        href="{{ route('inventory.product.productCompleted') }}">Completed Goods</a></li>
-                                <li><a class="slide-item {{ request()->routeIs('inventory.school_lunch.school_lunch') ? 'active' : '' }}"
-                                        href="{{ route('inventory.school_lunch.school_lunch') }}">Student Meal</a></li>
-                                <li><a class="slide-item {{ request()->routeIs('inventory.school_lunch.view', 'inventory.school_lunch.get_assigned_student') ? 'active' : '' }}"
-                                        href="{{ route('inventory.school_lunch.view') }}">Student Meal Assigned</a></li>
-                                <li><a class="slide-item {{ request()->routeIs('inventory.staff_lunch.emp_index') ? 'active' : '' }}"
-                                        href="{{ route('inventory.staff_lunch.emp_index') }}">Staff Meal</a></li>
-                                <li><a class="slide-item {{ request()->routeIs('inventory.staff_lunch.emp_view') ? 'active' : '' }}"
-                                        href="{{ route('inventory.staff_lunch.emp_view') }}">Staff Meal Assigned</a></li>
-                            </ul>
-                        </li>
-                    @endcan
-                    @can('StationeryInventory')
-                        <li class="slide">
-                            <a class="side-menu__item {{ request()->routeIs('inventory.items.index', 'inventory.suppliers.index', 'inventory.requisitions.index', 'inventory.quotes.index', 'inventory.requisitions.approval', 'inventory.purchase_order.index', 'inventory.inventry.index', 'inventory.product.index', 'inventory.grn') && in_array(request()->query('type'), ['stationary']) ? 'active' : '' }}"
-                                data-bs-toggle="slide" href="javascript:void(0);">
-                                <i class="fas fa-warehouse icons8 icon-style me-3"></i>
-                                <span class="side-menu__label">Stationery Inventory</span>
-                                <i class="angle fe fe-chevron-down"></i>
-                            </a>
-                            <ul class="slide-menu"
-                                style="display: {{ request()->routeIs('inventory.items.index', 'inventory.suppliers.index', 'inventory.requisitions.index', 'inventory.quotes.index', 'inventory.requisitions.approval', 'inventory.purchase_order.index', 'inventory.inventry.index', 'inventory.product.index', 'inventory.grn') && in_array(request()->query('type'), ['stationary']) ? 'block' : 'none' }}">
-                                <li><a class="slide-item {{ request()->routeIs('inventory.items.index') && request()->query('type') === 'stationary' ? 'active' : '' }}"
-                                        href="{{ route('inventory.items.index', ['type' => 'stationary']) }}">Items</a></li>
-                                <li><a class="slide-item {{ request()->routeIs('inventory.suppliers.index') && request()->query('type') === 'stationary' ? 'active' : '' }}"
-                                        href="{{ route('inventory.suppliers.index', ['type' => 'stationary']) }}">Suppliers</a>
-                                </li>
-                                <li><a class="slide-item {{ request()->routeIs('inventory.requisitions.index') && request()->query('type') === 'stationary' ? 'active' : '' }}"
-                                        href="{{ route('inventory.requisitions.index', ['type' => 'stationary']) }}">Requisitions</a>
-                                </li>
-                                <li><a class="slide-item {{ request()->routeIs('inventory.requisitions.approval') && request()->query('type') === 'stationary' ? 'active' : '' }}"
-                                        href="{{ route('inventory.requisitions.approval', ['type' => 'stationary']) }}">Requisition
-                                        Approval</a></li>
-                                <li><a class="slide-item {{ request()->routeIs('inventory.quotes.index') && request()->query('type') === 'stationary' ? 'active' : '' }}"
-                                        href="{{ route('inventory.quotes.index', ['type' => 'stationary']) }}">Quotes</a></li>
-                                <li><a class="slide-item {{ request()->routeIs('inventory.purchase_order.index') && request()->query('type') === 'stationary' ? 'active' : '' }}"
-                                        href="{{ route('inventory.purchase_order.index', ['type' => 'stationary']) }}">Purchase
-                                        Order</a></li>
-                                <li><a class="slide-item {{ request()->routeIs('inventory.grn') && request()->query('type') === 'stationary' ? 'active' : '' }}"
-                                        href="{{ route('inventory.grn', ['type' => 'stationary']) }}">GRN</a></li>
-                                <li><a class="slide-item {{ request()->routeIs('inventory.inventry.index') && request()->query('type') === 'stationary' ? 'active' : '' }}"
-                                        href="{{ route('inventory.inventry.index', ['type' => 'stationary']) }}">Store
-                                        Inventory</a></li>
-                                <li><a class="slide-item {{ request()->routeIs('inventory.product.index') && request()->query('type') === 'stationary' ? 'active' : '' }}"
-                                        href="{{ route('inventory.product.index', ['type' => 'stationary']) }}">Bundles</a></li>
-                            </ul>
-                        </li>
-                    @endcan
-                    @can('POS')
-                        <li class="slide">
-                            <a class="side-menu__item {{ request()->routeIs('inventory.pos.view') ? 'active' : '' }}"
-                                data-bs-toggle="slide" href="javascript:void(0);">
-                                <i class="fas fa-cart-arrow-down icons8 icon-style me-3"></i>
-                                <span class="side-menu__label">POS</span>
-                                <i class="angle fe fe-chevron-down"></i>
-                            </a>
-                            <ul class="slide-menu"
-                                style="display: {{ request()->routeIs('inventory.pos.view') ? 'block' : 'none' }}">
-                                <li><a class="slide-item {{ request()->routeIs('inventory.pos.view') && request()->query('type') === 'food' ? 'active' : '' }}"
-                                        href="{{ route('inventory.pos.view', ['type' => 'food']) }}">POS (Food)</a></li>
-                                <li><a class="slide-item {{ request()->routeIs('inventory.pos.view') && request()->query('type') === 'uniform' ? 'active' : '' }}"
-                                        href="{{ route('inventory.pos.view', ['type' => 'uniform']) }}">POS (Uniform)</a></li>
-                            </ul>
-                        </li>
-                    @endcan
-                @endcanany
+               @canany(['Vendor', 'VendorCategory', 'CafeInventory', 'StationeryInventory', 'POS'])
+
+    @php
+        $routeType = request()->query('type');
+    @endphp
+
+    <li class="side-item side-item-category">Inventory Management</li>
+
+    {{-- Uncomment if needed later
+    @can('Vendor')
+        <li class="slide">
+            <a class="side-menu__item {{ request()->routeIs('inventory.vendor-management.index') ? 'active' : '' }}"
+                href="{{ route('inventory.vendor-management.index') }}">
+                <i class="fas fa-users icons8 icon-style me-3"></i>
+                <span class="side-menu__label">Vendors</span>
+            </a>
+        </li>
+    @endcan
+
+    @can('VendorCategory')
+        <li class="slide">
+            <a class="side-menu__item {{ request()->routeIs('inventory.vendor-category.index') ? 'active' : '' }}"
+                href="{{ route('inventory.vendor-category.index') }}">
+                <i class="fas fa-layer-group icons8 icon-style me-3"></i>
+                <span class="side-menu__label">Vendor Categories</span>
+            </a>
+        </li>
+    @endcan
+    --}}
+
+    {{-- ================= CAFE INVENTORY ================= --}}
+    @can('CafeInventory')
+        <li class="slide">
+            <a class="side-menu__item {{ $routeType === 'food' ? 'active' : '' }}"
+                data-bs-toggle="slide" href="javascript:void(0);">
+                <i class="fas fa-box icons8 icon-style me-3"></i>
+                <span class="side-menu__label">Cafe Inventory</span>
+                <i class="angle fe fe-chevron-down"></i>
+            </a>
+            <ul class="slide-menu" style="display: {{ $routeType === 'food' ? 'block' : 'none' }}">
+                <li><a class="slide-item {{ request()->routeIs('inventory.items.index') && $routeType === 'food' ? 'active' : '' }}"
+                        href="{{ route('inventory.items.index', ['type' => 'food']) }}">Raw Material & Items</a></li>
+                <li><a class="slide-item {{ request()->routeIs('inventory.suppliers.index') && $routeType === 'food' ? 'active' : '' }}"
+                        href="{{ route('inventory.suppliers.index', ['type' => 'food']) }}">Suppliers</a></li>
+                <li><a class="slide-item {{ request()->routeIs('inventory.requisitions.index') && $routeType === 'food' ? 'active' : '' }}"
+                        href="{{ route('inventory.requisitions.index', ['type' => 'food']) }}">Requisitions</a></li>
+                <li><a class="slide-item {{ request()->routeIs('inventory.requisitions.approval') && $routeType === 'food' ? 'active' : '' }}"
+                        href="{{ route('inventory.requisitions.approval', ['type' => 'food']) }}">Requisition Approval</a></li>
+                <li><a class="slide-item {{ request()->routeIs('inventory.quotes.index') && $routeType === 'food' ? 'active' : '' }}"
+                        href="{{ route('inventory.quotes.index', ['type' => 'food']) }}">Quotes</a></li>
+                <li><a class="slide-item {{ request()->routeIs('inventory.purchase_order.index') && $routeType === 'food' ? 'active' : '' }}"
+                        href="{{ route('inventory.purchase_order.index', ['type' => 'food']) }}">Purchase Order</a></li>
+                <li><a class="slide-item {{ request()->routeIs('inventory.grn') && $routeType === 'food' ? 'active' : '' }}"
+                        href="{{ route('inventory.grn', ['type' => 'food']) }}">GRN</a></li>
+                <li><a class="slide-item {{ request()->routeIs('inventory.inventry.index') && $routeType === 'food' ? 'active' : '' }}"
+                        href="{{ route('inventory.inventry.index', ['type' => 'food']) }}">Inventory</a></li>
+                <li><a class="slide-item {{ request()->routeIs('inventory.product.index') && $routeType === 'food' ? 'active' : '' }}"
+                        href="{{ route('inventory.product.index', ['type' => 'food']) }}">Products</a></li>
+                <li><a class="slide-item {{ request()->routeIs('inventory.product.productCompleted') ? 'active' : '' }}"
+                        href="{{ route('inventory.product.productCompleted') }}">Completed Goods</a></li>
+                <li><a class="slide-item {{ request()->routeIs('inventory.school_lunch.school_lunch') ? 'active' : '' }}"
+                        href="{{ route('inventory.school_lunch.school_lunch') }}">Student Meal</a></li>
+                <li><a class="slide-item {{ request()->routeIs('inventory.school_lunch.view', 'inventory.school_lunch.get_assigned_student') ? 'active' : '' }}"
+                        href="{{ route('inventory.school_lunch.view') }}">Student Meal Assigned</a></li>
+                <li><a class="slide-item {{ request()->routeIs('inventory.staff_lunch.emp_index') ? 'active' : '' }}"
+                        href="{{ route('inventory.staff_lunch.emp_index') }}">Staff Meal</a></li>
+                <li><a class="slide-item {{ request()->routeIs('inventory.staff_lunch.emp_view') ? 'active' : '' }}"
+                        href="{{ route('inventory.staff_lunch.emp_view') }}">Staff Meal Assigned</a></li>
+            </ul>
+        </li>
+    @endcan
+
+    {{-- ================= STATIONERY INVENTORY ================= --}}
+    @can('StationeryInventory')
+        <li class="slide">
+            <a class="side-menu__item {{ $routeType === 'stationary' ? 'active' : '' }}"
+                data-bs-toggle="slide" href="javascript:void(0);">
+                <i class="fas fa-warehouse icons8 icon-style me-3"></i>
+                <span class="side-menu__label">Stationery Inventory</span>
+                <i class="angle fe fe-chevron-down"></i>
+            </a>
+            <ul class="slide-menu" style="display: {{ $routeType === 'stationary' ? 'block' : 'none' }}">
+                <li><a class="slide-item {{ request()->routeIs('inventory.items.index') && $routeType === 'stationary' ? 'active' : '' }}"
+                        href="{{ route('inventory.items.index', ['type' => 'stationary']) }}">Items</a></li>
+                <li><a class="slide-item {{ request()->routeIs('inventory.suppliers.index') && $routeType === 'stationary' ? 'active' : '' }}"
+                        href="{{ route('inventory.suppliers.index', ['type' => 'stationary']) }}">Suppliers</a></li>
+                <li><a class="slide-item {{ request()->routeIs('inventory.requisitions.index') && $routeType === 'stationary' ? 'active' : '' }}"
+                        href="{{ route('inventory.requisitions.index', ['type' => 'stationary']) }}">Requisitions</a></li>
+                <li><a class="slide-item {{ request()->routeIs('inventory.requisitions.approval') && $routeType === 'stationary' ? 'active' : '' }}"
+                        href="{{ route('inventory.requisitions.approval', ['type' => 'stationary']) }}">Requisition Approval</a></li>
+                <li><a class="slide-item {{ request()->routeIs('inventory.quotes.index') && $routeType === 'stationary' ? 'active' : '' }}"
+                        href="{{ route('inventory.quotes.index', ['type' => 'stationary']) }}">Quotes</a></li>
+                <li><a class="slide-item {{ request()->routeIs('inventory.purchase_order.index') && $routeType === 'stationary' ? 'active' : '' }}"
+                        href="{{ route('inventory.purchase_order.index', ['type' => 'stationary']) }}">Purchase Order</a></li>
+                <li><a class="slide-item {{ request()->routeIs('inventory.grn') && $routeType === 'stationary' ? 'active' : '' }}"
+                        href="{{ route('inventory.grn', ['type' => 'stationary']) }}">GRN</a></li>
+                <li><a class="slide-item {{ request()->routeIs('inventory.inventry.index') && $routeType === 'stationary' ? 'active' : '' }}"
+                        href="{{ route('inventory.inventry.index', ['type' => 'stationary']) }}">Store Inventory</a></li>
+                <li><a class="slide-item {{ request()->routeIs('inventory.product.index') && $routeType === 'stationary' ? 'active' : '' }}"
+                        href="{{ route('inventory.product.index', ['type' => 'stationary']) }}">Bundles</a></li>
+            </ul>
+        </li>
+    @endcan
+
+    {{-- ================= POINT OF SALE ================= --}}
+    @can('POS')
+        <li class="slide">
+            <a class="side-menu__item {{ request()->routeIs('inventory.pos.view') ? 'active' : '' }}"
+                data-bs-toggle="slide" href="javascript:void(0);">
+                <i class="fas fa-cart-arrow-down icons8 icon-style me-3"></i>
+                <span class="side-menu__label">POS</span>
+                <i class="angle fe fe-chevron-down"></i>
+            </a>
+            <ul class="slide-menu" style="display: {{ request()->routeIs('inventory.pos.view') ? 'block' : 'none' }}">
+                <li><a class="slide-item {{ request()->routeIs('inventory.pos.view') && $routeType === 'food' ? 'active' : '' }}"
+                        href="{{ route('inventory.pos.view', ['type' => 'food']) }}">POS (Food)</a></li>
+                <li><a class="slide-item {{ request()->routeIs('inventory.pos.view') && $routeType === 'uniform' ? 'active' : '' }}"
+                        href="{{ route('inventory.pos.view', ['type' => 'uniform']) }}">POS (Uniform)</a></li>
+            </ul>
+        </li>
+    @endcan
+
+@endcanany
+
 
                 @can('UserManagement')
                     <li class="side-item side-item-category">User Management</li>

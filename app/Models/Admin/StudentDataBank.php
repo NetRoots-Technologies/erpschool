@@ -5,6 +5,7 @@ namespace App\Models\Admin;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\Student\AcademicSession;
 
 class StudentDataBank extends Model
 {
@@ -14,25 +15,24 @@ class StudentDataBank extends Model
 
     protected $fillable = [
         'reference_no',
-        'first_name',
-        'last_name',
+        'student_name',
         'student_age',
         'student_email',
         'gender',
         'student_phone',
         'study_perviously',
         'admission_for',
-        'pick_address',
         'father_name',
         'father_cnic',
         'mother_name',
         'mother_cnic',
-        'b_form_no',
         'reason_for_leaving',
         'present_address',
         'landline_number',
         'previous_school',
-        'reason_of_switch'
+        'reason_of_switch',
+        'academic_session_id',
+        'status'
     ];
 
 
@@ -45,5 +45,10 @@ class StudentDataBank extends Model
     public function old_courses()
     {
         return $this->hasOne(StudentDataBankCourse::class, 'student_data_bank_id');
+    }
+
+    public function academicSession()
+    {
+        return $this->belongsTo(AcademicSession::class, 'academic_session_id');
     }
 }

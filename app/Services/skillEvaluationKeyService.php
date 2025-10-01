@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use App\Models\Exam\SkillEvaluationKey;
 
-class SkillEvaluationKeyService
+class skillEvaluationKeyService
 {
 
     public function store($request)

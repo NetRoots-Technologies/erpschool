@@ -10,6 +10,7 @@ use App\Models\Admin\Course;
 use Illuminate\Http\Request;
 use App\Models\Admin\Company;
 use App\Models\Admin\Session;
+use App\Models\Student\AcademicSession;
 use App\Models\HRM\Employees;
 use App\Services\LedgerService;
 use App\Models\Student\Students;
@@ -147,15 +148,16 @@ class StudentController extends Controller
         if (!Gate::allows('Students-edit')) {
             return abort(503);
         }
-        $student = Students::with('student_siblings', 'student_schools', 'student_emergency_contacts', 'student_transports', 'AcademicClass')->find($id);
+        $student = Students::with('student_siblings', 'student_schools', 'student_emergency_contacts', 'AcademicClass')->find($id);
         $companies = Company::where('status', 1)->get();
         $branches = Branch::where('status', 1)->get();
         $students = Students::all();
+        $sessions = AcademicSession::where('status', 1)->get();
         $selectClass = StudentSibling::where('student_id', $student->id)->first();
         $selectedClass = $student->class_id;
 
 
-        return view('acadmeic.student.edit', compact('branches', 'student', 'companies', 'students', 'selectedClass', 'id'));
+        return view('acadmeic.student.edit', compact('branches', 'student', 'companies', 'students', 'sessions', 'selectedClass', 'id'));
     }
 
     /**
