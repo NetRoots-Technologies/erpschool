@@ -5,7 +5,9 @@ namespace App\Models\Exam;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-
+use App\Models\Student\Students;
+use App\Models\Admin\Course;
+use App\Models\User;
 class EffortLevel extends Model
 {
     /**
@@ -33,7 +35,7 @@ class EffortLevel extends Model
      */
     public function student(): BelongsTo
     {
-        return $this->belongsTo(Student::class, 'student_id');
+        return $this->belongsTo(Students::class, 'student_id');
     }
 
     /**

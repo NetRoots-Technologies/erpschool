@@ -11,6 +11,9 @@ use App\Services\EffortLevelsService;
 use App\Models\Admin\Company;
 use App\Models\Exam\EffortLevel;
 use Auth;
+use App\Models\Students;
+
+
 
 class EffortLevelsController extends Controller
 {
@@ -35,11 +38,13 @@ class EffortLevelsController extends Controller
      */
     public function index()
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
-        $companies = Company::all();
-        return view('exam.effort_levels.index', compact('companies'));
+    
+    $effortLevels = EffortLevel::with(['student.AcademicClass','student.section','student.branch.company', 'course', 'user'])->get();
+    // dd($effortLevels);
+
+    return view('exam.effort_levels.index', compact('effortLevels'));
+    
+
     }
 
     /**
@@ -49,52 +54,20 @@ class EffortLevelsController extends Controller
      */
     public function create()
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+        $companies = Company::all();
+        return view('exam.effort_levels.create', compact('companies'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    // public function store(Request $request)
-    // {
-    //     if (!Gate::allows('Dashboard-list')) {
-    //         return abort(503);
-    //     }
-    //     $request->validate([
-    //         'abbrev' => 'required|unique:effort_levels,abbrev',
-    //         'key' => 'required'
-    //     ]);
-    //     return $this->effort_levels_service->store($request);
-    // }
+
 
 public function store(Request $request)
 {
-
-    // dd($request->all());
-    // $validated = $request->validate([
-    //     'company_id' => 'required|exists:companies,id',
-    //     'branch_id' => 'required|exists:branches,id',
-    //     'class_id' => 'required|exists:classes,id',
-    //     'section_id' => 'required|exists:sections,id',
-    //     'student_id' => 'required|exists:students,id',
-    //     'subject_id' => 'required|exists:courses,id',
-    //     'effort_level' => 'required|in:Very Good,Good,Satisfactory,Needs Improvement',
-    //     'achievement_level' => 'required|in:1,2,3'
-    // ]);
-
     $effortMap = [
         'Very Good' => 4,
         'Good' => 3,
         'Satisfactory' => 2,
         'Needs Improvement' => 1
     ];
-
-    
 
     EffortLevel::create([
         'student_id' => $request->student_id,
@@ -104,7 +77,8 @@ public function store(Request $request)
         'level' => (int) $request->achievement_level,
     ]);
 
-    return redirect()->back()->with('success', 'Effort level saved successfully');
+    return redirect()->route('exam.effort_levels.index')->with('success', 'Effort level saved successfully');
+
 }
 
     /**
