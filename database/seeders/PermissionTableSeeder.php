@@ -256,24 +256,24 @@ class PermissionTableSeeder extends Seeder
             ],
 
             // User Management
-            'UserManagement' => [
-                'Users-list', 'Users-create', 'Users-edit', 'Users-delete',
-                'Roles-list', 'Roles-create', 'Roles-edit', 'Roles-delete',
-                'Permissions-list', 'Permissions-create', 'Permissions-edit', 'Permissions-delete',
-          ],
-          'students'=> ['students','students-list', 'students-create', 'students-edit', 'students-delete'],
-            'pos' => [
-                'inventory-pos-view',
+                'UserManagement' => [
+                    'Users-list', 'Users-create', 'Users-edit', 'Users-delete',
+                    'Roles-list', 'Roles-create', 'Roles-edit', 'Roles-delete',
+                    'Permissions-list', 'Permissions-create', 'Permissions-edit', 'Permissions-delete',
             ],
+                'students'=> ['students','students-list', 'students-create', 'students-edit', 'students-delete'],
+                    'pos' => [
+                        'inventory-pos-view',
+                    ],
 
-            'type' => [
-                'manage types' , 'create types' , 'edit types' , 'delete types',
-            ],
+                    'type' => [
+                        'manage types' , 'create types' , 'edit types' , 'delete types',
+                    ],
 
-            'maintainer' => ['manage maintainer' , 'create maintainer' , 'edit maintainer' , 'delete maintainer'],
-            'supplementory' => ['supplementory create' , 'supplementory edit' , 'supplementory list' , 'supplementory list' , 'supplementory request'],
-            'expense' => ['expense create' , 'expense edit' , 'expense list' , 'expense list' ],
-        ];
+                    'maintainer' => ['manage maintainer' , 'create maintainer' , 'edit maintainer' , 'delete maintainer'],
+                    'supplementory' => ['supplementory create' , 'supplementory edit' , 'supplementory list' , 'supplementory list' , 'supplementory request'],
+                    'expense' => ['expense create' , 'expense edit' , 'expense list' , 'expense list' ],
+                ];
 
        foreach ($permissions as $mainPermission => $subPermissions) {
             // Create or get the main permission

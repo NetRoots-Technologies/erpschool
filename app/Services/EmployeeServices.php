@@ -27,7 +27,7 @@ use App\Models\HRM\HrmEmployeeAttendance;
 use App\Models\HRM\EmployeeWorkExperience;
 use App\Http\Controllers\HR\ZktecoController;
 use App\Models\EmployeeChild;
-
+use Auth;
 
 class EmployeeServices
 {
@@ -57,7 +57,6 @@ class EmployeeServices
         }
         $type = EmployeeTypes::all();
         return view('hr.employee.create', compact('type'));
-
     }
 
     public function sync_employee_attendance() //hr.sync_employee_attendance
@@ -124,11 +123,9 @@ class EmployeeServices
                     }
                     $user2->save();
                 }
-
             }
             //   $zk->clearAttendance();
         }
-
     }
 
     public function employee_attendance()
@@ -138,7 +135,6 @@ class EmployeeServices
         }
         $attendance = HrmEmployeeAttendance::with('user_name')->get();
         return view('hr.zkt.ZktShowAttendence', compact('attendance'));
-
     }
 
     public function store($request)
@@ -149,25 +145,25 @@ class EmployeeServices
         $request->validate([
             'email_address' => 'required|email|unique:users,email',
         ]);
-        
+
         //          dd($request->all());
         $data = [];
         ini_set('max_execution_time', 120000);
-        
+
         if ($request->hasFile('image') && $request->file('image')->isValid()) {
             $imageFile = $request->file('image');
             $employee_profile = ImageHelper::uploadImage($imageFile, 'employee_profile_picture');
         } else {
             $employee_profile = null;
         }
-        
+
         $professionalEmail = $request->input('email_address');
-        
+
         $existingUser = User::where('email', $professionalEmail)->first();
         if ($existingUser) {
             return redirect()->back()->withErrors(['email_address' => 'The email address is already taken. Please choose a different one.'])->withInput();
         }
-        
+
         $employee = Employees::create([
             'emp_id' => $request->input('emp_id'),
             'name' => $request->input('name'),
@@ -212,7 +208,7 @@ class EmployeeServices
             'bank_name' => $request->input('bank_name'),
             'provident_fund' => $request->input('provident_fund')
         ]);
-        
+
         if ($request->input('employeeWelfare')) {
             $existingEmployeeWelfare = EmployeeWelfare::where('employee_id', $employee->id)->first();
             if ($existingEmployeeWelfare) {
@@ -237,9 +233,9 @@ class EmployeeServices
                 'providentFund' => $request->input('providentFund'),
             ]);
         }
-        
+
         $medicalAllowance = $request->medicalAllowance ?? 0;
-        
+
         //for allowance
         MedicalAllowance::create([
             'medicalAllowance' => $medicalAllowance,
@@ -248,8 +244,8 @@ class EmployeeServices
             'employee_id' => $employee->id,
         ]);
 
-        
-        
+
+
         if ($request->has('email_address') && $request->has('password')) {
             // dd("hello", $request->get('email_address'),$request->all());
 
@@ -265,18 +261,18 @@ class EmployeeServices
             $roles = Role::where('name', 'General Employee')->pluck('id');
             $user->syncRoles($roles);
         }
-        
-        
+
+
         //employee education
         if ($request->has('education_institution')) {
             foreach ($request->input('education_institution') as $key => $institution) {
-                
+
                 $educationImage = null;
                 if ($request->hasfile('education_image') && isset($request->education_image[$key])) {
                     $educationImageFile = $request->file('education_image')[$key];
                     $educationImage = ImageHelper::uploadImage($educationImageFile, 'employee_files');
                 }
-                
+
                 EmployeeEducation::create([
                     'hrm_employee_id' => $employee->id,
                     'institution' => $institution,
@@ -292,7 +288,7 @@ class EmployeeServices
 
         if ($request->has('student_id')) {
             $studentIds = $request->input('student_id');
-            
+
             $childrenData = [];
             foreach ($studentIds as $studentId) {
                 if (!empty($studentId)) {
@@ -309,7 +305,7 @@ class EmployeeServices
                 EmployeeChild::insert($childrenData);
             }
         }
-        
+
         //for other branch
         if ($request->input('branchSelect')) {
             OtherBranch::create([
@@ -321,7 +317,7 @@ class EmployeeServices
 
         if ($request->has('otherBranchSelect')) {
             foreach ($request->input('otherBranchSelect') as $otherBranch) {
-                
+
                 OtherBranch::create([
                     'employee_id' => $employee->id,
                     'branch_id' => $otherBranch,
@@ -329,7 +325,7 @@ class EmployeeServices
                 ]);
             }
         }
-        
+
         // family information
         if ($request->has('sr_no')) {
             foreach ($request->input('sr_no') as $key => $srNo) {
@@ -342,11 +338,11 @@ class EmployeeServices
                     'dob' => $request->input('family_dob')[$key],
                     'cnic' => $request->input('cnic')[$key],
                     'workstation' => $request->input('workplace')[$key],
-                    
+
                 ]);
             }
         }
-        
+
         // work experince
         if ($request->has('designation')) {
             foreach ($request->input('designation') as $key => $designation) {
@@ -358,17 +354,17 @@ class EmployeeServices
                     'duration' => $request->input('duration')[$key],
                     'from' => $request->input('from')[$key],
                     'till' => $request->input('till')[$key],
-                    
+
                 ]);
             }
         }
-        
+
         $eobiSettings = GeneralSettingsHelper::getSetting('eobi');
 
         $company = $eobiSettings['company'] ?? 0;
         $total = $eobiSettings['total'] ?? 0;
         $employee_value = $eobiSettings['employee'] ?? 0;
-        
+
         Eobi::create([
             'employee_id' => $employee->id,
             'total' => $total,
@@ -395,15 +391,18 @@ class EmployeeServices
         }
         $data = Employees::with('company', 'branch', 'department')->orderBy('created_at', 'desc')->get();
 
+    
 
         return Datatables::of($data)->addIndexColumn()
             ->addColumn('action', function ($row) {
                 $btn = '<div style="display: flex;">';
-
-                if (Gate::allows('Employee-edit'))
+                
+                if (Gate::allows('Employees-edit')) {
                     $btn .= '<a href="' . route("hr.employee.edit", $row->id) . '" class="btn btn-primary btn-sm"  style="margin-right: 4px;">Edit</a>';
+                }
 
-                if (Gate::allows('Employee-destroy')) {
+
+                if (Gate::allows('Employees-destroy')) {
                     $btn .= '
                     <form method="POST" id="delete-form-' . $row->id . '" action="' . route("hr.employee.destroy", $row->id) . '">
                         ' . method_field('DELETE') . csrf_field() . '
@@ -430,11 +429,10 @@ class EmployeeServices
                         }
                     </script>
                 ';
-
                 }
 
 
-                if (Gate::allows('Employee-edit')) {
+                if (Gate::allows('Employees-edit')) {
                     $btn .= '<a href="' . route("hr.addEditBankDetail", $row->id) . '" class="btn btn-info btn-sm" style="margin-right: 4px;">Bank Detail</a>';
                 }
 
@@ -447,7 +445,6 @@ class EmployeeServices
                 $btn .= '</div>';
 
                 return $btn;
-
             })
             ->addColumn('sync_Data', function ($row) {
 
@@ -461,34 +458,26 @@ class EmployeeServices
 
                 if ($row->company) {
                     return $row->company->name;
-
                 } else {
                     return "N/A";
                 }
-
-
             })->addColumn('branch', function ($row) {
 
 
                 if ($row->branch) {
                     return $row->branch->name;
-
                 } else {
                     return "N/A";
                 }
-
-
             })->addColumn('department', function ($row) {
                 if ($row->department) {
                     return $row->department->name;
-
                 } else {
                     return "N/A";
                 }
             })->addColumn('emp_id', function ($row) {
                 if ($row->emp_id) {
                     return $row->emp_id;
-
                 } else {
                     return "N/A";
                 }
@@ -577,7 +566,7 @@ class EmployeeServices
             'provident_fund' => $request->input('provident_fund')
 
             //            'welfareAmount' => $request->input('employeeWelfare'),
-//            'deductedAmount' => $request->input('deductedAmount'),
+            //            'deductedAmount' => $request->input('deductedAmount'),
 
         ]);
 
@@ -747,15 +736,15 @@ class EmployeeServices
 
 
         //        $employee->employeeAllowance()->delete();
-////        for allowance
-//
-//            foreach ($request->input('allowance') as $key => $allowance){
-//                EmployeeAllowance::create([
-//                    'allowance' => $allowance,
-//                    'allowance_price' => $request->input('allowance_price')[$key],
-//                    'employee_id' => $employee->id,
-//                ]);
-//            }
+        ////        for allowance
+        //
+        //            foreach ($request->input('allowance') as $key => $allowance){
+        //                EmployeeAllowance::create([
+        //                    'allowance' => $allowance,
+        //                    'allowance_price' => $request->input('allowance_price')[$key],
+        //                    'employee_id' => $employee->id,
+        //                ]);
+        //            }
         $data = [
             $employee->id
         ];
@@ -799,5 +788,3 @@ class EmployeeServices
         }
     }
 }
-
-
