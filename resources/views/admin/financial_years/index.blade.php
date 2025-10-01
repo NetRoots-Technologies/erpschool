@@ -488,9 +488,9 @@ Financial
                     }
 
                     $.ajax({
-                        type: "put",
+                        type: "POST",
                         "url": url + '/' + id,
-                        data: $('#editform').serialize(),
+                        data: $('#editform').serialize() + '&_method=PUT',
                         success: function (response) {
                             $('#myModal').modal('hide');
                             loader.remove();
@@ -535,6 +535,7 @@ Financial
                                 type: 'DELETE',
                                 data: {
                                     "_token": "{{ csrf_token() }}",
+                                    _method: 'DELETE' 
                                 },
                                 success: function (result) {
                                     loader.remove();

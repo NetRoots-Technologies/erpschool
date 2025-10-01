@@ -207,7 +207,7 @@
 
                         var id = $(this).data('category-edit').id;
                         var name = $(this).data('category-edit').name;
-                        ``
+                        
                         $('#myModal').modal('show');
                         $("#edit_id").val(id);
                         $("#name_edit").val(name);
@@ -231,9 +231,9 @@
                         var loader = $('<div class="loader"></div>').appendTo('body');
 
                         $.ajax({
-                            type: "put",
+                            type: "POST",
                             "url": url + '/' + id,
-                            data: $('#editform').serialize(),
+                            data: $('#editform').serialize() + '&_method=PUT',
                             success: function (response) {
                                 loader.remove();
 
@@ -248,33 +248,6 @@
                         });
                         return false;
                     });
-
-                    {{--$('#file-datatable tbody').on('click', '.delete', function () {--}}
-
-
-                    {{--    var data = $(this).data('id');--}}
-
-                    {{--    $('#' + data).submit();--}}
-
-                    {{--});--}}
-
-                    {{--$(document).on("submit", ".delete_form", function (event) {--}}
-                    {{--    event.preventDefault();--}}
-                    {{--    var route = $(this).data('route');--}}
-                    {{--    var a = confirm('Are you sure you want to Delete this?');--}}
-                    {{--    if (a) {--}}
-                    {{--        $.ajax({--}}
-                    {{--            url: route,--}}
-                    {{--            type: 'DELETE',--}}
-                    {{--            data: {--}}
-                    {{--                "_token": "{{ csrf_token() }}",--}}
-                    {{--            },--}}
-                    {{--            success: function (result) {--}}
-                    {{--                tableData.ajax.reload();--}}
-                    {{--            }--}}
-                    {{--        });--}}
-                    {{--    }--}}
-                    {{--});--}}
 
                     $('#file-datatable tbody').on('click', '.change-status', function () {
                         var id = $(this).data('id');

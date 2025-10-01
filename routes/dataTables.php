@@ -116,6 +116,6 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'datatable', 'as' => 'datata
     Route::post('get-marksInput', [\App\Http\Controllers\Exam\MarksInputController::class, 'getData'])->name('getMarksInput');
     Route::post('get-skillEvaluationKey', [\App\Http\Controllers\Exam\SkillEvaluationKeyController::class, 'getData'])->name('skill-evaluation-key.getdata');
 
-
+    Route::post('get-overTime', [\App\Http\Controllers\HR\OvertimeController::class, 'getData'])->name('data.overtimeData');
 
 });

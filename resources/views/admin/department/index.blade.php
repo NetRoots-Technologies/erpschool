@@ -512,9 +512,9 @@ Departments
                 var loader = $('<div class="loader"></div>').appendTo('body');
 
                 $.ajax({
-                    type: "post",
+                    type: "POST",
                     "url": url,
-                    data: $('#createform').serialize(),
+                    data: $('#createform').serialize() + '&_method=PUT',
                     success: function (response) {
                         loader.remove();
 
@@ -553,11 +553,12 @@ Departments
                 $('#branch_value').val(branch_edit);
 
                 $.ajax({
-                    type: "post",
+                    type: "POST",
                     url: '{!! route('admin.departments.company.get') !!}',
                     data: {
                         id: company_id_edit,
-                        _token: "{{csrf_token()}}"
+                        _token: "{{csrf_token()}}",
+                         _method: 'DELETE' 
                     },
                     success: function (response) {
                         $('.branch_id').html(response);
