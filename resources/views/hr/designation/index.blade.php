@@ -499,9 +499,9 @@ Designations
                     var loader = $('<div class="loader"></div>').appendTo('body');
 
                     $.ajax({
-                        type: "put",
+                        type: "post",
                         "url": url + '/' + id,
-                        data: $('#editform').serialize(),
+                        data: $('#editform').serialize() + '&_method=PUT',
                         success: function (response) {
                             $('#myModal').modal('hide');
                             loader.remove();
@@ -548,6 +548,7 @@ Designations
                                 type: 'DELETE',
                                 data: {
                                     "_token": "{{ csrf_token() }}",
+                                    _method: 'DELETE'
                                 },
                                 success: function (result) {
                                     loader.remove();

@@ -31,22 +31,24 @@ class DashboardController extends Controller
 
     public function index()
     {
+
+      
      if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $employees_name = Employees::latest()->limit(6)->get();
-
+      
         // Fee module removed - these values need to be updated for new fee structure
         $today_fee_collections = 0;
         $today_fee = 0;
         $monthFee = 0;
 
         $employees = Employees::with('department')->get();
-
+       
         $employeesByDepartment = $employees->groupBy('department.name');
 
         $totalEmployees = $employees->count();
-
+        
         $percentagePerDepartment = $employeesByDepartment->map(function ($employeesInDepartment) use ($totalEmployees) {
             $departmentName = $employeesInDepartment->first()->department->name ?? '';
             $numberOfEmployees = $employeesInDepartment->count();
@@ -60,6 +62,7 @@ class DashboardController extends Controller
 
         });
 
+      
         return view('dashboard.home', compact('monthFee', 'percentagePerDepartment', 'today_fee', 'employees_name'));
     }
 

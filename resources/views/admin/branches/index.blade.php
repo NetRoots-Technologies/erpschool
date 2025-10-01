@@ -814,13 +814,15 @@ Branches
                     var id = $('#edit_id').val();
                     var url = "{{ route('admin.branches.index') }}";
                     var loader = $('<div class="loader"></div>').appendTo('.myModal');
+
+                    const data = ;
                     if (!$("#editform").valid()) {
                         return false;
                     }
                     $.ajax({
-                        type: "put",
+                        type: "POST",
                         "url": url + '/' + id,
-                        data: $('#editform').serialize(),
+                        data: $('#editform').serialize() + '&_method=PUT',
                         success: function (response) {
 
                             loader.remove();
@@ -864,9 +866,10 @@ Branches
                         if (result.isConfirmed) {
                             $.ajax({
                                 url: route,
-                                type: 'DELETE',
+                                type: 'POST',
                                 data: {
                                     "_token": "{{ csrf_token() }}",
+                                     _method: 'DELETE' 
                                 },
                                 success: function (result) {
 
