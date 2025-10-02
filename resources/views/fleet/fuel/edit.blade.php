@@ -125,6 +125,9 @@
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
+
+                                <input type="hidden" class="total_cost" name="total_cost" value="{{ old('total_cost', $fuel->total_cost) }}>
+                                
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
@@ -180,4 +183,21 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('js')
+<script>
+$(document).ready(function () {
+
+    $(document).on('keyup change', '#quantity, #rate_per_liter', function () {
+        const qty = parseFloat($('#quantity').val()) || 0;
+        const rate = parseFloat($('#rate_per_liter').val()) || 0;
+        const cost = qty * rate;
+        $('#total_cost').val(cost.toFixed(2)).prop('disabled', true);
+        $('.total_cost').val(cost.toFixed(2));
+        
+    });
+
+});
+</script>
 @endsection
