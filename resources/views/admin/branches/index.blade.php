@@ -814,8 +814,7 @@ Branches
                     var id = $('#edit_id').val();
                     var url = "{{ route('admin.branches.index') }}";
                     var loader = $('<div class="loader"></div>').appendTo('.myModal');
-
-                    const data = ;
+                    
                     if (!$("#editform").valid()) {
                         return false;
                     }
