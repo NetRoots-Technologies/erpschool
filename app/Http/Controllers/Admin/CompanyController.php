@@ -21,6 +21,7 @@ class CompanyController extends Controller
      * @return \Illuminate\Http\Response
      */
 
+    public $CompanyService;
 
     public function __construct(CompanyService $CompanyService)
     {

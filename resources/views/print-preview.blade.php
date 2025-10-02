@@ -33,7 +33,7 @@
             <tbody>
                 @foreach ($data as $row)
                     <tr>
-                        <td>{{$loop->index}}</td>
+                        <td>{{$loop->index+1}}</td>
                         @foreach ($fields as $field => $label)
                             <td>
                                 {{ data_get($row, $field) ?? '-' }}
