@@ -1145,7 +1145,7 @@ class FeeManagementController extends Controller
             abort(403, 'Unauthorized access');
         }
 
-        $billing = FeeBilling::with(['student.AcademicClass', 'academicSession'])
+        $billing = FeeBilling::with(['student.AcademicClass' ,'student.branch','academicSession'])
             ->findOrFail($id);
 
         // Load applicable discounts for this billing
@@ -1162,7 +1162,6 @@ class FeeManagementController extends Controller
             
             $totalTransportFee = $transportFees->sum('monthly_charges');
         }
-
         return view('admin.fee-management.billing.print', compact('billing', 'applicableDiscounts', 'transportFees', 'totalTransportFee'));
     }
 
