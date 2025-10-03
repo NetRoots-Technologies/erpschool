@@ -101,6 +101,7 @@ class StudentViewController extends Controller
             'guardian_document' => $student->studentPictures->guardian_document ?? null,
         ];
 
+        // dd($student->studentPictures->passport_photos ?? null);
         return view('acadmeic.view_students.show', compact('branches', 'student', 'siblings', 'companies', 'imageUrls'));
     }
 

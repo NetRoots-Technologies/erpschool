@@ -53,7 +53,7 @@
                                            required>
                                 </div>
                                 <div class="col-md-6">
-                                    <label for="campus"><b>Campus *</b></label>
+                                    <label for="campus"><b>Branch *</b></label>
                                     <select class="form-control select2 branch_select" name="branch_id">
                                         @foreach ($branches as $branch)
                                             <option value="{!! $branch->id !!}">{!! $branch->name !!}</option>

@@ -113,12 +113,14 @@
                                 <div class="form-group">
                                     <label for="total_cost">Total Cost <span class="text-danger">*</span></label>
                                     <input type="number" class="form-control @error('total_cost') is-invalid @enderror" 
-                                           id="total_cost" name="total_cost" 
+                                           id="total_cost"
                                            value="{{ old('total_cost', 0) }}" min="0" step="0.01" required>
                                     @error('total_cost')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
+
+                                <input type="hidden" class="total_cost" name="total_cost">
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
@@ -175,3 +177,21 @@
     </div>
 </div>
 @endsection
+
+@section('js')
+<script>
+$(document).ready(function () {
+
+    $(document).on('keyup change', '#quantity, #rate_per_liter', function () {
+        const qty = parseFloat($('#quantity').val()) || 0;
+        const rate = parseFloat($('#rate_per_liter').val()) || 0;
+        const cost = qty * rate;
+        $('#total_cost').val(cost.toFixed(2)).prop('disabled', true);
+        $('.total_cost').val(cost.toFixed(2));
+        
+    });
+
+});
+</script>
+@endsection
+

@@ -20,9 +20,6 @@ use Illuminate\Support\Facades\Gate;
 use App\Models\Student\StudentSibling;
 use Illuminate\Support\Facades\Config;
 use App\Models\Fee\StudentFee;
-
-
-
 use App\Exports\StudentSampleExport;
 use App\Imports\StudentExcelImport;
 use Maatwebsite\Excel\Facades\Excel;
@@ -271,6 +268,7 @@ class StudentController extends Controller
         if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
+        
         $branch = Branch::find($request->branch_id);
         if (!$branch) {
             return response()->json(['error' => 'Branch not found'], 404);
