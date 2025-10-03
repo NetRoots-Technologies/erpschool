@@ -93,6 +93,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'exam', 'as' => 'exam.'], fu
     Route::post('/exam/exam-schedules/bulk-delete', [ExamScheduleController::class, 'bulkDelete'])->name('exam_schedules.bulk_delete');
     Route::post('exam/components', [ComponentController::class, 'clone'])->name('component.clone');
     Route::post('exam/sub_components', [SubComponentController::class, 'clone'])->name('sub-component.clone');
+    Route::get('listing/{id}', [SkillEvaluationController::class, 'listing'])->name('listing');    
 
 });
 

@@ -17,17 +17,19 @@ class SkillEvaluationService
     if (!Gate::allows('Dashboard-list')) {
         return abort(503);
     }
-
     // Create new SkillEvaluation record
-    $evaluation = SkillEvaluation::create([
+   for ($i = 0; $i < count($request->subject_id); $i++) {
+    SkillEvaluation::create([
         'student_id'              => $request->student_id,
         'user_id'                 => Auth::id(), // logged-in user
-        'subject_id'              => $request->subject_id[0] ?? null,
-        'skill_group_id'          => $request->skill_group_id[0] ?? null,
-        'skill_id'                => $request->skill_id[0] ?? null,
-        'skill_evaluation_key_id' => $request->skill_evaluation_key_id[0] ?? null,
+        'subject_id'              => $request->subject_id[$i] ?? null,
+        'skill_group_id'          => $request->skill_group_id[$i] ?? null,
+        'skill_id'                => $request->skill_id[$i] ?? null,
+        'skill_evaluation_key_id' => isset($request->skill_evaluation_key_id[$i]) ? trim($request->skill_evaluation_key_id[$i], '}') : null,
         'logs'                    => json_encode($request->all()), // optional: store full logs
     ]);
+}
+
 
     return redirect()->route('exam.skill_evaluation.index')->with('success', 'Skill Evaluation created successfully.');
 }
