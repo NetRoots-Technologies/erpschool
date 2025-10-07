@@ -1,5 +1,5 @@
 @extends('admin.layouts.main')
-@section('title', 'Add Supplementory Budget Request')
+@section('title', 'Add Supplementary Budget Request')
 
 @section('content')
     <div class="container">
@@ -7,7 +7,7 @@
             <div class="col-12">
                 <div class="card basic-form">
                     <div class="card-body">
-                        <h3 class="text-22 text-midnight text-bold mb-4"> Supplementory Budeget Request </h3>
+                        <h3 class="text-22 text-midnight text-bold mb-4"> Supplementary Budget Request </h3>
 
                         <div class="w-100">
                             <form action="{{ route('inventory.supplementory.store') }}" method="POST">

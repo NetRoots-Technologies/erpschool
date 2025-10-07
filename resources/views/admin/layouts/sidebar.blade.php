@@ -925,7 +925,7 @@
                         <a class="side-menu__item {{ request()->routeIs('inventory.supplimentory.budget.report') ? 'active' : '' }}"
                             href="{{ route('inventory.supplimentory.budget.report') }}">
                             <i class="fas fa-tags icons8 icon-style me-3"></i>
-                            <span class="side-menu__label">Supplementory Report</span>
+                            <span class="side-menu__label">Supplementary Report</span>
                         </a>
                     </li>
 

@@ -6,7 +6,7 @@
         <div class="row w-100 text-center">
 
             <div class="col-auto mb-3">
-                <a href="{{ route('inventory.supplementory.create') }}" class="btn btn-primary">Add supplementory Request</a>
+                <a href="{{ route('inventory.supplementory.create') }}" class="btn btn-primary">Add supplementary Request</a>
 
             </div>
 
