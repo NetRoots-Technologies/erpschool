@@ -2,20 +2,22 @@
 
 namespace App\Http\Controllers\Type;
 
-use App\Http\Controllers\Controller;
-use App\Helper\CoreAccounts;
 use App\Models\Type;
-use Illuminate\Http\Request;
-use Config;
 use App\Helper\Helpers;
-use DataTables;
+use App\Helper\CoreAccounts;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Validator;
+use Yajra\DataTables\DataTables;
 class TypeController extends Controller
 {
 
     public function index()
     {   
         // dd(\Auth::user()->can('manage types'));
-        // if (\Auth::user()->can('manage types') ) {
+        if (\Auth::user()->can('manage types') ) {
 
             if (request()->ajax()) {
                 $data = Type::where('parent_id', Helpers::parentId());
@@ -33,7 +35,7 @@ class TypeController extends Controller
 
             $types = Type::$types;
             return view('type.index' , compact('types'));
-        // } 
+        } 
     }
 
 
@@ -47,8 +49,8 @@ class TypeController extends Controller
     public function store(Request $request)
     {
 
-        if (\Auth::user()->can('create types')) {
-            $validator = \Validator::make(
+        if (Auth::user()->can('create types')) {
+            $validator = Validator::make(
                 $request->all(), [
                 'title' => 'required',
                 'type' => 'required',
@@ -66,29 +68,31 @@ class TypeController extends Controller
             $type->parent_id = Helpers::parentId();
             $type->save();
 
-            if ($type->type == 'utility') {
-                $parent_groups = Config::get('constants.utility_group_ids');
-                foreach ($parent_groups as $parent_group) {
+            // if ($type->type == 'utility') {
+            //     $parent_groups = Config::get('constants.utility_group_ids');
+            //     foreach ($parent_groups as $parent_group) {
 
-                    $data['name'] = Type::$types[$type->type] . ' - ' . $type->title;
-                    $data['parent_id'] = $parent_group;
-                    $data['parent_type'] = $type->id;
-                    $data['type'] = 'utility';
+            //         $data['name'] = Type::$types[$type->type] . ' - ' . $type->title;
+            //         $data['parent_id'] = $parent_group;
+            //         $data['parent_type'] = $type->id;
+            //         $data['type'] = 'utility';
 
-                    CoreAccounts::createGroup($data);
-                }
-            } elseif ($type->type == 'levy') {
-                $parent_groups = Config::get('constants.levy_group_ids');
-                foreach ($parent_groups as $parent_group) {
+            //         CoreAccounts::createGroup($data);
+            //     }
+            // } elseif ($type->type == 'levy') {
+            //     $parent_groups = Config::get('constants.levy_group_ids');
+            //     foreach ($parent_groups as $parent_group) {
 
-                    $data['name'] = Type::$types[$type->type] . ' - ' . $type->title;
-                    $data['parent_id'] = $parent_group;
-                    $data['parent_type'] = $type->id;
-                    $data['type'] = 'levy';
+            //         $data['name'] = Type::$types[$type->type] . ' - ' . $type->title;
+            //         $data['parent_id'] = $parent_group;
+            //         $data['parent_type'] = $type->id;
+            //         $data['type'] = 'levy';
 
-                    CoreAccounts::createGroup($data);
-                }
-            }
+            //         CoreAccounts::createGroup($data);
+            //     }
+            // }
+
+            
             return response()->json([
                 'status' => 'success',
                 'message'=> 'Type successfully created',

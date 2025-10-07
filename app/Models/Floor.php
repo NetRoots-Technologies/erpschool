@@ -14,7 +14,7 @@ class Floor extends Model
 
     public function floor_type()
     {
-        return $this->belongsTo('App\Models\Type', 'floor_type_id', 'id');
+        return $this->belongsTo(Type::class, 'floor_type_id', 'id');
     }
 
     public function building()

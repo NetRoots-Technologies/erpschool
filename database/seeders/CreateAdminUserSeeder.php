@@ -52,7 +52,7 @@ class CreateAdminUserSeeder extends Seeder
             $user = User::Create([
                 'name' => 'Super Admin',
                 'email' => 'superadmin@admin.com',
-                'role_id' => json_encode([$role->id]),
+                'role_id' => 1,
                 'branch_id' => NULL,
                 'department_id' => NULL,
                 'password' => bcrypt('12345678')

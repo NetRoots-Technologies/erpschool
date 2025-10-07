@@ -220,7 +220,7 @@
                                 { 'visible': false }
                             ],
                             ajax: {
-                                "url": "{{ route('type.index') }}",
+                                "url": "{{ route('maintainer.type.index') }}",
                                 "type": "GET",
                                 "data": {_token: "{{csrf_token()}}"}
                             },
@@ -242,7 +242,7 @@
                         
                         $.ajax({
                             type: "POST",
-                            "url": "{{route('type.store')}}",
+                            "url": "{{route('maintainer.type.store')}}",
                             data: $('#createTypePost').serialize(),
                             success: function (response) {
                                 // console.log(response);
@@ -294,7 +294,7 @@
 
                         $.ajax({
                             type: "POST",
-                            url: "{{ route('type.update', ':id') }}".replace(':id', id),
+                            url: "{{ route('maintainer.type.update', ':id') }}".replace(':id', id),
                             data: $('#editform').serialize(),
                             success: function (response) {
                                 $('#editTypeModal').modal('hide');
@@ -324,7 +324,7 @@
                     }).then((result) => {
                         if (result.isConfirmed) {
                             $.ajax({
-                                url: "{{ route('type.destroy', ':id') }}".replace(':id', id),
+                                url: "{{ route('maintainer.type.destroy', ':id') }}".replace(':id', id),
                                 type: "POST",
                                 data: {
                                     "_token": "{{ csrf_token() }}"

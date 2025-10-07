@@ -4,14 +4,12 @@
 @stop
 
 @section('content')
-    @can('create maintainer')
-        <a class="btn btn-primary ml-20" href="{{ route('maintainer.create') }}"> <i class="ti-plus mr-5"></i>{{__('Create Maintainer')}}</a>
-    @endcan
-{{-- @endsection --}}
 
-{{-- @dd($maintainers); --}}
-{{-- @section('content') --}}
-    <div class="row mt-4">
+    @can('create maintainer')
+        <a class="btn btn-primary" href="{{ route('maintainer.maintainer.create') }}"> <i class="fa fa-plus"></i>{{__('Add Maintainer')}}</a>
+    @endcan
+
+    <div class="row mt-1">
         @foreach($maintainers as $maintainer)
             <div class="col-xl-6 col-md-6 cdx-xxl-50 cdx-xl-50">
                 <div class="card custom contact-card">
@@ -24,7 +22,7 @@
                             </div>
                             <div class="media-body">
                                 <a class="customModal" href="#" data-size="md"
-                                   data-url="{{ route('maintainer.edit',$maintainer->id) }}"  data-title="{{__('Edit Maintainer')}}">
+                                   data-url="{{ route('maintainer.maintainer.edit',$maintainer->id) }}"  data-title="{{__('Edit Maintainer')}}">
                                     <h4>{{!empty($maintainer->user)?ucfirst($maintainer->user->name):'-'}}</h4>
                                     <h6 class="text-dark">{{!empty($maintainer->user)?$maintainer->user->email:'-'}}</h6>
                                 </a>
@@ -36,15 +34,15 @@
                                         <ul class="action-dropdown">
                                             @can('edit maintainer')
                                                 <li>
-                                                    <a href="#" data-size="lg"
-                                                       data-url="{{ route('maintainer.edit',$maintainer->id) }}"
+                                                    <a href="{{ route('maintainer.maintainer.edit',$maintainer->id) }}" data-size="lg"
+                                                       data-url="{{ route('maintainer.maintainer.edit',$maintainer->id) }}"
                                                        data-title="{{__('Edit Maintainer')}}"> <i
                                                             data-feather="edit"> </i>{{__('Edit Maintainer')}}</a>
                                                 </li>
                                             @endcan
                                             @can('delete maintainer')
                                                 <li>
-                                                {!! Form::open(['method' => 'DELETE', 'route' => ['maintainer.destroy', $maintainer->id],'id'=>'tenant-'.$maintainer->id]) !!}
+                                                {!! Form::open(['method' => 'DELETE', 'route' => ['maintainer.maintainer.destroy', $maintainer->id],'id'=>'tenant-'.$maintainer->id]) !!}
                                                     <a href="#" class="confirm_dialog" data-id="{{ $maintainer->id }}">
                                                         <i data-feather="trash"></i>{{__('Delete Maintainer')}}
                                                     </a>
@@ -110,7 +108,7 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url: "{{ route('maintainer.destroy', ':id') }}".replace(':id', id),
+                    url: "{{ route('maintainer.maintainer.destroy', ':id') }}".replace(':id', id),
                     type: "POST",
                     data: {
                         "_token": "{{ csrf_token() }}",

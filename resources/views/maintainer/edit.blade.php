@@ -15,7 +15,7 @@
             </div>
             <div class="card-body">
 
-                {{ Form::model($maintainer, array('route' => array('maintainer.update', $maintainer->id), 'method' => 'PUT','enctype' => "multipart/form-data")) }}
+                {{ Form::model($maintainer, array('route' => array('maintainer.maintainer.update', $maintainer->id), 'method' => 'PUT','enctype' => "multipart/form-data")) }}
                 
                 <div class="form-row">
                     <div class="form-group col-md-12 col-lg-12">

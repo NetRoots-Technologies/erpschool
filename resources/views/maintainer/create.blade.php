@@ -11,11 +11,12 @@
     <div class="col-md-12">
         <div class="card">
             <div class="card-header">
+               
                 <h5>Create Maintainer</h5>
             </div>
             <div class="card-body">
 
-                {!! Form::open(['route' => 'maintainer.store', 'method' => 'POST', 'enctype' => 'multipart/form-data']) !!}
+                {!! Form::open(['route' => 'maintainer.maintainer.store', 'method' => 'POST', 'enctype' => 'multipart/form-data']) !!}
                     
                 <div class="form-row">
                     <div class="form-group col-md-6 col-lg-6">

@@ -42,7 +42,9 @@
 @endsection
 @php
     $company = \App\Models\Admin\Company::where('status', 1)->first();
-    $logoUrl = !empty($company->logo) ? asset($company->logo) : 'https://www.netrootstech.com/wp-content/uploads/2022/08/Netroots-logo-tm-transparent.png';
+    $logoUrl = !empty($company->logo)
+        ? asset($company->logo)
+        : 'https://www.netrootstech.com/wp-content/uploads/2022/08/Netroots-logo-tm-transparent.png';
 @endphp
 
 <div class="app-sidebar__overlay" data-bs-toggle="sidebar"></div>
@@ -53,7 +55,8 @@
                 <img src="{{ $logoUrl }}" style="height: 100px; margin-top: -35px;" class="main-logo" alt="logo">
             </a>
             <a class="desktop-logo logo-dark" href="{{ route('dashboard') }}">
-                <img src="{{ $logoUrl }}" style="height: 100px; margin-top: -35px;" class="main-logo" alt="logo">
+                <img src="{{ $logoUrl }}" style="height: 100px; margin-top: -35px;" class="main-logo"
+                    alt="logo">
             </a>
             <a class="logo-icon mobile-logo icon-light active circular-logo" href="{{ route('dashboard') }}">
                 <img src="{{ asset('logos/CSS_logo_mobile.png') }}" alt="logo">
@@ -77,7 +80,8 @@
                 </div>
             </div>
             <div class="slide-left disabled" id="slide-left">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="#7b8191" width="24" height="24" viewBox="0 0 24 24">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="#7b8191" width="24" height="24"
+                    viewBox="0 0 24 24">
                     <path d="M13.293 6.293 7.586 12l5.707 5.707 1.414-1.414L10.414 12l4.293-4.293z" />
                 </svg>
             </div>
@@ -93,7 +97,8 @@
                     </li>
                 @endcan
 
-                @canany(['Company', 'Branches', 'Category', 'Departments', 'FinancialYears', 'Designations', 'SignatoryAuthorities'])
+                @canany(['Company', 'Branches', 'Category', 'Departments', 'FinancialYears', 'Designations',
+                    'SignatoryAuthorities'])
                     <li class="side-item side-item-category">Academic</li>
                     @can('Company')
                         <li class="slide">
@@ -175,7 +180,8 @@
                                 <span class="side-menu__label">Designations</span>
                                 <i class="angle fe fe-chevron-down"></i>
                             </a>
-                            <ul class="slide-menu" style="display: {{ request()->is('hr/designation*') ? 'block' : 'none' }}">
+                            <ul class="slide-menu"
+                                style="display: {{ request()->is('hr/designation*') ? 'block' : 'none' }}">
                                 <li><a class="slide-item {{ request()->is('hr/designation*') ? 'active' : '' }}"
                                         href="{{ route('hr.designations.index') }}">Designations</a></li>
                             </ul>
@@ -252,7 +258,8 @@
                                 <li><a class="slide-item {{ request()->is('academic/students*') ? 'active' : '' }}"
                                         href="{{ route('academic.students.index') }}">Students</a></li>
                                 <li><a class="slide-item {{ request()->is('academic/student-siblings-report*') ? 'active' : '' }}"
-                                        href="{{ route('academic.student-siblings-report') }}">Student Siblings Report</a></li>
+                                        href="{{ route('academic.student-siblings-report') }}">Student Siblings Report</a>
+                                </li>
                                 <li><a class="slide-item {{ request()->is('academic/student-class_adjustment*') ? 'active' : '' }}"
                                         href="{{ route('academic.student-class-adjustment.create') }}">Student Class
                                         Promotion</a></li>
@@ -405,40 +412,38 @@
                     @endcan
                 @endcanany --}}
 
-                   {{-- @if (
-                    Gate::allows('agent') || Gate::allows('employee') || Gate::allows('teacher') ||
-                    Gate::allows('agent_comission')
-                ) --}}
+                {{-- @if (Gate::allows('agent') || Gate::allows('employee') || Gate::allows('teacher') || Gate::allows('agent_comission')) --}}
                 <li class="side-item side-item-category">HR Management</li>
                 <li class="slide ">
-                    <a class="side-menu__item {{ request()->is('hr/employee') ? 'active' : '' }}" data-bs-toggle="slide"
-                        href="javascript:void(0);">
+                    <a class="side-menu__item {{ request()->is('hr/employee') ? 'active' : '' }}"
+                        data-bs-toggle="slide" href="javascript:void(0);">
                         <i class="fa fa-user-circle-o icons8 icon-style" aria-hidden="true"></i>
                         <span class="side-menu__label">Employees</span>
                         <i class="angle fe fe-chevron-down"></i></a>
                     <ul class="slide-menu" style="display: {{ request()->is('hr/employee') ? 'block' : 'none' }}">
                         <li><a class="slide-item  {{ request()->is('hr/employee') ? 'active' : '' }}"
-                                href="{{route('hr.employee.index')}}">Employees </a></li>
+                                href="{{ route('hr.employee.index') }}">Employees </a></li>
                     </ul>
                 </li>
-            {{-- @endif --}}
-            {{-- @if (Gate::allows('workShift')) --}}
+                {{-- @endif --}}
+                {{-- @if (Gate::allows('workShift')) --}}
                 <li class="slide ">
-                    <a class="side-menu__item {{ request()->is('hr/work_shifts*') ? 'active' : '' }}" data-bs-toggle="slide"
-                        href="javascript:void(0);">
+                    <a class="side-menu__item {{ request()->is('hr/work_shifts*') ? 'active' : '' }}"
+                        data-bs-toggle="slide" href="javascript:void(0);">
                         <i class="fa fa-clock-o icons8 icon-style" aria-hidden="true"></i>
                         <span class="side-menu__label">Work Shift</span>
                         <i class="angle fe fe-chevron-down"></i></a>
-                    <ul class="slide-menu" style="display: {{ request()->is('hr/work_shifts*') ? 'block' : 'none' }}">
+                    <ul class="slide-menu"
+                        style="display: {{ request()->is('hr/work_shifts*') ? 'block' : 'none' }}">
                         <li><a class="slide-item {{ request()->is('hr/work_shifts*') ? 'active' : '' }}"
-                                href="{{route('hr.work_shifts.index')}}">Work Shift</a></li>
+                                href="{{ route('hr.work_shifts.index') }}">Work Shift</a></li>
                     </ul>
                 </li>
-            {{-- @endif --}}
-            {{-- @if (Gate::allows('attendance')) --}}
+                {{-- @endif --}}
+                {{-- @if (Gate::allows('attendance')) --}}
                 <li class="slide ">
-                    <a class="side-menu__item {{ request()->is('hr/attendance*') ? 'active' : '' }}" data-bs-toggle="slide"
-                        href="javascript:void(0);">
+                    <a class="side-menu__item {{ request()->is('hr/attendance*') ? 'active' : '' }}"
+                        data-bs-toggle="slide" href="javascript:void(0);">
                         <i class="fa fa-calendar icons8 icon-style" aria-hidden="true"></i>
                         <span class="side-menu__label">Attendance</span>
                         <i class="angle fe fe-chevron-down"></i></a>
@@ -454,8 +459,8 @@
                         </li>
                     </ul>
                 </li>
-            {{-- @endif --}}
-            {{-- @if (Gate::allows('payroll')) --}}
+                {{-- @endif --}}
+                {{-- @if (Gate::allows('payroll')) --}}
                 <li class="slide ">
                     <a class="side-menu__item {{ request()->is('hr/payroll*', 'hr/salary_slip') ? 'active' : '' }}"
                         data-bs-toggle="slide" href="javascript:void(0);">
@@ -464,92 +469,97 @@
                         <i class="angle fe fe-chevron-down"></i></a>
                     <ul class="slide-menu" style="display: {{ request()->is('hr/payroll*') ? 'block' : 'none' }}">
                         {{-- @if (Gate::allows('payroll-index')) --}}
-                            <li><a class="slide-item {{ request()->is('hr/payroll') ? 'active' : '' }}"
-                                    href="{{ route('hr.payroll.index') }}">PayRoll</a></li>
+                        <li><a class="slide-item {{ request()->is('hr/payroll') ? 'active' : '' }}"
+                                href="{{ route('hr.payroll.index') }}">PayRoll</a></li>
                         {{-- @endif
                         @if (Gate::allows('payroll-approve')) --}}
-                            <li><a class="slide-item {{ request()->is('hr/payroll_approve') ? 'active' : '' }}"
-                                    href="{{ route('hr.payroll.approve') }}">PayRoll Approve</a></li>
+                        <li><a class="slide-item {{ request()->is('hr/payroll_approve') ? 'active' : '' }}"
+                                href="{{ route('hr.payroll.approve') }}">PayRoll Approve</a></li>
                         {{-- @endif
                         @if (Gate::allows('payroll-slip')) --}}
-                            <li><a class="slide-item {{ request()->is('hr/salary_slip') ? 'active' : '' }}"
-                                    href="{{ route('hr.salary_slip.index') }}">PayRoll Slip</a></li>
+                        <li><a class="slide-item {{ request()->is('hr/salary_slip') ? 'active' : '' }}"
+                                href="{{ route('hr.salary_slip.index') }}">PayRoll Slip</a></li>
                         {{-- @endif
                         @if (Gate::allows('payroll-report')) --}}
-                            <li><a class="slide-item {{ request()->is('hr/payroll_report') ? 'active' : '' }}"
-                                    href="{{ route('hr.payroll.report') }}">PayRoll Report</a></li>
+                        <li><a class="slide-item {{ request()->is('hr/payroll_report') ? 'active' : '' }}"
+                                href="{{ route('hr.payroll.report') }}">PayRoll Report</a></li>
                         {{-- @endif --}}
                     </ul>
                 </li>
-            {{-- @endif
+                {{-- @endif
             @if (Gate::allows('salary-tax')) --}}
                 <li class="slide">
-                    <a class="side-menu__item {{ request()->is('hr/salary-tax*') ? 'active' : '' }}" data-bs-toggle="slide"
-                        href="javascript:void(0);">
+                    <a class="side-menu__item {{ request()->is('hr/salary-tax*') ? 'active' : '' }}"
+                        data-bs-toggle="slide" href="javascript:void(0);">
                         <i class="fa fa-chart-bar icons8 icon-style" aria-hidden="true"></i>
                         <span class="side-menu__label ">Tax Slab</span>
                         <i class="angle fe fe-chevron-down"></i>
                     </a>
-                    <ul class="slide-menu" style="display: {{ request()->is('hr/salary-tax*') ? 'block' : 'none' }}">
+                    <ul class="slide-menu"
+                        style="display: {{ request()->is('hr/salary-tax*') ? 'block' : 'none' }}">
                         {{-- <li><a class="slide-item" href="{{route('hr.tax-slabs.index')}}">Rental Tax
                                 Slab</a></li> --}}
                         <li><a class="slide-item {{ request()->is('hr/salary-tax') ? 'active' : '' }}"
                                 href="{{ route('hr.salary-tax.index') }}">Salary Tax Slab</a></li>
                     </ul>
                 </li>
-            {{-- @endif --}}
-            <li class="slide">
-                <a class="side-menu__item {{ request()->is('hr/overtime*') ? 'active' : '' }}" data-bs-toggle="slide"
-                    href="javascript:void(0);">
-                    <i class="fa fa-clock icons8 icon-style" aria-hidden="true"></i>
-                    <span class="side-menu__label ">Overtime</span>
-                    <i class="angle fe fe-chevron-down"></i>
-                </a>
-                <ul class="slide-menu" style="display: {{ request()->is('hr/salary-tax*') ? 'block' : 'none' }}">
-                    {{-- <li><a class="slide-item" href="{{route('hr.tax-slabs.index')}}">Rental Tax
+                {{-- @endif --}}
+                <li class="slide">
+                    <a class="side-menu__item {{ request()->is('hr/overtime*') ? 'active' : '' }}"
+                        data-bs-toggle="slide" href="javascript:void(0);">
+                        <i class="fa fa-clock icons8 icon-style" aria-hidden="true"></i>
+                        <span class="side-menu__label ">Overtime</span>
+                        <i class="angle fe fe-chevron-down"></i>
+                    </a>
+                    <ul class="slide-menu"
+                        style="display: {{ request()->is('hr/salary-tax*') ? 'block' : 'none' }}">
+                        {{-- <li><a class="slide-item" href="{{route('hr.tax-slabs.index')}}">Rental Tax
                             Slab</a></li> --}}
-                    <li><a class="slide-item {{ request()->is('hr/overtime') ? 'active' : '' }}"
-                            href="{{ route('hr.overtime.index') }}">Overtime</a></li>
-                </ul>
-            </li>
+                        <li><a class="slide-item {{ request()->is('hr/overtime') ? 'active' : '' }}"
+                                href="{{ route('hr.overtime.index') }}">Overtime</a></li>
+                    </ul>
+                </li>
 
                 {{-- @if (Gate::allows('hr-reports')) --}}
-                    <li class="side-item side-item-category">HR Reports</li>
-                    <li class="slide">
-                        <a class="side-menu__item {{ request()->is('hr/overtime-report*', 'hr/employeeBenefit/*') ? 'active' : '' }}"
-                            data-bs-toggle="slide" href="javascript:void(0);">
-                            <i class="fas fa-dollar icons8 icon-style" aria-hidden="true"></i>
-                            <span class="side-menu__label">Reports</span>
-                            <i class="angle fe fe-chevron-down"></i>
-                        </a>
-                        <ul class="slide-menu"
-                            style="display: {{ request()->is('hr/overtime-report*', 'hr/employeeBenefit/*' , 'reports/student/exam/*') ? 'block' : 'none' }}">
+                <li class="side-item side-item-category">HR Reports</li>
+                <li class="slide">
+                    <a class="side-menu__item {{ request()->is('hr/overtime-report*', 'hr/employeeBenefit/*') ? 'active' : '' }}"
+                        data-bs-toggle="slide" href="javascript:void(0);">
+                        <i class="fas fa-dollar icons8 icon-style" aria-hidden="true"></i>
+                        <span class="side-menu__label">Reports</span>
+                        <i class="angle fe fe-chevron-down"></i>
+                    </a>
+                    <ul class="slide-menu"
+                        style="display: {{ request()->is('hr/overtime-report*', 'hr/employeeBenefit/*', 'reports/student/exam/*') ? 'block' : 'none' }}">
 
-                           <li>
-                                <a class="slide-item {{ request()->is('reports/student/exam') ? 'active' : '' }}"
-                                    href="{{ route('reports.std.exam.index') }}">
-                                    Exam Report
-                                </a>
-                            </li>
+                        <li>
+                            <a class="slide-item {{ request()->is('reports/student/exam') ? 'active' : '' }}"
+                                href="{{ route('reports.std.exam.index') }}">
+                                Exam Report
+                            </a>
+                        </li>
 
 
-                            <li><a class="slide-item {{ request()->is('hr/overtime-report-view') ? 'active' : '' }}"
-                                    href="{{ route('hr.overtime-report-view') }}">Overtime</a></li>
-                            <li><a class="slide-item {{ request()->is('hr/employeeBenefit/EOBI') ? 'active' : '' }}"
-                                    href="{{ route('hr.employeeBenefit', ['EOBI']) }}">EOBI</a></li>
-                            <li><a class="slide-item {{ request()->is('hr/employeeBenefit/PF') ? 'active' : '' }}"
-                                    href="{{ route('hr.employeeBenefit', ['PF']) }}">Provident Fund</a></li>
-                            <li><a class="slide-item {{ request()->is('hr/employeeBenefit/SS') ? 'active' : '' }}"
-                                    href="{{ route('hr.employeeBenefit', ['SS']) }}">Social Security</a></li>
-                        </ul>
-                    </li>
+                        <li><a class="slide-item {{ request()->is('hr/overtime-report-view') ? 'active' : '' }}"
+                                href="{{ route('hr.overtime-report-view') }}">Overtime</a></li>
+                        <li><a class="slide-item {{ request()->is('hr/employeeBenefit/EOBI') ? 'active' : '' }}"
+                                href="{{ route('hr.employeeBenefit', ['EOBI']) }}">EOBI</a></li>
+                        <li><a class="slide-item {{ request()->is('hr/employeeBenefit/PF') ? 'active' : '' }}"
+                                href="{{ route('hr.employeeBenefit', ['PF']) }}">Provident Fund</a></li>
+                        <li><a class="slide-item {{ request()->is('hr/employeeBenefit/SS') ? 'active' : '' }}"
+                                href="{{ route('hr.employeeBenefit', ['SS']) }}">Social Security</a></li>
+                    </ul>
+                </li>
                 {{-- @endcan --}}
 
-               
 
 
 
-                @canany(['ExamTerms-list', 'TestTypes-list', 'ExamDetails-list', 'Components-list', 'SubComponents-list', 'Skills-list', 'SkillEvaluationsKey-list', 'SkillEvaluation-list', 'Behaviours-list', 'EffortLevels-list', 'GradingPolicies-list', 'AcademicEvaluationsKey-list', 'SkillGroups-list', 'SkillTypes-list', 'ExamSchedules-list', 'MarksInput-list'])
+
+                @canany(['ExamTerms-list', 'TestTypes-list', 'ExamDetails-list', 'Components-list',
+                    'SubComponents-list', 'Skills-list', 'SkillEvaluationsKey-list', 'SkillEvaluation-list',
+                    'Behaviours-list', 'EffortLevels-list', 'GradingPolicies-list', 'AcademicEvaluationsKey-list',
+                    'SkillGroups-list', 'SkillTypes-list', 'ExamSchedules-list', 'MarksInput-list'])
                     <li class="side-item side-item-category">Exam</li>
                     <li class="slide">
                         <a class="side-menu__item {{ request()->is('exam/exam_terms*') || request()->is('exam/test_types*') || request()->is('exam/exam_details*') || request()->is('exam/components*') || request()->is('exam/skill_evaluations_key*') || request()->is('exam/skill_evaluation*') || request()->is('exam/academic_evaluations_key*') || request()->is('exam/skill_groups*') || request()->is('exam/class_subjects*') || request()->is('exam/skill_types*') || request()->is('exam/exam_schedules*') || request()->is('exam/sub_components*') || request()->is('exam/skills*') || request()->is('exam/behaviours*') || request()->is('exam/effort_levels*') || request()->is('exam/grading_policies*') || request()->is('exam/marks_input*') ? 'active' : '' }}"
@@ -584,7 +594,7 @@
                                 <li><a class="slide-item {{ request()->is('exam/skills*') ? 'active' : '' }}"
                                         href="{{ route('exam.skills.index') }}">Skills</a></li>
                             @endcan
-                              @can('SkillGroups-list')
+                            @can('SkillGroups-list')
                                 <li><a class="slide-item {{ request()->is('exam/skill_groups*') ? 'active' : '' }}"
                                         href="{{ route('exam.skill_groups.index') }}">Skill Group</a></li>
                             @endcan
@@ -605,8 +615,8 @@
                                 <li><a class="slide-item {{ request()->is('exam/behaviours*') ? 'active' : '' }}"
                                         href="{{ route('exam.behaviours.index') }}">Behaviours</a></li>
                             @endcan --}}
-                             <li><a class="slide-item {{ request()->is('exam/class_subjects*') ? 'active' : '' }}"
-                            href="{{ route('exam.class_subjects.index') }}">Class Subjects</a></li>
+                            <li><a class="slide-item {{ request()->is('exam/class_subjects*') ? 'active' : '' }}"
+                                    href="{{ route('exam.class_subjects.index') }}">Class Subjects</a></li>
                             @can('EffortLevels-list')
                                 <li><a class="slide-item {{ request()->is('exam/effort_levels*') ? 'active' : '' }}"
                                         href="{{ route('exam.effort_levels.index') }}">Effort Levels</a></li>
@@ -620,7 +630,7 @@
                                         href="{{ route('exam.academic_evaluations_key.index') }}">Academic Evaluation Key</a>
                                 </li>
                             @endcan --}}
-                              
+
 
                             @can('ExamSchedules-list')
                                 <li><a class="slide-item {{ request()->is('exam/exam_schedules*') ? 'active' : '' }}"
@@ -643,7 +653,8 @@
                         <span class="side-menu__label">Fee Management</span>
                         <i class="angle fe fe-chevron-down"></i>
                     </a>
-                    <ul class="slide-menu" style="display: {{ request()->is('admin/fee-management*') ? 'block' : 'none' }}">
+                    <ul class="slide-menu"
+                        style="display: {{ request()->is('admin/fee-management*') ? 'block' : 'none' }}">
                         <li><a class="slide-item {{ request()->is('admin/fee-management') ? 'active' : '' }}"
                                 href="{{ route('admin.fee-management.index') }}">Dashboard</a></li>
                         <li><a class="slide-item {{ request()->is('admin/fee-management/categories*') ? 'active' : '' }}"
@@ -664,8 +675,8 @@
                 {{-- Fleet Management Section --}}
                 <li class="side-item side-item-category">Fleet Management</li>
                 <li class="slide">
-                    <a class="side-menu__item {{ request()->is('fleet*') ? 'active' : '' }}"
-                        data-bs-toggle="slide" href="javascript:void(0);">
+                    <a class="side-menu__item {{ request()->is('fleet*') ? 'active' : '' }}" data-bs-toggle="slide"
+                        href="javascript:void(0);">
                         <i class="fa fa-bus icons8 icon-style" aria-hidden="true"></i>
                         <span class="side-menu__label">Fleet Management</span>
                         <i class="angle fe fe-chevron-down"></i>
@@ -703,13 +714,14 @@
                             <ul class="slide-menu"
                                 style="display: {{ request()->is('admin/ledger_tree*', 'admin/report-center*', 'admin/entries*') ? 'block' : 'none' }}">
                                 <li><a class="slide-item {{ request()->is('admin/ledger_tree*') ? 'active' : '' }}"
-                                        href="{{ route('admin.accounts.chart_of_accounts.ledger_tree') }}">Chart of Accounts</a>
+                                        href="{{ route('admin.accounts.chart_of_accounts.ledger_tree') }}">Chart of
+                                        Accounts</a>
                                 </li>
                                 <li><a class="slide-item {{ request()->is('admin/report-center*') ? 'active' : '' }}"
                                         href="{{ route('admin.accounts.reports') }}">Report Center</a></li>
                                 <li><a class="slide-item {{ request()->is('admin/entries*') ? 'active' : '' }}"
                                         href="{{ route('admin.entries.index') }}">Journal Entry</a></li>
-                               
+
                             </ul>
                         </li>
                     @endcan
@@ -773,8 +785,8 @@
                     @endcan
                     @can('EOBI')
                         <li class="slide">
-                            <a class="side-menu__item {{ request()->is('hr/eobis*') ? 'active' : '' }}" data-bs-toggle="slide"
-                                href="javascript:void(0);">
+                            <a class="side-menu__item {{ request()->is('hr/eobis*') ? 'active' : '' }}"
+                                data-bs-toggle="slide" href="javascript:void(0);">
                                 <i class="fa fa-handshake-o icons8 icon-style" aria-hidden="true"></i>
                                 <span class="side-menu__label">EOBI</span>
                                 <i class="angle fe fe-chevron-down"></i>
@@ -793,7 +805,8 @@
                                 <span class="side-menu__label">Provident Fund</span>
                                 <i class="angle fe fe-chevron-down"></i>
                             </a>
-                            <ul class="slide-menu" style="display: {{ request()->is('hr/profit-funds*') ? 'block' : 'none' }}">
+                            <ul class="slide-menu"
+                                style="display: {{ request()->is('hr/profit-funds*') ? 'block' : 'none' }}">
                                 <li><a class="slide-item {{ request()->is('hr/profit-funds*') ? 'active' : '' }}"
                                         href="{{ route('hr.profit-funds.index') }}">Provident Fund</a></li>
                             </ul>
@@ -817,39 +830,39 @@
                 @endcanany
 
                 {{-- @if (Gate::allows('Leaves')) --}}
-                    <li class="side-item side-item-category ">Leave Management</li>
-                    <li class="slide">
-                        <a class="side-menu__item {{ request()->is('hr/qouta_sections*') || request()->is('hr/holidays*') || request()->is('hr/leave_requests*') || request()->is('hr/manage_leaves*') ? 'active' : '' }}"
-                            data-bs-toggle="slide" href="javascript:void(0);">
-                            <i class="fa fa-pencil icons8 icon-style" aria-hidden="true"></i>
-                            <span class="side-menu__label">Leave Settings</span>
-                            <i class="angle fe fe-chevron-down"></i>
-                        </a>
-                        <ul class="slide-menu "
-                            style="display: {{ request()->is('hr/qouta_sections*') || request()->is('hr/holidays*') || request()->is('hr/leave_requests*') || request()->is('hr/manage_leaves*') ? 'block' : 'none' }}">
-                            {{-- @if (Gate::allows('qouta_section')) --}}
-                                <li><a class="slide-item {{ request()->is('hr/qouta_sections*') ? 'active' : '' }}"
-                                        href="{{ route('hr.qouta_sections.index') }}">Permanent Employees Quota</a>
-                                </li>
-                            {{-- @endif --}}
-                            {{-- @if (Gate::allows('holidays')) --}}
-                                <li><a class="slide-item {{ request()->is('hr/holidays*') ? 'active' : '' }}"
-                                        href="{{ route('hr.holidays.index') }}">Gazetted Holidays</a></li>
-                            {{-- @endif --}}
-                            <li><a class="slide-item {{ request()->is('hr/leave_requests*') ? 'active' : '' }}"
-                                    href="{{ route('hr.leave_requests.index') }}">Leave Request</a></li>
-                            {{-- @if (Gate::allows('leave-approve')) --}}
-                                <li><a class="slide-item {{ request()->is('hr/manage_leaves*') ? 'active' : '' }}"
-                                        href="{{ route('hr.manage_leaves.index') }}">Manage Leaves</a></li>
-                            {{-- @endif --}}
-                        </ul>
-                    </li>
+                <li class="side-item side-item-category ">Leave Management</li>
+                <li class="slide">
+                    <a class="side-menu__item {{ request()->is('hr/qouta_sections*') || request()->is('hr/holidays*') || request()->is('hr/leave_requests*') || request()->is('hr/manage_leaves*') ? 'active' : '' }}"
+                        data-bs-toggle="slide" href="javascript:void(0);">
+                        <i class="fa fa-pencil icons8 icon-style" aria-hidden="true"></i>
+                        <span class="side-menu__label">Leave Settings</span>
+                        <i class="angle fe fe-chevron-down"></i>
+                    </a>
+                    <ul class="slide-menu "
+                        style="display: {{ request()->is('hr/qouta_sections*') || request()->is('hr/holidays*') || request()->is('hr/leave_requests*') || request()->is('hr/manage_leaves*') ? 'block' : 'none' }}">
+                        {{-- @if (Gate::allows('qouta_section')) --}}
+                        <li><a class="slide-item {{ request()->is('hr/qouta_sections*') ? 'active' : '' }}"
+                                href="{{ route('hr.qouta_sections.index') }}">Permanent Employees Quota</a>
+                        </li>
+                        {{-- @endif --}}
+                        {{-- @if (Gate::allows('holidays')) --}}
+                        <li><a class="slide-item {{ request()->is('hr/holidays*') ? 'active' : '' }}"
+                                href="{{ route('hr.holidays.index') }}">Gazetted Holidays</a></li>
+                        {{-- @endif --}}
+                        <li><a class="slide-item {{ request()->is('hr/leave_requests*') ? 'active' : '' }}"
+                                href="{{ route('hr.leave_requests.index') }}">Leave Request</a></li>
+                        {{-- @if (Gate::allows('leave-approve')) --}}
+                        <li><a class="slide-item {{ request()->is('hr/manage_leaves*') ? 'active' : '' }}"
+                                href="{{ route('hr.manage_leaves.index') }}">Manage Leaves</a></li>
+                        {{-- @endif --}}
+                    </ul>
+                </li>
                 {{-- @endif --}}
 
 
                 {{-- Budegt Management System --}}
 
-                 @canany(['Budget'])
+                @canany(['Budget'])
                     <li class="side-item side-item-category">Budegt Management</li>
                     @can('Budget')
                         <li class="slide">
@@ -862,16 +875,16 @@
                     @endcan
 
                     {{-- @can('Budget') --}}
-                        <li class="slide">
-                            <a class="side-menu__item {{ request()->routeIs('inventory.List.ofAssignDepartment') ? 'active' : '' }}"
-                                href="{{ route('inventory.List.ofAssignDepartment') }}">
-                                <i class="fas fa-users icons8 icon-style me-3"></i>
-                                <span class="side-menu__label">Assign Department List</span>
-                            </a>
-                        </li>
+                    <li class="slide">
+                        <a class="side-menu__item {{ request()->routeIs('inventory.List.ofAssignDepartment') ? 'active' : '' }}"
+                            href="{{ route('inventory.List.ofAssignDepartment') }}">
+                            <i class="fas fa-users icons8 icon-style me-3"></i>
+                            <span class="side-menu__label">Assign Department List</span>
+                        </a>
+                    </li>
                     {{-- @endcan --}}
 
-                     @can('InventoryCategory')
+                    @can('InventoryCategory')
                         <li class="slide">
                             <a class="side-menu__item {{ request()->routeIs('inventory.category.index') ? 'active' : '' }}"
                                 href="{{ route('inventory.category.index') }}">
@@ -882,9 +895,8 @@
                     @endcan
 
                     {{-- Expense  --}}
-                     @can('expense')
-                    
-                    <li class="slide">
+                    @can('expense')
+                        <li class="slide">
                             <a class="side-menu__item {{ request()->routeIs('inventory.expense.index') ? 'active' : '' }}"
                                 href="{{ route('inventory.expense.index') }}">
                                 <i class="fas fa-tags icons8 icon-style me-3"></i>
@@ -893,42 +905,104 @@
                         </li>
                     @endcan
 
-                        <li class="slide">
-                            <a class="side-menu__item {{ request()->routeIs('inventory.supplementory.index') ? 'active' : '' }}"
-                                href="{{ route('inventory.supplementory.index') }}">
-                                <i class="fas fa-tags icons8 icon-style me-3"></i>
-                                <span class="side-menu__label">Supplementory Budget</span>
-                            </a>
-                        </li>
+                    <li class="slide">
+                        <a class="side-menu__item {{ request()->routeIs('inventory.supplementory.index') ? 'active' : '' }}"
+                            href="{{ route('inventory.supplementory.index') }}">
+                            <i class="fas fa-tags icons8 icon-style me-3"></i>
+                            <span class="side-menu__label">Supplementory Budget</span>
+                        </a>
+                    </li>
 
-                        <li class="slide">
-                            <a class="side-menu__item {{ request()->routeIs('inventory.supplimentary.requests.list') ? 'active' : '' }}"
-                                href="{{ route('inventory.supplimentary.requests.list') }}">
-                                <i class="fas fa-tags icons8 icon-style me-3"></i>
-                                <span class="side-menu__label">Request List</span>
-                            </a>
-                        </li>
+                    <li class="slide">
+                        <a class="side-menu__item {{ request()->routeIs('inventory.supplimentary.requests.list') ? 'active' : '' }}"
+                            href="{{ route('inventory.supplimentary.requests.list') }}">
+                            <i class="fas fa-tags icons8 icon-style me-3"></i>
+                            <span class="side-menu__label">Request List</span>
+                        </a>
+                    </li>
 
-                        <li class="slide">
-                            <a class="side-menu__item {{ request()->routeIs('inventory.supplimentory.budget.report') ? 'active' : '' }}"
-                                href="{{ route('inventory.supplimentory.budget.report') }}">
-                                <i class="fas fa-tags icons8 icon-style me-3"></i>
-                                <span class="side-menu__label">Supplementory Report</span>
-                            </a>
-                        </li>
+                    <li class="slide">
+                        <a class="side-menu__item {{ request()->routeIs('inventory.supplimentory.budget.report') ? 'active' : '' }}"
+                            href="{{ route('inventory.supplimentory.budget.report') }}">
+                            <i class="fas fa-tags icons8 icon-style me-3"></i>
+                            <span class="side-menu__label">Supplementory Report</span>
+                        </a>
+                    </li>
 
-                 
+
                 @endcanany
 
-               @canany(['Vendor', 'VendorCategory', 'CafeInventory', 'StationeryInventory', 'POS'])
 
-    @php
-        $routeType = request()->query('type');
-    @endphp
+                {{-- Maintenance Management Section --}}
+                <li class="side-item side-item-category">Maintenance Management</li>
+                <li class="slide">
+                    <a class="side-menu__item {{ request()->is('maintainer*') ? 'active' : '' }}"
+                        data-bs-toggle="slide" href="javascript:void(0);">
+                        <i class="fa fa-money icons8 icon-style" aria-hidden="true"></i>
+                        <span class="side-menu__label">Maintenance</span>
+                        <i class="angle fe fe-chevron-down"></i>
+                    </a>
 
-    <li class="side-item side-item-category">Inventory Management</li>
+                    <ul class="slide-menu"
+                        style="display: {{ request()->is('maintenance-request*') || request()->is('maintainer*') ? 'block' : 'none' }}">
+                        {{-- Maintainer Section --}}
+                        <li>
+                            <a class="slide-item {{ request()->is('maintainer/type*') ? 'active' : '' }}"
+                                href="{{ route('maintainer.type.index') }}">
+                                Type
+                            </a>
+                        </li>
+                        <li>
+                            <a class="slide-item {{ request()->is('maintainer/maintainer*') ? 'active' : '' }}"
+                                href="{{ route('maintainer.maintainer.index') }}">
+                                Maintainer
+                            </a>
+                        </li>
+                        <li>
+                            <a class="slide-item {{ request()->is('maintainer/building*') ? 'active' : '' }}"
+                                href="{{ route('maintainer.building.index') }}">
+                                Building
+                            </a>
+                        </li>
 
-    {{-- Uncomment if needed later
+                        {{-- Maintenance Request Section --}}
+                        <li>
+                            <a class="slide-item {{ request()->is('maintenance-request') || request()->is('maintenance-request/index') ? 'active' : '' }}"
+                                href="{{ route('maintenance-request.index') }}">
+                                All Requests
+                            </a>
+                        </li>
+                        <li>
+                            <a class="slide-item {{ request()->is('maintenance-request/pending') ? 'active' : '' }}"
+                                href="{{ route('maintenance-request.pending') }}">
+                                Pending Requests
+                            </a>
+                        </li>
+                        <li>
+                            <a class="slide-item {{ request()->is('maintenance-request/in-progress') ? 'active' : '' }}"
+                                href="{{ route('maintenance-request.inprogress') }}">
+                                In Progress Requests
+                            </a>
+                        </li>
+                        <li>
+                            <a class="slide-item {{ request()->is('maintenance-request/approval') ? 'active' : '' }}"
+                                href="{{ route('maintenance-request.approval') }}">
+                                Maintenance Approval
+                            </a>
+                        </li>
+                    </ul>
+
+                </li>
+
+                @canany(['Vendor', 'VendorCategory', 'CafeInventory', 'StationeryInventory', 'POS'])
+
+                    @php
+                        $routeType = request()->query('type');
+                    @endphp
+
+                    <li class="side-item side-item-category">Inventory Management</li>
+
+                    {{-- Uncomment if needed later
     @can('Vendor')
         <li class="slide">
             <a class="side-menu__item {{ request()->routeIs('inventory.vendor-management.index') ? 'active' : '' }}"
@@ -950,99 +1024,113 @@
     @endcan
     --}}
 
-    {{-- ================= CAFE INVENTORY ================= --}}
-    @can('CafeInventory')
-        <li class="slide">
-            <a class="side-menu__item {{ $routeType === 'food' ? 'active' : '' }}"
-                data-bs-toggle="slide" href="javascript:void(0);">
-                <i class="fas fa-box icons8 icon-style me-3"></i>
-                <span class="side-menu__label">Cafe Inventory</span>
-                <i class="angle fe fe-chevron-down"></i>
-            </a>
-            <ul class="slide-menu" style="display: {{ $routeType === 'food' ? 'block' : 'none' }}">
-                <li><a class="slide-item {{ request()->routeIs('inventory.items.index') && $routeType === 'food' ? 'active' : '' }}"
-                        href="{{ route('inventory.items.index', ['type' => 'food']) }}">Raw Material & Items</a></li>
-                <li><a class="slide-item {{ request()->routeIs('inventory.suppliers.index') && $routeType === 'food' ? 'active' : '' }}"
-                        href="{{ route('inventory.suppliers.index', ['type' => 'food']) }}">Suppliers</a></li>
-                <li><a class="slide-item {{ request()->routeIs('inventory.requisitions.index') && $routeType === 'food' ? 'active' : '' }}"
-                        href="{{ route('inventory.requisitions.index', ['type' => 'food']) }}">Requisitions</a></li>
-                <li><a class="slide-item {{ request()->routeIs('inventory.requisitions.approval') && $routeType === 'food' ? 'active' : '' }}"
-                        href="{{ route('inventory.requisitions.approval', ['type' => 'food']) }}">Requisition Approval</a></li>
-                <li><a class="slide-item {{ request()->routeIs('inventory.quotes.index') && $routeType === 'food' ? 'active' : '' }}"
-                        href="{{ route('inventory.quotes.index', ['type' => 'food']) }}">Quotes</a></li>
-                <li><a class="slide-item {{ request()->routeIs('inventory.purchase_order.index') && $routeType === 'food' ? 'active' : '' }}"
-                        href="{{ route('inventory.purchase_order.index', ['type' => 'food']) }}">Purchase Order</a></li>
-                <li><a class="slide-item {{ request()->routeIs('inventory.grn') && $routeType === 'food' ? 'active' : '' }}"
-                        href="{{ route('inventory.grn', ['type' => 'food']) }}">GRN</a></li>
-                <li><a class="slide-item {{ request()->routeIs('inventory.inventry.index') && $routeType === 'food' ? 'active' : '' }}"
-                        href="{{ route('inventory.inventry.index', ['type' => 'food']) }}">Inventory</a></li>
-                <li><a class="slide-item {{ request()->routeIs('inventory.product.index') && $routeType === 'food' ? 'active' : '' }}"
-                        href="{{ route('inventory.product.index', ['type' => 'food']) }}">Products</a></li>
-                <li><a class="slide-item {{ request()->routeIs('inventory.product.productCompleted') ? 'active' : '' }}"
-                        href="{{ route('inventory.product.productCompleted') }}">Completed Goods</a></li>
-                <li><a class="slide-item {{ request()->routeIs('inventory.school_lunch.school_lunch') ? 'active' : '' }}"
-                        href="{{ route('inventory.school_lunch.school_lunch') }}">Student Meal</a></li>
-                <li><a class="slide-item {{ request()->routeIs('inventory.school_lunch.view', 'inventory.school_lunch.get_assigned_student') ? 'active' : '' }}"
-                        href="{{ route('inventory.school_lunch.view') }}">Student Meal Assigned</a></li>
-                <li><a class="slide-item {{ request()->routeIs('inventory.staff_lunch.emp_index') ? 'active' : '' }}"
-                        href="{{ route('inventory.staff_lunch.emp_index') }}">Staff Meal</a></li>
-                <li><a class="slide-item {{ request()->routeIs('inventory.staff_lunch.emp_view') ? 'active' : '' }}"
-                        href="{{ route('inventory.staff_lunch.emp_view') }}">Staff Meal Assigned</a></li>
-            </ul>
-        </li>
-    @endcan
+                    {{-- ================= CAFE INVENTORY ================= --}}
+                    @can('CafeInventory')
+                        <li class="slide">
+                            <a class="side-menu__item {{ $routeType === 'food' ? 'active' : '' }}" data-bs-toggle="slide"
+                                href="javascript:void(0);">
+                                <i class="fas fa-box icons8 icon-style me-3"></i>
+                                <span class="side-menu__label">Cafe Inventory</span>
+                                <i class="angle fe fe-chevron-down"></i>
+                            </a>
+                            <ul class="slide-menu" style="display: {{ $routeType === 'food' ? 'block' : 'none' }}">
+                                <li><a class="slide-item {{ request()->routeIs('inventory.items.index') && $routeType === 'food' ? 'active' : '' }}"
+                                        href="{{ route('inventory.items.index', ['type' => 'food']) }}">Raw Material &
+                                        Items</a></li>
+                                <li><a class="slide-item {{ request()->routeIs('inventory.suppliers.index') && $routeType === 'food' ? 'active' : '' }}"
+                                        href="{{ route('inventory.suppliers.index', ['type' => 'food']) }}">Suppliers</a>
+                                </li>
+                                <li><a class="slide-item {{ request()->routeIs('inventory.requisitions.index') && $routeType === 'food' ? 'active' : '' }}"
+                                        href="{{ route('inventory.requisitions.index', ['type' => 'food']) }}">Requisitions</a>
+                                </li>
+                                <li><a class="slide-item {{ request()->routeIs('inventory.requisitions.approval') && $routeType === 'food' ? 'active' : '' }}"
+                                        href="{{ route('inventory.requisitions.approval', ['type' => 'food']) }}">Requisition
+                                        Approval</a></li>
+                                <li><a class="slide-item {{ request()->routeIs('inventory.quotes.index') && $routeType === 'food' ? 'active' : '' }}"
+                                        href="{{ route('inventory.quotes.index', ['type' => 'food']) }}">Quotes</a></li>
+                                <li><a class="slide-item {{ request()->routeIs('inventory.purchase_order.index') && $routeType === 'food' ? 'active' : '' }}"
+                                        href="{{ route('inventory.purchase_order.index', ['type' => 'food']) }}">Purchase
+                                        Order</a></li>
+                                <li><a class="slide-item {{ request()->routeIs('inventory.grn') && $routeType === 'food' ? 'active' : '' }}"
+                                        href="{{ route('inventory.grn', ['type' => 'food']) }}">GRN</a></li>
+                                <li><a class="slide-item {{ request()->routeIs('inventory.inventry.index') && $routeType === 'food' ? 'active' : '' }}"
+                                        href="{{ route('inventory.inventry.index', ['type' => 'food']) }}">Inventory</a></li>
+                                <li><a class="slide-item {{ request()->routeIs('inventory.product.index') && $routeType === 'food' ? 'active' : '' }}"
+                                        href="{{ route('inventory.product.index', ['type' => 'food']) }}">Products</a></li>
+                                <li><a class="slide-item {{ request()->routeIs('inventory.product.productCompleted') ? 'active' : '' }}"
+                                        href="{{ route('inventory.product.productCompleted') }}">Completed Goods</a></li>
+                                <li><a class="slide-item {{ request()->routeIs('inventory.school_lunch.school_lunch') ? 'active' : '' }}"
+                                        href="{{ route('inventory.school_lunch.school_lunch') }}">Student Meal</a></li>
+                                <li><a class="slide-item {{ request()->routeIs('inventory.school_lunch.view', 'inventory.school_lunch.get_assigned_student') ? 'active' : '' }}"
+                                        href="{{ route('inventory.school_lunch.view') }}">Student Meal Assigned</a></li>
+                                <li><a class="slide-item {{ request()->routeIs('inventory.staff_lunch.emp_index') ? 'active' : '' }}"
+                                        href="{{ route('inventory.staff_lunch.emp_index') }}">Staff Meal</a></li>
+                                <li><a class="slide-item {{ request()->routeIs('inventory.staff_lunch.emp_view') ? 'active' : '' }}"
+                                        href="{{ route('inventory.staff_lunch.emp_view') }}">Staff Meal Assigned</a></li>
+                            </ul>
+                        </li>
+                    @endcan
 
-    {{-- ================= STATIONERY INVENTORY ================= --}}
-    @can('StationeryInventory')
-        <li class="slide">
-            <a class="side-menu__item {{ $routeType === 'stationary' ? 'active' : '' }}"
-                data-bs-toggle="slide" href="javascript:void(0);">
-                <i class="fas fa-warehouse icons8 icon-style me-3"></i>
-                <span class="side-menu__label">Stationery Inventory</span>
-                <i class="angle fe fe-chevron-down"></i>
-            </a>
-            <ul class="slide-menu" style="display: {{ $routeType === 'stationary' ? 'block' : 'none' }}">
-                <li><a class="slide-item {{ request()->routeIs('inventory.items.index') && $routeType === 'stationary' ? 'active' : '' }}"
-                        href="{{ route('inventory.items.index', ['type' => 'stationary']) }}">Items</a></li>
-                <li><a class="slide-item {{ request()->routeIs('inventory.suppliers.index') && $routeType === 'stationary' ? 'active' : '' }}"
-                        href="{{ route('inventory.suppliers.index', ['type' => 'stationary']) }}">Suppliers</a></li>
-                <li><a class="slide-item {{ request()->routeIs('inventory.requisitions.index') && $routeType === 'stationary' ? 'active' : '' }}"
-                        href="{{ route('inventory.requisitions.index', ['type' => 'stationary']) }}">Requisitions</a></li>
-                <li><a class="slide-item {{ request()->routeIs('inventory.requisitions.approval') && $routeType === 'stationary' ? 'active' : '' }}"
-                        href="{{ route('inventory.requisitions.approval', ['type' => 'stationary']) }}">Requisition Approval</a></li>
-                <li><a class="slide-item {{ request()->routeIs('inventory.quotes.index') && $routeType === 'stationary' ? 'active' : '' }}"
-                        href="{{ route('inventory.quotes.index', ['type' => 'stationary']) }}">Quotes</a></li>
-                <li><a class="slide-item {{ request()->routeIs('inventory.purchase_order.index') && $routeType === 'stationary' ? 'active' : '' }}"
-                        href="{{ route('inventory.purchase_order.index', ['type' => 'stationary']) }}">Purchase Order</a></li>
-                <li><a class="slide-item {{ request()->routeIs('inventory.grn') && $routeType === 'stationary' ? 'active' : '' }}"
-                        href="{{ route('inventory.grn', ['type' => 'stationary']) }}">GRN</a></li>
-                <li><a class="slide-item {{ request()->routeIs('inventory.inventry.index') && $routeType === 'stationary' ? 'active' : '' }}"
-                        href="{{ route('inventory.inventry.index', ['type' => 'stationary']) }}">Store Inventory</a></li>
-                <li><a class="slide-item {{ request()->routeIs('inventory.product.index') && $routeType === 'stationary' ? 'active' : '' }}"
-                        href="{{ route('inventory.product.index', ['type' => 'stationary']) }}">Bundles</a></li>
-            </ul>
-        </li>
-    @endcan
+                    {{-- ================= STATIONERY INVENTORY ================= --}}
+                    @can('StationeryInventory')
+                        <li class="slide">
+                            <a class="side-menu__item {{ $routeType === 'stationary' ? 'active' : '' }}"
+                                data-bs-toggle="slide" href="javascript:void(0);">
+                                <i class="fas fa-warehouse icons8 icon-style me-3"></i>
+                                <span class="side-menu__label">Stationery Inventory</span>
+                                <i class="angle fe fe-chevron-down"></i>
+                            </a>
+                            <ul class="slide-menu" style="display: {{ $routeType === 'stationary' ? 'block' : 'none' }}">
+                                <li><a class="slide-item {{ request()->routeIs('inventory.items.index') && $routeType === 'stationary' ? 'active' : '' }}"
+                                        href="{{ route('inventory.items.index', ['type' => 'stationary']) }}">Items</a></li>
+                                <li><a class="slide-item {{ request()->routeIs('inventory.suppliers.index') && $routeType === 'stationary' ? 'active' : '' }}"
+                                        href="{{ route('inventory.suppliers.index', ['type' => 'stationary']) }}">Suppliers</a>
+                                </li>
+                                <li><a class="slide-item {{ request()->routeIs('inventory.requisitions.index') && $routeType === 'stationary' ? 'active' : '' }}"
+                                        href="{{ route('inventory.requisitions.index', ['type' => 'stationary']) }}">Requisitions</a>
+                                </li>
+                                <li><a class="slide-item {{ request()->routeIs('inventory.requisitions.approval') && $routeType === 'stationary' ? 'active' : '' }}"
+                                        href="{{ route('inventory.requisitions.approval', ['type' => 'stationary']) }}">Requisition
+                                        Approval</a></li>
+                                <li><a class="slide-item {{ request()->routeIs('inventory.quotes.index') && $routeType === 'stationary' ? 'active' : '' }}"
+                                        href="{{ route('inventory.quotes.index', ['type' => 'stationary']) }}">Quotes</a>
+                                </li>
+                                <li><a class="slide-item {{ request()->routeIs('inventory.purchase_order.index') && $routeType === 'stationary' ? 'active' : '' }}"
+                                        href="{{ route('inventory.purchase_order.index', ['type' => 'stationary']) }}">Purchase
+                                        Order</a></li>
+                                <li><a class="slide-item {{ request()->routeIs('inventory.grn') && $routeType === 'stationary' ? 'active' : '' }}"
+                                        href="{{ route('inventory.grn', ['type' => 'stationary']) }}">GRN</a></li>
+                                <li><a class="slide-item {{ request()->routeIs('inventory.inventry.index') && $routeType === 'stationary' ? 'active' : '' }}"
+                                        href="{{ route('inventory.inventry.index', ['type' => 'stationary']) }}">Store
+                                        Inventory</a></li>
+                                <li><a class="slide-item {{ request()->routeIs('inventory.product.index') && $routeType === 'stationary' ? 'active' : '' }}"
+                                        href="{{ route('inventory.product.index', ['type' => 'stationary']) }}">Bundles</a>
+                                </li>
+                            </ul>
+                        </li>
+                    @endcan
 
-    {{-- ================= POINT OF SALE ================= --}}
-    @can('POS')
-        <li class="slide">
-            <a class="side-menu__item {{ request()->routeIs('inventory.pos.view') ? 'active' : '' }}"
-                data-bs-toggle="slide" href="javascript:void(0);">
-                <i class="fas fa-cart-arrow-down icons8 icon-style me-3"></i>
-                <span class="side-menu__label">POS</span>
-                <i class="angle fe fe-chevron-down"></i>
-            </a>
-            <ul class="slide-menu" style="display: {{ request()->routeIs('inventory.pos.view') ? 'block' : 'none' }}">
-                <li><a class="slide-item {{ request()->routeIs('inventory.pos.view') && $routeType === 'food' ? 'active' : '' }}"
-                        href="{{ route('inventory.pos.view', ['type' => 'food']) }}">POS (Food)</a></li>
-                <li><a class="slide-item {{ request()->routeIs('inventory.pos.view') && $routeType === 'uniform' ? 'active' : '' }}"
-                        href="{{ route('inventory.pos.view', ['type' => 'uniform']) }}">POS (Uniform)</a></li>
-            </ul>
-        </li>
-    @endcan
+                    {{-- ================= POINT OF SALE ================= --}}
+                    @can('POS')
+                        <li class="slide">
+                            <a class="side-menu__item {{ request()->routeIs('inventory.pos.view') ? 'active' : '' }}"
+                                data-bs-toggle="slide" href="javascript:void(0);">
+                                <i class="fas fa-cart-arrow-down icons8 icon-style me-3"></i>
+                                <span class="side-menu__label">POS</span>
+                                <i class="angle fe fe-chevron-down"></i>
+                            </a>
+                            <ul class="slide-menu"
+                                style="display: {{ request()->routeIs('inventory.pos.view') ? 'block' : 'none' }}">
+                                <li><a class="slide-item {{ request()->routeIs('inventory.pos.view') && $routeType === 'food' ? 'active' : '' }}"
+                                        href="{{ route('inventory.pos.view', ['type' => 'food']) }}">POS (Food)</a></li>
+                                <li><a class="slide-item {{ request()->routeIs('inventory.pos.view') && $routeType === 'uniform' ? 'active' : '' }}"
+                                        href="{{ route('inventory.pos.view', ['type' => 'uniform']) }}">POS (Uniform)</a>
+                                </li>
+                            </ul>
+                        </li>
+                    @endcan
 
-@endcanany
+                @endcanany
 
 
                 @can('UserManagement')
@@ -1067,7 +1155,8 @@
                 @endcan
             </ul>
             <div class="slide-right" id="slide-right">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="#7b8191" width="24" height="24" viewBox="0 0 24 24">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="#7b8191" width="24" height="24"
+                    viewBox="0 0 24 24">
                     <path d="M10.707 17.707 16.414 12l-5.707-5.707-1.414 1.414L13.586 12l-4.293 4.293z" />
                 </svg>
             </div>

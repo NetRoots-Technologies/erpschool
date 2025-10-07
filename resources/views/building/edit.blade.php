@@ -6,7 +6,7 @@
 
 @section('content')
     {!! Form::model($buildings, [
-        'route' => ['building.update', $buildings->id],
+        'route' => ['maintainer.building.update', $buildings->id],
         'method' => 'POST',
         'enctype' => 'multipart/form-data'
     ]) !!}

@@ -3,8 +3,9 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Permission;
+use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 class PermissionTableSeeder extends Seeder
 {
@@ -273,39 +274,29 @@ class PermissionTableSeeder extends Seeder
                     'maintainer' => ['manage maintainer' , 'create maintainer' , 'edit maintainer' , 'delete maintainer'],
                     'supplementory' => ['supplementory create' , 'supplementory edit' , 'supplementory list' , 'supplementory list' , 'supplementory request'],
                     'expense' => ['expense create' , 'expense edit' , 'expense list' , 'expense list' ],
+                    'maintenance-request' => ['maintenance-request create', 'maintenance-request edit' , 'maintenance-request list' , 'maintenance-request delete' , '' ]
                 ];
 
-       foreach ($permissions as $mainPermission => $subPermissions) {
-            // Create or get the main permission
-            $main = Permission::firstOrCreate([
-                'name' => $mainPermission,
-                'guard_name' => 'web',
-                'main' => 1,
-                'parent_id' => 0,
-            ]);
+        DB::transaction(function () use ($permissions) {
+            foreach ($permissions as $group => $subs) {
+                // Create or update the "group" permission (main = 1)
+                $main = Permission::updateOrCreate(
+                    ['name' => $group, 'guard_name' => 'web'], // match only unique fields
+                    ['main' => 1, 'parent_id' => 0]
+                );
 
-            foreach ($subPermissions as $subPermission) {
-                // Check if the sub-permission already exists
-                $existingPermission = Permission::where([
-                    'name' => $subPermission,
-                    'guard_name' => 'web',
-                ])->first();
+                // De-duplicate sub-permissions within the array (safety)
+                $subs = array_values(array_unique(array_filter($subs)));
 
-                if (!$existingPermission) {
-                    // Create the sub-permission only if it doesn't exist
-                    Permission::create([
-                        'name' => $subPermission,
-                        'guard_name' => 'web',
-                        'main' => 0,
-                        'parent_id' => $main->id,
-                    ]);
-                } else {
-                    // Optionally update the parent_id if needed
-                    if ($existingPermission->parent_id != $main->id) {
-                        $existingPermission->update(['parent_id' => $main->id]);
-                    }
+                foreach ($subs as $perm) {
+                    // Create or update each sub-permission (main = 0, parent points to group)
+                    Permission::updateOrCreate(
+                        ['name' => $perm, 'guard_name' => 'web'],
+                        ['main' => 0, 'parent_id' => $main->id]
+                    );
                 }
             }
-        }
+        });
+
     }
 }

@@ -3,7 +3,9 @@
 namespace App\Models;
 
 use App\Models\HRM\Employees;
+use App\Models\ApprovalAuthority;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Models\Role;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -70,5 +72,9 @@ class User extends Authenticatable
 
     public function approvalauthorities(){
         return $this->hasMany(ApprovalAuthority::class);
+    }
+       
+    public function maintainerUsers(){
+        return $this->hasMany(Role::class  , 'id' , 'role_id');
     }
 }

@@ -4,11 +4,11 @@
 @stop
 @section('content')
     {{-- @can('create property') --}}
-        <a class="btn btn-primary  ml-20 text-end" href="{{ route('building.create') }}" data-size="md"> 
-            <i class="ti-plus mr-5"></i>{{__('Create Buildings')}}</a>
+        <a class="btn btn-primary" href="{{ route('maintainer.building.create') }}" data-size="md"> 
+            <i class="fa fa-plus"></i>{{__('Create Buildings')}}</a>
     {{-- @endcan --}}
 
-    <div class="row mt-4">
+    <div class="row mt-1">
     @forelse ($buildings as $bg)
         <div class="col-xl-3 col-lg-4 col-md-6 mb-4">
             <div class="card shadow-sm h-100">
@@ -42,15 +42,15 @@
 
                     {{-- Actions --}}
                     <div class="mt-3 d-flex justify-content-between">
-                        <a href="{{ route('building.show', $bg->id) }}" class="btn btn-sm btn-outline-primary">
+                        <a href="{{ route('maintainer.building.show', $bg->id) }}" class="btn btn-sm btn-outline-primary">
                             <i class="fa fa-eye"></i> View
                         </a>
                         
-                        <a href="{{ route('building.edit', $bg->id) }}" class="btn btn-sm btn-outline-secondary">
+                        <a href="{{ route('maintainer.building.edit', $bg->id) }}" class="btn btn-sm btn-outline-secondary">
                             <i class="fa fa-edit"></i> Edit
                         </a>
 
-                        {!! Form::open(['method' => 'POST', 'route' => ['building.destroy', $bg->id],'id'=>'tenant-'.$bg->id]) !!}
+                        {!! Form::open(['method' => 'POST', 'route' => ['maintainer.building.destroy', $bg->id],'id'=>'tenant-'.$bg->id]) !!}
                         <a href="" class="btn btn-sm btn-outline-info confirm_dialog" data-id="{{ $bg->id }}">
                             <i class="fa fa-eye"></i> Delete
                         </a>
@@ -95,7 +95,7 @@
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url: "{{ route('building.destroy', ':id') }}".replace(':id', id),
+                    url: "{{ route('maintainer.building.destroy', ':id') }}".replace(':id', id),
                     type: "POST",
                     data: {
                         "_token": "{{ csrf_token() }}",
