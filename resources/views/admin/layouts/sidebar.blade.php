@@ -909,7 +909,7 @@
                         <a class="side-menu__item {{ request()->routeIs('inventory.supplementory.index') ? 'active' : '' }}"
                             href="{{ route('inventory.supplementory.index') }}">
                             <i class="fas fa-tags icons8 icon-style me-3"></i>
-                            <span class="side-menu__label">Supplementory Budget</span>
+                            <span class="side-menu__label">Supplementary Budget</span>
                         </a>
                     </li>
 
