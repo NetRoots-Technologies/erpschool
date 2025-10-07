@@ -24,12 +24,17 @@ class TypeController extends Controller
 
                 return Datatables::of($data)
                     ->addIndexColumn()
+                    ->addColumn('type' , function($row){
+                        $types = Type::$types;
+                        $label = $types[$row->type];
+                        return $label;
+                    })
                     ->addColumn('action', function($row){
                         $btn  = '<a href="javascript:void(0)" data-id="'.$row->id.'" data-type="'.$row->type.'" data-title="'.$row->title.'" class="editType btn btn-primary btn-sm mr-1">Edit</a>';
                         $btn .= ' <a href="javascript:void(0)" data-id="'.$row->id.'" class="deleteType btn btn-danger btn-sm">Delete</a>';
                         return $btn;
                     })
-                    ->rawColumns(['action'])
+                    ->rawColumns(['action' , 'type'])
                     ->make(true);
             }
 
@@ -48,7 +53,6 @@ class TypeController extends Controller
 
     public function store(Request $request)
     {
-
         if (Auth::user()->can('create types')) {
             $validator = Validator::make(
                 $request->all(), [
