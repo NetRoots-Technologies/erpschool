@@ -41,11 +41,34 @@ class SkillEvaluationController extends Controller
         if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
-        $companies = Company::all();
-        $academic_sessions = AcademicSession::all();
-        $skill_groups = SkillGroup::where('active', 1)->get();
-        return view('exam.skill_evaluation.index', compact('companies', 'academic_sessions', 'skill_groups'));
+        $skillEvaluations = SkillEvaluation::with([
+            'user',
+            'student.AcademicClass',
+            'student.section',
+            'subject',
+        ])->groupBy('student_id', 'subject_id')->get();
+    //    dd($skillEvaluations);
+        return view('exam.skill_evaluation.index', compact('skillEvaluations'));
+    }
 
+    public function listing($id)
+    {
+
+        if (!Gate::allows('Dashboard-list')) {
+            return abort(503);
+        }
+        $skillEvaluations = SkillEvaluation::where('student_id', $id)->with([
+            'user',
+            'student.AcademicClass',
+            'student.section',
+            'subject',
+            'skill',
+            'groupskill',
+            'skillEvaluationKeys'
+            
+        ])->get();
+        // dd($skillEvaluations);
+        return view('exam.skill_evaluation.listing', compact('skillEvaluations'));
     }
 
     /**
@@ -55,9 +78,13 @@ class SkillEvaluationController extends Controller
      */
     public function create()
     {
-        if (!Gate::allows('Dashboard-list')) {
+      if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
+        $companies = Company::all();
+        $academic_sessions = AcademicSession::all();
+        $skill_groups = SkillGroup::where('active', 1)->get();
+        return view('exam.skill_evaluation.create', compact('companies', 'academic_sessions', 'skill_groups'));
     }
 
     /**
