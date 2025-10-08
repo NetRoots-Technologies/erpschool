@@ -14,7 +14,7 @@ use App\Http\Controllers\Academic\TimeTableController;
 use App\Http\Controllers\Admin\AccountHeadController;
 use App\Http\Controllers\Admin\CourseController;
 use App\Http\Controllers\Admin\CourseTypeController;
-use App\Http\Controllers\Admin\LedgersController;
+use App\Http\Controllers\Accounts\ChartOfAccountsController;
 use App\Http\Controllers\Exam\ComponentController;
 use App\Http\Controllers\Exam\ExamScheduleController;
 use App\Http\Controllers\Student\AcademicSessionController;

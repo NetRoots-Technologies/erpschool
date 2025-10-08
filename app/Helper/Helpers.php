@@ -4,133 +4,130 @@ namespace App\Helper;
 
 use Carbon\Carbon;
 use Illuminate\Support\Str;
-use App\Helper\CoreAccounts;
-use App\Models\Admin\Groups;
-use App\Models\Admin\Entries;
-use App\Models\Admin\Ledgers;
+use App\Models\Accounts\AccountGroup;
+use App\Models\Accounts\AccountLedger;
+use App\Models\Accounts\JournalEntry;
+use App\Models\Accounts\JournalEntryLine;
 use App\Models\HRM\Employees;
-use App\Models\Account\Ledger;
 use App\Models\Admin\Currencies;
-use App\Models\Admin\EntryItems;
 use App\Models\Student\Students;
-
-
 use Illuminate\Support\Facades\Auth;
 use App\Models\HR\CalculateComission;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 
 class Helpers
 {
+    /**
+     * Create ledger using new accounts system
+     */
     public static function create_ledger($data)
     {
-
-        //        try {
-
-        $ledger = new Ledger();
-        $ledger->name = $data['name'];
-        //        $ledger->number = $data['number'];
-        $ledger->parent_type = $data['parent_type'];
-        //        $ledger->branch_id = $data['branch_id'];
-//        $ledger->code = $data['code'];
-        $ledger->group_id = $data['group_id'];
-        //        $ledger->group_number = $data['group_number'];
-        $ledger->opening_balance = 0;
-        $ledger->closing_balance = 0;
-        $ledger->balance_type = 'd';
-        $ledger->save();
-        return $ledger;
-        //        } catch (\Exception $e) {
-
-        //            return false;
-//        }
-
+        try {
+            return AccountLedger::create([
+                'name' => $data['name'],
+                'code' => $data['code'] ?? 'AUTO-' . time(),
+                'account_group_id' => $data['group_id'] ?? $data['account_group_id'] ?? 1,
+                'opening_balance' => $data['opening_balance'] ?? 0,
+                'opening_balance_type' => $data['balance_type'] ?? 'debit',
+                'current_balance' => $data['opening_balance'] ?? 0,
+                'current_balance_type' => $data['balance_type'] ?? 'debit',
+                'is_active' => true,
+                'branch_id' => $data['branch_id'] ?? auth()->user()->branch_id ?? null,
+                'created_by' => auth()->id(),
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Helpers::create_ledger failed: ' . $e->getMessage());
+            return null;
+        }
     }
 
+    /**
+     * Get debit sum for journal entry
+     */
     public static function debit_amount_sum($id)
     {
-        return EntryItems::where('entry_id', $id)->where('dc', 'd')->sum('amount');
+        return JournalEntryLine::where('journal_entry_id', $id)->sum('debit');
     }
 
+    /**
+     * Get credit sum for journal entry
+     */
     public static function credit_amount_sum($id)
     {
-        return EntryItems::where('entry_id', $id)->where('dc', 'c')->sum('amount');
-
+        return JournalEntryLine::where('journal_entry_id', $id)->sum('credit');
     }
 
-
+    /**
+     * Create journal entry using new accounts system
+     */
     public static function create_entry($data)
     {
-
-        $data1['voucher_date'] = date('Y-m-d');
-        $data1['created_by'] = Auth::user()->id;
-        $data1['updated_by'] = Auth::user()->id;
-        $data1['currence_type'] = 1;
-
-        //        $data1['employee_id'] = Auth::user()->id;
-//        $data['branch_id'] = $data['branch_id'];
-        $data1['narration'] = $data['narration'];
-        $data1['entry_type_id'] = $data['entry_type_id'];
-
-        //        try {
-
-        $entry = Entries::create($data1);
-        $entry->update(array(
-            'number' => CoreAccounts::generateNumber($entry->id),
-        ));
-
-        return $entry->id;
-
-        //        } catch (\Exception $e) {
-
-        //            return $e->getMessage();
-//        }
-
+        try {
+            return JournalEntry::create([
+                'entry_number' => JournalEntry::generateNumber(),
+                'entry_date' => $data['voucher_date'] ?? now(),
+                'reference' => $data['reference'] ?? '',
+                'description' => $data['narration'] ?? 'Auto-generated entry',
+                'status' => 'posted',
+                'entry_type' => $data['entry_type'] ?? 'journal',
+                'branch_id' => $data['branch_id'] ?? auth()->user()->branch_id ?? null,
+                'posted_at' => now(),
+                'posted_by' => auth()->id(),
+                'created_by' => auth()->id(),
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Helpers::create_entry failed: ' . $e->getMessage());
+            return null;
+        }
     }
 
+    /**
+     * Create entry item (journal line) using new accounts system
+     */
     public static function create_entry_item($data)
     {
-        $EntItem['entry_id'] = $data['entry_id'];
-        $EntItem['voucher_date'] = date('Y-m-d');
-        $EntItem['amount'] = $data['amount'];
-        $EntItem['currence_type'] = 1;
-        $EntItem['narration'] = 'student fee ' . $data['narration'];
-        $EntItem['dc'] = $data['dc'];
-        $EntItem['ledger_id'] = $data['ledger_id'];
-        //        try {
-
-        $entry_item = EntryItems::insert($EntItem);
-
-        //        } catch (\Exception $e) {
-
-        //            return $e->getMessage();
-//        }
-
-
+        try {
+            return JournalEntryLine::create([
+                'journal_entry_id' => $data['entry_id'] ?? $data['journal_entry_id'],
+                'account_ledger_id' => $data['ledger_id'] ?? $data['account_ledger_id'],
+                'description' => $data['narration'] ?? '',
+                'debit' => $data['dc'] == 'd' ? $data['amount'] : 0,
+                'credit' => $data['dc'] == 'c' ? $data['amount'] : 0,
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Helpers::create_entry_item failed: ' . $e->getMessage());
+            return null;
+        }
     }
 
-
-    public static function get_ledger($group_id, $parent_type = null)
+    /**
+     * Get ledger by ID
+     */
+    public static function get_ledger($id)
     {
-        return Ledgers::where('group_id', $group_id)->where('parent_type', $parent_type)->first();
+        return AccountLedger::find($id);
     }
 
-    public static function get_group($parent_id, $parent_type_id)
+    /**
+     * Get ledger balance
+     */
+    public static function get_ledger_balance($id)
     {
-        return Groups::where('parent_id', $parent_id)->where('parent_type', $parent_type_id)->first();
-
+        $ledger = AccountLedger::find($id);
+        return $ledger ? $ledger->current_balance : 0;
     }
 
-    public static function create_group($parent_id, $parent_type_id, $data)
+    /**
+     * Update ledger balance
+     */
+    public static function update_ledger_balance($ledgerId, $debit, $credit)
     {
-        $g = new Groups();
-        $g->name = $data['name'];
-        $g->number = $data['number'];
-        $g->code = $data['code'];
-        $g->level = $data['level'];
-        $g->parent_id = $parent_id;
-        $g->parent_type = $parent_type_id;
-        $g->save();
-
+        $ledger = AccountLedger::find($ledgerId);
+        if ($ledger) {
+            $ledger->updateBalance($debit, $credit);
+            return true;
+        }
+        return false;
     }
 
     public static function getStudentCounts()
@@ -446,4 +443,7 @@ class Helpers
         }
     }
 
+
+    // Keep other non-accounting helper methods below
+    // (Add any other utility methods that don't relate to accounts)
 }

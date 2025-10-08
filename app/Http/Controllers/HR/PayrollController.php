@@ -27,7 +27,7 @@ use Illuminate\Support\Facades\Gate;
 use App\Helpers\GeneralSettingsHelper;
 use App\Models\Admin\Bank;
 use App\Models\Admin\BankAccount;
-use App\Models\Admin\Ledgers;
+use App\Models\Accounts\AccountLedger;
 
 class PayrollController extends Controller
 {

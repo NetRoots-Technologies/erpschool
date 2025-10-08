@@ -4,7 +4,7 @@ namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\VendorRequest;
-use App\Models\Account\Ledger;
+use App\Models\Accounts\AccountLedger;
 use App\Models\Admin\City;
 use App\Models\Admin\State;
 use App\Models\Admin\Vendor;

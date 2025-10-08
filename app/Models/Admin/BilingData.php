@@ -3,7 +3,7 @@
 namespace App\Models\Admin;
 
 use App\Models\Academic\AcademicClass;
-use App\Models\Account\Ledger;
+use App\Models\Accounts\AccountLedger;
 use App\Models\Student\Students;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

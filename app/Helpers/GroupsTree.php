@@ -1,7 +1,7 @@
 <?php
 namespace App\Helpers;
 
-use App\Models\Admin\Groups;
+use App\Models\Accounts\AccountGroup;
 
 /**
  * Class to store the entire group tree
@@ -41,7 +41,7 @@ class GroupsTree
             $this->number = "None";
             $this->level = "None";
         } else {
-            $group = Groups::where(['id' => $id])->first()->toArray();
+            $group = AccountGroup::where(['id' => $id])->first()->toArray();
             $this->id = $group['id'];
             $this->name = $group['name'];
             // $this->number = $group['number'];
@@ -59,9 +59,9 @@ class GroupsTree
     {
         /* If primary group sort by id else sort by name */
         if ($this->id == 0) {
-            $child_group_q = Groups::where(['parent_id' => $this->id])->OrderBy('code', 'asc')->get()->toArray();
+            $child_group_q = AccountGroup::where(['parent_id' => $this->id])->OrderBy('code', 'asc')->get()->toArray();
         } else {
-            $child_group_q = Groups::where(['parent_id' => $this->id])->OrderBy('code', 'asc')->get()->toArray();
+            $child_group_q = AccountGroup::where(['parent_id' => $this->id])->OrderBy('code', 'asc')->get()->toArray();
         }
 
         $counter = 0;

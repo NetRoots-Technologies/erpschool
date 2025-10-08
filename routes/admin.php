@@ -11,7 +11,7 @@ use App\Http\Controllers\FinancialzkController;
 use App\Http\Controllers\Admin\BranchController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Admin\CompanyController;
-use App\Http\Controllers\Admin\LedgersController;
+use App\Http\Controllers\Accounts\ChartOfAccountsController;
 use App\Http\Controllers\Admin\BankFileController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DataBankController;
@@ -20,7 +20,7 @@ use App\Http\Controllers\Admin\DepartmentController;
 use App\Http\Controllers\Admin\VideoUploadController;
 use App\Http\Controllers\Admin\AcademicYearController;
 use App\Http\Controllers\Admin\BankBranchesController;
-use App\Http\Controllers\Admin\BanksAccountController;
+// BanksAccountController removed - now using Accounts\ChartOfAccountsController
 use App\Http\Controllers\Admin\MarketingVideoController;
 use App\Http\Controllers\Admin\MarketingBannerAdController;
 use App\Http\Controllers\Admin\PromotionalMessageController;
@@ -114,13 +114,14 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'admin', 'as' => 'admin.'], 
     Route::resource('financial-years', FinancialController::class);
     Route::resource('banks', BankController::class);
     Route::resource('banks_branches', BankBranchesController::class);
-    Route::resource('banks_accounts', BanksAccountController::class);
+    // Bank accounts now managed in Accounts & Finance module
+    Route::redirect('banks_accounts', '/accounts/chart-of-accounts')->name('banks_accounts.index');
+    Route::redirect('banks_accounts/create', '/accounts/chart-of-accounts/create')->name('banks_accounts.create');
 
     Route::post('/admin/financial-years/change-status', [FinancialController::class, 'changeStatus'])->name('financial-years.change-status');
     Route::post('import-bankFile', [BankFileController::class, 'import'])->name('import.bankFile');
 
     Route::post('/bankBulk-action', [BankController::class, 'handleBulkAction'])->name('bank-bulk');
-    Route::post('/banksAcount-action', [BanksAccountController::class, 'handleBulkAction'])->name('banks_account-bulk');
 
     Route::post('bank-branch-change-status', [BankBranchesController::class, 'changeStatus'])->name('bank-branch.change-status');
     Route::post('bank-status', [BankController::class, 'changeStatus'])->name('bank.change-status');

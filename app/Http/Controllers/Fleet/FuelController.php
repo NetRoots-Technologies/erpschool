@@ -52,7 +52,21 @@ class FuelController extends Controller
             'notes' => 'nullable|string',
         ]);
 
-        Fuel::create($request->all());
+        $fuel = Fuel::create($request->all());
+
+        // ✅ INTEGRATE WITH ACCOUNTS SYSTEM
+        try {
+            $vehicle = Vehicle::find($request->vehicle_id);
+            \Illuminate\Support\Facades\Http::post(route('accounts.integration.fleet_expense'), [
+                'vehicle_id' => $fuel->vehicle_id,
+                'expense_amount' => $fuel->total_cost,
+                'expense_date' => $fuel->fuel_date,
+                'expense_type' => 'fuel',
+                'reference' => 'FUEL-' . $fuel->id . ' - ' . ($vehicle->registration_number ?? 'Vehicle'),
+            ]);
+        } catch (\Exception $e) {
+            \Log::warning('Fuel expense accounts integration failed: ' . $e->getMessage());
+        }
 
         return redirect()->route('fleet.fuel.index')
             ->with('success', 'Fuel record created successfully.');

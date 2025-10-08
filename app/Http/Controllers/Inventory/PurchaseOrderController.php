@@ -11,7 +11,7 @@ use App\Models\Admin\Branch;
 use App\Models\SupplierItem;
 use Illuminate\Http\Request;
 use App\Models\PurchaseOrder;
-use App\Models\Account\Ledger;
+use App\Models\Accounts\AccountLedger;
 use App\Models\Admin\Branches;
 use App\Services\LedgerService;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -80,15 +80,11 @@ class PurchaseOrderController extends Controller
 
         $currentStatus = $purchase_order->delivery_status;
 
-        $bank_account_ids = BankAccount::where('type', 'MOA')
-            ->pluck('id')->toArray();
-            
-
-        $ledgers = Ledger::where('parent_type', BankAccount::class)
-            ->whereIn('parent_type', $bank_account_ids)
-            ->orWhere(function ($query) use ($cash_in_hand) {
-                $query->where('group_id', $cash_in_hand)
-                    ->orWhereNull('parent_type');
+        // Using new accounts system - get cash and bank ledgers
+        $ledgers = AccountLedger::where('is_active', true)
+            ->where(function($query) {
+                $query->where('name', 'LIKE', '%Cash%')
+                      ->orWhere('name', 'LIKE', '%Bank%');
             })
             ->get();
 
@@ -139,6 +135,19 @@ class PurchaseOrderController extends Controller
                 $purchase_order_item->save();
             }
 
+
+            // ✅ INTEGRATE WITH ACCOUNTS SYSTEM
+            try {
+                $supplier = \App\Models\Supplier::find($request->supplier_id);
+                \Illuminate\Support\Facades\Http::post(route('accounts.integration.inventory_purchase'), [
+                    'vendor_id' => $data->supplier_id,
+                    'purchase_amount' => $data->total_amount,
+                    'purchase_date' => $data->order_date,
+                    'reference' => 'PO-' . $data->id . ' - ' . ($supplier->name ?? 'Supplier'),
+                ]);
+            } catch (\Exception $e) {
+                \Log::warning('Purchase order accounts integration failed: ' . $e->getMessage());
+            }
 
             DB::commit();
             return response()->json(["success" => true, "message" => 'Data stored successfully'], 200);
@@ -343,13 +352,12 @@ class PurchaseOrderController extends Controller
             return abort(503);
         }
         // DB::beginTransaction();
-        // try {
-            $paymentLedger = Ledger::find($status);
-            $supplierLedger = Ledger::where([
-                'branch_id' => $purchaseOrder->branch_id,
-                "parent_id" => $purchaseOrder->supplier_id,
-                "parent_type" => Supplier::class
-            ])->first();
+        // Using new accounts system
+        try {
+            $paymentLedger = AccountLedger::find($status);
+            $supplierLedger = AccountLedger::where('linked_module', 'vendor')
+                ->where('linked_id', $purchaseOrder->supplier_id)
+                ->first();
 
             $supplier_name = Supplier::where('id',$purchaseOrder->supplier_id)->value('name');
             
@@ -391,10 +399,10 @@ class PurchaseOrderController extends Controller
 
             // DB::commit();
             return response()->json(["success" => true, 'message' => 'Payment Method Updated', 'data' => []], 200);
-        // } catch (Exception $e) {
-        //     DB::rollBack();
-        //     return response()->json(["success" => false, "message" => $e->getMessage()], 500);
-        // }
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json(["success" => false, "message" => $e->getMessage()], 500);
+        }
     }
 
     public function grn($type)

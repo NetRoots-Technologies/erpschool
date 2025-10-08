@@ -11,7 +11,8 @@ use App\Http\Controllers\RequisitionController;
 use App\Http\Controllers\Admin\BudgetController;
 use App\Http\Controllers\admin\VendorController;
 use App\Http\Controllers\Admin\EntriesController;
-use App\Http\Controllers\Admin\LedgersController;
+use App\Http\Controllers\Accounts\ChartOfAccountsController;
+use App\Models\Accounts\AccountLedger;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Inventory\ItemController;
 use App\Http\Controllers\admin\InventoryController;
@@ -33,9 +34,61 @@ use App\Http\Controllers\Inventory\PurchaseOrderController;
 Route::group(['middleware' => ['auth'], 'prefix' => 'datatable', 'as' => 'datatable.'], function () {
     Route::post('get-data-user', 'App\Http\Controllers\UserController@getData')->name('get-data-user');
     Route::post('get-data-role', 'App\Http\Controllers\RoleController@getData')->name('get-data-role');
-    Route::get('get-data-ledger', [LedgersController::class, 'getData'])->name('get-data-ledger');
-    Route::get('get-data-ledger-income', 'App\Http\Controllers\Admin\LedgersController@getDataincome')->name('get-data-ledger-income');
-    Route::get('get-data-ledger-receivable', 'App\Http\Controllers\Admin\LedgersController@getDatareciable')->name('get-data-ledger-receivable');
+    // Ledger DataTables - Using new Accounts system
+    Route::get('get-data-ledger', function() {
+        $ledgers = AccountLedger::with('accountGroup')->where('is_active', true)->get();
+        return response()->json([
+            'data' => $ledgers->map(function($ledger) {
+                return [
+                    'id' => $ledger->id,
+                    'code' => $ledger->code,
+                    'name' => $ledger->name,
+                    'group' => $ledger->accountGroup->name ?? '',
+                    'balance' => number_format($ledger->current_balance, 2),
+                    'type' => $ledger->current_balance_type,
+                ];
+            }),
+            'recordsTotal' => $ledgers->count(),
+            'recordsFiltered' => $ledgers->count()
+        ]);
+    })->name('get-data-ledger');
+    
+    Route::get('get-data-ledger-income', function() {
+        $ledgers = AccountLedger::whereHas('accountGroup', function($q) {
+            $q->where('type', 'revenue');
+        })->where('is_active', true)->get();
+        return response()->json([
+            'data' => $ledgers->map(function($ledger) {
+                return [
+                    'id' => $ledger->id,
+                    'code' => $ledger->code,
+                    'name' => $ledger->name,
+                    'balance' => number_format($ledger->current_balance, 2),
+                ];
+            }),
+            'recordsTotal' => $ledgers->count(),
+            'recordsFiltered' => $ledgers->count()
+        ]);
+    })->name('get-data-ledger-income');
+    
+    Route::get('get-data-ledger-receivable', function() {
+        $ledgers = AccountLedger::where('name', 'LIKE', '%Receivable%')
+            ->orWhere('linked_module', 'customer')
+            ->where('is_active', true)
+            ->get();
+        return response()->json([
+            'data' => $ledgers->map(function($ledger) {
+                return [
+                    'id' => $ledger->id,
+                    'code' => $ledger->code,
+                    'name' => $ledger->name,
+                    'balance' => number_format($ledger->current_balance, 2),
+                ];
+            }),
+            'recordsTotal' => $ledgers->count(),
+            'recordsFiltered' => $ledgers->count()
+        ]);
+    })->name('get-data-ledger-receivable');
     Route::post('get-data-permission', 'App\Http\Controllers\PermissionController@getData')->name('get-data-permission');
     Route::post('get-data-coursetype', 'App\Http\Controllers\Admin\CourseTypeController@getData')->name('course-type.getdata');
     Route::post('category/getdata', 'App\Http\Controllers\Admin\CategoryController@getdata')->name('category.getdata');

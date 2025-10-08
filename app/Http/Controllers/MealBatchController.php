@@ -8,7 +8,7 @@ use App\Models\MealBatch;
 use App\Models\Admin\Branch;
 use Illuminate\Http\Request;
 use App\Models\HRM\Employees;
-use App\Models\Account\Ledger;
+use App\Models\Accounts\AccountLedger;
 use App\Models\MealBatchDetail;
 use App\Services\LedgerService;
 use App\Models\Academic\Section;

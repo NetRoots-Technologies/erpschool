@@ -9,7 +9,7 @@ use App\Models\HR\Advance;
 use App\Models\HR\Payroll;
 use App\Mail\SalarySlipMail;
 use Illuminate\Http\Request;
-use App\Models\Admin\Ledgers;
+use App\Models\Accounts\AccountLedger;
 use App\Models\HR\SalarySlip;
 use App\Models\Admin\Branches;
 use App\Services\LedgerService;
@@ -255,6 +255,22 @@ if (!Gate::allows('Dashboard-list')) {
 
                     ]);
                 }
+            }
+
+            // ✅ INTEGRATE WITH ACCOUNTS SYSTEM
+            try {
+                foreach ($payrollEmployees as $payroll) {
+                    if ($payroll->net_salary > 0) {
+                        \Illuminate\Support\Facades\Http::post(route('accounts.integration.hr_salary'), [
+                            'employee_id' => $payroll->employee_id,
+                            'salary_amount' => $payroll->net_salary,
+                            'payment_date' => now(),
+                            'reference' => 'SAL-' . $payroll->id . ' - ' . ($payroll->employee->name ?? 'Employee') . ' - ' . $salary->generated_month,
+                        ]);
+                    }
+                }
+            } catch (\Exception $e) {
+                \Log::warning('Payroll accounts integration failed: ' . $e->getMessage());
             }
 
             DB::commit();

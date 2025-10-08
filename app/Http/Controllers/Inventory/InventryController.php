@@ -6,7 +6,7 @@ use App\Models\Item;
 use App\Models\Product;
 use App\Models\Inventry;
 use Illuminate\Http\Request;
-use App\Models\Account\Ledger;
+use App\Models\Accounts\AccountLedger;
 use App\Models\PurchaseHistory;
 use App\Services\LedgerService;
 use App\Models\Student\Students;

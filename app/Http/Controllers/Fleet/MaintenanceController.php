@@ -53,7 +53,21 @@ class MaintenanceController extends Controller
             'notes' => 'nullable|string',
         ]);
 
-        Maintenance::create($request->all());
+        $maintenance = Maintenance::create($request->all());
+
+        // ✅ INTEGRATE WITH ACCOUNTS SYSTEM
+        try {
+            $vehicle = Vehicle::find($request->vehicle_id);
+            \Illuminate\Support\Facades\Http::post(route('accounts.integration.fleet_expense'), [
+                'vehicle_id' => $maintenance->vehicle_id,
+                'expense_amount' => $maintenance->cost,
+                'expense_date' => $maintenance->maintenance_date,
+                'expense_type' => 'maintenance',
+                'reference' => 'MAINT-' . $maintenance->id . ' - ' . ($vehicle->registration_number ?? 'Vehicle'),
+            ]);
+        } catch (\Exception $e) {
+            \Log::warning('Maintenance expense accounts integration failed: ' . $e->getMessage());
+        }
 
         return redirect()->route('fleet.maintenance.index')
             ->with('success', 'Maintenance record created successfully.');

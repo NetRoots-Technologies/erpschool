@@ -4,9 +4,9 @@ namespace App\Http\Controllers\HR;
 
 use Carbon\Carbon;
 use App\Models\HR\Advance;
-use App\Models\Admin\Groups;
+use App\Models\Accounts\AccountGroup;
 use Illuminate\Http\Request;
-use App\Models\Admin\Ledgers;
+use App\Models\Accounts\AccountLedger;
 use App\Models\HRM\Employees;
 use App\Services\LedgerService;
 use App\Services\AdvanceService;

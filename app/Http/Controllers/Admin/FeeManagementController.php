@@ -615,6 +615,20 @@ class FeeManagementController extends Controller
                 $billing->save();
             }
 
+            // ✅ INTEGRATE WITH ACCOUNTS SYSTEM
+            try {
+                $student = Students::find($request->student_id);
+                \Illuminate\Support\Facades\Http::post(route('accounts.integration.academic_fee'), [
+                    'student_id' => $collection->student_id,
+                    'fee_amount' => $collection->paid_amount,
+                    'collection_date' => $collection->collection_date,
+                    'reference' => 'FEE-' . $collection->id . ' - ' . ($student->fullname ?? 'Student'),
+                ]);
+            } catch (\Exception $e) {
+                \Log::warning('Fee collection accounts integration failed: ' . $e->getMessage());
+                // Don't fail the fee collection if accounts integration fails
+            }
+
             DB::commit();
             return redirect()->route('admin.fee-management.collections')
                 ->with('success', 'Fee collection recorded successfully!');

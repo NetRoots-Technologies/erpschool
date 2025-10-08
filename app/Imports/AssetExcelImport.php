@@ -6,7 +6,7 @@ use App\Models\HR\Asset;
 use App\Models\HR\AssetType;
 use App\Models\Admin\Company;
 use App\Models\Admin\Branch;
-use App\Models\Account\Ledger;
+use App\Models\Accounts\AccountLedger;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;

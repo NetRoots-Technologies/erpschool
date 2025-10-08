@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Exam;
 use App\Helpers\UserHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Admin\Company;
-use App\Models\Admin\Groups;
+// Groups model removed - not needed for Exam module
 use App\Models\Exam\ClassSubject;
 use App\Models\Exam\ExamDetail;
 use App\Models\Exam\SkillGroup;

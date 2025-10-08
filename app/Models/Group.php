@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use App\Models\Admin\Groups;
-use App\Models\Admin\Ledgers;
+use App\Models\Accounts\AccountGroup;
+use App\Models\Accounts\AccountLedger;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;

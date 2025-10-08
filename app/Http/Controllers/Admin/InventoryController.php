@@ -7,7 +7,7 @@ use App\Models\inventory\InventoryCategory;
 use Illuminate\Http\Request;
 use App\Models\Admin\Inventory;
 use App\Models\BCategory;
-use App\Models\Account\Ledger;
+use App\Models\Accounts\AccountLedger;
 use App\Models\Group;
 use App\Services\InventoryCategoryService;
 use Illuminate\Support\Facades\Gate;

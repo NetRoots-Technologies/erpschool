@@ -1,7 +1,5 @@
 <?php
 use App\Http\Controllers\PrintableController;
-use App\Models\Admin\Ledgers;
-use App\Services\LedgerService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;

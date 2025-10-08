@@ -8,7 +8,7 @@ use App\Http\Controllers\HR\ZktecoController;
 use App\Models\Academic\SchoolType;
 use App\Models\Admin\Branch;
 use App\Models\Admin\Company;
-use App\Models\Admin\Groups;
+use App\Models\Accounts\AccountGroup;
 use App\Models\HR\OtherBranch;
 use App\Services\BranchService;
 use App\Services\LedgerService;
