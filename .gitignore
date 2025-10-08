@@ -1,23 +1,52 @@
-# Never delete local env or storage symlink
-!.env
-!/public/storage
+# =========================================
+# Laravel & Composer
+# =========================================
+
 /vendor
 /node_modules
+/bootstrap/cache
+
+# =========================================
+# Environment Files
+# =========================================
+
+# Never delete or commit local env or storage symlink
+!.env
+/.env
+/.env.*
+Homestead.yaml
+
+# =========================================
+# Storage (ignore all except public)
+# =========================================
+
 /storage/*.key
 /storage/app/*
 !/storage/app/public
 /storage/framework/*
 /storage/logs/*
-/bootstrap/cache
-/.env
-/.env.*
-/.idea
-/public/storage
-/public
+!/public/storage
+
+# =========================================
+# Public Folder
+# =========================================
+
 /public/hot
+/public/storage
 /public/.htaccess
-.phpunit.result.cache
-Homestead.yaml
+/public
+
+# =========================================
+# IDE & Debug Files
+# =========================================
+
+/.idea
+/.phpunit.result.cache
 npm-debug.log
 yarn-error.log
+
+# =========================================
+# Custom Notes
+# =========================================
+# Ignore all log files, including laravel.log
 /storage/logs/*
