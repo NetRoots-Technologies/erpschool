@@ -90,40 +90,17 @@
                                     <option disabled selected>Select Section</option>
                                 </select>
                             </div>
-                            <div class="col-md-6 mt-3">
-                                <label><b>Student:</b><span class="danger">*</span></label>
-                                <select name="student_id" class="form-select select2 select_student" required>
-                                    <option disabled selected>Select Student</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6 mt-3">
-                                <label><b>Subject:</b><span class="danger">*</span></label>
-                                <select name="subject_id" class="form-select select2 select_subject" required>
-                                    <option disabled selected>Select Subject</option>
-                                </select>
-                            </div>
-                            <div class="col-md-12 effort-achievement-group">
-                                <div class="row">
-                                    <div class="col-md-6 mt-3">
-                                        <label><b>Effort Level:</b><span class="danger">*</span></label>
-                                        <select name="effort_level" class="form-select select2" required>
-                                            <option disabled selected>Select Effort Level</option>
-                                            <option value="Very Good">Very Good</option>
-                                            <option value="Good">Good</option>
-                                            <option value="Satisfactory">Satisfactory</option>
-                                            <option value="Needs Improvement">Needs Improvement</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6 mt-3">
-                                        <label><b>Level of Achievement:</b><span class="danger">*</span></label>
-                                        <select name="achievement_level" class="form-select select2" required>
-                                            <option disabled selected>Select Achievement Level</option>
-                                            <option value="3">3 - Fully Meets Expectations</option>
-                                            <option value="2">2 - Meets Expectations</option>
-                                            <option value="1">1 - Minimally Meets Expectations</option>
-                                        </select>
-                                    </div>
-                                </div>
+                  
+                            <div class="col-md-6 mt-3" id="subjectContainer" style="display: none;">
+                            <label><b>Subject:</b><span class="danger">*</span></label>
+                            <select id="globalSubject" name="subject_id" class="form-select select2" required>
+                                <option disabled selected>Select Subject</option>
+                            </select>
+                        </div>
+
+                            <div id="students_table" class="mt-4"></div>
+
+                             </div>
                             </div>
                         </div>
                         <div id="js_all_subjects_with_skill_group_and_skill_evaluation" class="mt-4"></div>
@@ -180,22 +157,97 @@
                 loader('hide');
             }).trigger('change');
 
-            $('.select_section').change(function () {
+                $('.select_section').change(function () {
                 loader('show');
+
                 let branch = $('.branch_select').val(),
                     cls = $('.select_class').val(),
                     sect = this.value;
+
+                // Step 1: Fetch subjects for this class/section (once)
+                $.get('{{ route("exam.fetchSubjects") }}', {
+                    branch_id: branch,
+                    class_id: cls,
+                    section_id: sect
+                }).done(subjects => {
+                    let subjectOptions = '<option disabled selected>Select Subject</option>';
+                    subjects.forEach(s => subjectOptions += `<option value="${s.id}">${s.name}</option>`);
+                    $('#globalSubject').html(subjectOptions);
+                    $('#subjectContainer').show(); // show dropdown
+                });
+
+                // Step 2: Fetch students for section
                 $.get('{{ route("fetch-students") }}', {
                     branch_id: branch,
                     class_id: cls,
                     section_id: sect
-                }).done(comps => {
-                    let o = '<option disabled selected>Select Student</option>';
-                    comps.forEach(c => o += `<option value="${c.id}">${c.full_name}</option>`);
-                    $('.select_student').html(o);
-                });
-                loader('hide');
-            }).trigger('change');
+                }).done(students => {
+                    if (students.length === 0) {
+                        $('#students_table').html(`<p class="text-danger text-center mt-3">No students found in this section.</p>`);
+                        loader('hide');
+                        return;
+                    }
+
+                    // Build student table
+                    let html = `
+                        <table class="table table-bordered align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Student Name</th>
+                                    <th>Effort Level</th>
+                                    <th>Achievement Level</th>
+                                    <th class="text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                    `;
+
+                    students.forEach(student => {
+                        html += `
+                            <tr data-id="${student.id}">
+                                <td><b>${student.full_name}</b></td>
+                                <input type="hidden" name="students[${student.id}][student_id]" value="${student.id}">
+                                <td>
+                                    <select name="students[${student.id}][effort_level]" class="form-select" required>
+                                        <option disabled selected>Select Effort</option>
+                                        <option value="Very Good">Very Good</option>
+                                        <option value="Good">Good</option>
+                                        <option value="Satisfactory">Satisfactory</option>
+                                        <option value="Needs Improvement">Needs Improvement</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select name="students[${student.id}][achievement_level]" class="form-select" required>
+                                        <option disabled selected>Select Achievement</option>
+                                        <option value="3">3 - Fully Meets Expectations</option>
+                                        <option value="2">2 - Meets Expectations</option>
+                                        <option value="1">1 - Minimally Meets Expectations</option>
+                                    </select>
+                                </td>
+                                <td class="text-center">
+                                    <button type="button" class="btn btn-sm btn-danger remove-row"><i class="fa fa-trash"></i></button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+
+                    html += `</tbody></table>`;
+                    $('#students_table').html(html);
+                }).always(() => loader('hide'));
+            });
+
+
+            // 🔹 When subject selected — assign to all hidden inputs
+            $('#globalSubject').change(function () {
+                const subjectId = $(this).val();
+                $('.subject_input').val(subjectId);
+            });
+
+
+            // 🔹 Remove row handler
+            $(document).on('click', '.remove-row', function () {
+                $(this).closest('tr').remove();
+            });
 
             $('.select_student').change(function () {
                 loader('show');

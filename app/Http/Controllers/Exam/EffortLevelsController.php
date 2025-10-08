@@ -62,20 +62,18 @@ class EffortLevelsController extends Controller
 
 public function store(Request $request)
 {
-    $effortMap = [
-        'Very Good' => 4,
-        'Good' => 3,
-        'Satisfactory' => 2,
-        'Needs Improvement' => 1
-    ];
-
+   
+    foreach ($request->students as $key => $st) {
+    
     EffortLevel::create([
-        'student_id' => $request->student_id,
-        'user_id' => Auth::user()->id,
+        'student_id' => $st['student_id'],
+        'user_id' => auth()->id(),
         'subject_id' => $request->subject_id,
-        'effort' => $request->effort_level,
-        'level' => (int) $request->achievement_level,
+        'effort' => $st['effort_level'],
+        'level' => (int) $st['achievement_level'],
     ]);
+
+    }
 
     return redirect()->route('exam.effort_levels.index')->with('success', 'Effort level saved successfully');
 
