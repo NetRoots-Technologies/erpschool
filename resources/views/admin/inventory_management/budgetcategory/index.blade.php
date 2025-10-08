@@ -4,7 +4,7 @@
 @section('content')
     <div class="container-fluid">
         <div class="row w-100 text-center">
-            @if (Gate::allows('InventoryCategory-create'))
+            @if (Gate::allows('BudgetCategory-create'))
                 <div class="col-auto mb-3">
                     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createModal">Create New
                         Category</button>

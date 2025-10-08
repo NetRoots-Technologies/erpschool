@@ -270,10 +270,10 @@ class PermissionTableSeeder extends Seeder
                     'type' => [
                         'manage types' , 'create types' , 'edit types' , 'delete types',
                     ],
-
+                    'BudgetCategory' => ['BudgetCategory-list', 'BudgetCategory-create', 'BudgetCategory-edit', 'BudgetCategory-delete'],
                     'maintainer' => ['manage maintainer' , 'create maintainer' , 'edit maintainer' , 'delete maintainer'],
                     'supplementory' => ['supplementory create' , 'supplementory edit' , 'supplementory list' , 'supplementory list' , 'supplementory request'],
-                    'expense' => ['expense create' , 'expense edit' , 'expense list' , 'expense list' ],
+                    'expense' => ['expense create' , 'expense edit' , 'expense list' , 'expense delete' ],
                     'maintenance-request' => ['maintenance-request create', 'maintenance-request edit' , 'maintenance-request list' , 'maintenance-request delete' , '' ]
                 ];
 

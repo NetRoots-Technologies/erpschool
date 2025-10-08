@@ -31,9 +31,11 @@ class BudgetController extends Controller
      */
     public function index()
     {
-        if (!Gate::allows('students')) {
-            return abort(503);
+      
+        if (!auth()->user()->hasPermissionTo('Budget-list')) {
+            abort(503, 'Unauthorized');
         }
+
         $departments = $this->budgetService->getDepartments();
         $category = $this->budgetService->getCategories();
         return view('admin.inventory_management.budget.index', compact('departments', 'category'));
@@ -46,8 +48,8 @@ class BudgetController extends Controller
      */
     public function create()
     {
-        if (!Gate::allows('students')) {
-            return abort(503);
+       if (!auth()->user()->hasPermissionTo('Budget-create')) {
+            abort(503, 'Unauthorized');
         }
         // $departments = Departments::whereNull('parent_id')->get();
         // $categories = BCategory::whereNull('parent_id')->get();
@@ -62,10 +64,11 @@ class BudgetController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request->all());
-        if (!Gate::allows('students')) {
-            return abort(503);
+        
+        if (!auth()->user()->hasPermissionTo('Budget-create')) {
+            abort(503, 'Unauthorized');
         }
+
         $this->budgetService->store($request->all());
 
         return response()->json([
@@ -82,16 +85,16 @@ class BudgetController extends Controller
      */
     public function show($id)
     {
-        if (!Gate::allows('students')) {
-            return abort(503);
+       if (!auth()->user()->hasPermissionTo('Budget-list')) {
+            abort(503, 'Unauthorized');
         }
     }
 
     public function getData()
     {
 
-        if (!Gate::allows('students')) {
-            return abort(503);
+        if (!auth()->user()->hasPermissionTo('Budget-list')) {
+            abort(503, 'Unauthorized');
         }
         return $this->budgetService->getData();
     }
@@ -104,8 +107,8 @@ class BudgetController extends Controller
      */
     public function edit($id)
     {
-        if (!Gate::allows('students')) {
-            return abort(503);
+       if (!auth()->user()->hasPermissionTo('Budget-edit')) {
+            abort(503, 'Unauthorized');
         }
 
         $budget = Budget::with('details')->findOrFail($id);
@@ -122,8 +125,8 @@ class BudgetController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('students')) {
-            return abort(503);
+        if (!auth()->user()->hasPermissionTo('Budget-edit')) {
+            abort(503, 'Unauthorized');
         }
 
         $validatedData = $request->validate([
@@ -180,9 +183,10 @@ class BudgetController extends Controller
      */
     public function destroy($id)
     {
-        if (!Gate::allows('students')) {
-            return abort(503);
+        if (!auth()->user()->hasPermissionTo('Budget-delete')) {
+            abort(503, 'Unauthorized');
         }
+
         $this->budgetService->delete($id);
         return response()->json(['success' => 'Budget deleted successfully.']);
     }
@@ -191,7 +195,7 @@ class BudgetController extends Controller
     public function assignDepartment(Budget $budget)
     {
 
-        // $departments = Departments::whereNull('parent_id')->get();
+       
         $categories = BCategory::whereNull('parent_id')->get();
         $subcategories = BCategory::with('parent')->get();
 
@@ -309,8 +313,4 @@ class BudgetController extends Controller
 
         return back()->with('success', 'Budget Imported Successfully!');
     }
-
-
-
 }
-

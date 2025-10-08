@@ -51,5 +51,12 @@ class SkillEvaluation extends Model
         return $this->belongsTo(SkillEvaluationKey::class, 'skill_evaluation_key_id', 'id');
     }
 
+     public function key()
+    {
+        return $this->belongsTo(SkillEvaluationKey::class, 'skill_evaluation_key_id', 'id');
+    }
+
+
+
 
 }

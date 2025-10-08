@@ -87,55 +87,24 @@ class StudentExamReport extends Controller
         {
             // dd("d");
              $student = Students::with(['branch','class','section.session','studentPictures'])->findOrFail($student_id);
-             $efforts = EffortLevel::where('student_id', $student_id)->get()->groupBy('subject_id');
-            //  $skills = SkillType::with([
-            //     'subject.EvolutionKeySkills' => function ($q) use ($student_id) {
-            //         $q->where('student_id', $student_id)   // student filter
-            //         ->with(['skillEvaluationKeys' => function ($subQ) use ($student_id) {
-            //             $subQ->where('student_id', $student_id); // agar is table me student_id hai
-            //         }]);
-            //     },
-            //         'group',
-            //         'skill'
-            //     ])
-            //                                 ->whereIn('class_id', [$student->class_id])
-            //                                 ->get()->groupBy('subject_id');
-            // return view('reports.students.report_card', compact('student','efforts','skills'));
-
-    //         $skills = SkillType::with([
-    //     'subject.EvolutionKeySkills' => function ($q) use ($student_id) {
-    //         $q->where('student_id', $student_id)   // student filter
-    //           ->with(['skillEvaluationKeys' => function ($subQ) use ($student_id) {
-    //               $subQ->where('student_id', $student_id); // agar is table me student_id hai
-    //           }]);
-    //     },
-    //     'group',
-    //     'skill'
-    // ])
-    // ->where('class_id', $student->class_id)
-    // ->whereHas('subject.EvolutionKeySkills', function ($q) use ($student_id) {
-    //     $q->where('student_id', $student_id);
-    // })
-    // ->get()
-    // ->groupBy('subject_id');
-
-            $skills = SkillType::with([
-                'subject.EvolutionKeySkills' => function ($q) use ($student_id) {
-                    $q->where('student_id', $student_id)   // Student ka filter sirf yahan
-                    ->with('skillEvaluationKeys');      // Related keys ko load karo
-                },
-                'group',
-                'skill'
-            ])
-            ->where('class_id', $student->class_id)
-            ->whereHas('subject.EvolutionKeySkills', function ($q) use ($student_id) {
-                $q->where('student_id', $student_id);
-            })
+             $efforts = EffortLevel::where('student_id', $student_id)->get()->groupBy('student_id');    
+             $skills = SkillType::with([
+                    'subject.EvolutionKeySkills' => function ($q) use ($student_id) {
+                        $q->where('student_id', $student_id)   // Student ka filter sirf yahan
+                        ->with('key');      // Related keys ko load karo
+                    },
+                    'group',
+                    'skill'
+                ])
+                ->where('class_id', $student->class_id)
+                ->whereHas('subject.EvolutionKeySkills', function ($q) use ($student_id) {
+                    $q->where('student_id', $student_id);
+                })
             ->get()
             ->groupBy('subject_id');
 
 
-            // dd($skills);
+            // dd($skills , $student_id , request()->all() , $student , $efforts);
            $pdf = Pdf::loadView('reports.students.report_card', compact('student','efforts','skills'))
               ->setOptions([
                   'isRemoteEnabled' => true,

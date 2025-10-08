@@ -22,6 +22,8 @@ class BudgetExpenseController extends Controller
      */
     public function index(Request $request)
     {
+
+      
         $budgets = BudgetExpense::with('budget', 'category', 'subcategory');
         if ($request->ajax()) {
 

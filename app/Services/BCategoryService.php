@@ -10,9 +10,7 @@ class BCategoryService
     public function store($validatedData)
     {
         
-        if (!Gate::allows('students')) {
-            return abort(503);
-        }
+
 
         // dd($validatedData);
         return BCategory::create([
@@ -27,9 +25,7 @@ class BCategoryService
 
     public function getData()
     {
-        if (!Gate::allows('students')) {
-            return abort(503);
-        }
+
         $data = BCategory::with('parent');
         return \Yajra\DataTables\DataTables::of($data)
             ->addIndexColumn()
@@ -57,9 +53,7 @@ class BCategoryService
     public function update($validatedData, $id)
     {
         
-        if (!Gate::allows('students')) {
-            return abort(503);
-        }
+
         $data = BCategory::findOrFail($id);
         $data->update($validatedData);
 
@@ -68,9 +62,7 @@ class BCategoryService
     }
     public function delete($id)
     {
-        if (!Gate::allows('students')) {
-            return abort(503);
-        }
+
         $bcategory = BCategory::findOrFail($id);
         $bcategory->delete();
     }

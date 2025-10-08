@@ -14,9 +14,10 @@ class BudgetService
 
     private function generateEndDate($startDate,$timeFrame)
     {
-        if (!Gate::allows('students')) {
-            return abort(503);
+       if (!auth()->user()->hasPermissionTo('Budget')) {
+            abort(503, 'Unauthorized');
         }
+
         switch($timeFrame)
         {
             case 'monthly':
@@ -32,26 +33,19 @@ class BudgetService
     }
     public function getDepartments()
     {
-        if (!Gate::allows('students')) {
-            return abort(503);
-        }
+       
         return Department::with('branch')->where('status', true)->get();
     }
 
     public function getCategories()
     {
-        if (!Gate::allows('students')) {
-            return abort(503);
-        }
+    
         return BCategory::get();
     }
 
         public function store($validatedData)
         {
-            // dd($validatedData);
-            if (!Gate::allows('students')) {
-                return abort(503);
-            }
+            
             
                     $data = Budget::create([
                     'title'       => $validatedData['name'],
@@ -83,45 +77,35 @@ class BudgetService
 
     public function getData()
     {
-        if (!Gate::allows('students')) {
-            return abort(503);
-        }
+       
+
         $data = Budget::orderBy('created_at', 'desc');
 
         return \Yajra\DataTables\DataTables::of($data)
             ->addIndexColumn()
 
             ->addColumn('title', fn($row) => $row->title ?? 'N/A')
-
-            // ->addColumn('category', fn($row) => optional($row->category)->title  ?? 'N/A')
-
-            // ->addColumn('timeFrame', fn($row) => $row->timeFrame ?? 'N/A')
-
-            // ->addColumn('cost_center', function($row) {
-            //     if ($row->department) {
-            //         $departmentName = $row->department->name ?? 'N/A';
-            //         $branchName = $row->department->branch->name ?? 'N/A';
-            //         return $departmentName . ' (' . $branchName . ')';
-            //     }
-            //     return 'N/A';
-            // })
-
-            // ->addColumn('amount', fn($row) => $row->amount ?? '0')
-
             ->addColumn('action', function ($row) {
-                $btn = '<form class="delete_form" data-route="' . route("inventory.budget.destroy", $row->id) . '" id="budget-' . $row->id . '" method="POST">';
-                $btn = '<a href="' . route("inventory.budget.edit", $row->id) . '" class="btn btn-primary me-2 btn-sm">Edit</a>';
-                $btn .= '<form class="delete_form d-inline" data-route="' . route("inventory.budget.destroy", $row->id) . '" id="budget-' . $row->id . '" method="POST">';
-                $btn .= csrf_field();
-                $btn .= method_field('DELETE'); // yahan DELETE use karna hai
-                $btn .= '<button data-id="budget-' . $row->id . '" type="button" class="btn btn-danger delete btn-sm">Delete</button>';
-                $btn .= '</form>';
-              
+                $btn = '';
 
-                $btn .= '<a href="' . route("inventory.budget.assignDepartment", $row->id) . '" class="btn btn-info me-2 btn-sm" style="margin-left: 6px;">Assign Departments</a>';
-                return $btn;
+                if (auth()->user()->can('Budget-edit')) {
+                    $btn .= '<a href="'.route('inventory.budget.edit', $row->id).'" class="btn btn-primary me-2 btn-sm">Edit</a>';
+                }
+
+                if (auth()->user()->can('Budget-delete')) {
+                    $btn .= '<form class="delete_form d-inline" data-route="'.route('inventory.budget.destroy', $row->id).'" id="budget-'.$row->id.'" method="POST">'
+                        . csrf_field()
+                        . method_field('DELETE')
+                        . '<button data-id="budget-'.$row->id.'" type="button" class="btn btn-danger delete btn-sm">Delete</button>'
+                        . '</form>';
+                }
+
+                if (auth()->user()->can('Budget-list')) {
+                    $btn .= '<a href="'.route('inventory.budget.assignDepartment', $row->id).'" class="btn btn-info ms-2 btn-sm">Assign Departments</a>';
+                }
+
+                return $btn ?: '-';
             })
-
             ->rawColumns(['action'])
             ->make(true);
     }
@@ -130,10 +114,7 @@ class BudgetService
     public function delete($id)
 
     {
-        if (!Gate::allows('students')) {
-            return abort(503);
-        }
-        
+      
         $budget = Budget::findOrFail($id);
         $budget->details()->delete();
         $budget->delete();

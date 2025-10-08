@@ -13,7 +13,7 @@
             <h3 class="text-22 text-center text-bold w-100 mb-4">Skill Evaluation</h3>
         </div>
         <div class="row    mt-4 mb-4 ">
-            @if (Gate::allows('students'))
+            {{-- @if (Gate::allows('students')) --}}
                 <form action="{{ route('exam.skill_evaluation.store') }}" method="post">
                     @csrf
                     <div class="row">
@@ -56,7 +56,7 @@
                         <button type="submit" class="btn btn-primary">Save</button>
                     </div>
                 </form>
-            @endif
+            {{-- @endif --}}
         </div>
         <div class="row w-100 text-center">
             <div class="col-12">

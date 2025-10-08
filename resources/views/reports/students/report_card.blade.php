@@ -105,22 +105,25 @@
             </div>
 
             @php
-        $path = public_path(!empty($student->studentPictures->passport_photos) ? $student->studentPictures->passport_photos : 'report\std.jpg');
-        $image = base64_encode(file_get_contents($path));
-    @endphp
+                $path = public_path(
+                    !empty($student->studentPictures->passport_photos)
+                        ? $student->studentPictures->passport_photos
+                        : 'report\std.jpg',
+                );
+                $image = base64_encode(file_get_contents($path));
+            @endphp
 
             <div class="line"></div>
             {{-- @dd(public_path($student->studentPictures->passport_photos)); --}}
-        <!-- Student Photo -->
-                {{-- <img src="https://media.istockphoto.com/id/1298626342/photo/clever-young-boy-holding-folders-for-studing-at-school-isolated-over-yellow-background.jpg?s=2048x2048&w=is&k=20&c=Phd1ilUJcvquEWGeydA72sBjJB0yNS5PukTlfQNcPm4=" alt="Student Photo" class="student-photo" width="100" style="text-align: center">  --}}
+            <!-- Student Photo -->
+            {{-- <img src="https://media.istockphoto.com/id/1298626342/photo/clever-young-boy-holding-folders-for-studing-at-school-isolated-over-yellow-background.jpg?s=2048x2048&w=is&k=20&c=Phd1ilUJcvquEWGeydA72sBjJB0yNS5PukTlfQNcPm4=" alt="Student Photo" class="student-photo" width="100" style="text-align: center">  --}}
             <div style="text-align: center; margin-bottom: 15px;">
                 <img src="https://media.istockphoto.com/id/1298626342/photo/clever-young-boy-holding-folders-for-studing-at-school-isolated-over-yellow-background.jpg?s=2048x2048&w=is&k=20&c=Phd1ilUJcvquEWGeydA72sBjJB0yNS5PukTlfQNcPm4="
-                    alt="Student Photo"
-                    width="120"
+                    alt="Student Photo" width="120"
                     style="display: inline-block; border: 1px solid #ccc; border-radius: 5px;">
             </div>
 
-            
+
 
 
             <!-- Student Information -->
@@ -128,7 +131,8 @@
                 <p><strong>Registration No.:</strong> <span class="underline">STD-001</span></p>
                 <p><strong>Student’s Name:</strong> <span class="underline">{{ $student->first_name }}
                         {{ $student->last_name }}</span></p>
-                <p><strong>Parent/Guardian’s Name:</strong> <span class="underline">{{ $student->guardian_name }}</span></p>
+                <p><strong>Parent/Guardian’s Name:</strong> <span class="underline">{{ $student->guardian_name }}</span>
+                </p>
                 <p><strong>Address:</strong> <span class="underline">{{ $student->student_current_address }}</span></p>
                 <p><strong>Phone:</strong> <span class="underline">{{ $student->landline }}</span></p>
                 <p><strong>Issue Date:</strong> <span
@@ -154,7 +158,9 @@
                     <thead>
                         <tr>
                             <th colspan="2">{{ $subject->name }}</th>
-                            <th>Level: {{ $effort->level ?? '-' }}</th>
+                            @php $eff = optional($efforts->get($student->id))->first(); @endphp
+
+                            <th>Level: {{ $eff->level ?? '-' }}</th>
                             <th>Skill</th>
                         </tr>
                     </thead>
@@ -173,32 +179,34 @@
                                     </ul>
                                 </td>
                                 <td></td>
-                               <td>
-                                <ul style="list-style:none; padding:0; margin:0;">
-                                    @foreach ($groupSkills as $skill)
-                                        @php
-                                            // Check if this skill has evaluation for this student
-                                            $evaluation = $skill->subject->EvolutionKeySkills
-                                                ->where('skill_id', $skill->skill_id)
-                                                ->where('student_id', $student->id)
-                                                ->first();
-                                        @endphp
-                                        
-                                        <li>
-                                            {{ $evaluation && $evaluation->skillEvaluationKey 
-                                                ? $evaluation->skillEvaluationKey->abbr 
-                                                : '-' }}
-                                        </li>
-                                    @endforeach
-                                </ul>
+                                <td>
+                                    <ul style="list-style:none; padding:0; margin:0;">
+                                        @foreach ($groupSkills as $skill)
+                                            @php
+                                                // Check if this skill has evaluation for this student
+                                                $evaluation = $skill->subject->EvolutionKeySkills
+                                                    ->where('skill_id', $skill->skill_id)
+                                                    ->where('student_id', $student->id)
+                                                    ->first();
+                                            @endphp
+                                             {{-- @dd($evaluation->key); --}}
+
+                                            <li>
+                                                {{ $evaluation && $evaluation->key ? $evaluation->key->key : '-' }}
+                                            </li>
+                                        @endforeach
+                                    </ul>
                                 </td>
 
                             </tr>
                         @endforeach
-                         <tr class="fw-bold">
-                                <td colspan="3">Effort in {{ $subject->name }}</td>
-                                <td>{{ $effort->effort ?? '-' }}</td>
-                            </tr>
+
+
+                        <tr class="fw-bold">
+                            <td colspan="3">Effort in {{ $subject->name }}</td>
+                            @php $eff = optional($efforts->get($student->id))->first(); @endphp
+                            <td>{{ $eff->effort ?? '-' }}</td>
+                        </tr>
                     </tbody>
                 </table>
             @endforeach

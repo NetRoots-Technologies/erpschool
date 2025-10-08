@@ -14,7 +14,7 @@ use App\Services\BCategoryService;
 class BudgetCategoryController extends Controller
 {
 
-      protected $BcategoryService;
+    protected $BcategoryService;
 
     public function __construct(BCategoryService $BcategoryService)
     {
@@ -23,20 +23,22 @@ class BudgetCategoryController extends Controller
 
     public function index()
     {
-        if (!Gate::allows('students')) {
+
+       
+        if (!auth()->user()->hasPermissionTo("BudgetCategory-list")) {
             return abort(503);
         }
-        $categories = BCategory::whereNull('parent_id')->get(); // Fetch all categories
-    
+        $categories = BCategory::whereNull('parent_id')->get();
+
         return view('admin.inventory_management.budgetcategory.index', compact('categories'));
     }
 
 
-       public function store(CategoryRpequest $request)
+    public function store(CategoryRpequest $request)
     {
 
         // dd($request->all());
-        if (!Gate::allows('students')) {
+        if (!auth()->user()->hasPermissionTo("BudgetCategory-create")) {
             return abort(503);
         }
         $this->BcategoryService->store($request->validated());
@@ -44,39 +46,44 @@ class BudgetCategoryController extends Controller
     }
 
 
-    public function edit(BCategory $Bcategory , $id){
-         if (!Gate::allows('students')) {
+    public function edit(BCategory $Bcategory, $id)
+    {
+        if (!auth()->user()->hasPermissionTo("BudgetCategory-edit")) {
             return abort(503);
         }
         $categories = BCategory::whereNull('parent_id')->get(); // Fetch all categories
         $bCategoryId = BCategory::where('id', $id)->first();
 
-        
 
-        return view('admin.inventory_management.budgetcategory.edit', compact('categories','bCategoryId'));
+
+        return view('admin.inventory_management.budgetcategory.edit', compact('categories', 'bCategoryId'));
     }
-     public function getData()
+
+
+    public function getData()
     {
-        if (!Gate::allows('students')) {
+
+        if (!auth()->user()->hasPermissionTo("BudgetCategory-list")) {
             return abort(503);
         }
+
         return $this->BcategoryService->getData();
     }
 
-      public function update(CategoryRpequest $request, $id)
+    public function update(CategoryRpequest $request, $id)
     {
-        if (!Gate::allows('students')) {
+        if (!auth()->user()->hasPermissionTo("BudgetCategory-edit")) {
             return abort(503);
         }
-        $this->BcategoryService->update($request->validated(),$id);
-       return redirect()
-        ->route('inventory.category.index')
-        ->with('success', 'Category updated successfully');
+        $this->BcategoryService->update($request->validated(), $id);
+        return redirect()
+            ->route('inventory.category.index')
+            ->with('success', 'Category updated successfully');
     }
 
-        public function destroy($id)
+    public function destroy($id)
     {
-        if (!Gate::allows('students')) {
+        if (!auth()->user()->hasPermissionTo("BudgetCategory-edit")) {
             return abort(503);
         }
         $this->BcategoryService->delete($id);
