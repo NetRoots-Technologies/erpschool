@@ -101,11 +101,11 @@
                                     <!-- Subjects -->
                                     <div class="col-md-3">
                                         <label><b>Subjects: *</b></label>
-                                        <select name="subject_id2" class="form-select select2 mt-3">
+                                        <select name="course_id" class="form-select select2 mt-3">
                                             @if(count($classSubject) > 0)
                                                 @foreach($classSubject as $item)
-                                                    <option value="{{ $item->subject_id }}" {{ $exam_schedule_detail->subject_id == $item->subject->id ? 'selected' : '' }}>
-                                                        {{ $item->subject->name }}
+                                                    <option value="{{ $item->Subject->id }}" {{ $exam_schedule_detail->course_id == $item->Subject->id ? 'selected' : '' }}>
+                                                        {{ $item->Subject->name }}
                                                     </option>
                                                 @endforeach
                                             @else
@@ -117,7 +117,7 @@
                                     <!-- Component -->
                                     <div class="col-md-3">
                                         <label><b>Component: *</b></label>
-                                        <select name="component_id2" class="form-select select2 mt-3">
+                                        <select name="component_id" class="form-select select2 mt-3">
                                             @foreach($components as $item)
                                                 <option value="{{ $item->id }}" {{ $exam_schedule_detail->component_id == $item->id ? 'selected' : '' }}>
                                                     {{ $item->name }}
@@ -129,13 +129,13 @@
                                     <!-- Marks -->
                                     <div class="col-md-3">
                                         <label><b>Marks: *</b></label>
-                                        <input type="text" class="form-control" name="marks2" id="marks" value="{{ $exam_schedule_detail->marks }}">
+                                        <input type="text" class="form-control" name="marks" id="marks" value="{{ $exam_schedule_detail->marks }}">
                                     </div>
 
                                     <!-- Grade -->
                                     <div class="col-md-1 mt-4">
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="grade2" id="grade" {{ $exam_schedule_detail->grade ? 'checked' : '' }}>
+                                            <input class="form-check-input" type="checkbox" name="grade" id="grade" {{ $exam_schedule_detail->grade ? 'checked' : '' }}>
                                             <label class="form-check-label" for="grade">Grade</label>
                                         </div>
                                     </div>
@@ -143,7 +143,7 @@
                                     <!-- Pass -->
                                     <div class="col-md-1 mt-4">
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" name="pass2" id="pass" {{ $exam_schedule_detail->pass ? 'checked' : '' }}>
+                                            <input class="form-check-input" type="checkbox" name="pass" id="pass" {{ $exam_schedule_detail->pass ? 'checked' : '' }}>
                                             <label class="form-check-label" for="pass">Pass</label>
                                         </div>
                                     </div>
