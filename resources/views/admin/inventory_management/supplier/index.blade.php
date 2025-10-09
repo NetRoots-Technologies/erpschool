@@ -29,6 +29,7 @@
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
                 <form id="iForm" method="post" action="{{ route('inventory.suppliers.store') }}">
+                        @csrf   {{-- ✅ very important --}}
                     <input type="hidden" name="id" id="id" value="">
                     <input type="hidden" name="type" id="type" value="{{ $type }}">
                     <div class="modal-header">
@@ -57,6 +58,13 @@
                             <input type="email" class="form-control" id="email" name="email"
                                 placeholder="Enter email" required>
                         </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label for="ntn_number" class="form-label">NTN Number</label>
+                            <input type="text" class="form-control" id="ntn_number" name="ntn_number"
+                                placeholder="Enter NTN Number" maxlength="50">
+                        </div>
+
                         <div class="col-md-4 mb-3">
                             <label for="branches" class="form-label">Supplier Branch</label>
                             <select class="form-control select2" id="branches" name="branches[]" required multiple>
@@ -142,17 +150,20 @@
                 }
             },
                 rules: {
-                    name: {
-                        required: true,
-                        minlength: 3
-                    }
-                },
-                messages: {
-                    name: {
-                        required: "Please enter item name",
-                        minlength: "Item name should be at least 3 characters long"
-                    }
-                },
+                        name:        { required: true, minlength: 3 },
+                        ntn_number:  { required: true, maxlength: 50, ntnPattern: true } // ✅ added
+                    },
+                    messages: {
+                        name: {
+                        required: "Please enter supplier name",
+                        minlength: "Supplier name should be at least 3 characters long"
+                        },
+                        ntn_number: {
+                        required:  "NTN Number is required",
+                        maxlength:  "Max 50 characters allowed"
+                        }
+                    },
+
                 submitHandler: function(form) {
                     console.log(form);
                     const formData = $(form).serialize();
@@ -238,6 +249,11 @@
                         title: 'Email'
                     },
                     {
+                        data: 'ntn_number',
+                        title: 'NTN',
+                        defaultContent: '-'
+                        },
+                    {
                         data: 'address',
                         title: 'Address'
                     },
@@ -312,6 +328,7 @@
                 $(`#contact`).val('')
                 $(`#address`).val('')
                 $(`#email`).val('')
+                $(`#ntn_number`).val('')
                 $(`#branches`).val('').trigger('change')
                 $(`#items`).val('').trigger('change')
             });
@@ -331,6 +348,7 @@
                     $(`#contact`).val(sData.contact)
                     $(`#address`).val(sData.address)
                     $(`#email`).val(sData.email)
+                     $('#ntn_number').val(sData.ntn_number || '');   // ✅ prefill NTN here
                     $(`#branches`).val(sData.branches.map(x => x.id)).trigger('change')
                     $(`#items`).val(sData.items.map(x => x.id)).trigger('change')
                 }

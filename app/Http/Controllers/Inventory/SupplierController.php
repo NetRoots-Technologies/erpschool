@@ -61,6 +61,8 @@ class SupplierController extends Controller
             'contact' => 'required',
             'address' => 'required',
             'email' => 'required|email',
+           'ntn_number' => 'required|string|max:50',
+
         ]);
 
         try {
@@ -71,6 +73,7 @@ class SupplierController extends Controller
             $supplier->contact = $request->contact;
             $supplier->address = $request->address;
             $supplier->email = $request->email;
+            $supplier->ntn_number = $request->ntn_number;
             $supplier->type = $this->type[$request->type];
             $supplier->type == 'F' ? $group_id = $fixedGroup['Food'] : $group_id = $fixedGroup['Stationary'];
             $supplier->save();

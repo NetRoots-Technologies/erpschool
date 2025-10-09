@@ -18,6 +18,7 @@ class Supplier extends Model
         "contact",
         "address",
         "email",
+        "ntn_number",
         "status",
         "type"
     ];

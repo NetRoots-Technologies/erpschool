@@ -56,11 +56,11 @@
                                     name="total_amount" readonly required>
                             </div>
 
-                            <div class="col-6 mb-3">
-                                <label for="description" class="form-label">Comments</label>
-                                <input type="text" value="" class="form-control" id="description"
-                                    name="description" required>
-                            </div>
+                        <div class="col-6 mb-3">
+                            <label for="description" class="form-label">Comments</label>
+                            <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
+                        </div>
+
 
                             <div class="col-12 mb-3">
                                 <div class="items" id="items">
@@ -363,6 +363,14 @@
                             return `<span class="badge bg-warning rounded-pill m-1">${row.delivery_status}</span>`;
                         },
                     },
+                         {
+                        data: 'description',
+                        title: 'Comments',
+                        render: function(data, type, row, meta) {
+                            return `<span class="badge bg-warning rounded-pill m-1">${row.description}</span>`;
+                        },
+                    },
+
                     {
                         data: 'order_date',
                         title: 'Order date',

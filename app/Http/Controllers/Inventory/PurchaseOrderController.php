@@ -169,11 +169,11 @@ class PurchaseOrderController extends Controller
         return response()->json(["success" => true, 'message' => 'Deleted Successfully', 'data' => []], 200);
     }
 
-    
+
     public function pdf($id)
     {
         $purchaseOrder = PurchaseOrder::with(['supplier', 'branch', 'purchaseOrderItems.item'])->findOrFail($id);
-        // dd($purchaseOrder->purchaseOrderItems); 
+        // dd($purchaseOrder->purchaseOrderItems);
 
         $pdf = Pdf::loadView('admin.inventory_management.purchase_order.pdf', compact('purchaseOrder'));
 
@@ -202,6 +202,7 @@ class PurchaseOrderController extends Controller
             "order_date",
             "delivery_status",
             "delivery_date",
+            'description',
         ])
             ->has('supplier')
             ->has('branch')
@@ -362,7 +363,7 @@ class PurchaseOrderController extends Controller
                 ->first();
 
             $supplier_name = Supplier::where('id',$purchaseOrder->supplier_id)->value('name');
-            
+
             $data = [
                 "amount" => $purchaseOrder->total_amount,
                 "narration" => "Paying Supplier $supplier_name",
@@ -371,7 +372,7 @@ class PurchaseOrderController extends Controller
             ];
 
             $entry = $this->ledgerService->createEntry($data);
-            
+
             $createEntryItemsData = [
                 "entry_type_id" => 8,
                 "entry_id" => $entry->id,
@@ -479,7 +480,7 @@ class PurchaseOrderController extends Controller
     }
 
     public function showData($id){
-    
+
         $purchaseOrder = PurchaseOrder::where('id', $id)
             ->select([
                 "id",
@@ -488,6 +489,7 @@ class PurchaseOrderController extends Controller
                 "order_date",
                 "delivery_status",
                 "delivery_date",
+                'description',
             ])
             ->has('supplier')
             ->has('branch')
@@ -499,7 +501,7 @@ class PurchaseOrderController extends Controller
                 "purchaseOrderItems.item:id,name",
             ])->first();
 
-           
+
         return view('admin.inventory_management.purchase_order.show', compact('purchaseOrder'));
 
     }
