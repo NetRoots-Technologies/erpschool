@@ -85,8 +85,7 @@ class StudentExamReport extends Controller
     
         public function viewReport($student_id)
         {
-            // dd("d");
-             $student = Students::with(['branch','class','section.session','studentPictures'])->findOrFail($student_id);
+             $student = Students::with(['branch','class','section.session','studentPictures' , 'remarks'])->findOrFail($student_id);
              $efforts = EffortLevel::where('student_id', $student_id)->get()->groupBy('student_id');    
              $skills = SkillType::with([
                     'subject.EvolutionKeySkills' => function ($q) use ($student_id) {
@@ -103,7 +102,41 @@ class StudentExamReport extends Controller
             ->get()
             ->groupBy('subject_id');
 
+            
+            return view('reports.students.show' , compact('student','efforts','skills'));
+            // dd($skills , $student_id , request()->all() , $student , $efforts);
+        //    $pdf = Pdf::loadView('reports.students.report_card', compact('student','efforts','skills'))
+        //       ->setOptions([
+        //           'isRemoteEnabled' => true,
+        //           'defaultFont' => 'DejaVu Sans'
+        //       ]);
 
+        //  return $pdf->download('report-card-'.$student->id.'.pdf');
+
+        }
+
+
+         public function printReport($student_id)
+        {
+             $student = Students::with(['branch','class','section.session','studentPictures' , 'remarks'])->findOrFail($student_id);
+             $efforts = EffortLevel::where('student_id', $student_id)->get()->groupBy('student_id');    
+             $skills = SkillType::with([
+                    'subject.EvolutionKeySkills' => function ($q) use ($student_id) {
+                        $q->where('student_id', $student_id)   // Student ka filter sirf yahan
+                        ->with('key');      // Related keys ko load karo
+                    },
+                    'group',
+                    'skill'
+                ])
+                ->where('class_id', $student->class_id)
+                ->whereHas('subject.EvolutionKeySkills', function ($q) use ($student_id) {
+                    $q->where('student_id', $student_id);
+                })
+            ->get()
+            ->groupBy('subject_id');
+
+            
+           
             // dd($skills , $student_id , request()->all() , $student , $efforts);
            $pdf = Pdf::loadView('reports.students.report_card', compact('student','efforts','skills'))
               ->setOptions([
@@ -111,7 +144,7 @@ class StudentExamReport extends Controller
                   'defaultFont' => 'DejaVu Sans'
               ]);
 
-        return $pdf->download('report-card-'.$student->id.'.pdf');
+          return $pdf->download('report-card-'.$student->id.'.pdf');
 
         }
 

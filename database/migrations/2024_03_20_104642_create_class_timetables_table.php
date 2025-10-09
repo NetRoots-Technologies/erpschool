@@ -13,7 +13,7 @@ class CreateClassTimetablesTable extends Migration
      */
     public function up()
     {
-        if (!Schema::hasTable('course')) {
+        if (!Schema::hasTable('class_timetables')) {
 
             Schema::create('class_timetables', function (Blueprint $table) {
                 $table->id();

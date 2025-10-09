@@ -5,21 +5,22 @@ namespace App\Http\Controllers\Exam;
 use App\Http\Controllers\Controller;
 use App\Models\Admin\Branch;
 use App\Models\Admin\Company;
+use App\Models\Admin\Course;
 use App\Models\Exam\ClassSubject;
 use App\Models\Exam\Component;
 use App\Models\Exam\ExamDetail;
+use App\Models\Exam\ExamSchedule;
 use App\Models\Exam\ExamTerm;
 use App\Models\Exam\TestType;
+use App\Services\ExamScheduleService;
 use Illuminate\Http\Request;
-use App\Models\Exam\ExamSchedule;
+use Illuminate\Support\Carbon;
+
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
-use App\Models\Admin\Course;
-
-use Illuminate\Support\Carbon;
+use Illuminate\Validation\Rule;
 use Yajra\DataTables\DataTables;
-use App\Services\ExamScheduleService;
-use Illuminate\Support\Facades\DB;
 
 
 class ExamScheduleController extends Controller
@@ -59,7 +60,7 @@ class ExamScheduleController extends Controller
         }
         $companies = Company::where('status', 1)->get();
         // $tests = ExamDetail::all();
-        $tests =  DB::table('test_types')->where('status', 1)->select('id' , 'name as test_name')->get();
+        $tests =  DB::table('test_types')->where('status', 1)->select('id', 'name as test_name')->get();
         return view('exam.exam_schedule.create', compact('companies', 'tests'));
     }
 
@@ -70,14 +71,14 @@ class ExamScheduleController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-     public function store(Request $request)
+    public function store(Request $request)
     {
         if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $this->ExamScheduleService->store($request);
         return redirect()->route('exam.exam_schedules.index')
-                        ->with('success', 'Exam Schedule created successfully.');
+            ->with('success', 'Exam Schedule created successfully.');
     }
 
     /**
@@ -105,51 +106,38 @@ class ExamScheduleController extends Controller
             return abort(503);
         }
         $components = Component::where('status', 1)->get();
-        $exam_schedule_detail=ExamSchedule::findOrFail($id);
-        $branch_id=$exam_schedule_detail->branch_id;
-        $class_id=$exam_schedule_detail->class_id;
+        $exam_schedule_detail = ExamSchedule::findOrFail($id);
+        $branch_id = $exam_schedule_detail->branch_id;
+        $class_id = $exam_schedule_detail->class_id;
         $companies = Company::where('status', 1)->get();
         $tests = ExamDetail::all();
         $classSubject = ClassSubject::with('Subject')
             ->where('branch_id', $branch_id)
             ->where('class_id', $class_id)
             ->get();
-        return view('exam.exam_schedule.edit', compact('companies', 'tests','exam_schedule_detail','components','classSubject'));
+        return view('exam.exam_schedule.edit', compact('companies', 'tests', 'exam_schedule_detail', 'components', 'classSubject'));
     }
 
     public function update(Request $request, $id)
     {
 
-    if (!Gate::allows('Dashboard-list')) {
+        // dd($request->all(), $id);
+        if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         $rules = [
-            'company_id'     => 'required|exists:company,id',
-            'branch_id'      => 'required|exists:branches,id',
-            'exam_term_id'   => 'required|exists:exam_terms,id',
-            'test_type_id'   => 'required|exists:test_types,id',
-            'class_id'       => 'required|exists:classes,id',
+                'company_id' => ['required', 'integer', Rule::exists('company', 'id')],
+                'branch_id'    => ['required', 'integer', Rule::exists('branches', 'id')],
+                'exam_term_id' => ['required', 'integer', Rule::exists('exam_terms', 'id')],
+                'test_type_id' => ['required', 'integer', Rule::exists('test_types', 'id')],
+                'class_id'     => ['required', 'integer', Rule::exists('classes', 'id')],
+                'course_id'   => ['required', 'integer', Rule::exists('courses', 'id')],
+                'component_id' => ['required', 'integer', Rule::exists('components', 'id')],
+                'marks'        => 'nullable|numeric|min:0',
+                'grade'        => 'nullable|in:on',
+                'pass'         => 'nullable|in:on',
+
         ];
-
-        if ($request->get('getvalue') == 1) {
-            $rules = array_merge($rules, [
-                'subject_id2'     => 'required|exists:class_subjects,id',
-                'component_id2'   => 'required|exists:components,id',
-                'marks2'          => 'nullable|numeric|min:0',
-                'grade2'          => 'nullable|in:on',
-                'pass2'           => 'nullable|in:on',
-            ]);
-        } else {
-            $rules = array_merge($rules, [
-                'subject_id'     => 'required|exists:class_subjects,id',
-                'component_id'   => 'required|exists:components,id',
-                'marks'          => 'nullable|numeric|min:0',
-                'grade'          => 'nullable|in:on',
-                'pass'           => 'nullable|in:on',
-            ]);
-        }
-
-
         $validator = Validator::make($request->all(), $rules);
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
@@ -157,38 +145,21 @@ class ExamScheduleController extends Controller
 
 
         $examSchedule = ExamSchedule::findOrFail($id);
+        $examSchedule->update([
+            'company_id'   => $request->company_id,
+            'branch_id'    => $request->branch_id,
+            'exam_term_id' => $request->exam_term_id,
+            'test_type_id' => $request->test_type_id,
+            'class_id'     => $request->class_id,
+            'course_id'   => $request->course_id,
+            'component_id' => $request->component_id,
+            'marks'        => $request->marks,
+            'grade'        => $request->has('grade'),
+            'pass'         => $request->has('pass'),
+        ]);
 
 
-        if ($request->get('getvalue') == 1) {
-            $examSchedule->update([
-                'company_id'   => $request->company_id,
-                'branch_id'    => $request->branch_id,
-                'exam_term_id' => $request->exam_term_id,
-                'test_type_id' => $request->test_type_id,
-                'class_id'     => $request->class_id,
-                'subject_id'   => $request->subject_id2,
-                'component_id' => $request->component_id2,
-                'marks'        => $request->marks2,
-                'grade'        => $request->has('grade2'),
-                'pass'         => $request->has('pass2'),
-            ]);
-        } else {
-            $examSchedule->update([
-                'company_id'   => $request->company_id,
-                'branch_id'    => $request->branch_id,
-                'exam_term_id' => $request->exam_term_id,
-                'test_type_id' => $request->test_type_id,
-                'class_id'     => $request->class_id,
-                'subject_id'   => $request->subject_id,
-                'component_id' => $request->component_id,
-                'marks'        => $request->marks,
-                'grade'        => $request->has('grade'),
-                'pass'         => $request->has('pass'),
-            ]);
-        }
-
-        return redirect()->route('exam.exam_schedules.index')
-            ->with('success', 'Exam Schedule updated successfully.');
+        return redirect()->route('exam.exam_schedules.index')->with('success', 'Exam Schedule updated successfully.');
     }
 
 
@@ -261,15 +232,14 @@ class ExamScheduleController extends Controller
         }
         $data = $request->all();
 
-        if(isset($data['id'])){
-             $class_id = $data['id'];
-        }else{
-             $class_id = $data['class_id'];
+        if (isset($data['id'])) {
+            $class_id = $data['id'];
+        } else {
+            $class_id = $data['class_id'];
         }
 
 
-         $classSubjects = Course::
-            where('class_id', $class_id)
+        $classSubjects = Course::where('class_id', $class_id)
             ->get();
 
         return response()->json($classSubjects);
@@ -294,12 +264,17 @@ class ExamScheduleController extends Controller
             return abort(503);
         }
         $data = ExamSchedule::with([
-            'company', 'branch', 'testType', 'examTerm',
-            'class', 'subject', 'component'
+            'company',
+            'branch',
+            'testType',
+            'examTerm',
+            'class',
+            'subject',
+            'component'
         ])->orderBy('created_at', 'desc')->get();
 
         return Datatables::of($data)->addIndexColumn()
-           ->addColumn('test_type', function ($row) {
+            ->addColumn('test_type', function ($row) {
                 return is_object($row->testType) ? ($row->testType->test_name ?? 'N/A') : 'Invalid Data';
             })
             ->addColumn('company', fn($row) => $row->company->name ?? 'N/A')
@@ -327,14 +302,12 @@ class ExamScheduleController extends Controller
             ->make(true);
     }
 
-    public function getDataOnEdit($exam_schedule_id){
+    public function getDataOnEdit($exam_schedule_id)
+    {
         if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
-       $data=ExamSchedule::findOrFail($exam_schedule_id);
-       return response()->json(['data' => $data]);
+        $data = ExamSchedule::findOrFail($exam_schedule_id);
+        return response()->json(['data' => $data]);
     }
-
-
 }
-

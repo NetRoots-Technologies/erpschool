@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 use App\Models\Admin\Company;
+use App\Models\ProgressReportRemark;
 
 class Students extends Model
 {
@@ -133,4 +134,8 @@ class Students extends Model
         return $this->hasMany(\App\Models\Fleet\Transportation::class, 'student_id');
     }
    
+     public function remarks()
+    {
+        return $this->hasOne(ProgressReportRemark::class, 'student_id');
+    }
 }

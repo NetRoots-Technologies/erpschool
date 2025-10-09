@@ -231,6 +231,11 @@
                 </tr>
             </table>
 
+                 @if(!empty($student->remarks->remarks))
+                <div class="mt-4">
+                    <p><strong>Concluding Teacher &nbsp;({!! $student->remarks->author->name !!})Comments:</strong> {!! nl2br(e($student->remarks->remarks)) !!}</p>
+                </div>
+                @endif
 
             <div class="mt-4">
 
