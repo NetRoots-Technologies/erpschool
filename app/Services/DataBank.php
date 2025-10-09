@@ -179,7 +179,7 @@ class DataBank
 
             })->addColumn('action', function ($row) {
                 $btn = '';
-                if (Gate::allows('students-create'))
+                if (Gate::allows('Students-create'))
                     $btn = '<a href="' . route("students.databank.create", $row->id) . '" class="btn btn-primary create_student   btn-sm mt-2">Create Student</a><br>';
 
                 if (Gate::allows('student_databank-delete'))

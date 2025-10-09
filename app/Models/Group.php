@@ -60,12 +60,12 @@ class Group extends Model
     }
 
     public function ledgers(){
-        return $this->hasOne(ledgers::class,'group_id','id');
+        return $this->hasMany(AccountLedger::class,'account_group_id','id');
     }
 
     static function hasChildLedgers($group_id)
     {
-        return Ledgers::where('group_id', '=', $group_id)->count();
+        return AccountLedger::where('account_group_id', '=', $group_id)->count();
     }
 
     public function parent()

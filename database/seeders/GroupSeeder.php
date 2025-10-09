@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Account\Group;
-use App\Models\Admin\Ledgers;
+use App\Models\Accounts\AccountLedger;
 use Illuminate\Database\Seeder;
 use App\Models\Account\Ledger;
 
@@ -73,7 +73,7 @@ class GroupSeeder extends Seeder
             'status' => ' 1',
         ]);
         //Building Ledger
-        $Building_Ledgers = Ledgers::insert([
+        $Building_Ledgers = AccountLedger::insert([
 
             [
                 'name' => 'Building',

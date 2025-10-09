@@ -258,7 +258,7 @@ class Helpers
             $expData .= '<tr>';
             $expData .= '<td colspan="2"><span style="margin-left:' . $margin . '">' . $Exp->name . '</span></td>';
             $expData .= '</tr>    ';
-            $Ledgers = Ledgers::where('group_id', $Exp->id)->get();
+            $Ledgers = AccountLedger::where('account_group_id', $Exp->id)->get();
             if (count($Ledgers) > 0)
 
                 foreach ($Ledgers as $Ledger) {
@@ -327,7 +327,7 @@ class Helpers
             $expData .= '<tr>';
             $expData .= '<td colspan="2"><span style="margin-left:' . $margin . '">' . $Exp->name . '</span></td>';
             $expData .= '</tr>    ';
-            $Ledgers = Ledgers::where('group_id', $Exp->id)->get();
+            $Ledgers = AccountLedger::where('account_group_id', $Exp->id)->get();
             if (count($Ledgers) > 0)
 
                 foreach ($Ledgers as $Ledger) {

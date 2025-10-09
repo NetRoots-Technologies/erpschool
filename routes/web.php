@@ -8,6 +8,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\HR\AssetController;
+use App\Models\Accounts\AccountLedger;
 use App\Http\Controllers\HR\ZktecoController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\HR\EmployeeController;
@@ -106,12 +107,12 @@ Route::get('/run-queue-worker', function () {
 Route::get('/temp', function () {
     DB::beginTransaction();
     try {
-        $duplicateLedgers = Ledgers::select('number')
-            ->groupBy('number')
+        $duplicateLedgers = AccountLedger::select('code')
+            ->groupBy('code')
             ->havingRaw('COUNT(*) > 1')
-            ->pluck('number');
+            ->pluck('code');
 
-        $legders = Ledgers::whereIn('number', $duplicateLedgers)->delete();
+        $legders = AccountLedger::whereIn('code', $duplicateLedgers)->delete();
         DB::commit();
         return $legders;
     } catch (Exception $es) {

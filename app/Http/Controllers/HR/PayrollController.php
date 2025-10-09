@@ -46,7 +46,7 @@ class PayrollController extends Controller
        $timestamp = time();
         $branches = Branch::where('status', 1)->get();
         $bank_accounts = BankAccount::where('type', 'MOA')->pluck('id');
-        $ledgers = Ledgers::where('parent_type', BankAccount::class)->whereIn('parent_type_id', $bank_accounts)->get();
+        $ledgers = AccountLedger::where('linked_module', 'bank_account')->whereIn('linked_id', $bank_accounts)->get();
         return view('hr.payroll.index', compact('branches', 'ledgers'));
 
     }

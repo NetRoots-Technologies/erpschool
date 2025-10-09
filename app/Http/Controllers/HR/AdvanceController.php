@@ -69,7 +69,7 @@ class AdvanceController extends Controller
             if ($employees) {
                 $advance_salary = config('constants.FixedGroups.advance_salary');
 
-                $empLedger = Ledgers::where("parent_type", Employees::class)->where('parent_type_id', $employees->id)->first();
+                $empLedger = AccountLedger::where("linked_module", "employee")->where('linked_id', $employees->id)->first();
 
                 if (!$empLedger) {
 

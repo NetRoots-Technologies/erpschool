@@ -1,6 +1,6 @@
 @inject('request', 'Illuminate\Http\Request')
 @inject('CoreAccounts', 'App\Helpers\CoreAccounts')
-@inject('Ledgers', 'App\Models\Admin\Ledgers')
+@inject('Ledgers', 'App\Models\Accounts\AccountLedger')
 @if($request->get('medium_type') != 'web')
     @if($request->get('medium_type') == 'pdf')
         @include('partials.pdf_head')
@@ -84,7 +84,7 @@
                 <tr class="tr-highlight">
                     <td>{{ $entry->voucher_date }}</td>
                     <td>{{ $entry->number }}</td>
-                    {{--<td>{{ $Ledgers::entryLedgers($entry->id) }}</td>--}}
+                    {{--<td>{{ $Ledgers->entryLedgers($entry->id) }}</td>--}}
                     <td>{{ $EntryTypes[$entry->entry_type_id]->code }}</td>
                     <td>{{ $entry->narration }}</td>
                     @if ($entry['dc'] == 'd')

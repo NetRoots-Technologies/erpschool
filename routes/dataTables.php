@@ -35,26 +35,9 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'datatable', 'as' => 'datata
     Route::post('get-data-user', 'App\Http\Controllers\UserController@getData')->name('get-data-user');
     Route::post('get-data-role', 'App\Http\Controllers\RoleController@getData')->name('get-data-role');
     // Ledger DataTables - Using new Accounts system
-    Route::get('get-data-ledger', function() {
-        $ledgers = AccountLedger::with('accountGroup')->where('is_active', true)->get();
-        return response()->json([
-            'data' => $ledgers->map(function($ledger) {
-                return [
-                    'id' => $ledger->id,
-                    'code' => $ledger->code,
-                    'name' => $ledger->name,
-                    'group' => $ledger->accountGroup->name ?? '',
-                    'balance' => number_format($ledger->current_balance, 2),
-                    'type' => $ledger->current_balance_type,
-                ];
-            }),
-            'recordsTotal' => $ledgers->count(),
-            'recordsFiltered' => $ledgers->count()
-        ]);
-    })->name('get-data-ledger');
-    
+    Route::get('get-data-ledger', [App\Http\Controllers\Accounts\ChartOfAccountsController::class, 'getData'])->name('get-data-ledger');
     Route::get('get-data-ledger-income', function() {
-        $ledgers = AccountLedger::whereHas('accountGroup', function($q) {
+        $ledgers = App\Models\Accounts\AccountLedger::whereHas('accountGroup', function($q) {
             $q->where('type', 'revenue');
         })->where('is_active', true)->get();
         return response()->json([
@@ -70,9 +53,9 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'datatable', 'as' => 'datata
             'recordsFiltered' => $ledgers->count()
         ]);
     })->name('get-data-ledger-income');
-    
+
     Route::get('get-data-ledger-receivable', function() {
-        $ledgers = AccountLedger::where('name', 'LIKE', '%Receivable%')
+        $ledgers = App\Models\Accounts\AccountLedger::where('name', 'LIKE', '%Receivable%')
             ->orWhere('linked_module', 'customer')
             ->where('is_active', true)
             ->get();

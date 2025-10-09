@@ -63,7 +63,7 @@ class StudentController extends Controller
      */
     public function create()
     {
-        // if (!Gate::allows('students-create')) {
+        // if (!Gate::allows('Students-create')) {
         //     return abort(503);
         // }
 
@@ -102,7 +102,7 @@ class StudentController extends Controller
      */
     public function store(Request $request)
     {
-        // if (!Gate::allows('students-create')) {
+        // if (!Gate::allows('Students-create')) {
         //     return abort(503);
         // }
 
@@ -195,7 +195,7 @@ class StudentController extends Controller
 
     public function destroy($id)
     {
-        if (!Gate::allows('students-delete')) {
+        if (!Gate::allows('Students-delete')) {
             return abort(503);
         }
         $student = $this->StudentServices->destroy($id);

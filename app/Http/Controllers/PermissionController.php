@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Services\RolesServise;
 use Illuminate\Http\Request;
-use App\Services\PermisionServices;
+use App\Services\PermissionServices;
 use Illuminate\Support\Facades\Gate;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -17,10 +17,10 @@ class PermissionController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-    protected $PermisionServices;
-    public function __construct(Request $request,PermisionServices $PermisionServices)
+    protected $PermissionServices;
+    public function __construct(Request $request, PermissionServices $PermissionServices)
     {
-        $this->PermisionServices = $PermisionServices;
+        $this->PermissionServices = $PermissionServices;
     }
 
     public function index()
@@ -39,7 +39,7 @@ class PermissionController extends Controller
         if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
-        $Users = $this->PermisionServices->getdata();
+        $Users = $this->PermissionServices->getdata();
         return $Users;
     }
 
@@ -50,7 +50,7 @@ class PermissionController extends Controller
      */
     public function create()
     {
-        if (!Gate::allows('permission-create')) {
+        if (!Gate::allows('Permissions-create')) {
             return abort(503);
         }
         $mainpermissions = Permission::where('main', 1)->get();
@@ -65,7 +65,7 @@ class PermissionController extends Controller
      */
     public function store(Request $request)
     {
-        if (!Gate::allows('permission-create')) {
+        if (!Gate::allows('Permissions-create')) {
             return abort(503);
         }
 
@@ -73,7 +73,7 @@ class PermissionController extends Controller
             'name' => 'required|unique:permissions,name',
         ]);
 
-        $data = $this->PermisionServices->store($request);
+        $data = $this->PermissionServices->store($request);
 
 
         return 'done';
@@ -100,12 +100,12 @@ class PermissionController extends Controller
      */
     public function edit($id)
     {
-        if (!Gate::allows('permission-edit')) {
+        if (!Gate::allows('Permissions-edit')) {
             return abort(503);
         }
-        $Permision = $this->PermisionServices->edit($id);
+        $Permission = $this->PermissionServices->edit($id);
         $mainpermissions = Permission::where('main', 1)->get();
-        return view('admin.permisions.edit', compact('Permision', 'mainpermissions'));
+        return view('admin.permisions.edit', compact('Permission', 'mainpermissions'));
     }
 
     /**
@@ -115,12 +115,12 @@ class PermissionController extends Controller
      * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $id, $request)
+    public function update(Request $request, $id)
     {
-        if (!Gate::allows('permission-edit')) {
+        if (!Gate::allows('Permissions-edit')) {
             return abort(503);
         }
-        $Permision = $this->PermisionServices->update($id, $request);
+        $Permission = $this->PermissionServices->update($request, $id);
         return 'done';
     }
 
@@ -132,10 +132,15 @@ class PermissionController extends Controller
      */
     public function destroy($id)
     {
-        if (!Gate::allows('permission-delete')) {
+        if (!Gate::allows('Permissions-delete')) {
             return abort(503);
         }
-        $Permision = $this->PermisionServices->destroy($id);
+        $Permission = $this->PermissionServices->destroy($id);
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Permission deleted successfully'
+        ]);
     }
 }
 

@@ -347,24 +347,12 @@ Permissions
                         $('#createModal1').modal('hide');
                     });
 
-                    $('#file-datatable tbody').on('click', '.delete', function () {
-
-
-                        var data = $(this).data('id');
-
-                        $('#' + data).submit();
-
-                    });
-
-                    $(document).on("submit", ".delete_form", function (event) {
-
-                        event.preventDefault();
+                    $('#file-datatable tbody').on('click', '.delete', function (e) {
+                        e.preventDefault();
                         var route = $(this).data('route');
 
-
-                        var a = confirm('Are you sure you want to Delete this?');
+                        var a = confirm('Are you sure you want to Delete this permission?');
                         if (a) {
-
                             $.ajax({
                                 url: route,
                                 type: 'DELETE',
@@ -372,18 +360,24 @@ Permissions
                                     "_token": "{{ csrf_token() }}",
                                 },
                                 success: function (result) {
-
                                     tableData.ajax.reload();
                                     Swal.fire({
                                         icon: 'success',
                                         title: 'Success!',
-                                        text: 'Permission Deleted successfully.',
-                                        timer: 1000,
+                                        text: 'Permission deleted successfully.',
+                                        timer: 1500,
                                         showConfirmButton: false
+                                    });
+                                },
+                                error: function (xhr, status, error) {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error!',
+                                        text: 'Failed to delete permission: ' + (xhr.responseJSON?.message || error),
+                                        showConfirmButton: true
                                     });
                                 }
                             });
-
                         }
                     });
                     //Modal CLose

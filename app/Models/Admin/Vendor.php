@@ -4,6 +4,7 @@ namespace App\Models\Admin;
 
 use App\Models\BCategory;
 use App\Models\inventory\VendorCategory;
+use App\Models\Accounts\AccountLedger;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -33,6 +34,6 @@ class Vendor extends Model
     }
     public function ledger()
     {
-        return $this->morphOne(Ledgers::class, 'sourceable');
+        return $this->morphOne(AccountLedger::class, 'sourceable');
     }
 }

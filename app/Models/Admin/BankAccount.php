@@ -2,6 +2,7 @@
 
 namespace App\Models\Admin;
 
+use App\Models\Accounts\AccountLedger;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -24,6 +25,6 @@ class BankAccount extends Model
     }
     public function ledger()
     {
-        return $this->hasOne(Ledgers::class, 'parent_type_id', 'id')->where('parent_type', self::class);
+        return $this->hasOne(AccountLedger::class, 'linked_id', 'id')->where('linked_module', 'bank_account');
     }
 }

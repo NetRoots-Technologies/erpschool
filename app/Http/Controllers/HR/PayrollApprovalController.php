@@ -156,13 +156,13 @@ if (!Gate::allows('Dashboard-list')) {
             $payrollApprovals = PayrollApproval::with(['payroll.employee'])->where('approved', 1)->find($id);
             $generatedMonth_year = $payrollApprovals->generated_month_year;
             $generatedMonth = $payrollApprovals->generated_month;
-            $bank_ledger = Ledgers::where('id', $payrollApprovals->bank_account_ledger)->first();
-            $cash_ledger = Ledgers::where('code', 'cash')->first();
+            $bank_ledger = AccountLedger::where('id', $payrollApprovals->bank_account_ledger)->first();
+            $cash_ledger = AccountLedger::where('code', 'cash')->first();
 
             if ($payrollApprovals->has('payroll')) {
 
-                $payroll_ledger = Ledgers::where('parent_type', Branches::class)
-                    ->where('parent_type_id', $payrollApprovals->branch_id)
+                $payroll_ledger = AccountLedger::where('linked_module', 'branch')
+                    ->where('linked_id', $payrollApprovals->branch_id)
                     ->first();
                 foreach ($payrollApprovals->payroll as $payroll) {
                     if ($payroll->cash_in_hand == 0 && $payroll->cash_in_bank == 0) {
