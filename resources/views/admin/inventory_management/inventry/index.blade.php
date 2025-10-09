@@ -158,10 +158,10 @@ Inventry
                 { data: 'quantity', title: 'Quantity' },
                     { data: 'unit_price', title: 'Unit Price' },
                     { data: 'cost_price', title: 'Cost Price' },
-                    // { data: 'sale_price', title: 'Sale Price',
-                    // render: function (data, type, row, meta) {
-                    //     return data;
-                    // }},
+                    { data: 'sale_price', title: 'Sale Price',
+                    render: function (data, type, row, meta) {
+                        return data;
+                    }},
                     { data: null, title: 'Action', orderable: false,
                         render: function (data, type, row, meta) {
                             return `<a class="btn btn-sm btn-warning edit-item" data-id="${row.id}" data-sale_price="${row.sale_price}" data-expiry_date="${row.expiry_date}"><i class="fa fa-pencil"></i></a>`;

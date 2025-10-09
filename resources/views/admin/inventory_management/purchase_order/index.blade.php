@@ -55,6 +55,13 @@
                                 <input type="number" min="0" value="0" class="form-control" id="total_amount"
                                     name="total_amount" readonly required>
                             </div>
+
+                            <div class="col-6 mb-3">
+                                <label for="description" class="form-label">Comments</label>
+                                <input type="text" value="" class="form-control" id="description"
+                                    name="description" required>
+                            </div>
+
                             <div class="col-12 mb-3">
                                 <div class="items" id="items">
 

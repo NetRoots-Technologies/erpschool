@@ -108,6 +108,7 @@ class PurchaseOrderController extends Controller
             "total" => 'required|array',
             "order_date" => 'required|date',
             "delivery_date" => 'required|date',
+            "description" => 'nullable|string',
         ]);
         $type = $request->type == 'food' ? 'F' : 'S';
         try {
@@ -119,6 +120,7 @@ class PurchaseOrderController extends Controller
             $data->total_amount = $request->total_amount;
             $data->delivery_status = $request->delivery_status;
             $data->type = $type;
+            $data->description = $request->description;
             $data->save();
 
             $data->purchaseOrderItems()->delete();

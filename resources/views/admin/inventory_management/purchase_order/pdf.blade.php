@@ -17,6 +17,7 @@
     <p><strong>Order Date:</strong> {{ $purchaseOrder->order_date }}</p>
     <p><strong>Delivery Date:</strong> {{ $purchaseOrder->delivery_date }}</p>
     <p><strong>Delivery Status:</strong> {{ $purchaseOrder->delivery_status }}</p>
+    <p><strong>Comments:</strong> {{ $purchaseOrder->description }}</p>
 
     <table>
         <thead>
@@ -44,6 +45,28 @@
     </table>
 
     <h4 style="text-align:right;">Total: {{ number_format($purchaseOrder->total_amount, 2) }}</h4>
+
+        <br><br><br>
+    <table style="width:100%; text-align:center; margin-top: 50px;">
+        <tr>
+            <td>
+                <hr style="width:80%; margin: auto;">
+                <em>Procurement Officer</em><br>
+                <strong>Prepared By</strong>
+            </td>
+            <td>
+                <hr style="width:80%; margin: auto;">
+                <br>
+                <strong>Purchase Manager</strong>
+            </td>
+            <td>
+                <hr style="width:80%; margin: auto;">
+                <br>
+                <strong>Approved By</strong>
+            </td>
+        </tr>
+    </table>
+
 
 </body>
 </html>

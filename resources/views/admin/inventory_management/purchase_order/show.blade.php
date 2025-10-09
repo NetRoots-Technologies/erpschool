@@ -13,6 +13,7 @@
                 <div class="col-md-6">
                     <p><strong>Branch:</strong> {{ $purchaseOrder->branch->name ?? '-' }}</p>
                     <p><strong>Supplier:</strong> {{ $purchaseOrder->supplier->name ?? '-' }}</p>
+                    <p><strong>Comments:</strong> {{ $purchaseOrder->description ?? '-' }}</p>
                 </div>
                 <div class="col-md-6">
                     <p><strong>Order Date:</strong> {{ \Carbon\Carbon::parse($purchaseOrder->order_date)->format('d-M-Y') }}</p>

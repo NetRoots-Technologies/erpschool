@@ -16,6 +16,7 @@
 <p><strong>Branch:</strong> {{ $purchaseOrder->branch->name }}</p>
 <p><strong>Supplier:</strong> {{ $purchaseOrder->supplier->name }}</p>
 <p><strong>Order Date:</strong> {{ $purchaseOrder->order_date }}</p>
+<p><strong>Comments:</strong> {{ $purchaseOrder->description }}</p>
 
 <table>
     <thead>
@@ -43,6 +44,28 @@
 </table>
 
 <p style="text-align:right;"><strong>Total: </strong>{{ number_format($purchaseOrder->total_amount, 2) }}</p>
+
+
+        <br><br><br>
+    <table style="width:100%; text-align:center; margin-top: 50px;">
+        <tr>
+            <td>
+                <hr style="width:80%; margin: auto;">
+                <em>Procurement Officer</em><br>
+                <strong>Prepared By</strong>
+            </td>
+            <td>
+                <hr style="width:80%; margin: auto;">
+                <br>
+                <strong>Purchase Manager</strong>
+            </td>
+            <td>
+                <hr style="width:80%; margin: auto;">
+                <br>
+                <strong>Approved By</strong>
+            </td>
+        </tr>
+    </table>
 
 <script>
     // auto print
