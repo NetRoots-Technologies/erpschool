@@ -28,7 +28,7 @@ Exam Term Edit
 
                                     <div class="col-md-4">
                                         <label for="Academic"><b>Academic Session </b></label>
-                                        <select name="session_id" class="form-control session_select  select2 basic-single" required id="session_id" disabled>
+                                        <select name="session_id" class="form-control session_select  select2 basic-single" required id="session_id">
                                             <option>Select Session</option>
                                             @foreach($sessions as $key => $item)
                                                 <option value="{!! $key !!}" {{$examTerm->session_id == $key ? 'selected' : ''}}>{!! $item !!}</option>
@@ -41,7 +41,7 @@ Exam Term Edit
                                             <div class="input-label">
                                                 <label class="branch_Style"><b>Campus</b></label>
                                             </div>
-                                            <select name="branch_id" class="form-control  select2 basic-single " required disabled>
+                                            <select name="branch_id" class="form-control  select2 basic-single " required>
                                                 <option value="" selected disabled>Select Branch</option>
                                                 @foreach($branches as $item)
                                                     <option value="{!! $item->id !!}" {{$examTerm->branch_id == $item->id ? 'selected' : ''}}>{!! $item->name !!}</option>

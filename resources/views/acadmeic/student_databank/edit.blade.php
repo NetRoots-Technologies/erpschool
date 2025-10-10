@@ -87,8 +87,8 @@
                                     <label for="gender"><b>Gender </b></label>
                                     <select class="form-select select2 basic-single" id="gender" name="gender" required>
                                         <option value="">Select Gender</option>
-                                        <option value="male" {!! $studentDatabank->gender == 'male' ? 'selected' : '' !!} >Male</option>
-                                        <option value="female" {!! $studentDatabank->gender == 'male' ? 'selected' : '' !!}>Female</option>
+                                        <option value="male" {{ $studentDatabank->gender == 'male' ? 'selected' : '' }} >Male</option>
+                                        <option value="female" {{ $studentDatabank->gender == 'male' ? 'selected' : '' }}>Female</option>
                                     </select>
                                 </div>
 

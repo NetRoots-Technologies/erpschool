@@ -73,22 +73,20 @@
                                     <h5>Employee Data</h5>
                                     <div class="row mt-2">
                                         <div class="col-lg-4">
-                                            <label for="name"> <b>Applicant Name</b> </label>
-                                            <input name="name" id="name" type="text"
-                                                   onkeydown="return /[a-z]/i.test(event.key)" class="form-control"
-                                                   value="{{$employee->name}}"/>
+                                            <label for="applicant_name"> <b>Applicant Name</b> </label>
+                                            <input name="applicant_name" type="text" id = "applicant_name" class="form-control" value="{{$employee->name}}" required/>
                                         </div>
                                         <div class="col-lg-4">
-                                            <label for="name"> <b>Father Name</b> </label>
-                                            <input name="father_name" id="name"
-                                                   onkeydown="return /[a-z]/i.test(event.key)" type="text"
+                                            <label for="father_name"> <b>Father Name</b> </label>
+                                            <input name="father_name" id="father_name"
+                                                   type="text"
                                                    class="form-control"
                                                    value="{{$employee->father_name}}"/>
                                         </div>
                                         <div class="col-lg-4">
                                             <label for="cnic"> <b>CNIC</b> <span
                                                     class="small">(with (-) )</span></label>
-                                            <input name="cnic_card" id="cnic_card" type="text"
+                                            <input name="cnic_card" type="text"
                                                    class="form-control cnic_card"
                                                    data-inputmask="'mask': '99999-9999999-9'"
                                                    placeholder="XXXXX-XXXXXXX-X" onchange="checkCNIC(this)"
@@ -967,11 +965,11 @@
                                                                  data-id="{{$employeeFamily->id}}">
                                                                 <label for="cnic">CNIC <b>*</b> <span
                                                                         class="small">(with (-) )</span></label>
-                                                                <input name="cnic[]" id="cnic_card"
+                                                                <input name="cnic[]"
                                                                        type="text"
                                                                        data-inputmask="'mask': '99999-9999999-9'"
                                                                        placeholder="XXXXX-XXXXXXX-X"
-                                                                       class="form-control cnic_card"
+                                                                       class="form-control family_cnic_card"
                                                                        onchange="checkCNIC(this)"
                                                                        value="{{$employeeFamily->cnic}}">
                                                             </div>
@@ -1022,10 +1020,10 @@
                                                     <div class="col-md-3">
                                                         <label for="cnic"> CNIC <span
                                                                 class="small">(with (-) )</span></label>
-                                                        <input name="cnic[]" id="cnic_card"
+                                                        <input name="cnic[]"
                                                                data-inputmask="'mask': '99999-9999999-9'"
                                                                placeholder="XXXXX-XXXXXXX-X" type="text"
-                                                               class="form-control cnic_card" onchange="checkCNIC(this)"
+                                                               class="form-control family_cnic_card" onchange="checkCNIC(this)"
                                                         />
                                                     </div>
                                                     <div class="col-md-3">
@@ -1060,6 +1058,17 @@
     </div>
 @stop
 
+@section('css')
+    <style>
+        .form-control:focus {
+    color: #0834a9;
+    background-color: #fff;
+    border-color: #ef0d0d;
+    outline: 0;
+    box-shadow: none;}
+    </style>
+@endsection
+
 @section('js')
     <script src="{{asset('dist/assets/plugins/bootstrap-datepicker/bootstrap-datepicker.js')}}"></script>
     <script>
@@ -1069,8 +1078,7 @@
             multidate: false,
             multidateSeparator: "-",
         });
-    </script>
-    <script>
+    
         var checkCNIC = function (textBox) {
             debugger;
             var regexp = new RegExp('^[0-9+]{5}-[0-9+]{7}-[0-9]{1}$');
@@ -1087,8 +1095,7 @@
                 return true;
             }
         }
-    </script>
-    <script>
+
         $(document).ready(function () {
             let counter = {!! $count ?? 1 !!};
 
@@ -1140,9 +1147,7 @@
                 $(`.col-md-2[data-id="${dataId}"]`).remove();
             });
         });
-    </script>
-    {{--    for branches--}}
-    <script>
+
         $(document).ready(function () {
             $('#companySelect').on('change', function () {
                 loader('show');
@@ -1196,9 +1201,6 @@
             }).change();
         });
 
-    </script>
-    {{--    for work experince--}}
-    <script>
         $(document).ready(function () {
             let workCounter =  {!! $count ??  1!!};
 
@@ -1270,12 +1272,7 @@
            
 
         });
-    </script>
 
-
-    {{--for family--}}
-
-    <script>
         $(document).ready(function () {
             let familyCounter = {!! $count ?? 1 !!};
 
@@ -1317,8 +1314,8 @@
                     <div class="col-md-3" ${dataId}>
                             <label for="cnic"> CNIC <b>*</b> <span
                                          class="small">(with (-) )</span></label>
-                                 <input  name="cnic[]" id="cnic_card" type="text"
-                                      class="form-control cnic_card" data-inputmask="'mask': '99999-9999999-9'"  placeholder="XXXXX-XXXXXXX-X" onchange="checkCNIC(this)" value="{{old('cnic_card')}}"/>
+                                 <input  name="cnic[]" type="text"
+                                      class="form-control family_cnic_card" data-inputmask="'mask': '99999-9999999-9'"  placeholder="XXXXX-XXXXXXX-X" onchange="checkCNIC(this)" value="{{old('cnic_card')}}"/>
 
                     </div>
                     <div class="col-md-3" ${dataId} style="position: relative;">
@@ -1342,9 +1339,7 @@
 
 
         });
-    </script>
 
-    <script>
         var company_id;
         $(document).ready(function () {
             $('#companySelect').on('change', function () {
@@ -1379,9 +1374,7 @@
                 loader('hide');
             }).change();
         });
-    </script>
 
-    <script>
         var department_id;
         $(document).ready(function () {
             $('#departmentDropdown').on('change', function () {
@@ -1414,10 +1407,6 @@
                 loader('hide');
             }).change();
         });
-    </script>
-
-
-    <script>
         $(document).ready(function () {
             $('input[name="applied_before"]').change(function () {
                 if ($(this).val() === 'Yes') {
@@ -1427,9 +1416,6 @@
                 }
             });
         });
-    </script>
-
-    <script>
         $(document).ready(function () {
             $('input[name="job_seeking"]').change(function () {
 
@@ -1441,9 +1427,7 @@
                 }
             });
         });
-    </script>
 
-    <script>
         $(document).ready(function () {
             $('input[name="employed_here"]').change(function () {
                 if ($(this).val() === 'Yes') {
@@ -1453,9 +1437,7 @@
                 }
             });
         });
-    </script>
 
-    <script>
         $(document).ready(function () {
             $('input[name="engaged_in_other_employment"]').change(function () {
                 if ($(this).val() === 'Yes') {
@@ -1465,27 +1447,8 @@
                 }
             });
         });
-    </script>
+ 
 
-    {{--    <script>--}}
-    {{--        $(document).ready(function() {--}}
-    {{--            function calculateGrossSalary() {--}}
-    {{--                var basicSalary = parseFloat($('#basic_salary').val());--}}
-    {{--                var totalAllowance = 0;--}}
-    {{--                $('.allowance_price').each(function() {--}}
-    {{--                    totalAllowance += parseFloat($(this).val() || 0);--}}
-    {{--                });--}}
-    {{--                var grossSalary = basicSalary + totalAllowance;--}}
-    {{--                $('#gross_salary').val(grossSalary.toFixed(2));--}}
-    {{--            }--}}
-
-    {{--            $('#basic_salary, .allowance_price').on('input', calculateGrossSalary);--}}
-
-    {{--            calculateGrossSalary();--}}
-    {{--        });--}}
-    {{--    </script>--}}
-
-    <script>
         $(document).ready(function () {
             $('#gross_salary').on('input', function () {
                 var grossSalary = parseFloat($(this).val());
@@ -1498,9 +1461,6 @@
             });
         });
 
-    </script>
-
-    <script>
         $(document).ready(function () {
             calculateEmployeeWelfare();
             $('#gross_salary').on('input', function () {
@@ -1519,9 +1479,7 @@
                 $('#employeeWelfare').val(welfareAmount);
             }
         });
-    </script>
-
-    <script>
+ 
         $(document).ready(function () {
             calculateProvidentFund();
             $('#gross_salary').on('input', function () {
@@ -1537,9 +1495,7 @@
 
             }
         });
-    </script>
 
-    <script>
         $(document).ready(function () {
             $('.datePicker, #startDate').on('change', function () {
                 loader('show');
@@ -1562,22 +1518,18 @@
             });
         });
 
-    </script>
 
-    <script>
         var CheckNumber = function (input) {
             var inputValue = input.value;
             if (!/^-?\d{0,1}([.,]?\d{0,1})?$/.test(inputValue)) {
                 input.value = inputValue.slice(0, -1);
             }
         }
-    </script>
 
-    <script>
+
+  
         $(".cnic_card").inputmask();
-    </script>
-
-    <script>
+   
         $(document).ready(function () {
             $('#designationSelect').on('change', function () {
                 loader('show');
@@ -1591,15 +1543,10 @@
             });
         });
 
-    </script>
-
-    <script>
         $(document).ready(function () {
             $('#account_number').inputmask('9999 9999 9999 9999');
         });
-    </script>
-
-    <script>
+ 
         $(document).ready(function () {
             $('.working_hour').on('input', function () {
                 var workingHour = $(this).val();
@@ -1614,8 +1561,7 @@
             });
         });
 
-    </script>
-    <script>
+  
         $(document).ready(function () {
             function isUnderAge(dob) {
                 var currentDate = new Date();
@@ -1655,9 +1601,6 @@
 
 
 
-    </script>
-
-    <script>
         $(document).ready(function () {
             $('.branch_select').on('change', function () {
                 loader('show');
@@ -1695,9 +1638,7 @@
                 loader('hide');
             });
         });
-    </script>
-
-    <script>
+   
 function waitAndSelect($select, value, triggerChange = true, maxTries = 10) {
     if (maxTries <= 0) return;
     if ($select.find(`option[value="${value}"]`).length) {
@@ -1708,7 +1649,7 @@ function waitAndSelect($select, value, triggerChange = true, maxTries = 10) {
     }
 }
 
-$(document).ready(function () {
+    $(document).ready(function () {
     // Load branches when company changes
     $(document).on('change', '.company-select', function () {
         loader('show');

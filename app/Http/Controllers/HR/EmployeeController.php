@@ -190,19 +190,19 @@ class EmployeeController extends Controller
         $user = User::where('employee_id', $id)->first();
         if ($user) {
             $validated = $request->validate([
-                'name' => 'required',
+                'applicant_name' => 'required',
                 'email_address' => "required|email|unique:users,email,$user->id",
             ]);
         }
-        try {
+        // try {
 
             $this->EmployeeServices->update($request, $id);
 
             return redirect()->route('hr.employee.index')
                 ->with('success', 'Employee updated successfully');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', $e->getMessage());
-        }
+        // } catch (\Exception $e) {
+        //     return redirect()->back()->with('error', $e->getMessage());
+        // }
     }
 
     /**

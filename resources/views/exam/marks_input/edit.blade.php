@@ -265,7 +265,7 @@
                         }
                     })
                 }).change();
-                var subjectId = {{ $marksInput->subject_id }};
+                var subjectId = {{ $marksInput->course_id }};
                 $('.select_class').on('change', function () {
                     var class_id = $(this).val();
                     $.ajax({

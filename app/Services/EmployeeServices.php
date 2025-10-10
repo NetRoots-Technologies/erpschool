@@ -338,7 +338,6 @@ class EmployeeServices
                     'dob' => $request->input('family_dob')[$key],
                     'cnic' => $request->input('cnic')[$key],
                     'workstation' => $request->input('workplace')[$key],
-
                 ]);
             }
         }
@@ -522,7 +521,7 @@ class EmployeeServices
         }
 
         $employee->update([
-            'name' => $request->input('name'),
+            'name' => $request->input('applicant_name'),
             // 'employee_profile' => $employee_profile,
             'father_name' => $request->input('father_name'),
             'cnic_card' => $request->input('cnic_card'),
@@ -610,13 +609,15 @@ class EmployeeServices
 
         $employee->employeeFamily()->delete();
 
+       
+
         if ($request->has('sr_no')) {
             foreach ($request->input('sr_no') as $key => $srNo) {
 
                 $familyData = [
                     'hrm_employee_id' => $employee->id,
                     'sr_no' => $srNo,
-                    'name' => $request->input('name')[$key],
+                    'name' => $request->input('applicant_name')[$key],
                     'relation' => $request->input('relation')[$key],
                     'gender' => $request->input('gender')[$key],
                     'dob' => $request->input('family_dob')[$key],

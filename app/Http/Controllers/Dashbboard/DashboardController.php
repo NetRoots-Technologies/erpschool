@@ -31,8 +31,6 @@ class DashboardController extends Controller
 
     public function index()
     {
-
-      
      if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }

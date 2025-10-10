@@ -96,7 +96,7 @@ class MarksInputController extends Controller
         $sessions = UserHelper::session_name();
         $companies = Company::where('id', $marksInput->company_id)->get();
         $branches = Branch::where('status', 1)->get();
-        //dd($marksInput);
+        // dd($marksInput);
         return view('exam.marks_input.edit', compact('marksInput', 'sessions', 'branches', 'companies'));
     }
 
