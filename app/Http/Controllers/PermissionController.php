@@ -121,7 +121,9 @@ class PermissionController extends Controller
             return abort(503);
         }
         $Permission = $this->PermissionServices->update($request, $id);
-        return 'done';
+        // return 'done';
+         return redirect()->route('permissions.index')
+        ->with('success', 'Permission updated successfully.');
     }
 
     /**
