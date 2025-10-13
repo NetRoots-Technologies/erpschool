@@ -103,11 +103,32 @@ class BillController extends Controller
 
     private function createJournalEntry($bill)
     {
-        // Debit: Expense account, Credit: Vendor payable
+        // Get or create expense ledger
         $expenseLedger = AccountLedger::where('linked_module', 'expense')->first();
         
         if (!$expenseLedger) {
-            throw new \Exception('Expense ledger not found. Please create an expense account ledger first.');
+            // Try to find any expense ledger
+            $expenseLedger = AccountLedger::whereHas('accountGroup', function($q) {
+                $q->where('type', 'expense');
+            })->first();
+            
+            // If still not found, create one
+            if (!$expenseLedger) {
+                $expenseLedger = AccountLedger::create([
+                    'name' => 'General Expenses',
+                    'code' => 'EXP-GEN-' . time(),
+                    'description' => 'General business expenses',
+                    'account_group_id' => 16, // Expenses
+                    'opening_balance' => 0,
+                    'opening_balance_type' => 'debit',
+                    'current_balance' => 0,
+                    'current_balance_type' => 'debit',
+                    'linked_module' => 'expense',
+                    'is_active' => true,
+                    'created_by' => auth()->id() ?? 1
+                ]);
+                \Log::info("Expense ledger auto-created for bill");
+            }
         }
         
         $entry = JournalEntry::create([

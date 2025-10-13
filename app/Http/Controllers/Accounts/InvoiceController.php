@@ -103,11 +103,32 @@ class InvoiceController extends Controller
 
     private function createJournalEntry($invoice)
     {
-        // Debit: Customer receivable, Credit: Revenue
+        // Get or create revenue ledger
         $revenueLedger = AccountLedger::where('linked_module', 'revenue')->first();
         
         if (!$revenueLedger) {
-            throw new \Exception('Revenue ledger not found. Please create a revenue account ledger first.');
+            // Try to find any revenue ledger
+            $revenueLedger = AccountLedger::whereHas('accountGroup', function($q) {
+                $q->where('type', 'revenue');
+            })->first();
+            
+            // If still not found, create one
+            if (!$revenueLedger) {
+                $revenueLedger = AccountLedger::create([
+                    'name' => 'General Revenue',
+                    'code' => 'REV-GEN-' . time(),
+                    'description' => 'General business revenue',
+                    'account_group_id' => 12, // Revenue
+                    'opening_balance' => 0,
+                    'opening_balance_type' => 'credit',
+                    'current_balance' => 0,
+                    'current_balance_type' => 'credit',
+                    'linked_module' => 'revenue',
+                    'is_active' => true,
+                    'created_by' => auth()->id() ?? 1
+                ]);
+                \Log::info("Revenue ledger auto-created for invoice");
+            }
         }
         
         $entry = JournalEntry::create([
