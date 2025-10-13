@@ -4,7 +4,11 @@ namespace App\Providers;
 
 
 use App\Models\Admin\Vendor;
+use App\Models\Accounts\Vendor as AccountVendor;
+use App\Models\Accounts\Customer;
 use App\Observers\VendorObserver;
+use App\Observers\AccountVendorObserver;
+use App\Observers\AccountCustomerObserver;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Schema;
 
@@ -31,6 +35,7 @@ class AppServiceProvider extends ServiceProvider
         ini_set('memory_limit', '1024M');
         ini_set('max_input_vars', '5000');
         Vendor::observe(VendorObserver::class);
-
+        AccountVendor::observe(AccountVendorObserver::class);
+        Customer::observe(AccountCustomerObserver::class);
     }
 }

@@ -56,6 +56,29 @@ class BillController extends Controller
 
             // Load the vendor relationship with accountLedger
             $bill->load('vendor.accountLedger');
+            
+            // Ensure vendor has an account ledger
+            if (!$bill->vendor->accountLedger) {
+                $vendorLedger = AccountLedger::create([
+                    'name' => 'Vendor - ' . $bill->vendor->name,
+                    'code' => 'VEN-' . $bill->vendor->id . '-' . time(),
+                    'description' => 'Vendor payable account',
+                    'account_group_id' => 7, // Accounts Payable
+                    'opening_balance' => 0,
+                    'opening_balance_type' => 'credit',
+                    'current_balance' => 0,
+                    'current_balance_type' => 'credit',
+                    'is_active' => true,
+                    'created_by' => auth()->id() ?? 1
+                ]);
+                
+                // Update vendor with ledger
+                $bill->vendor->account_ledger_id = $vendorLedger->id;
+                $bill->vendor->save();
+                
+                // Reload the relationship
+                $bill->load('vendor.accountLedger');
+            }
 
             // Create journal entry
             $this->createJournalEntry($bill);
@@ -155,9 +178,15 @@ class BillController extends Controller
         ]);
 
         // Credit vendor payable
+        $vendorLedger = $bill->vendor->accountLedger;
+        if (!$vendorLedger) {
+            // This should not happen as we create it in store method, but just in case
+            throw new \Exception('Vendor account ledger not found. Please ensure vendor has an account ledger.');
+        }
+        
         JournalEntryLine::create([
             'journal_entry_id' => $entry->id,
-            'account_ledger_id' => $bill->vendor->accountLedger->id,
+            'account_ledger_id' => $vendorLedger->id,
             'debit' => 0,
             'credit' => $bill->total_amount,
         ]);
@@ -194,9 +223,14 @@ class BillController extends Controller
         ]);
 
         // Debit vendor payable (reduce liability)
+        $vendorLedger = $bill->vendor->accountLedger;
+        if (!$vendorLedger) {
+            throw new \Exception('Vendor account ledger not found for payment entry.');
+        }
+        
         JournalEntryLine::create([
             'journal_entry_id' => $entry->id,
-            'account_ledger_id' => $bill->vendor->accountLedger->id,
+            'account_ledger_id' => $vendorLedger->id,
             'debit' => $amount,
             'credit' => 0,
         ]);

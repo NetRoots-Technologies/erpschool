@@ -56,6 +56,29 @@ class InvoiceController extends Controller
 
             // Load the customer relationship with accountLedger
             $invoice->load('customer.accountLedger');
+            
+            // Ensure customer has an account ledger
+            if (!$invoice->customer->accountLedger) {
+                $customerLedger = AccountLedger::create([
+                    'name' => 'Customer - ' . $invoice->customer->name,
+                    'code' => 'CUST-' . $invoice->customer->id . '-' . time(),
+                    'description' => 'Customer receivable account',
+                    'account_group_id' => 4, // Accounts Receivable
+                    'opening_balance' => 0,
+                    'opening_balance_type' => 'debit',
+                    'current_balance' => 0,
+                    'current_balance_type' => 'debit',
+                    'is_active' => true,
+                    'created_by' => auth()->id() ?? 1
+                ]);
+                
+                // Update customer with ledger
+                $invoice->customer->account_ledger_id = $customerLedger->id;
+                $invoice->customer->save();
+                
+                // Reload the relationship
+                $invoice->load('customer.accountLedger');
+            }
 
             // Create journal entry
             $this->createJournalEntry($invoice);
@@ -147,9 +170,14 @@ class InvoiceController extends Controller
         ]);
 
         // Debit customer receivable
+        $customerLedger = $invoice->customer->accountLedger;
+        if (!$customerLedger) {
+            throw new \Exception('Customer account ledger not found. Please ensure customer has an account ledger.');
+        }
+        
         JournalEntryLine::create([
             'journal_entry_id' => $entry->id,
-            'account_ledger_id' => $invoice->customer->accountLedger->id,
+            'account_ledger_id' => $customerLedger->id,
             'debit' => $invoice->total_amount,
             'credit' => 0,
         ]);
@@ -166,7 +194,7 @@ class InvoiceController extends Controller
         $invoice->save();
 
         // Update ledger balances
-        $invoice->customer->accountLedger->updateBalance($invoice->total_amount, 0);
+        $customerLedger->updateBalance($invoice->total_amount, 0);
         $revenueLedger->updateBalance(0, $invoice->total_amount);
     }
 
@@ -202,15 +230,20 @@ class InvoiceController extends Controller
         ]);
 
         // Credit customer receivable
+        $customerLedger = $invoice->customer->accountLedger;
+        if (!$customerLedger) {
+            throw new \Exception('Customer account ledger not found for payment entry.');
+        }
+        
         JournalEntryLine::create([
             'journal_entry_id' => $entry->id,
-            'account_ledger_id' => $invoice->customer->accountLedger->id,
+            'account_ledger_id' => $customerLedger->id,
             'debit' => 0,
             'credit' => $amount,
         ]);
 
         // Update ledger balances
         $cashLedger->updateBalance($amount, 0);
-        $invoice->customer->accountLedger->updateBalance(0, $amount);
+        $customerLedger->updateBalance(0, $amount);
     }
 }
