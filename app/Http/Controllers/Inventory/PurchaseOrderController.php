@@ -380,27 +380,31 @@ class PurchaseOrderController extends Controller
 
                     $entry = $this->ledgerService->createEntry($data);
 
-                    // Debit: Inventory (Asset increases)
-                    $this->ledgerService->createEntryItems([
-                        "entry_type_id" => 1,
-                        "entry_id" => $entry->id,
-                        "ledger_id" => $inventoryLedger->id,
-                        "amount" => $purchaseOrder->total_amount,
-                        "balanceType" => 'd', // Debit
-                        "narration" => $data["narration"],
-                    ]);
+                    if ($entry) {
+                        // Debit: Inventory (Asset increases)
+                        $this->ledgerService->createEntryItems([
+                            "entry_type_id" => 1,
+                            "entry_id" => $entry->id,
+                            "ledger_id" => $inventoryLedger->id,
+                            "amount" => $purchaseOrder->total_amount,
+                            "balanceType" => 'd', // Debit
+                            "narration" => $data["narration"],
+                        ]);
 
-                    // Credit: Supplier Payable (Liability increases)
-                    $this->ledgerService->createEntryItems([
-                        "entry_type_id" => 1,
-                        "entry_id" => $entry->id,
-                        "ledger_id" => $supplierLedger->id,
-                        "amount" => $purchaseOrder->total_amount,
-                        "balanceType" => 'c', // Credit
-                        "narration" => $data["narration"],
-                    ]);
+                        // Credit: Supplier Payable (Liability increases)
+                        $this->ledgerService->createEntryItems([
+                            "entry_type_id" => 1,
+                            "entry_id" => $entry->id,
+                            "ledger_id" => $supplierLedger->id,
+                            "amount" => $purchaseOrder->total_amount,
+                            "balanceType" => 'c', // Credit
+                            "narration" => $data["narration"],
+                        ]);
 
-                    \Log::info("Accounting entry created for Purchase Order #" . $purchaseOrder->id);
+                        \Log::info("Accounting entry created for Purchase Order #" . $purchaseOrder->id);
+                    } else {
+                        \Log::error("Failed to create journal entry for Purchase Order #" . $purchaseOrder->id);
+                    }
                 }
             } catch (\Exception $e) {
                 \Log::error('Purchase order accounting entry failed: ' . $e->getMessage());
