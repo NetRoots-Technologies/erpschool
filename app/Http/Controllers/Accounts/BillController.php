@@ -50,9 +50,12 @@ class BillController extends Controller
                 'balance' => $request->total_amount,
                 'status' => 'pending',
                 'notes' => $request->notes,
-                'branch_id' => auth()->user()->branch_id,
+                'branch_id' => auth()->user()->branch_id ?? null,
                 'created_by' => auth()->id(),
             ]);
+
+            // Load the vendor relationship with accountLedger
+            $bill->load('vendor.accountLedger');
 
             // Create journal entry
             $this->createJournalEntry($bill);
@@ -78,7 +81,7 @@ class BillController extends Controller
             'payment_date' => 'required|date',
         ]);
 
-        $bill = VendorBill::findOrFail($id);
+        $bill = VendorBill::with('vendor.accountLedger')->findOrFail($id);
 
         DB::beginTransaction();
         try {
@@ -102,6 +105,10 @@ class BillController extends Controller
     {
         // Debit: Expense account, Credit: Vendor payable
         $expenseLedger = AccountLedger::where('linked_module', 'expense')->first();
+        
+        if (!$expenseLedger) {
+            throw new \Exception('Expense ledger not found. Please create an expense account ledger first.');
+        }
         
         $entry = JournalEntry::create([
             'entry_number' => JournalEntry::generateNumber(),
@@ -129,7 +136,7 @@ class BillController extends Controller
         // Credit vendor payable
         JournalEntryLine::create([
             'journal_entry_id' => $entry->id,
-            'account_ledger_id' => $bill->vendor->account_ledger_id,
+            'account_ledger_id' => $bill->vendor->accountLedger->id,
             'debit' => 0,
             'credit' => $bill->total_amount,
         ]);
@@ -145,6 +152,10 @@ class BillController extends Controller
     private function createPaymentEntry($bill, $amount, $date)
     {
         $cashLedger = AccountLedger::where('name', 'LIKE', '%Cash%')->first();
+        
+        if (!$cashLedger) {
+            throw new \Exception('Cash ledger not found. Please create a cash account ledger first.');
+        }
         
         $entry = JournalEntry::create([
             'entry_number' => JournalEntry::generateNumber(),
@@ -164,7 +175,7 @@ class BillController extends Controller
         // Debit vendor payable (reduce liability)
         JournalEntryLine::create([
             'journal_entry_id' => $entry->id,
-            'account_ledger_id' => $bill->vendor->account_ledger_id,
+            'account_ledger_id' => $bill->vendor->accountLedger->id,
             'debit' => $amount,
             'credit' => 0,
         ]);
