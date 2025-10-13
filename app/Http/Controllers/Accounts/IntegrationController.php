@@ -26,15 +26,41 @@ class IntegrationController extends Controller
 
         DB::beginTransaction();
         try {
-            // Get ledgers
+            // Get or create ledgers
             $salaryExpenseLedger = AccountLedger::where('name', 'LIKE', '%Salary%')
                 ->where('linked_module', 'expense')
                 ->first();
             
+            if (!$salaryExpenseLedger) {
+                $salaryExpenseLedger = AccountLedger::create([
+                    'name' => 'Salary Expense',
+                    'code' => 'EXP-SAL-001',
+                    'description' => 'Employee salaries and wages',
+                    'account_group_id' => 17, // Salary Expense
+                    'opening_balance' => 0,
+                    'opening_balance_type' => 'debit',
+                    'current_balance' => 0,
+                    'current_balance_type' => 'debit',
+                    'linked_module' => 'expense',
+                    'is_active' => true,
+                    'created_by' => auth()->id() ?? 1
+                ]);
+            }
+            
             $cashLedger = AccountLedger::where('name', 'LIKE', '%Cash%')->first();
-
-            if (!$salaryExpenseLedger || !$cashLedger) {
-                throw new \Exception('Required ledgers not found. Please setup chart of accounts.');
+            if (!$cashLedger) {
+                $cashLedger = AccountLedger::create([
+                    'name' => 'Cash Account',
+                    'code' => 'AST-CASH-001',
+                    'description' => 'Cash in hand',
+                    'account_group_id' => 2, // Current Assets
+                    'opening_balance' => 0,
+                    'opening_balance_type' => 'debit',
+                    'current_balance' => 0,
+                    'current_balance_type' => 'debit',
+                    'is_active' => true,
+                    'created_by' => auth()->id() ?? 1
+                ]);
             }
 
             // Create journal entry
@@ -98,21 +124,55 @@ class IntegrationController extends Controller
 
         DB::beginTransaction();
         try {
-            // Get ledgers
+            // Get or create ledgers
             $inventoryLedger = AccountLedger::where('name', 'LIKE', '%Inventory%')
                 ->whereHas('accountGroup', function($q) {
                     $q->where('type', 'asset');
                 })
                 ->first();
             
+            if (!$inventoryLedger) {
+                $inventoryLedger = AccountLedger::create([
+                    'name' => 'Inventory',
+                    'code' => 'AST-INV-001',
+                    'description' => 'Inventory and stock items',
+                    'account_group_id' => 2, // Current Assets
+                    'opening_balance' => 0,
+                    'opening_balance_type' => 'debit',
+                    'current_balance' => 0,
+                    'current_balance_type' => 'debit',
+                    'linked_module' => 'inventory',
+                    'is_active' => true,
+                    'created_by' => auth()->id() ?? 1
+                ]);
+            }
+            
             $payableLedger = AccountLedger::where('name', 'LIKE', '%Payable%')
                 ->whereHas('accountGroup', function($q) {
                     $q->where('type', 'liability');
                 })
                 ->first();
-
-            if (!$inventoryLedger || !$payableLedger) {
-                throw new \Exception('Required ledgers not found.');
+            
+            // If no payable ledger found, use any liability ledger or create one
+            if (!$payableLedger) {
+                $payableLedger = AccountLedger::whereHas('accountGroup', function($q) {
+                    $q->where('type', 'liability');
+                })->first();
+                
+                if (!$payableLedger) {
+                    $payableLedger = AccountLedger::create([
+                        'name' => 'Accounts Payable',
+                        'code' => 'LIA-PAY-001',
+                        'description' => 'Amounts owed to suppliers and vendors',
+                        'account_group_id' => 7, // Accounts Payable
+                        'opening_balance' => 0,
+                        'opening_balance_type' => 'credit',
+                        'current_balance' => 0,
+                        'current_balance_type' => 'credit',
+                        'is_active' => true,
+                        'created_by' => auth()->id() ?? 1
+                    ]);
+                }
             }
 
             // Create journal entry
@@ -174,16 +234,43 @@ class IntegrationController extends Controller
 
         DB::beginTransaction();
         try {
-            // Get ledgers
+            // Get or create ledgers
             $cashLedger = AccountLedger::where('name', 'LIKE', '%Cash%')->first();
-            $feeRevenueLedger = AccountLedger::where('name', 'LIKE', '%Fee%')
+            if (!$cashLedger) {
+                $cashLedger = AccountLedger::create([
+                    'name' => 'Cash Account',
+                    'code' => 'AST-CASH-001',
+                    'description' => 'Cash in hand',
+                    'account_group_id' => 2, // Current Assets
+                    'opening_balance' => 0,
+                    'opening_balance_type' => 'debit',
+                    'current_balance' => 0,
+                    'current_balance_type' => 'debit',
+                    'is_active' => true,
+                    'created_by' => auth()->id() ?? 1
+                ]);
+            }
+
+            $feeRevenueLedger = AccountLedger::where('name', 'LIKE', '%revenue%')
                 ->whereHas('accountGroup', function($q) {
                     $q->where('type', 'revenue');
                 })
                 ->first();
-
-            if (!$cashLedger || !$feeRevenueLedger) {
-                throw new \Exception('Required ledgers not found.');
+            
+            if (!$feeRevenueLedger) {
+                $feeRevenueLedger = AccountLedger::create([
+                    'name' => 'Fee Revenue',
+                    'code' => 'REV-FEE-001',
+                    'description' => 'Student fees and tuition revenue',
+                    'account_group_id' => 12, // Revenue
+                    'opening_balance' => 0,
+                    'opening_balance_type' => 'credit',
+                    'current_balance' => 0,
+                    'current_balance_type' => 'credit',
+                    'linked_module' => 'revenue',
+                    'is_active' => true,
+                    'created_by' => auth()->id() ?? 1
+                ]);
             }
 
             // Create journal entry
@@ -246,7 +333,7 @@ class IntegrationController extends Controller
 
         DB::beginTransaction();
         try {
-            // Get ledgers
+            // Get or create ledgers
             $fleetExpenseLedger = AccountLedger::where('name', 'LIKE', '%Fleet%')
                 ->orWhere('name', 'LIKE', '%Transport%')
                 ->whereHas('accountGroup', function($q) {
@@ -254,10 +341,35 @@ class IntegrationController extends Controller
                 })
                 ->first();
             
+            if (!$fleetExpenseLedger) {
+                $fleetExpenseLedger = AccountLedger::create([
+                    'name' => 'Transport Expense',
+                    'code' => 'EXP-TRAN-001',
+                    'description' => 'Vehicle fuel and maintenance expenses',
+                    'account_group_id' => 21, // Transport Expense
+                    'opening_balance' => 0,
+                    'opening_balance_type' => 'debit',
+                    'current_balance' => 0,
+                    'current_balance_type' => 'debit',
+                    'is_active' => true,
+                    'created_by' => auth()->id() ?? 1
+                ]);
+            }
+            
             $cashLedger = AccountLedger::where('name', 'LIKE', '%Cash%')->first();
-
-            if (!$fleetExpenseLedger || !$cashLedger) {
-                throw new \Exception('Required ledgers not found.');
+            if (!$cashLedger) {
+                $cashLedger = AccountLedger::create([
+                    'name' => 'Cash Account',
+                    'code' => 'AST-CASH-001',
+                    'description' => 'Cash in hand',
+                    'account_group_id' => 2, // Current Assets
+                    'opening_balance' => 0,
+                    'opening_balance_type' => 'debit',
+                    'current_balance' => 0,
+                    'current_balance_type' => 'debit',
+                    'is_active' => true,
+                    'created_by' => auth()->id() ?? 1
+                ]);
             }
 
             // Create journal entry
