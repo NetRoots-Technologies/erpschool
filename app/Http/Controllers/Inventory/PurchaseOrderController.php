@@ -315,6 +315,63 @@ class PurchaseOrderController extends Controller
                 $inventry->type           = $purchaseOrder->type;
                 $inventry->save();
             }
+
+            // ✅ ACCOUNTING ENTRY - Create Journal Entry for Purchase
+            try {
+                // Get supplier ledger
+                $supplierLedger = AccountLedger::where('linked_module', 'vendor')
+                    ->where('linked_id', $purchaseOrder->supplier_id)
+                    ->first();
+
+                // Get inventory ledger
+                $inventoryLedger = AccountLedger::where('linked_module', 'inventory')
+                    ->orWhere('name', 'LIKE', '%Inventory%')
+                    ->whereHas('accountGroup', function($q) {
+                        $q->where('type', 'asset');
+                    })
+                    ->first();
+
+                if (!$supplierLedger || !$inventoryLedger) {
+                    \Log::warning('Purchase order accounting: Required ledgers not found for PO #' . $purchaseOrder->id);
+                } else {
+                    $supplier = Supplier::find($purchaseOrder->supplier_id);
+                    
+                    // Create journal entry
+                    $data = [
+                        "amount" => $purchaseOrder->total_amount,
+                        "narration" => "Purchase Order Completed - PO #" . $purchaseOrder->id . " from " . ($supplier->name ?? 'Supplier'),
+                        "branch_id" => $purchaseOrder->branch_id,
+                        "entry_type_id" => 1, // Journal Entry
+                    ];
+
+                    $entry = $this->ledgerService->createEntry($data);
+
+                    // Debit: Inventory (Asset increases)
+                    $this->ledgerService->createEntryItems([
+                        "entry_type_id" => 1,
+                        "entry_id" => $entry->id,
+                        "ledger_id" => $inventoryLedger->id,
+                        "amount" => $purchaseOrder->total_amount,
+                        "balanceType" => 'd', // Debit
+                        "narration" => $data["narration"],
+                    ]);
+
+                    // Credit: Supplier Payable (Liability increases)
+                    $this->ledgerService->createEntryItems([
+                        "entry_type_id" => 1,
+                        "entry_id" => $entry->id,
+                        "ledger_id" => $supplierLedger->id,
+                        "amount" => $purchaseOrder->total_amount,
+                        "balanceType" => 'c', // Credit
+                        "narration" => $data["narration"],
+                    ]);
+
+                    \Log::info("Accounting entry created for Purchase Order #" . $purchaseOrder->id);
+                }
+            } catch (\Exception $e) {
+                \Log::error('Purchase order accounting entry failed: ' . $e->getMessage());
+                // Don't fail the whole transaction, just log the error
+            }
         }
 
         DB::commit();
