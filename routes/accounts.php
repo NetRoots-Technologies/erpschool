@@ -18,6 +18,16 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'accounts', 'as' => 'account
     Route::get('/dashboard', [\App\Http\Controllers\Accounts\DashboardController::class, 'index'])->name('dashboard');
     
     // M1: Chart of Accounts & Journal Entries
+    // Account Groups Management
+    Route::prefix('groups')->name('groups.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Accounts\AccountGroupController::class, 'index'])->name('index');
+        Route::get('/create', [\App\Http\Controllers\Accounts\AccountGroupController::class, 'create'])->name('create');
+        Route::post('/store', [\App\Http\Controllers\Accounts\AccountGroupController::class, 'store'])->name('store');
+        Route::get('/{id}/edit', [\App\Http\Controllers\Accounts\AccountGroupController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [\App\Http\Controllers\Accounts\AccountGroupController::class, 'update'])->name('update');
+        Route::delete('/{id}', [\App\Http\Controllers\Accounts\AccountGroupController::class, 'destroy'])->name('destroy');
+    });
+    
     Route::prefix('chart-of-accounts')->name('coa.')->group(function () {
         Route::get('/', [\App\Http\Controllers\Accounts\ChartOfAccountsController::class, 'index'])->name('index');
         Route::get('/create', [\App\Http\Controllers\Accounts\ChartOfAccountsController::class, 'create'])->name('create');

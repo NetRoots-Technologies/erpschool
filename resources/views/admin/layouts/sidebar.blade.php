@@ -702,7 +702,9 @@
                         <li><a class="slide-item {{ request()->is('accounts/dashboard') ? 'active' : '' }}"
                                 href="{{ route('accounts.dashboard') }}">Dashboard</a></li>
                         
-                        {{-- Chart of Accounts & Journal --}}
+                        {{-- Account Groups & Chart of Accounts --}}
+                        <li><a class="slide-item {{ request()->is('accounts/groups*') ? 'active' : '' }}"
+                                href="{{ route('accounts.groups.index') }}">Account Groups</a></li>
                         <li><a class="slide-item {{ request()->is('accounts/chart-of-accounts*') ? 'active' : '' }}"
                                 href="{{ route('accounts.coa.index') }}">Chart of Accounts</a></li>
                         <li><a class="slide-item {{ request()->is('accounts/journal-entries*') ? 'active' : '' }}"

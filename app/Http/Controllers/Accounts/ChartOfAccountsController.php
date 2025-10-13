@@ -12,14 +12,36 @@ class ChartOfAccountsController extends Controller
 {
     public function index()
     {
-        $groups = AccountGroup::with(['children', 'ledgers'])->whereNull('parent_id')->get();
-        return view('accounts.chart_of_accounts.index', compact('groups'));
+        $groups = AccountGroup::with(['ledgers' => function($query) {
+            $query->orderBy('code');
+        }])
+        ->orderBy('name')
+        ->get();
+
+        // Add summary statistics
+        $stats = [
+            'total_groups' => $groups->count(),
+            'total_ledgers' => $groups->sum(function($group) {
+                return $group->ledgers->count();
+            }),
+            'active_ledgers' => $groups->sum(function($group) {
+                return $group->ledgers->where('is_active', true)->count();
+            }),
+        ];
+
+        return view('accounts.chart_of_accounts.index', compact('groups', 'stats'));
     }
 
     public function tree()
     {
+        $groups = AccountGroup::with(['ledgers' => function($query) {
+            $query->orderBy('code');
+        }])
+        ->orderBy('name')
+        ->get();
+        
         $tree = $this->buildTree();
-        return view('accounts.chart_of_accounts.tree', compact('tree'));
+        return view('accounts.chart_of_accounts.tree', compact('groups', 'tree'));
     }
 
     public function create()
