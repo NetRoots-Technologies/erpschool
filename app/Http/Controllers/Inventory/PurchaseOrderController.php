@@ -318,22 +318,56 @@ class PurchaseOrderController extends Controller
 
             // ✅ ACCOUNTING ENTRY - Create Journal Entry for Purchase
             try {
-                // Get supplier ledger
+                // Get or create supplier ledger
                 $supplierLedger = AccountLedger::where('linked_module', 'vendor')
                     ->where('linked_id', $purchaseOrder->supplier_id)
                     ->first();
+                
+                if (!$supplierLedger) {
+                    $supplier = Supplier::find($purchaseOrder->supplier_id);
+                    $supplierLedger = AccountLedger::create([
+                        'name' => 'Supplier - ' . ($supplier->name ?? 'Unknown'),
+                        'code' => 'SUP-' . $purchaseOrder->supplier_id . '-' . time(),
+                        'description' => 'Supplier payable account',
+                        'account_group_id' => 7, // Accounts Payable
+                        'opening_balance' => 0,
+                        'opening_balance_type' => 'credit',
+                        'current_balance' => 0,
+                        'current_balance_type' => 'credit',
+                        'linked_module' => 'vendor',
+                        'linked_id' => $purchaseOrder->supplier_id,
+                        'is_active' => true,
+                        'created_by' => 1
+                    ]);
+                    \Log::info("Supplier ledger auto-created for Supplier ID: " . $purchaseOrder->supplier_id);
+                }
 
-                // Get inventory ledger
+                // Get or create inventory ledger
                 $inventoryLedger = AccountLedger::where('linked_module', 'inventory')
                     ->orWhere('name', 'LIKE', '%Inventory%')
                     ->whereHas('accountGroup', function($q) {
                         $q->where('type', 'asset');
                     })
                     ->first();
+                
+                if (!$inventoryLedger) {
+                    $inventoryLedger = AccountLedger::create([
+                        'name' => 'Inventory',
+                        'code' => 'AST-INV-001',
+                        'description' => 'Inventory and stock items',
+                        'account_group_id' => 2, // Current Assets
+                        'opening_balance' => 0,
+                        'opening_balance_type' => 'debit',
+                        'current_balance' => 0,
+                        'current_balance_type' => 'debit',
+                        'linked_module' => 'inventory',
+                        'is_active' => true,
+                        'created_by' => 1
+                    ]);
+                    \Log::info("Inventory ledger auto-created");
+                }
 
-                if (!$supplierLedger || !$inventoryLedger) {
-                    \Log::warning('Purchase order accounting: Required ledgers not found for PO #' . $purchaseOrder->id);
-                } else {
+                if ($supplierLedger && $inventoryLedger) {
                     $supplier = Supplier::find($purchaseOrder->supplier_id);
                     
                     // Create journal entry
