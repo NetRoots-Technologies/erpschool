@@ -44,7 +44,7 @@ Branches
         {{--@endif--}}
 
         {{-- Download Sample Bulk File --}}
-        <div class="col-auto p-0">
+        <div class="col-auto p-0" style="display: none;">
             <a href="{{ route('academic.branch.export-file') }}" class="btn btn-warning btn-md">
                 <b>Download Sample Bulk File</b>
             </a>
@@ -52,7 +52,7 @@ Branches
 
 
         {{-- Import Sample Bulk File --}}
-        <div class="col-auto">
+        <div class="col-auto" style="display: none;">
             <a href="#" class="btn btn-success btn-md" data-bs-toggle="modal" data-bs-target="#importModal">
                 <b>Import Data</b>
             </a>

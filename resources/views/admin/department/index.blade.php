@@ -27,14 +27,14 @@ Departments
         {{-- Add Department --}}
      @if (Gate::allows('Departments-create'))
 
-        <div class="col-auto p-0">
+        <div class="col-auto p-0" style="display: none;">
             <a class="btn btn-primary btn-md text-white" id="createBtn" data-toggle="modal"
                 data-target="#createModal1"><b>Create
                     Department</b></a>
               </div>
 
         {{-- Download Sample Bulk File --}}
-        <div class="col-auto p-0">
+        <div class="col-auto p-0" style="display: none;">
             <a href="{{ route('academic.department.export-file') }}" class="btn btn-warning btn-md">
                 <b>Download Sample Bulk File</b>
             </a>

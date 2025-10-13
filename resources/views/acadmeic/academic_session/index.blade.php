@@ -536,9 +536,9 @@ Academic
                     return false;
                 }
                 $.ajax({
-                    type: "put",
+                    type: "post",
                     "url": url + '/' + id,
-                    data: $('#editform').serialize(),
+                    data: $('#editform').serialize()  + '&_method=PUT',
                     success: function (response) {
                         $('#myModal').modal('hide');
                         tableData.ajax.reload();
@@ -574,6 +574,8 @@ Academic
                             type: 'DELETE',
                             data: {
                                 "_token": "{{ csrf_token() }}",
+                                _method: 'DELETE' 
+
                             },
                             success: function (result) {
                                 tableData.ajax.reload();
