@@ -343,17 +343,20 @@ class PurchaseOrderController extends Controller
                 }
 
                 // Get or create inventory ledger
-                $inventoryLedger = AccountLedger::where('linked_module', 'inventory')
-                    ->orWhere('name', 'LIKE', '%Inventory%')
-                    ->whereHas('accountGroup', function($q) {
-                        $q->where('type', 'asset');
-                    })
-                    ->first();
+                $inventoryLedger = AccountLedger::where('linked_module', 'inventory')->first();
+                
+                if (!$inventoryLedger) {
+                    $inventoryLedger = AccountLedger::where('name', 'LIKE', '%Inventory%')
+                        ->whereHas('accountGroup', function($q) {
+                            $q->where('type', 'asset');
+                        })
+                        ->first();
+                }
                 
                 if (!$inventoryLedger) {
                     $inventoryLedger = AccountLedger::create([
                         'name' => 'Inventory',
-                        'code' => 'AST-INV-001',
+                        'code' => 'AST-INV-' . time(),
                         'description' => 'Inventory and stock items',
                         'account_group_id' => 2, // Current Assets
                         'opening_balance' => 0,
@@ -364,7 +367,7 @@ class PurchaseOrderController extends Controller
                         'is_active' => true,
                         'created_by' => 1
                     ]);
-                    \Log::info("Inventory ledger auto-created");
+                    \Log::info("Inventory ledger auto-created with code: " . $inventoryLedger->code);
                 }
 
                 if ($supplierLedger && $inventoryLedger) {
