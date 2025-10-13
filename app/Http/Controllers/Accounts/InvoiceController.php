@@ -50,9 +50,12 @@ class InvoiceController extends Controller
                 'balance' => $request->total_amount,
                 'status' => 'sent',
                 'notes' => $request->notes,
-                'branch_id' => auth()->user()->branch_id,
+                'branch_id' => auth()->user()->branch_id ?? null,
                 'created_by' => auth()->id(),
             ]);
+
+            // Load the customer relationship with accountLedger
+            $invoice->load('customer.accountLedger');
 
             // Create journal entry
             $this->createJournalEntry($invoice);
@@ -103,6 +106,10 @@ class InvoiceController extends Controller
         // Debit: Customer receivable, Credit: Revenue
         $revenueLedger = AccountLedger::where('linked_module', 'revenue')->first();
         
+        if (!$revenueLedger) {
+            throw new \Exception('Revenue ledger not found. Please create a revenue account ledger first.');
+        }
+        
         $entry = JournalEntry::create([
             'entry_number' => JournalEntry::generateNumber(),
             'entry_date' => $invoice->invoice_date,
@@ -121,7 +128,7 @@ class InvoiceController extends Controller
         // Debit customer receivable
         JournalEntryLine::create([
             'journal_entry_id' => $entry->id,
-            'account_ledger_id' => $invoice->customer->account_ledger_id,
+            'account_ledger_id' => $invoice->customer->accountLedger->id,
             'debit' => $invoice->total_amount,
             'credit' => 0,
         ]);
@@ -145,6 +152,10 @@ class InvoiceController extends Controller
     private function createPaymentEntry($invoice, $amount, $date)
     {
         $cashLedger = AccountLedger::where('name', 'LIKE', '%Cash%')->first();
+        
+        if (!$cashLedger) {
+            throw new \Exception('Cash ledger not found. Please create a cash account ledger first.');
+        }
         
         $entry = JournalEntry::create([
             'entry_number' => JournalEntry::generateNumber(),
@@ -172,7 +183,7 @@ class InvoiceController extends Controller
         // Credit customer receivable
         JournalEntryLine::create([
             'journal_entry_id' => $entry->id,
-            'account_ledger_id' => $invoice->customer->account_ledger_id,
+            'account_ledger_id' => $invoice->customer->accountLedger->id,
             'debit' => 0,
             'credit' => $amount,
         ]);
