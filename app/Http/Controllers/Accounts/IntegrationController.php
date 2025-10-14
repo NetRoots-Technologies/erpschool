@@ -232,11 +232,16 @@ class IntegrationController extends Controller
             'reference' => 'required|string',
         ]);
 
+        \Log::info("=== INTEGRATION: recordAcademicFee START ===");
+        \Log::info("Request data: " . json_encode($request->all()));
+        
         DB::beginTransaction();
         try {
             // Get or create ledgers
+            \Log::info("Searching for Cash ledger...");
             $cashLedger = AccountLedger::where('name', 'LIKE', '%Cash%')->first();
             if (!$cashLedger) {
+                \Log::info("Cash ledger not found, creating new one...");
                 $cashLedger = AccountLedger::create([
                     'name' => 'Cash Account',
                     'code' => 'AST-CASH-001',
@@ -249,8 +254,12 @@ class IntegrationController extends Controller
                     'is_active' => true,
                     'created_by' => auth()->id() ?? 1
                 ]);
+                \Log::info("✅ Cash ledger created with ID: {$cashLedger->id}");
+            } else {
+                \Log::info("✅ Cash ledger found with ID: {$cashLedger->id}, Name: {$cashLedger->name}");
             }
 
+            \Log::info("Searching for Fee Revenue ledger...");
             $feeRevenueLedger = AccountLedger::where('name', 'LIKE', '%revenue%')
                 ->whereHas('accountGroup', function($q) {
                     $q->where('type', 'revenue');
@@ -258,9 +267,10 @@ class IntegrationController extends Controller
                 ->first();
             
             if (!$feeRevenueLedger) {
+                \Log::info("Fee Revenue ledger not found, creating new one...");
                 $feeRevenueLedger = AccountLedger::create([
                     'name' => 'Fee Revenue',
-                    'code' => 'REV-FEE-001',
+                    'code' => 'REV-FEE-' . time(),
                     'description' => 'Student fees and tuition revenue',
                     'account_group_id' => 12, // Revenue
                     'opening_balance' => 0,
@@ -271,9 +281,13 @@ class IntegrationController extends Controller
                     'is_active' => true,
                     'created_by' => auth()->id() ?? 1
                 ]);
+                \Log::info("✅ Fee Revenue ledger created with ID: {$feeRevenueLedger->id}");
+            } else {
+                \Log::info("✅ Fee Revenue ledger found with ID: {$feeRevenueLedger->id}, Name: {$feeRevenueLedger->name}");
             }
 
             // Create journal entry
+            \Log::info("Creating journal entry...");
             $entry = JournalEntry::create([
                 'entry_number' => JournalEntry::generateNumber(),
                 'entry_date' => $request->collection_date,
@@ -305,14 +319,24 @@ class IntegrationController extends Controller
                 'credit' => $request->fee_amount,
             ]);
 
+            \Log::info("✅ Journal entry created with ID: {$entry->id}, Number: {$entry->entry_number}");
+            
             // Update balances
+            \Log::info("Updating ledger balances...");
             $cashLedger->updateBalance($request->fee_amount, 0);
             $feeRevenueLedger->updateBalance(0, $request->fee_amount);
+            \Log::info("✅ Ledger balances updated successfully");
 
             DB::commit();
+            \Log::info("✅ Transaction committed successfully");
+            \Log::info("=== INTEGRATION: recordAcademicFee SUCCESS ===");
+            
             return response()->json(['success' => true, 'entry_id' => $entry->id]);
         } catch (\Exception $e) {
             DB::rollBack();
+            \Log::error("=== INTEGRATION: recordAcademicFee FAILED ===");
+            \Log::error("Error: " . $e->getMessage());
+            \Log::error("Stack trace: " . $e->getTraceAsString());
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }

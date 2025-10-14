@@ -617,6 +617,9 @@ class FeeManagementController extends Controller
 
             // ✅ ACCOUNTING INTEGRATION - Record fee collection in accounts
             try {
+                \Log::info("=== FEE COLLECTION ACCOUNTING START ===");
+                \Log::info("Collection ID: {$collection->id}, Student ID: {$collection->student_id}, Amount: {$collection->paid_amount}");
+                
                 $student = Students::find($request->student_id);
                 $integrationController = new \App\Http\Controllers\Accounts\IntegrationController();
                 
@@ -627,11 +630,23 @@ class FeeManagementController extends Controller
                     'reference' => 'FEE-' . str_pad($collection->id, 6, '0', STR_PAD_LEFT) . ' - ' . ($student->fullname ?? 'Student'),
                 ]);
                 
-                $integrationController->recordAcademicFee($integrationRequest);
+                \Log::info("Calling recordAcademicFee with data: " . json_encode($integrationRequest->all()));
                 
-                \Log::info("Fee accounting entry created for collection ID: {$collection->id}, Student: " . ($student->fullname ?? 'Unknown'));
+                $response = $integrationController->recordAcademicFee($integrationRequest);
+                $responseData = $response->getData(true);
+                
+                \Log::info("Integration response: " . json_encode($responseData));
+                
+                if (isset($responseData['success']) && $responseData['success']) {
+                    \Log::info("✅ Fee accounting entry created successfully for collection ID: {$collection->id}, Entry ID: " . ($responseData['entry_id'] ?? 'N/A'));
+                } else {
+                    \Log::error("❌ Fee accounting integration returned error: " . ($responseData['message'] ?? 'Unknown error'));
+                }
+                
+                \Log::info("=== FEE COLLECTION ACCOUNTING END ===");
             } catch (\Exception $e) {
-                \Log::error('Fee accounting integration failed: ' . $e->getMessage());
+                \Log::error("❌ Fee accounting integration EXCEPTION: " . $e->getMessage());
+                \Log::error("Stack trace: " . $e->getTraceAsString());
                 // Don't fail the fee collection if accounts integration fails
             }
 
@@ -1392,6 +1407,9 @@ class FeeManagementController extends Controller
 
             // ✅ ACCOUNTING INTEGRATION - Record fee collection in accounts
             try {
+                \Log::info("=== CHALLAN PAYMENT ACCOUNTING START ===");
+                \Log::info("Collection ID: {$collection->id}, Challan: {$challan->challan_number}, Student ID: {$collection->student_id}, Amount: {$collection->paid_amount}");
+                
                 $integrationController = new \App\Http\Controllers\Accounts\IntegrationController();
                 
                 $integrationRequest = new \Illuminate\Http\Request([
@@ -1401,11 +1419,23 @@ class FeeManagementController extends Controller
                     'reference' => 'FEE-' . str_pad($collection->id, 6, '0', STR_PAD_LEFT) . ' (Challan: ' . $challan->challan_number . ')',
                 ]);
                 
-                $integrationController->recordAcademicFee($integrationRequest);
+                \Log::info("Calling recordAcademicFee with data: " . json_encode($integrationRequest->all()));
                 
-                \Log::info("Fee accounting entry created for collection ID: {$collection->id}, Challan: {$challan->challan_number}");
+                $response = $integrationController->recordAcademicFee($integrationRequest);
+                $responseData = $response->getData(true);
+                
+                \Log::info("Integration response: " . json_encode($responseData));
+                
+                if (isset($responseData['success']) && $responseData['success']) {
+                    \Log::info("✅ Challan payment accounting entry created successfully, Entry ID: " . ($responseData['entry_id'] ?? 'N/A'));
+                } else {
+                    \Log::error("❌ Challan payment accounting returned error: " . ($responseData['message'] ?? 'Unknown error'));
+                }
+                
+                \Log::info("=== CHALLAN PAYMENT ACCOUNTING END ===");
             } catch (\Exception $e) {
-                \Log::error('Fee accounting integration failed: ' . $e->getMessage());
+                \Log::error("❌ Challan payment accounting EXCEPTION: " . $e->getMessage());
+                \Log::error("Stack trace: " . $e->getTraceAsString());
                 // Don't fail the whole transaction, just log the error
             }
 
