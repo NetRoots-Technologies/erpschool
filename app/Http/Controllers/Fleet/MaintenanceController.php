@@ -55,18 +55,20 @@ class MaintenanceController extends Controller
 
         $maintenance = Maintenance::create($request->all());
 
-        // ✅ INTEGRATE WITH ACCOUNTS SYSTEM
+        // ✅ ACCOUNTING INTEGRATION
         try {
             $vehicle = Vehicle::find($request->vehicle_id);
-            \Illuminate\Support\Facades\Http::post(route('accounts.integration.fleet_expense'), [
+            $integrationController = new \App\Http\Controllers\Accounts\IntegrationController();
+            $integrationRequest = new \Illuminate\Http\Request([
                 'vehicle_id' => $maintenance->vehicle_id,
                 'expense_amount' => $maintenance->cost,
                 'expense_date' => $maintenance->maintenance_date,
                 'expense_type' => 'maintenance',
                 'reference' => 'MAINT-' . $maintenance->id . ' - ' . ($vehicle->registration_number ?? 'Vehicle'),
             ]);
+            $integrationController->recordFleetExpense($integrationRequest);
         } catch (\Exception $e) {
-            \Log::warning('Maintenance expense accounts integration failed: ' . $e->getMessage());
+            \Log::error('Maintenance accounting failed: ' . $e->getMessage());
         }
 
         return redirect()->route('fleet.maintenance.index')

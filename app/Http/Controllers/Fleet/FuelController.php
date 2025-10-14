@@ -54,18 +54,20 @@ class FuelController extends Controller
 
         $fuel = Fuel::create($request->all());
 
-        // ✅ INTEGRATE WITH ACCOUNTS SYSTEM
+        // ✅ ACCOUNTING INTEGRATION
         try {
             $vehicle = Vehicle::find($request->vehicle_id);
-            \Illuminate\Support\Facades\Http::post(route('accounts.integration.fleet_expense'), [
+            $integrationController = new \App\Http\Controllers\Accounts\IntegrationController();
+            $integrationRequest = new \Illuminate\Http\Request([
                 'vehicle_id' => $fuel->vehicle_id,
                 'expense_amount' => $fuel->total_cost,
                 'expense_date' => $fuel->fuel_date,
                 'expense_type' => 'fuel',
                 'reference' => 'FUEL-' . $fuel->id . ' - ' . ($vehicle->registration_number ?? 'Vehicle'),
             ]);
+            $integrationController->recordFleetExpense($integrationRequest);
         } catch (\Exception $e) {
-            \Log::warning('Fuel expense accounts integration failed: ' . $e->getMessage());
+            \Log::error('Fuel accounting failed: ' . $e->getMessage());
         }
 
         return redirect()->route('fleet.fuel.index')

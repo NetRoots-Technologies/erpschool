@@ -48,37 +48,76 @@
                             <tr class="table-secondary">
                                 <td colspan="2"><strong>Operating Activities</strong></td>
                             </tr>
-                            <tr>
-                                <td>Cash from Operations</td>
-                                <td class="text-end">Rs. {{ number_format($operating, 2) }}</td>
-                            </tr>
+                            @if(isset($operatingData['details']) && count($operatingData['details']) > 0)
+                                @foreach($operatingData['details'] as $item)
+                                    <tr>
+                                        <td class="ps-4">{{ $item['label'] }}</td>
+                                        <td class="text-end {{ $item['amount'] >= 0 ? 'text-success' : 'text-danger' }}">
+                                            Rs. {{ number_format(abs($item['amount']), 2) }}
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            @else
+                                <tr>
+                                    <td class="ps-4 text-muted">No operating activities</td>
+                                    <td class="text-end">Rs. 0.00</td>
+                                </tr>
+                            @endif
                             <tr class="table-light">
                                 <th>Net Cash from Operating Activities</th>
-                                <th class="text-end">Rs. {{ number_format($operating, 2) }}</th>
+                                <th class="text-end {{ $operating >= 0 ? 'text-success' : 'text-danger' }}">
+                                    Rs. {{ number_format($operating, 2) }}
+                                </th>
                             </tr>
 
                             <tr class="table-secondary">
                                 <td colspan="2"><strong>Investing Activities</strong></td>
                             </tr>
-                            <tr>
-                                <td>Cash from Investments</td>
-                                <td class="text-end">Rs. {{ number_format($investing, 2) }}</td>
-                            </tr>
+                            @if(isset($investingData['details']) && count($investingData['details']) > 0)
+                                @foreach($investingData['details'] as $item)
+                                    <tr>
+                                        <td class="ps-4">{{ $item['label'] }}</td>
+                                        <td class="text-end {{ $item['amount'] >= 0 ? 'text-success' : 'text-danger' }}">
+                                            Rs. {{ number_format(abs($item['amount']), 2) }}
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            @else
+                                <tr>
+                                    <td class="ps-4 text-muted">No investing activities</td>
+                                    <td class="text-end">Rs. 0.00</td>
+                                </tr>
+                            @endif
                             <tr class="table-light">
                                 <th>Net Cash from Investing Activities</th>
-                                <th class="text-end">Rs. {{ number_format($investing, 2) }}</th>
+                                <th class="text-end {{ $investing >= 0 ? 'text-success' : 'text-danger' }}">
+                                    Rs. {{ number_format($investing, 2) }}
+                                </th>
                             </tr>
 
                             <tr class="table-secondary">
                                 <td colspan="2"><strong>Financing Activities</strong></td>
                             </tr>
-                            <tr>
-                                <td>Cash from Financing</td>
-                                <td class="text-end">Rs. {{ number_format($financing, 2) }}</td>
-                            </tr>
+                            @if(isset($financingData['details']) && count($financingData['details']) > 0)
+                                @foreach($financingData['details'] as $item)
+                                    <tr>
+                                        <td class="ps-4">{{ $item['label'] }}</td>
+                                        <td class="text-end {{ $item['amount'] >= 0 ? 'text-success' : 'text-danger' }}">
+                                            Rs. {{ number_format(abs($item['amount']), 2) }}
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            @else
+                                <tr>
+                                    <td class="ps-4 text-muted">No financing activities</td>
+                                    <td class="text-end">Rs. 0.00</td>
+                                </tr>
+                            @endif
                             <tr class="table-light">
                                 <th>Net Cash from Financing Activities</th>
-                                <th class="text-end">Rs. {{ number_format($financing, 2) }}</th>
+                                <th class="text-end {{ $financing >= 0 ? 'text-success' : 'text-danger' }}">
+                                    Rs. {{ number_format($financing, 2) }}
+                                </th>
                             </tr>
                         </tbody>
                         <tfoot class="table-dark">

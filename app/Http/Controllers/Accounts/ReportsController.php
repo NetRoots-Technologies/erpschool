@@ -64,13 +64,21 @@ class ReportsController extends Controller
         $startDate = $request->start_date ?? now()->startOfMonth()->format('Y-m-d');
         $endDate = $request->end_date ?? now()->format('Y-m-d');
         
-        $operating = $this->getOperatingCashFlow($startDate, $endDate);
-        $investing = $this->getInvestingCashFlow($startDate, $endDate);
-        $financing = $this->getFinancingCashFlow($startDate, $endDate);
+        $operatingData = $this->getOperatingCashFlow($startDate, $endDate);
+        $investingData = $this->getInvestingCashFlow($startDate, $endDate);
+        $financingData = $this->getFinancingCashFlow($startDate, $endDate);
+        
+        $operating = $operatingData['total'];
+        $investing = $investingData['total'];
+        $financing = $financingData['total'];
         
         $netCashFlow = $operating + $investing + $financing;
 
-        return view('accounts.reports.cash_flow', compact('operating', 'investing', 'financing', 'netCashFlow', 'startDate', 'endDate'));
+        return view('accounts.reports.cash_flow', compact(
+            'operating', 'investing', 'financing', 'netCashFlow', 
+            'operatingData', 'investingData', 'financingData',
+            'startDate', 'endDate'
+        ));
     }
 
     public function generalLedger(Request $request)
@@ -181,20 +189,132 @@ class ReportsController extends Controller
 
     private function getOperatingCashFlow($startDate, $endDate)
     {
-        // Simplified: Net income + adjustments
-        return 0; // Placeholder
+        // Get all cash/bank ledgers
+        $cashBankLedgers = AccountLedger::where(function($q) {
+            $q->where('name', 'LIKE', '%Cash%')
+              ->orWhere('name', 'LIKE', '%Bank%');
+        })->whereHas('accountGroup', function($q) {
+            $q->where('type', 'asset');
+        })->get();
+        
+        $details = [];
+        $totalInflow = 0;
+        $totalOutflow = 0;
+        
+        foreach ($cashBankLedgers as $ledger) {
+            // Cash inflows (Debits to cash account)
+            $feeInflow = JournalEntryLine::where('account_ledger_id', $ledger->id)
+                ->whereHas('journalEntry', function($q) use ($startDate, $endDate) {
+                    $q->where('status', 'posted')
+                      ->whereBetween('entry_date', [$startDate, $endDate])
+                      ->where('source_module', 'academic_fee');
+                })
+                ->sum('debit');
+            
+            $invoiceInflow = JournalEntryLine::where('account_ledger_id', $ledger->id)
+                ->whereHas('journalEntry', function($q) use ($startDate, $endDate) {
+                    $q->where('status', 'posted')
+                      ->whereBetween('entry_date', [$startDate, $endDate])
+                      ->where('source_module', 'customer_invoice');
+                })
+                ->sum('debit');
+            
+            // Cash outflows (Credits to cash account)
+            $salaryOutflow = JournalEntryLine::where('account_ledger_id', $ledger->id)
+                ->whereHas('journalEntry', function($q) use ($startDate, $endDate) {
+                    $q->where('status', 'posted')
+                      ->whereBetween('entry_date', [$startDate, $endDate])
+                      ->where('source_module', 'hr_salary');
+                })
+                ->sum('credit');
+            
+            $billOutflow = JournalEntryLine::where('account_ledger_id', $ledger->id)
+                ->whereHas('journalEntry', function($q) use ($startDate, $endDate) {
+                    $q->where('status', 'posted')
+                      ->whereBetween('entry_date', [$startDate, $endDate])
+                      ->whereIn('source_module', ['vendor_bill', 'bill_payment']);
+                })
+                ->sum('credit');
+            
+            $totalInflow += $feeInflow + $invoiceInflow;
+            $totalOutflow += $salaryOutflow + $billOutflow;
+            
+            if ($feeInflow > 0) $details[] = ['label' => 'Fee Collections', 'amount' => $feeInflow];
+            if ($invoiceInflow > 0) $details[] = ['label' => 'Customer Receipts', 'amount' => $invoiceInflow];
+            if ($salaryOutflow > 0) $details[] = ['label' => 'Salary Payments', 'amount' => -$salaryOutflow];
+            if ($billOutflow > 0) $details[] = ['label' => 'Vendor Payments', 'amount' => -$billOutflow];
+        }
+        
+        return ['total' => $totalInflow - $totalOutflow, 'details' => $details];
     }
 
     private function getInvestingCashFlow($startDate, $endDate)
     {
-        // Asset purchases/sales
-        return 0; // Placeholder
+        // Get cash ledgers
+        $cashBankLedgers = AccountLedger::where(function($q) {
+            $q->where('name', 'LIKE', '%Cash%')
+              ->orWhere('name', 'LIKE', '%Bank%');
+        })->get();
+        
+        $details = [];
+        $totalInflow = 0;
+        $totalOutflow = 0;
+        
+        foreach ($cashBankLedgers as $ledger) {
+            // Asset purchases (Credits to cash - money going out)
+            $assetPurchase = JournalEntryLine::where('account_ledger_id', $ledger->id)
+                ->whereHas('journalEntry', function($q) use ($startDate, $endDate) {
+                    $q->where('status', 'posted')
+                      ->whereBetween('entry_date', [$startDate, $endDate])
+                      ->where('source_module', 'LIKE', '%asset%');
+                })
+                ->sum('credit');
+            
+            $totalOutflow += $assetPurchase;
+            
+            if ($assetPurchase > 0) $details[] = ['label' => 'Asset Purchases', 'amount' => -$assetPurchase];
+        }
+        
+        return ['total' => $totalInflow - $totalOutflow, 'details' => $details];
     }
 
     private function getFinancingCashFlow($startDate, $endDate)
     {
-        // Loans, equity
-        return 0; // Placeholder
+        // Get cash ledgers
+        $cashBankLedgers = AccountLedger::where(function($q) {
+            $q->where('name', 'LIKE', '%Cash%')
+              ->orWhere('name', 'LIKE', '%Bank%');
+        })->get();
+        
+        $details = [];
+        $totalInflow = 0;
+        $totalOutflow = 0;
+        
+        foreach ($cashBankLedgers as $ledger) {
+            // Loan receipts (Debits to cash - money coming in)
+            $loanReceipt = JournalEntryLine::where('account_ledger_id', $ledger->id)
+                ->whereHas('journalEntry', function($q) use ($startDate, $endDate) {
+                    $q->where('status', 'posted')
+                      ->whereBetween('entry_date', [$startDate, $endDate])
+                      ->where('source_module', 'LIKE', '%loan%');
+                })
+                ->sum('debit');
+            
+            $capitalInvestment = JournalEntryLine::where('account_ledger_id', $ledger->id)
+                ->whereHas('journalEntry', function($q) use ($startDate, $endDate) {
+                    $q->where('status', 'posted')
+                      ->whereBetween('entry_date', [$startDate, $endDate])
+                      ->where('source_module', 'LIKE', '%capital%');
+                })
+                ->sum('debit');
+            
+            $totalInflow += $loanReceipt + $capitalInvestment;
+            
+            if ($loanReceipt > 0) $details[] = ['label' => 'Loan Receipts', 'amount' => $loanReceipt];
+            if ($capitalInvestment > 0) $details[] = ['label' => 'Capital Investment', 'amount' => $capitalInvestment];
+        }
+        
+        return ['total' => $totalInflow - $totalOutflow, 'details' => $details];
     }
 
     private function getAgingBucket($days)

@@ -355,9 +355,13 @@ class IntegrationController extends Controller
             'reference' => 'required|string',
         ]);
 
+        \Log::info("=== FLEET EXPENSE ACCOUNTING START ===");
+        \Log::info("Request: " . json_encode($request->all()));
+
         DB::beginTransaction();
         try {
             // Get or create ledgers
+            \Log::info("Searching for Fleet Expense ledger...");
             $fleetExpenseLedger = AccountLedger::where('name', 'LIKE', '%Fleet%')
                 ->orWhere('name', 'LIKE', '%Transport%')
                 ->whereHas('accountGroup', function($q) {
@@ -366,9 +370,10 @@ class IntegrationController extends Controller
                 ->first();
             
             if (!$fleetExpenseLedger) {
+                \Log::info("Fleet Expense ledger not found, creating...");
                 $fleetExpenseLedger = AccountLedger::create([
                     'name' => 'Transport Expense',
-                    'code' => 'EXP-TRAN-001',
+                    'code' => 'EXP-TRAN-' . time(),
                     'description' => 'Vehicle fuel and maintenance expenses',
                     'account_group_id' => 21, // Transport Expense
                     'opening_balance' => 0,
@@ -378,13 +383,18 @@ class IntegrationController extends Controller
                     'is_active' => true,
                     'created_by' => auth()->id() ?? 1
                 ]);
+                \Log::info("✅ Fleet Expense ledger created: ID {$fleetExpenseLedger->id}");
+            } else {
+                \Log::info("✅ Fleet Expense ledger found: ID {$fleetExpenseLedger->id}");
             }
             
+            \Log::info("Searching for Cash ledger...");
             $cashLedger = AccountLedger::where('name', 'LIKE', '%Cash%')->first();
             if (!$cashLedger) {
+                \Log::info("Cash ledger not found, creating...");
                 $cashLedger = AccountLedger::create([
                     'name' => 'Cash Account',
-                    'code' => 'AST-CASH-001',
+                    'code' => 'AST-CASH-' . time(),
                     'description' => 'Cash in hand',
                     'account_group_id' => 2, // Current Assets
                     'opening_balance' => 0,
@@ -394,9 +404,13 @@ class IntegrationController extends Controller
                     'is_active' => true,
                     'created_by' => auth()->id() ?? 1
                 ]);
+                \Log::info("✅ Cash ledger created: ID {$cashLedger->id}");
+            } else {
+                \Log::info("✅ Cash ledger found: ID {$cashLedger->id}");
             }
 
             // Create journal entry
+            \Log::info("Creating journal entry...");
             $entry = JournalEntry::create([
                 'entry_number' => JournalEntry::generateNumber(),
                 'entry_date' => $request->expense_date,
@@ -411,6 +425,7 @@ class IntegrationController extends Controller
                 'posted_by' => auth()->id(),
                 'created_by' => auth()->id(),
             ]);
+            \Log::info("✅ Journal entry created: ID {$entry->id}");
 
             // Debit: Fleet Expense
             JournalEntryLine::create([
@@ -427,15 +442,23 @@ class IntegrationController extends Controller
                 'debit' => 0,
                 'credit' => $request->expense_amount,
             ]);
+            \Log::info("✅ Journal entry lines created");
 
             // Update balances
             $fleetExpenseLedger->updateBalance($request->expense_amount, 0);
             $cashLedger->updateBalance(0, $request->expense_amount);
+            \Log::info("✅ Ledger balances updated");
 
             DB::commit();
+            \Log::info("✅ Transaction committed");
+            \Log::info("=== FLEET EXPENSE ACCOUNTING SUCCESS ===");
+            
             return response()->json(['success' => true, 'entry_id' => $entry->id]);
         } catch (\Exception $e) {
             DB::rollBack();
+            \Log::error("=== FLEET EXPENSE ACCOUNTING FAILED ===");
+            \Log::error("Error: " . $e->getMessage());
+            \Log::error("Stack trace: " . $e->getTraceAsString());
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }

@@ -53,18 +53,20 @@ class ExpenseController extends Controller
 
         $expense = Expense::create($request->all());
 
-        // ✅ INTEGRATE WITH ACCOUNTS SYSTEM
+        // ✅ ACCOUNTING INTEGRATION
         try {
             $vehicle = Vehicle::find($request->vehicle_id);
-            \Illuminate\Support\Facades\Http::post(route('accounts.integration.fleet_expense'), [
+            $integrationController = new \App\Http\Controllers\Accounts\IntegrationController();
+            $integrationRequest = new \Illuminate\Http\Request([
                 'vehicle_id' => $expense->vehicle_id,
                 'expense_amount' => $expense->amount,
                 'expense_date' => $expense->expense_date,
                 'expense_type' => $expense->expense_type,
                 'reference' => 'EXP-' . $expense->id . ' - ' . ($vehicle->registration_number ?? 'Vehicle'),
             ]);
+            $integrationController->recordFleetExpense($integrationRequest);
         } catch (\Exception $e) {
-            \Log::warning('Fleet expense accounts integration failed: ' . $e->getMessage());
+            \Log::error('Fleet expense accounting failed: ' . $e->getMessage());
         }
 
         return redirect()->route('fleet.expenses.index')

@@ -88,7 +88,7 @@ class StudentTransportController extends Controller
         }
 
         // Create transportation assignment
-        Transportation::create([
+        $transportation = Transportation::create([
             'student_id' => $request->student_id,
             'vehicle_id' => $request->vehicle_id,
             'route_id' => $request->route_id,
@@ -101,6 +101,21 @@ class StudentTransportController extends Controller
             'company_id' => auth()->user()->company_id ?? 1,
             'branch_id' => auth()->user()->branch_id ?? 1,
         ]);
+
+        // ✅ ACCOUNTING INTEGRATION - Record transport fee as revenue
+        try {
+            $student = Students::find($request->student_id);
+            $integrationController = new \App\Http\Controllers\Accounts\IntegrationController();
+            $integrationRequest = new \Illuminate\Http\Request([
+                'student_id' => $transportation->student_id,
+                'fee_amount' => $transportation->monthly_charges,
+                'collection_date' => now()->format('Y-m-d'),
+                'reference' => 'TRANS-' . $transportation->id . ' - ' . ($student->fullname ?? 'Student') . ' (Monthly)',
+            ]);
+            $integrationController->recordAcademicFee($integrationRequest);
+        } catch (\Exception $e) {
+            \Log::error('Transportation fee accounting failed: ' . $e->getMessage());
+        }
         
         return redirect()->route('fleet.transportation.index')
             ->with('success', 'Transportation assignment created successfully.');
