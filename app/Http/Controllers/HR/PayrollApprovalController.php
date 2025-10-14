@@ -158,12 +158,48 @@ if (!Gate::allows('Dashboard-list')) {
             $generatedMonth = $payrollApprovals->generated_month;
             $bank_ledger = AccountLedger::where('id', $payrollApprovals->bank_account_ledger)->first();
             $cash_ledger = AccountLedger::where('code', 'cash')->first();
+            
+            // Auto-create cash ledger if not found
+            if (!$cash_ledger) {
+                $cash_ledger = AccountLedger::create([
+                    'name' => 'Cash Account',
+                    'code' => 'cash',
+                    'description' => 'Cash in hand',
+                    'account_group_id' => 2, // Current Assets
+                    'opening_balance' => 0,
+                    'opening_balance_type' => 'debit',
+                    'current_balance' => 0,
+                    'current_balance_type' => 'debit',
+                    'is_active' => true,
+                    'created_by' => auth()->id() ?? 1
+                ]);
+                \Log::info("Cash ledger auto-created for payroll");
+            }
 
             if ($payrollApprovals->has('payroll')) {
 
                 $payroll_ledger = AccountLedger::where('linked_module', 'branch')
                     ->where('linked_id', $payrollApprovals->branch_id)
                     ->first();
+                    
+                // Auto-create salary expense ledger if not found
+                if (!$payroll_ledger) {
+                    $payroll_ledger = AccountLedger::create([
+                        'name' => 'Salary Expense - ' . $branch->name,
+                        'code' => 'SAL-BR-' . $payrollApprovals->branch_id . '-' . time(),
+                        'description' => 'Salary expense for ' . $branch->name,
+                        'account_group_id' => 17, // Salary Expense
+                        'opening_balance' => 0,
+                        'opening_balance_type' => 'debit',
+                        'current_balance' => 0,
+                        'current_balance_type' => 'debit',
+                        'linked_module' => 'branch',
+                        'linked_id' => $payrollApprovals->branch_id,
+                        'is_active' => true,
+                        'created_by' => auth()->id() ?? 1
+                    ]);
+                    \Log::info("Salary expense ledger auto-created for branch: {$branch->name}");
+                }
                 foreach ($payrollApprovals->payroll as $payroll) {
                     if ($payroll->cash_in_hand == 0 && $payroll->cash_in_bank == 0) {
                         throw new Exception("Cash in bank and Bank can not be 0 for " . $payroll->employee->name);
@@ -257,21 +293,10 @@ if (!Gate::allows('Dashboard-list')) {
                 }
             }
 
-            // ✅ INTEGRATE WITH ACCOUNTS SYSTEM
-            try {
-                foreach ($payrollEmployees as $payroll) {
-                    if ($payroll->net_salary > 0) {
-                        \Illuminate\Support\Facades\Http::post(route('accounts.integration.hr_salary'), [
-                            'employee_id' => $payroll->employee_id,
-                            'salary_amount' => $payroll->net_salary,
-                            'payment_date' => now(),
-                            'reference' => 'SAL-' . $payroll->id . ' - ' . ($payroll->employee->name ?? 'Employee') . ' - ' . $salary->generated_month,
-                        ]);
-                    }
-                }
-            } catch (\Exception $e) {
-                \Log::warning('Payroll accounts integration failed: ' . $e->getMessage());
-            }
+            // ✅ Accounting entries already created above (lines 153-185)
+            // No need for additional integration - ledger entries are complete
+            
+            \Log::info("Payroll approved and accounting entries created for: {$salary->generated_month}, Branch: {$branch->name}, Total: {$Payroll_total}");
 
             DB::commit();
             return redirect()->route('hr.payroll.approve')->with('success', 'Payroll Approved');

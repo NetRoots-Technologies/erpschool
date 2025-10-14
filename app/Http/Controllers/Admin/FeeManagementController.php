@@ -560,9 +560,9 @@ class FeeManagementController extends Controller
             'collection_date' => 'required|date',
             'payment_method' => 'required|in:cash,bank_transfer,cheque',
             'remarks' => 'nullable|string',
-            'collections' => 'required|array',
+            'collections' => 'required|array|min:1',
             'collections.*.category_id' => 'required|exists:fee_categories,id',
-            'collections.*.amount' => 'required|numeric|min:0',
+            'collections.*.amount' => 'required|numeric|min:0.01',
         ]);
 
         DB::beginTransaction();
@@ -615,17 +615,23 @@ class FeeManagementController extends Controller
                 $billing->save();
             }
 
-            // ✅ INTEGRATE WITH ACCOUNTS SYSTEM
+            // ✅ ACCOUNTING INTEGRATION - Record fee collection in accounts
             try {
                 $student = Students::find($request->student_id);
-                \Illuminate\Support\Facades\Http::post(route('accounts.integration.academic_fee'), [
+                $integrationController = new \App\Http\Controllers\Accounts\IntegrationController();
+                
+                $integrationRequest = new \Illuminate\Http\Request([
                     'student_id' => $collection->student_id,
                     'fee_amount' => $collection->paid_amount,
                     'collection_date' => $collection->collection_date,
-                    'reference' => 'FEE-' . $collection->id . ' - ' . ($student->fullname ?? 'Student'),
+                    'reference' => 'FEE-' . str_pad($collection->id, 6, '0', STR_PAD_LEFT) . ' - ' . ($student->fullname ?? 'Student'),
                 ]);
+                
+                $integrationController->recordAcademicFee($integrationRequest);
+                
+                \Log::info("Fee accounting entry created for collection ID: {$collection->id}, Student: " . ($student->fullname ?? 'Unknown'));
             } catch (\Exception $e) {
-                \Log::warning('Fee collection accounts integration failed: ' . $e->getMessage());
+                \Log::error('Fee accounting integration failed: ' . $e->getMessage());
                 // Don't fail the fee collection if accounts integration fails
             }
 
@@ -1383,6 +1389,25 @@ class FeeManagementController extends Controller
             }
             
             $challan->save();
+
+            // ✅ ACCOUNTING INTEGRATION - Record fee collection in accounts
+            try {
+                $integrationController = new \App\Http\Controllers\Accounts\IntegrationController();
+                
+                $integrationRequest = new \Illuminate\Http\Request([
+                    'student_id' => $collection->student_id,
+                    'fee_amount' => $collection->paid_amount,
+                    'collection_date' => $collection->collection_date,
+                    'reference' => 'FEE-' . str_pad($collection->id, 6, '0', STR_PAD_LEFT) . ' (Challan: ' . $challan->challan_number . ')',
+                ]);
+                
+                $integrationController->recordAcademicFee($integrationRequest);
+                
+                \Log::info("Fee accounting entry created for collection ID: {$collection->id}, Challan: {$challan->challan_number}");
+            } catch (\Exception $e) {
+                \Log::error('Fee accounting integration failed: ' . $e->getMessage());
+                // Don't fail the whole transaction, just log the error
+            }
 
             DB::commit();
 
