@@ -390,12 +390,12 @@ class EmployeeServices
         }
         $data = Employees::with('company', 'branch', 'department')->orderBy('created_at', 'desc')->get();
 
-    
+
 
         return Datatables::of($data)->addIndexColumn()
             ->addColumn('action', function ($row) {
                 $btn = '<div style="display: flex;">';
-                
+
                 if (Gate::allows('Employees-edit')) {
                     $btn .= '<a href="' . route("hr.employee.edit", $row->id) . '" class="btn btn-primary btn-sm"  style="margin-right: 4px;">Edit</a>';
                 }
@@ -569,27 +569,15 @@ class EmployeeServices
 
         ]);
 
-    
-        if ($request->has('email_address')) {
-           
-            $roles = Role::where('name', 'General Employee')->first();
-            $professionalEmail = $request->input('email_address');
-            $user = User::updateOrCreate(
-                [
-                    'email' => $professionalEmail,
-                ],
-                [
-                'password' => Hash::make($request->get('password', '12345678')),
-                'email' => $professionalEmail,
-                'name' => $request->input('name'),
-                'employee_id' => $employee->id,
-                'branch_id' => $request->input('branchSelect'),
-                'role_id' => $roles->id,
-            ]);
+            $user =  User::where('employee_id', $id)->where('active', 1)->first();
+            if ($user) {
+                $roles = Role::where('name', 'General Employee')->first();
+                if ($roles) {
+                    $user->syncRoles($roles);
+                }
+            }
 
-            $user->syncRoles($roles);
-        }
-           
+
 
         $employee->educations()->delete();
 
@@ -631,7 +619,7 @@ class EmployeeServices
 
         $employee->employeeFamily()->delete();
 
-       
+
 
         if ($request->has('sr_no')) {
             foreach ($request->input('sr_no') as $key => $srNo) {
