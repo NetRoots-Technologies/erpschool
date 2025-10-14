@@ -27,7 +27,7 @@ Departments
         {{-- Add Department --}}
      @if (Gate::allows('Departments-create'))
 
-        <div class="col-auto p-0" style="display: none;">
+        <div class="col-auto p-0" >
             <a class="btn btn-primary btn-md text-white" id="createBtn" data-toggle="modal"
                 data-target="#createModal1"><b>Create
                     Department</b></a>
@@ -41,7 +41,7 @@ Departments
         </div>
 
         {{-- Import Sample Bulk File --}}
-        <div class="col-auto">
+        <div class="col-auto" style="display: none;">
             <a href="#" class="btn btn-success btn-md" data-bs-toggle="modal" data-bs-target="#importModal">
                 <b>Import Data</b>
             </a>

@@ -112,8 +112,8 @@ class UserServise
         if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
-        $data = User::get();
-
+        $data = User::query();
+        
 
         return Datatables::of($data)->addIndexColumn()
             ->addColumn('status', function ($row) {

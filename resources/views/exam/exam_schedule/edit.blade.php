@@ -41,7 +41,7 @@
                                             <label for="company"><b>Company:</b></label>
                                             <select name="company_id"
                                                     class="form-select select2 mt-3" id="companySelect"
-                                                    aria-label=".form-select-lg example" required>
+                                                    required>
                                                     @foreach($companies as $item)
                                                         <option value="{{ $item->id }}" {{ $exam_schedule_detail->company_id == $item->id ? 'selected' : '' }}>
                                                             {{ $item->name }}
@@ -53,8 +53,8 @@
                                         <div class="col-md-3">
                                             <label for="branches"><b>Branch: </b></label>
                                             <select name="branch_id"
-                                                    class="form-select select2 basic-single mt-3 branch_select"
-                                                    aria-label=".form-select-lg example" required>
+                                                    class="form-select select2 mt-3 branch_select"
+                                                    required>
 
                                             </select>
                                         </div>
@@ -62,8 +62,8 @@
                                         <div class="col-md-3">
                                             <label for="branches"><b>Term: *</b></label>
                                             <select required name="exam_term_id"
-                                                    class="form-select select2 basic-single mt-3 exam_term"
-                                                    aria-label=".form-select-lg example">
+                                                    class="form-select select2 mt-3 exam_term"
+                                                   >
 
                                             </select>
                                         </div>
@@ -72,8 +72,8 @@
                                         <div class="col-md-3">
                                             <label for="branches"><b>Test: *</b></label>
                                             <select name="test_type_id"
-                                                    class="form-select select2 basic-single mt-3"
-                                                    aria-label=".form-select-lg example" required>
+                                                    class="form-select select2 mt-3"
+                                                    required>
                                                 @foreach($tests as $item)
                                                     <option value="{{$item->id}}">{{$item->test_name}}</option>
                                                 @endforeach
@@ -86,8 +86,8 @@
                                         <div class="col-md-4">
                                             <label for="branches"><b>Class: *</b></label>
                                             <select required name="class_id"
-                                                    class="form-select select2 basic-single mt-3 select_class"
-                                                    aria-label=".form-select-lg example">
+                                                    class="form-select select2 mt-3 select_class"
+                                                   >
 
                                             </select>
                                         </div>
@@ -173,6 +173,7 @@
             var selectedCompanyId = $('#companySelect').val();
             var selectedBranchId = '{{ $exam_schedule_detail->branch_id ?? '' }}'; // from Blade
 
+           
             $.ajax({
                 type: 'GET',
                 url: '{{ route('hr.fetch.branches') }}',
@@ -184,6 +185,8 @@
                     branchesDropdown.append('<option value="">Select Branch</option>');
 
                     data.forEach(function (branch) {
+
+                      
                         var isSelected = (branch.id == selectedBranchId) ? 'selected' : '';
                         branchesDropdown.append(
                             '<option value="' + branch.id + '" ' + isSelected + '>' + branch.name + '</option>'
@@ -205,6 +208,8 @@
             $('.branch_select').on('change', function () {
 
                 var branch_id = $(this).val();
+                var selectedClassId = '{{ $exam_schedule_detail->class_id ?? '' }}'; // from class
+
                 $.ajax({
                     type: 'GET',
                     url: '{{ route('academic.fetchClass') }}',
@@ -226,8 +231,9 @@
             });
 
             $('.branch_select').on('change', function () {
-
                 var branch_id = $(this).val();
+                var savedTestTypeId = '{{ $exam_schedule_detail->exam_type_id  ?? '' }}';
+
                 $.ajax({
                     type: 'GET',
                     url: '{{ route('academic.fetchExamTerm') }}',
@@ -238,8 +244,16 @@
                         var termDropdown = $('.exam_term').empty();
                         termDropdown.append('<option value="" disabled>Select Exam Term</option>');
                         data.forEach(function (academic_class) {
-                            termDropdown.append('<option value="' + academic_class.id + '">' + academic_class.term_desc + '</option>');
-                        });
+	
+                            var isSelected = (academic_class.id == savedTestTypeId) ? 'selected' : '';
+                        termDropdown.append(
+                            '<option value="' + academic_class.id + '" ' + isSelected + '>' + academic_class.term_desc + '</option>'
+                        );
+                    });
+
+                    @if(isset($exam_schedule_detail->exam_type_id))
+                        $('.branch_select').val('{{ $exam_schedule_detail->exam_type_id }}').trigger('change');
+                    @endif
                     },
                     error: function (error) {
                         console.error('Error fetching branches:', error);

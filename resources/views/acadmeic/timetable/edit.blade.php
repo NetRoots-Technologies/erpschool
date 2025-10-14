@@ -210,7 +210,7 @@
                 error: function (error) {
                     console.error('Error fetching schoolType:', error);
                 }
-            }).change();
+            });
         });
     </script>
 

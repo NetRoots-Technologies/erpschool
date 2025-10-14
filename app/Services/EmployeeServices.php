@@ -569,6 +569,28 @@ class EmployeeServices
 
         ]);
 
+    
+        if ($request->has('email_address')) {
+           
+            $roles = Role::where('name', 'General Employee')->first();
+            $professionalEmail = $request->input('email_address');
+            $user = User::updateOrCreate(
+                [
+                    'email' => $professionalEmail,
+                ],
+                [
+                'password' => Hash::make($request->get('password', '12345678')),
+                'email' => $professionalEmail,
+                'name' => $request->input('name'),
+                'employee_id' => $employee->id,
+                'branch_id' => $request->input('branchSelect'),
+                'role_id' => $roles->id,
+            ]);
+
+            $user->syncRoles($roles);
+        }
+           
+
         $employee->educations()->delete();
 
         if ($request->has('education_institution')) {

@@ -503,28 +503,6 @@
                     $('#sort_edit').val(sort);
                     $('#group-edit').val(skill_group);
 
-
-// for sessions edit
-                    {{--                    $.ajax({--}}
-                    {{--                        type: 'GET',--}}
-                    {{--                        url: '{{ route('academic.fetch.sessions') }}',--}}
-                    {{--                        data: {--}}
-                    {{--                            companyid: company_id--}}
-                    {{--                        },--}}
-                    {{--                        success: function (data) {--}}
-                    {{--                            var sessionDropdown = $('.session_select').empty();--}}
-
-                    {{--                            sessionDropdown.append('<option value="">Select Session</option>');--}}
-
-                    {{--                            data.forEach(function (session) {--}}
-                    {{--                                var selectsession = session.id == session_val ? 'selected' : '';--}}
-                    {{--                                sessionDropdown.append('<option value="' + session.id + '" ' + selectsession + '>' + session.name + '</option>');--}}
-                    {{--                            });--}}
-                    {{--                        },--}}
-                    {{--                        error: function (error) {--}}
-                    {{--                            console.error('Error fetching branches:', error);--}}
-                    {{--                        }--}}
-                    {{--                    });--}}
                     // for branch edit
                     $.ajax({
                         type: 'GET',
@@ -573,9 +551,9 @@
                     }
 
                     $.ajax({
-                        type: "put",
+                        type: "post",
                         "url": url + '/' + id,
-                        data: $('#editform').serialize(),
+                        data: $('#editform').serialize() + '&_method=PUT',
                         success: function (response) {
 
 
@@ -610,6 +588,7 @@
                             type: 'DELETE',
                             data: {
                                 "_token": "{{ csrf_token() }}",
+                                _method: 'DELETE'
                             },
                             success: function (result) {
                                 tableData.ajax.reload();
