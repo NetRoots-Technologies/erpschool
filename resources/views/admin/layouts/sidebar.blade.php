@@ -72,7 +72,7 @@
                     </div>
                     <div class="user-info">
                         <h4 class="fw-semibold mt-3 mb-0">{{ auth()->user()->name ?? '' }}</h4>
-                        <span class="mb-0 text-muted">{{ auth()->user()->getRoleNames()[0] ?? '' }}</span>
+                        <span class="mb-0 text-muted">{{ auth()->user()->getRoleNames()->first() ?? '' }}</span>
                     </div>
                 </div>
             </div>

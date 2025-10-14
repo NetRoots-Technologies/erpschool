@@ -77,19 +77,19 @@
                         <div class="col-md-4">
                             <div class="mb-3">
                                 <label class="form-label">Subtotal <span class="text-danger">*</span></label>
-                                <input type="number" step="0.01" name="subtotal" id="subtotal" class="form-control" value="{{ old('subtotal', 0) }}" required onchange="calculateTotal()">
+                                <input type="number" step="0.01" name="subtotal" id="subtotal" class="form-control" value="{{ old('subtotal', 0) }}" required oninput="calculateTotal()" onchange="calculateTotal()">
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="mb-3">
                                 <label class="form-label">Tax Amount</label>
-                                <input type="number" step="0.01" name="tax_amount" id="tax_amount" class="form-control" value="{{ old('tax_amount', 0) }}" onchange="calculateTotal()">
+                                <input type="number" step="0.01" name="tax_amount" id="tax_amount" class="form-control" value="{{ old('tax_amount', 0) }}" oninput="calculateTotal()" onchange="calculateTotal()">
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="mb-3">
                                 <label class="form-label">Discount</label>
-                                <input type="number" step="0.01" name="discount" id="discount" class="form-control" value="{{ old('discount', 0) }}" onchange="calculateTotal()">
+                                <input type="number" step="0.01" name="discount" id="discount" class="form-control" value="{{ old('discount', 0) }}" oninput="calculateTotal()" onchange="calculateTotal()">
                             </div>
                         </div>
                     </div>
@@ -149,7 +149,7 @@
 </form>
 @endsection
 
-@section('scripts')
+@section('js')
 <script>
 function calculateTotal() {
     const subtotal = parseFloat(document.getElementById('subtotal').value) || 0;

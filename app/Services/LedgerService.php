@@ -232,5 +232,73 @@ class LedgerService
             ->where('linked_id', $modelId)
             ->first();
     }
+
+    /**
+     * Create entry (for old system compatibility)
+     * Used by purchase orders and billing
+     */
+    public function createEntry($data)
+    {
+        try {
+            $entry = JournalEntry::create([
+                'entry_number' => JournalEntry::generateNumber(),
+                'entry_date' => $data['voucher_date'] ?? $data['date'] ?? now(),
+                'reference' => $data['number'] ?? $data['reference'] ?? '',
+                'description' => $data['narration'] ?? $data['description'] ?? 'Legacy entry',
+                'status' => 'posted',
+                'entry_type' => 'journal',
+                'source_module' => $data['source_module'] ?? 'legacy',
+                'source_id' => $data['source_id'] ?? null,
+                'branch_id' => $data['branch_id'] ?? auth()->user()->branch_id ?? null,
+                'posted_at' => now(),
+                'posted_by' => auth()->id() ?? 1,
+                'created_by' => auth()->id() ?? 1,
+            ]);
+            
+            \Log::info("Legacy journal entry created: ID {$entry->id}");
+            return $entry;
+        } catch (\Exception $e) {
+            \Log::error('LedgerService::createEntry failed: ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Create entry items (for old system compatibility)
+     * Used by purchase orders and billing
+     */
+    public function createEntryItems($data)
+    {
+        try {
+            $debit = 0;
+            $credit = 0;
+            
+            if ($data['balanceType'] == 'd') {
+                $debit = $data['amount'];
+            } else {
+                $credit = $data['amount'];
+            }
+            
+            $line = JournalEntryLine::create([
+                'journal_entry_id' => $data['entry_id'],
+                'account_ledger_id' => $data['ledger_id'],
+                'description' => $data['narration'] ?? '',
+                'debit' => $debit,
+                'credit' => $credit,
+            ]);
+            
+            // Update ledger balance
+            $ledger = AccountLedger::find($data['ledger_id']);
+            if ($ledger) {
+                $ledger->updateBalance($debit, $credit);
+            }
+            
+            \Log::info("Legacy journal entry line created: ID {$line->id}, Ledger: {$data['ledger_id']}, Debit: {$debit}, Credit: {$credit}");
+            return $line;
+        } catch (\Exception $e) {
+            \Log::error('LedgerService::createEntryItems failed: ' . $e->getMessage());
+            return null;
+        }
+    }
 }
 

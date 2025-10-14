@@ -54,8 +54,12 @@ class Vendor extends Model
     // Helper methods
     public function getTotalOutstandingAttribute()
     {
-        return $this->bills()
-            ->whereIn('status', ['pending', 'partially_paid', 'overdue'])
-            ->sum('balance');
+        try {
+            return $this->bills()
+                ->whereIn('status', ['pending', 'partially_paid', 'overdue'])
+                ->sum('balance') ?? 0;
+        } catch (\Exception $e) {
+            return 0;
+        }
     }
 }
