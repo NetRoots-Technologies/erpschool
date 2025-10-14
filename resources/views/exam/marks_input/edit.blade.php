@@ -299,7 +299,7 @@
             
            setTimeout(() => {
                 $('.select_course').on('change', function () {
-                    var course_id = {{ $marksInput->subject_id }};
+                    var course_id = {{ $marksInput->course_id }};
                     console.log("The course id is", course_id);
 
                     $.ajax({
@@ -332,16 +332,18 @@
 
             var subComponentId = {{ $marksInput->sub_component_id }};
             setTimeout(() => {
+                // alert("d");
                 $('.component_id').on('change', function () {
-                var component_id = $(this).val();
+                 var comId = {{ $marksInput->component_id }};
                 $.ajax({
                     type: 'GET',
                     url: '{{ route('exam.fetchSubComponent') }}',
                     data: {
-                        component_id: component_id
+                        component_id: comId
                     },
                     success: function (data) {
                         // loader.remove();
+                        // alert(data);
                         var subComponentDropdown = $('.sub_component_id').empty();
                         subComponentDropdown.append('<option value="" selected>Select SubComponent</option>');
 
@@ -356,7 +358,7 @@
                     }
                 });
             }).change();
-            }, 5000);
+            }, 3500);
 
 
             function loadData() {
@@ -373,7 +375,7 @@
                         'X-CSRF-TOKEN': '{{ csrf_token() }}'
                     },
                     success: function (data) {
-                        loader.remove();
+                        // loader.remove();
 
                         $('#loadData').html(data);
                     },

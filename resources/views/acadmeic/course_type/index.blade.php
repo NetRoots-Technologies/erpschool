@@ -372,9 +372,9 @@
                         var id = $('#edit_id').val();
                         var url = "{{ route('academic.subject-type.index') }}";
                         $.ajax({
-                            type: "put",
+                            type: "post",
                             "url": url + '/' + id,
-                            data: $('#editform').serialize(),
+                            data: $('#editform').serialize() + '&_method=PUT',
                             success: function (response) {
                                 $('#myModal').modal('hide');
                                 tableData.ajax.reload();

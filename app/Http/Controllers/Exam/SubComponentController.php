@@ -195,6 +195,7 @@ class SubComponentController extends Controller
 
     public function fetchSubComponent(Request $request)
     {
+       
         if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
