@@ -27,6 +27,7 @@ use App\Http\Controllers\Admin\PromotionalMessageController;
 use App\Http\Controllers\Admin\MarketingNotificationController;
 use App\Http\Controllers\Admin\SignatoryAuthorityController;
 use App\Http\Controllers\Admin\FeeManagementController;
+use App\Http\Controllers\Admin\BankAccountController;
 
 Route::group(['middleware' => ['auth'], 'prefix' => 'admin', 'as' => 'admin.'], function () {
 
@@ -114,6 +115,10 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'admin', 'as' => 'admin.'], 
     Route::resource('financial-years', FinancialController::class);
     Route::resource('banks', BankController::class);
     Route::resource('banks_branches', BankBranchesController::class);
+
+    Route::get('banks_branches/index', [BankBranchesController::class, 'index'])->name('banks.branchs.index');
+
+    Route::resource('bank_accounts', BankAccountController::class);
     // Bank accounts now managed in Accounts & Finance module
     Route::redirect('banks_accounts', '/accounts/chart-of-accounts')->name('banks_accounts.index');
     Route::redirect('banks_accounts/create', '/accounts/chart-of-accounts/create')->name('banks_accounts.create');

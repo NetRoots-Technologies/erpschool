@@ -5,7 +5,7 @@ namespace App\Models\Admin;
 use App\Models\Accounts\AccountLedger;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use App\Models\Admin\BankBranch;
 class BankAccount extends Model
 {
     use HasFactory;
@@ -19,9 +19,11 @@ class BankAccount extends Model
         return $this->belongsTo(Bank::class, 'bank_id');
     }
 
-    public function bankBranch()
+
+
+    public function branches()
     {
-        return $this->belongsTo(BankBranch::class, 'bank_branch_id');
+        return $this->belongsTo(BankBranch::class, 'bank_branch_id' , 'id');
     }
     public function ledger()
     {
