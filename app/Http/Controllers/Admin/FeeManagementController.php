@@ -35,7 +35,7 @@ class FeeManagementController extends Controller
      */
     public function index()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('fee-dashboard')) {
             abort(403, 'Unauthorized access');
         }
 
@@ -85,7 +85,7 @@ class FeeManagementController extends Controller
      */
     public function categories()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('fee-Categories-list')) {
             abort(403, 'Unauthorized access');
         }
 
@@ -98,9 +98,19 @@ class FeeManagementController extends Controller
             ->select(['id', 'name', 'description', 'type', 'is_mandatory', 'affects_financials', 'is_active', 'created_at']);
 
         return DataTables::of($categories)
-            ->addColumn('action', function ($category) {
-                $editBtn = '<a href="' . route('admin.fee-management.categories.edit', $category->id) . '" class="btn btn-sm btn-primary">Edit</a>';
-                $deleteBtn = '<button class="btn btn-sm btn-danger" onclick="deleteCategory(' . $category->id . ')">Delete</button>';
+            ->addColumn('action', function ($category) {  
+
+                $editBtn = '';
+                $deleteBtn = '';
+                if (Gate::allows('fee-Categories-edit')) {
+                $editBtn .= '<a href="' . route('admin.fee-management.categories.edit', $category->id) . '" class="btn btn-sm btn-primary">Edit</a>';
+                    
+                    }
+
+                            if (Gate::allows('fee-Categories-delete')) {
+                            $deleteBtn .= '<button class="btn btn-sm btn-danger" onclick="deleteCategory(' . $category->id . ')">Delete</button>';
+                        
+                    }
                 return $editBtn . ' ' . $deleteBtn;
             })
             ->addColumn('status', function ($category) {
@@ -112,7 +122,7 @@ class FeeManagementController extends Controller
 
     public function createCategory()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('fee-Categories-create')) {
             abort(403, 'Unauthorized access');
         }
 
@@ -121,7 +131,7 @@ class FeeManagementController extends Controller
 
     public function storeCategory(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('fee-Categories-create')) {
             abort(403, 'Unauthorized access');
         }
 
@@ -161,7 +171,7 @@ class FeeManagementController extends Controller
 
     public function editCategory($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('fee-Categories-edit')) {
             abort(403, 'Unauthorized access');
         }
 
@@ -171,7 +181,7 @@ class FeeManagementController extends Controller
 
     public function updateCategory(Request $request, $id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('fee-Categories-edit')) {
             abort(403, 'Unauthorized access');
         }
 
@@ -201,7 +211,7 @@ class FeeManagementController extends Controller
 
     public function deleteCategory($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('fee-Categories-delete')) {
             abort(403, 'Unauthorized access');
         }
 
@@ -216,7 +226,7 @@ class FeeManagementController extends Controller
      */
     public function structures()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('fee-structures-list')) {
             abort(403, 'Unauthorized access');
         }
 
@@ -230,8 +240,20 @@ class FeeManagementController extends Controller
 
         return DataTables::of($structures)
             ->addColumn('action', function ($structure) {
-                $editBtn = '<a href="' . route('admin.fee-management.structures.edit', $structure->id) . '" class="btn btn-sm btn-primary">Edit</a>';
-                $deleteBtn = '<button class="btn btn-sm btn-danger" onclick="deleteStructure(' . $structure->id . ')">Delete</button>';
+
+                $editBtn = "";
+                $deleteBtn = "";
+
+                if(Gate::allows('fee-structures-edit')){
+                $editBtn .= '<a href="' . route('admin.fee-management.structures.edit', $structure->id) . '" class="btn btn-sm btn-primary">Edit</a>';
+
+                }
+
+                if(Gate::allows('fee-structures-delete')){
+                $deleteBtn .= '<button class="btn btn-sm btn-danger" onclick="deleteStructure(' . $structure->id . ')">Delete</button>';
+                    
+                }
+
                 return $editBtn . ' ' . $deleteBtn;
             })
             ->addColumn('class_name', function ($structure) {
@@ -252,7 +274,7 @@ class FeeManagementController extends Controller
 
     public function createStructure()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('fee-structures-create')) {
             abort(403, 'Unauthorized access');
         }
 
@@ -266,7 +288,7 @@ class FeeManagementController extends Controller
 
     public function storeStructure(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('fee-structures-create')) {
             abort(403, 'Unauthorized access');
         }
 
@@ -324,7 +346,7 @@ class FeeManagementController extends Controller
 
     public function editStructure($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('fee-structures-edit')) {
             abort(403, 'Unauthorized access');
         }
 
@@ -339,7 +361,7 @@ class FeeManagementController extends Controller
 
     public function updateStructure(Request $request, $id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('fee-structures-edit')) {
             abort(403, 'Unauthorized access');
         }
 
@@ -394,7 +416,7 @@ class FeeManagementController extends Controller
 
     public function deleteStructure($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('fee-structures-delete')) {
             abort(403, 'Unauthorized access');
         }
 
@@ -409,7 +431,7 @@ class FeeManagementController extends Controller
      */
     public function collections()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('fee-collections-list')) {
             abort(403, 'Unauthorized access');
         }
 
@@ -423,8 +445,19 @@ class FeeManagementController extends Controller
 
         return DataTables::of($collections)
             ->addColumn('action', function ($collection) {
-                $viewBtn = '<a href="' . route('admin.fee-management.collections.show', $collection->id) . '" class="btn btn-sm btn-info">View</a>';
-                $editBtn = '<a href="' . route('admin.fee-management.collections.edit', $collection->id) . '" class="btn btn-sm btn-primary">Edit</a>';
+
+                $viewBtn = ''; 
+                $editBtn = '';
+
+                if(Gate::allows('fee-collections-view')){
+                $viewBtn .= '<a href="' . route('admin.fee-management.collections.show', $collection->id) . '" class="btn btn-sm btn-info">View</a>';
+
+                }
+
+                if(Gate::allows('fee-collections-edit')){
+                $editBtn .= '<a href="' . route('admin.fee-management.collections.edit', $collection->id) . '" class="btn btn-sm btn-primary">Edit</a>';
+
+                }
                 return $viewBtn . ' ' . $editBtn;
             })
             ->addColumn('student_name', function ($collection) {
@@ -445,7 +478,7 @@ class FeeManagementController extends Controller
 
     public function showCollection($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('fee-collections-view')) {
             abort(403, 'Unauthorized access');
         }
 
@@ -479,7 +512,7 @@ class FeeManagementController extends Controller
 
     public function createCollection()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('fee-collections-create')) {
             abort(403, 'Unauthorized access');
         }
 
@@ -493,7 +526,7 @@ class FeeManagementController extends Controller
 
     public function getStudentsByClass($classId)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('fee-collections-create')) {
             abort(403, 'Unauthorized access');
         }
 
@@ -517,9 +550,7 @@ class FeeManagementController extends Controller
 
     public function getSessionsByClass($classId)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            abort(403, 'Unauthorized access');
-        }
+       
 
         // Get sessions assigned to this class through ActiveSession table
         $sessions = ActiveSession::with('academicSession')
@@ -550,7 +581,7 @@ class FeeManagementController extends Controller
 
     public function storeCollection(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('fee-collections-create')) {
             abort(403, 'Unauthorized access');
         }
 
@@ -661,7 +692,7 @@ class FeeManagementController extends Controller
 
     public function editCollection($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('fee-collections-edit')) {
             abort(403, 'Unauthorized access');
         }
 
@@ -709,7 +740,7 @@ class FeeManagementController extends Controller
      */
     public function updateChallanCollection(Request $request, $id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('fee-collections-edit')) {
             abort(403, 'Unauthorized access');
         }
 
@@ -776,7 +807,7 @@ class FeeManagementController extends Controller
 
     public function updateCollection(Request $request, $id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('fee-collections-edit')) {
             abort(403, 'Unauthorized access');
         }
 
@@ -834,7 +865,7 @@ class FeeManagementController extends Controller
      */
     public function discounts()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('fee-discount-list')) {
             abort(403, 'Unauthorized access');
         }
 
@@ -848,8 +879,21 @@ class FeeManagementController extends Controller
 
         return DataTables::of($discounts)
             ->addColumn('action', function ($discount) {
-                $editBtn = '<a href="' . route('admin.fee-management.discounts.edit', $discount->id) . '" class="btn btn-sm btn-primary">Edit</a>';
+
+                $deleteBtn = ''; 
+                $editBtn = '';
+
+                if(Gate::allows('fee-discount-edit')){
+                  $editBtn = '<a href="' . route('admin.fee-management.discounts.edit', $discount->id) . '" class="btn btn-sm btn-primary">Edit</a>';
+
+                }
+
+                if(Gate::allows('fee-discount-delete')){
                 $deleteBtn = '<button class="btn btn-sm btn-danger" onclick="deleteDiscount(' . $discount->id . ')">Delete</button>';
+
+                }
+                
+
                 return $editBtn . ' ' . $deleteBtn;
             })
             ->addColumn('student_name', function ($discount) {
@@ -864,7 +908,7 @@ class FeeManagementController extends Controller
 
     public function createDiscount()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('fee-discount-create')) {
             abort(403, 'Unauthorized access');
         }
 
@@ -876,7 +920,7 @@ class FeeManagementController extends Controller
 
     public function storeDiscount(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('fee-discount-create')) {
             abort(403, 'Unauthorized access');
         }
 
@@ -907,7 +951,7 @@ class FeeManagementController extends Controller
 
     public function editDiscount($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('fee-discount-edit')) {
             abort(403, 'Unauthorized access');
         }
 
@@ -920,7 +964,7 @@ class FeeManagementController extends Controller
 
     public function updateDiscount(Request $request, $id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('fee-discount-edit')) {
             abort(403, 'Unauthorized access');
         }
 
@@ -977,7 +1021,7 @@ class FeeManagementController extends Controller
 
     public function deleteDiscount($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('fee-discount-delete')) {
             abort(403, 'Unauthorized access');
         }
 
@@ -992,7 +1036,7 @@ class FeeManagementController extends Controller
      */
     public function billing()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('fee-billing-list')) {
             abort(403, 'Unauthorized access');
         }
 
@@ -1004,6 +1048,11 @@ class FeeManagementController extends Controller
 
     public function getBillingData(Request $request)
     {
+
+        if (!Gate::allows('fee-billing-list')) {
+            abort(403, 'Unauthorized access');
+        }
+
         $billing = FeeBilling::with(['student.AcademicClass', 'academicSession'])
             ->select(['id', 'student_id', 'academic_session_id', 'challan_number', 'total_amount', 'paid_amount', 'outstanding_amount', 'due_date', 'status', 'billing_month', 'created_at']);
             
@@ -1014,7 +1063,11 @@ class FeeManagementController extends Controller
 
         return DataTables::of($billing)
             ->addColumn('action', function ($bill) {
-                $printBtn = '<a href="' . route('admin.fee-management.billing.print', $bill->id) . '" class="btn btn-sm btn-success" target="_blank">Print</a>';
+                $printBtn = '';
+                if (Gate::allows('fee-billing-print')) {
+                $printBtn .= '<a href="' . route('admin.fee-management.billing.print', $bill->id) . '" class="btn btn-sm btn-success" target="_blank">Print</a>';
+        }
+
                 return $printBtn;
             })
             ->addColumn('student_name', function ($bill) {
@@ -1048,7 +1101,7 @@ class FeeManagementController extends Controller
 
     public function generateBilling(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('fee-billing-create')) {
             abort(403, 'Unauthorized access');
         }
 
@@ -1176,7 +1229,7 @@ class FeeManagementController extends Controller
 
     public function printBilling($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('fee-billing-print')) {
             abort(403, 'Unauthorized access');
         }
 
@@ -1205,7 +1258,7 @@ class FeeManagementController extends Controller
      */
     public function payChallan()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('pay-challan')) {
             abort(403, 'Unauthorized access');
         }
 
@@ -1456,7 +1509,7 @@ class FeeManagementController extends Controller
      */
     public function reports()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('fee-report-list')) {
             abort(403, 'Unauthorized access');
         }
 
@@ -1465,7 +1518,7 @@ class FeeManagementController extends Controller
 
     public function incomeReport(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('fee-report-income')) {
             abort(403, 'Unauthorized access');
         }
 
@@ -1482,7 +1535,7 @@ class FeeManagementController extends Controller
 
     public function outstandingReport(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('fee-report-outstanding')) {
             abort(403, 'Unauthorized access');
         }
 
@@ -1509,7 +1562,7 @@ class FeeManagementController extends Controller
 
     public function studentLedger($studentId)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('fee-report-ledger')) {
             abort(403, 'Unauthorized access');
         }
 
