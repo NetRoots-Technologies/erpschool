@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\Group;
 use App\Models\Admin\Bank;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use App\Helper\CoreAccounts;
 use Illuminate\Http\Request;
@@ -12,6 +11,8 @@ use App\Models\Admin\BankBranch;
 use Illuminate\Support\Facades\DB;
 use App\Services\BankBranchService;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Gate;
+use Yajra\DataTables\Facades\DataTables;
 
 class BankBranchesController extends Controller
 {
@@ -27,23 +28,15 @@ class BankBranchesController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-    public function getData()
-    {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
-        $BankBranchService = $this->BankBranchService->getdata();
-        return $BankBranchService;
-    }
+    
 
     public function index()
-    {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
-        $banks = Bank::where('status', 1)->get();
-        return view('fee.bank_branches.index', compact('banks'));
-    }
+{
+    $branches = BankBranch::with('bank')->orderBy('id', 'DESC')->get();
+
+    return view('admin.bank_branches.index', compact('branches'));
+}
+
 
     /**
      * Show the form for creating a new resource.
@@ -52,9 +45,9 @@ class BankBranchesController extends Controller
      */
     public function create()
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+        $banks = Bank::where('status', 1)->get();
+
+        return view('admin.bank_branches.create' ,  compact('banks'));
     }
 
     /**
@@ -63,30 +56,24 @@ class BankBranchesController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
-    {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
-        $request->validate([
-            // 'bank_id' => 'required',
-            'branch_name' => 'required|string|max:255',
-            'branch_code' => 'required|string|max:255',
-        ]);
+   public function store(Request $request)
+{
+    $request->validate([
+        'bank_id' => 'required|exists:banks,id',
+        'branch_name' => 'required|string|max:255',
+        'branch_code' => 'required|string|max:50',
+    ]);
 
-        $bankBranch = $this->BankBranchService->store($request);
-        $parentGroup = Group::where('parent_type_id', $request->get('bank_id'))->where("parent_type", Bank::class)->first();
+    BankBranch::create([
+        'bank_id' => $request->bank_id,
+        'branch_name' => $request->branch_name,
+        'branch_code' => $request->branch_code,
+        'status' => 1
+    ]);
 
-        $data['name'] = Str::upper($bankBranch->branch_name."-".$bankBranch->branch_code);
-        $data['parent_id'] = $parentGroup->id;
-        $data['parent_type'] = BankBranch::class;
-        $data['parent_type_id'] = $bankBranch->id;
+    return redirect()->route('admin.banks_branches.index')->with('success', 'Branch created successfully.');
+}
 
-        CoreAccounts::createGroup($data);
-
-        return response()->json(["message" => "Success"]);
-
-    }
 
     /**
      * Display the specified resource.
@@ -107,44 +94,54 @@ class BankBranchesController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
-    {
-      if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+  public function edit($id)
+{
+    if (!Gate::allows('Dashboard-list')) {
+        return abort(503);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
-        return $BankBranchService = $this->BankBranchService->update($request, $id);
+    $branch = BankBranch::findOrFail($id);
+    $banks = Bank::where('status', 1)->get();
+
+    return view('admin.bank_branches.edit', compact('branch', 'banks'));
+}
+
+public function update(Request $request, $id)
+{
+    if (!Gate::allows('Dashboard-list')) {
+        return abort(503);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
+    $request->validate([
+        'bank_id' => 'required|exists:banks,id',
+        'branch_name' => 'required|string|max:255',
+        'branch_code' => 'required|string|max:50',
+        'status' => 'required|boolean',
+    ]);
 
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
-        return $BankBranchService = $this->BankBranchService->destroy($id);
+    $branch = BankBranch::findOrFail($id);
 
+    $branch->update([
+        'bank_id' => $request->bank_id,
+        'branch_name' => $request->branch_name,
+        'branch_code' => $request->branch_code,
+        'status' => $request->status,
+    ]);
+
+    return redirect()->route('admin.banks_branches.index')->with('success', 'Branch updated successfully.');
+}
+
+public function destroy($id)
+{
+    if (!Gate::allows('Dashboard-list')) {
+        return abort(503);
     }
 
+    $branch = BankBranch::findOrFail($id);
+    $branch->delete();
+
+    return redirect()->route('admin.banks_branches.index')->with('success', 'Branch deleted successfully.');
+}
 
 
     public function changeStatus(Request $request)

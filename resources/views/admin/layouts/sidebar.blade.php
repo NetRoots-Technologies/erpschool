@@ -684,95 +684,73 @@
 
 
                 {{-- Accounts & Finance Section --}}
-                @if (Gate::allows('Accounts') || Gate::allows('Assets') || Gate::allows('AccountReports'))
+                <li class="side-item side-item-category">Accounts & Finance</li>
+                <li class="slide">
+                    <a class="side-menu__item {{ request()->is('accounts*')|| request()->is('admin*') ? 'active' : '' }}"
+                        data-bs-toggle="slide" href="javascript:void(0);">
+                        <i class="fa fa-calculator icons8 icon-style" aria-hidden="true"></i>
+                        <span class="side-menu__label">Accounts & Finance</span>
+                        <i class="angle fe fe-chevron-down"></i>
+                    </a>
+                    <ul class="slide-menu" style="display: {{ request()->is('accounts*') || request()->is('admin*') ? 'block' : 'none' }}">
+                        <li><a class="slide-item {{ request()->is('accounts/dashboard') ? 'active' : '' }}"
+                                href="{{ route('accounts.dashboard') }}">Dashboard</a></li>
+                        
+                        {{-- Account Groups & Chart of Accounts --}}
+                        <li><a class="slide-item {{ request()->is('accounts/groups*') ? 'active' : '' }}"
+                                href="{{ route('accounts.groups.index') }}">Account Groups</a></li>
+                        <li><a class="slide-item {{ request()->is('accounts/chart-of-accounts*') ? 'active' : '' }}"
+                                href="{{ route('accounts.coa.index') }}">Chart of Accounts</a></li>
+                        <li><a class="slide-item {{ request()->is('accounts/journal-entries*') ? 'active' : '' }}"
+                                href="{{ route('accounts.journal.index') }}">Journal Entries</a></li>
+                        
+                        {{-- Payables --}}
+                        <li><a class="slide-item {{ request()->is('accounts/payables') ? 'active' : '' }}"
+                                href="{{ route('accounts.payables.index') }}">Accounts Payable</a></li>
+                        <li><a class="slide-item {{ request()->is('accounts/payables/vendors*') ? 'active' : '' }}"
+                                href="{{ route('accounts.payables.vendors.index') }}">Vendors</a></li>
+                        <li><a class="slide-item {{ request()->is('accounts/payables/bills*') ? 'active' : '' }}"
+                                href="{{ route('accounts.payables.bills.index') }}">Bills</a></li>
+                        
+                        {{-- Receivables --}}
+                        <li><a class="slide-item {{ request()->is('accounts/receivables') ? 'active' : '' }}"
+                                href="{{ route('accounts.receivables.index') }}">Accounts Receivable</a></li>
+                        <li><a class="slide-item {{ request()->is('accounts/receivables/customers*') ? 'active' : '' }}"
+                                href="{{ route('accounts.receivables.customers.index') }}">Customers</a></li>
+                        <li><a class="slide-item {{ request()->is('accounts/receivables/invoices*') ? 'active' : '' }}"
+                                href="{{ route('accounts.receivables.invoices.index') }}">Invoices</a></li>
+                        
+                        {{-- Cost & Profit Centers --}}
+                        <li><a class="slide-item {{ request()->is('accounts/cost-centers*') ? 'active' : '' }}"
+                                href="{{ route('accounts.cost_centers.index') }}">Cost Centers</a></li>
+                        <li><a class="slide-item {{ request()->is('accounts/profit-centers*') ? 'active' : '' }}"
+                                href="{{ route('accounts.profit_centers.index') }}">Profit Centers</a></li>
+                        
+                        {{-- Reports --}}
+                        <li><a class="slide-item {{ request()->is('accounts/reports/trial-balance*') ? 'active' : '' }}"
+                                href="{{ route('accounts.reports.trial_balance') }}">Trial Balance</a></li>
+                        <li><a class="slide-item {{ request()->is('accounts/reports/balance-sheet*') ? 'active' : '' }}"
+                                href="{{ route('accounts.reports.balance_sheet') }}">Balance Sheet</a></li>
+                        <li><a class="slide-item {{ request()->is('accounts/reports/income-statement*') ? 'active' : '' }}"
+                                href="{{ route('accounts.reports.income_statement') }}">Income Statement</a></li>
+                        <li><a class="slide-item {{ request()->is('accounts/reports/cash-flow*') ? 'active' : '' }}"
+                                href="{{ route('accounts.reports.cash_flow') }}">Cash Flow</a></li>
+                        <li><a class="slide-item {{ request()->is('accounts/reports/aged-payables*') ? 'active' : '' }}"
+                                href="{{ route('accounts.reports.aged_payables') }}">Aged Payables</a></li>
+                        <li><a class="slide-item {{ request()->is('accounts/reports/aged-receivables*') ? 'active' : '' }}"
+                                href="{{ route('accounts.reports.aged_receivables') }}">Aged Receivables</a></li>
 
+                        <li><a class="slide-item {{ request()->is('admin/banks') || request()->is('admin/banks/*') ? 'active' : '' }}" 
+                            href="{{ route('admin.banks.index') }}">Bank</a></li>
 
-                    <li class="side-item side-item-category">Accounts & Finance</li>
-                    <li class="slide">
-                        <a class="side-menu__item {{ request()->is('accounts*') ? 'active' : '' }}"
-                            data-bs-toggle="slide" href="javascript:void(0);">
-                            <i class="fa fa-calculator icons8 icon-style" aria-hidden="true"></i>
-                            <span class="side-menu__label">Accounts & Finance</span>
-                            <i class="angle fe fe-chevron-down"></i>
-                        </a>
-                        <ul class="slide-menu" style="display: {{ request()->is('accounts*') ? 'block' : 'none' }}">
-                            <li><a class="slide-item {{ request()->is('accounts/dashboard') ? 'active' : '' }}"
-                                    href="{{ route('accounts.dashboard') }}">Dashboard</a></li>
+                           <li><a class="slide-item {{ request()->is('admin/banks_branches') || request()->is('admin/banks_branches/*') ? 'active' : '' }}"
+                             href="{{ route('admin.banks_branches.index') }}">Bank Branch</a></li>
 
-                            {{-- Account Groups & Chart of Accounts --}}
-                            <li><a class="slide-item {{ request()->is('accounts/groups*') ? 'active' : '' }}"
-                                    href="{{ route('accounts.groups.index') }}">Account Groups</a></li>
+                           <li><a class="slide-item {{ request()->is('admin/bank_accounts*') ? 'active' : '' }}"
+                           href="{{ route('admin.bank_accounts.index') }}">Bank Account</a></li>
 
-                            @if (Gate::allows('ChartsOfAccounts-list'))
-                                <li><a class="slide-item {{ request()->is('accounts/chart-of-accounts*') ? 'active' : '' }}"
-                                        href="{{ route('accounts.coa.index') }}">Chart of Accounts</a></li>
-                            @endif
-
-                            @if (Gate::allows('JournalEntry-list'))
-                                <li><a class="slide-item {{ request()->is('accounts/journal-entries*') ? 'active' : '' }}"
-                                        href="{{ route('accounts.journal.index') }}">Journal Entries</a></li>
-                            @endif
-
-
-
-                            {{-- Payables --}}
-                            <li><a class="slide-item {{ request()->is('accounts/payables') ? 'active' : '' }}"
-                                    href="{{ route('accounts.payables.index') }}">Accounts Payable</a></li>
-                            <li><a class="slide-item {{ request()->is('accounts/payables/vendors*') ? 'active' : '' }}"
-                                    href="{{ route('accounts.payables.vendors.index') }}">Vendors</a></li>
-                            <li><a class="slide-item {{ request()->is('accounts/payables/bills*') ? 'active' : '' }}"
-                                    href="{{ route('accounts.payables.bills.index') }}">Bills</a></li>
-
-                            {{-- Receivables --}}
-                            <li><a class="slide-item {{ request()->is('accounts/receivables') ? 'active' : '' }}"
-                                    href="{{ route('accounts.receivables.index') }}">Accounts Receivable</a></li>
-                            <li><a class="slide-item {{ request()->is('accounts/receivables/customers*') ? 'active' : '' }}"
-                                    href="{{ route('accounts.receivables.customers.index') }}">Customers</a></li>
-                            <li><a class="slide-item {{ request()->is('accounts/receivables/invoices*') ? 'active' : '' }}"
-                                    href="{{ route('accounts.receivables.invoices.index') }}">Invoices</a></li>
-
-                            {{-- Cost & Profit Centers --}}
-                            <li><a class="slide-item {{ request()->is('accounts/cost-centers*') ? 'active' : '' }}"
-                                    href="{{ route('accounts.cost_centers.index') }}">Cost Centers</a></li>
-                            <li><a class="slide-item {{ request()->is('accounts/profit-centers*') ? 'active' : '' }}"
-                                    href="{{ route('accounts.profit_centers.index') }}">Profit Centers</a></li>
-
-                            {{-- Reports --}}
-                            @if (Gate::allows('TrialBalance-list'))
-                                <li><a class="slide-item {{ request()->is('accounts/reports/trial-balance*') ? 'active' : '' }}"
-                                        href="{{ route('accounts.reports.trial_balance') }}">Trial Balance</a>
-                                </li>
-                            @endif
-
-                            @if (Gate::allows('BalanceSheet-list'))
-                                <li><a class="slide-item {{ request()->is('accounts/reports/balance-sheet*') ? 'active' : '' }}"
-                                        href="{{ route('accounts.reports.balance_sheet') }}">Balance Sheet</a>
-                                </li>
-                            @endif
-
-                            @if (Gate::allows('ProfitLoss-list'))
-                                <li><a class="slide-item {{ request()->is('accounts/reports/income-statement*') ? 'active' : '' }}"
-                                        href="{{ route('accounts.reports.income_statement') }}">Income
-                                        Statement</a></li>
-
-                                <li><a class="slide-item {{ request()->is('accounts/reports/cash-flow*') ? 'active' : '' }}"
-                                        href="{{ route('accounts.reports.cash_flow') }}">Cash Flow</a></li>
-                                <li><a class="slide-item {{ request()->is('accounts/reports/aged-payables*') ? 'active' : '' }}"
-                                        href="{{ route('accounts.reports.aged_payables') }}">Aged Payables</a>
-                                </li>
-                                <li><a class="slide-item {{ request()->is('accounts/reports/aged-receivables*') ? 'active' : '' }}"
-                                        href="{{ route('accounts.reports.aged_receivables') }}">Aged
-                                        Receivables</a></li>
-                            @endif
-
-
-
-
-
-
-                        </ul>
-                    </li>
-                @endif
+                    </ul>
+                </li>
 
                 @canany(['EmployeeWelfare', 'EOBI', 'ProfitFunds', 'SocialSecurity'])
                     <li class="side-item side-item-category">Funds</li>

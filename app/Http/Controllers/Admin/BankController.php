@@ -2,174 +2,63 @@
 
 namespace App\Http\Controllers\Admin;
 
-use constants;
-use Exception;
-use App\Models\Admin\Bank;
-use App\Helper\CoreAccounts;
-use Illuminate\Http\Request;
-use App\Services\BankService;
-use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Gate;
+use Illuminate\Http\Request;
+use App\Models\Admin\Bank;
 
 class BankController extends Controller
 {
-
-    protected $BankService;
-    
-    public function __construct(BankService $BankService)
-    {
-        $this->BankService = $BankService;
-    }
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function getData()
-    {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
-        $BankService = $this->BankService->getdata();
-        return $BankService;
-    }
-
     public function index()
     {
-if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
-
-        return view('fee.banks.index');
+        $banks = Bank::orderBy('id', 'DESC')->get();
+        return view('admin.banks.index', compact('banks'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+        return view('admin.banks.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
-        try {
-            DB::beginTransaction();
+        $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
 
-            $request->validate([
-                'name' => 'required',
-            ]);
-            
-            $bank = $this->BankService->store($request);
+        Bank::create([
+            'name' => $request->name,
+            'status' => 1,
+        ]);
 
-            $data["name"] = $request->name;
-            $data["parent_id"] = config('constants.FixedGroups.banks');
-            $data['parent_type_id'] = $bank->id;
-            $data['parent_type'] = Bank::class;
-
-            CoreAccounts::createGroup($data);
-
-            DB::commit();
-            return response()->json(["message" => "Success"]);
-
-        } catch (Exception $exception) {
-            DB::rollback();
-        }
+        return redirect()->route('admin.banks.index')->with('success', 'Bank created successfully.');
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function edit($id)
     {
-       if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+        $bank = Bank::findOrFail($id);
+        return view('admin.banks.edit', compact('bank'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
-        return $Bank = $this->BankService->update($request, $id);
+        $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
 
+        $bank = Bank::findOrFail($id);
+        $bank->update([
+            'name' => $request->name,
+            'status' => $request->status ?? 1,
+        ]);
+
+        return redirect()->route('admin.banks.index')->with('success', 'Bank updated successfully.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
-        return $Bank = $this->BankService->destroy($id);
+        $bank = Bank::findOrFail($id);
+        $bank->delete();
 
-    }
-
-    public function handleBulkAction(Request $request)
-    {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
-        $ids = $request->get('ids');
-        foreach ($ids as $id) {
-            $bank = Bank::find($id);
-            if ($bank) {
-                $bank->delete();
-            }
-        }
-        return response()->json(['message' => 'Bulk Action Completed Successfully']);
-    }
-
-    public function changeStatus(Request $request)
-    {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
-        return $bill = $this->BankService->changeStatus($request);
-
+        return redirect()->route('admin.banks.index')->with('success', 'Bank deleted successfully.');
     }
 }
-
