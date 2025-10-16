@@ -16,33 +16,25 @@ class UserServise
 
     public function index()
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
     }
 
     public function apiindex()
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         return User::all();
 
     }
 
     public function create()
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         return Role::all();
     }
 
     public function store($request)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         // dd($request->all());
         $data = $request->all();
         $data['image'] = "dist/Profile/defualt.png";
@@ -74,9 +66,7 @@ class UserServise
 
     public function user_deactive($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         $user = User::find($id);
         if ($user) {
             $user->active = 0;
@@ -86,18 +76,14 @@ class UserServise
 
     public function user_data($slug)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         return $user = User::where('slug', $slug)->first();
 
     }
 
     public function user_active($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         $user = User::find($id);
         if ($user) {
             $user->active = 1;
@@ -109,9 +95,7 @@ class UserServise
 
     public function getdata()
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         $data = User::query();
         
 
@@ -130,7 +114,9 @@ class UserServise
 
                 $btn = ' <form class="delete_form" data-route="' . route("users.destroy", $row->id) . '"   id="User-' . $row->id . '"  method="POST"> ';
 
-                // if (Gate::allows('users-edit'))
+                if (Gate::allows('users-edit')){
+
+               
                 // $btn = $btn . '<a  data-id="' . $row->id . '" class="btn btn-primary text-white  btn-sm user_edit"  data-user-edit=\'' . $row . '\'>Edit</a>';
                 $btn = $btn . '<a  data-id="' . $row->id . '" class="btn btn-primary text-white  btn-sm user_edit"  data-user-edit=\'' . json_encode([
                     'id' => $row->id,
@@ -142,12 +128,15 @@ class UserServise
                     'role_id' => $row->roles->pluck('id'), // ✅ this returns an array of role IDs
                 ]) . '\'
                         >Edit</a>';
-                // if (Gate::allows('users-delete'))
-                $btn = $btn . ' <button data-id="User-' . $row->id . '" type="button" class="btn btn-danger delete btn-sm "" >Delete</button>';
+                }
+                if (Gate::allows('users-delete')){
+                    $btn = $btn . ' <button data-id="User-' . $row->id . '" type="button" class="btn btn-danger delete btn-sm "" >Delete</button>';
 
                 $btn = $btn . method_field('DELETE') . '' . csrf_field();
 
                 $btn = $btn . ' </form>';
+                }
+                
                 return $btn;
             })
             ->rawColumns(['name', 'email', 'role', 'status', 'action'])
@@ -156,9 +145,7 @@ class UserServise
 
     public function edit($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         return User::find($id);
 
 
@@ -199,9 +186,7 @@ class UserServise
 
     public function update($request, $id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         $input = $request->all();
         $user = User::find($id);
 
@@ -236,9 +221,7 @@ class UserServise
 
     public function destroy($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         $User = User::findOrFail($id);
         if ($User)
             $User->delete();

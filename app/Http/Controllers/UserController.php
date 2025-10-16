@@ -29,9 +29,9 @@ class UserController extends Controller
     public function index()
     {
 
-        // if (!Gate::allows('users-list')) {
-        //     return abort(503);
-        // }
+        if (!Gate::allows('users-list')) {
+            return abort(503);
+        }
         $companies=Company::select('id','name')->where('status',1)->get();
         $roles = Role::get();
         return view('admin.users.index', compact('roles','companies'));
@@ -49,9 +49,9 @@ class UserController extends Controller
     public function create()
     {
 
-        // if (!Gate::allows('users-create')) {
-        //     return abort(503);
-        // }
+        if (!Gate::allows('users-create')) {
+            return abort(503);
+        }
         $roles = Role::get();
         return view('admin.users.create', compact('roles'));
     }
@@ -59,6 +59,9 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
+         if (!Gate::allows('users-create')) {
+            return abort(503);
+        }
         $validator = Validator::make($request->all(), [
             'email' => 'required|email|unique:users,email',
             'name' => 'required|string|max:255',
@@ -100,9 +103,9 @@ class UserController extends Controller
      */
     public function edit($id)
     {
-        // if (!Gate::allows('users-edit')) {
-        //     return abort(503);
-        // }
+        if (!Gate::allows('users-edit')) {
+            return abort(503);
+        }
         //$user = User::find($id);
         $user = User::find($id);
         $roles = Role::get();
@@ -118,9 +121,9 @@ class UserController extends Controller
      */
     public function update(Request $request,$id)
     {
-        // if (!Gate::allows('users-edit')) {
-        //     return abort(503);
-        // }
+        if (!Gate::allows('users-edit')) {
+            return abort(503);
+        }
         $this->validate($request, [
             'name' => 'required',
             'email' => 'required|email|unique:users,email,' . $id,
@@ -136,9 +139,9 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        // if (!Gate::allows('users-delete')) {
-        //     return abort(503);
-        // }
+        if (!Gate::allows('users-delete')) {
+            return abort(503);
+        }
         User::find($id)->delete();
         return 0;
     }

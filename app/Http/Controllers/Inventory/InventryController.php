@@ -24,7 +24,7 @@ class InventryController extends Controller
     }
     public function index($type)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('inventory-list')) {
             return abort(503);
         }
         return view('admin.inventory_management.inventry.index', compact('type'));
@@ -32,7 +32,7 @@ class InventryController extends Controller
 
     public function store(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('inventory-create')) {
             return abort(503);
         }
         // if (!Gate::allows('inventory-store')) {
@@ -60,7 +60,7 @@ class InventryController extends Controller
 
     public function getData(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('inventory-list')) {
             return abort(503);
         }
         $query = Inventry::latest()->with('branch');
@@ -71,7 +71,7 @@ class InventryController extends Controller
 
     public function view($type = 'food')
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('inventory-view')) {
             return abort(503);
         }
         return view('admin.inventory_management.inventry.pos', compact('type'));
@@ -80,10 +80,6 @@ class InventryController extends Controller
     public function listing(Request $request)
     {
 
-       
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
         $inventory = Inventry::select([
             'id',
             'name',
@@ -112,9 +108,7 @@ class InventryController extends Controller
 
     public function save(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+    
         $request->validate([
             "name" => 'required|array',
             "inventory_id" => 'required|array',
@@ -226,9 +220,7 @@ class InventryController extends Controller
 
     public function purchaseHistory()
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         $purchaseHistory = PurchaseHistory::latest()->get();
         return view('admin.inventory_management.inventry.purchase_history', compact('purchaseHistory'));
     }

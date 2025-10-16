@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers\Fleet;
 
-use App\Http\Controllers\Controller;
 use App\Models\Fleet\Route;
-use App\Models\Fleet\Vehicle;
 use Illuminate\Http\Request;
+use App\Models\Fleet\Vehicle;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Gate;
 
 class RouteController extends Controller
 {
@@ -16,6 +17,9 @@ class RouteController extends Controller
      */
     public function index()
     {
+          if (!Gate::allows('routes-list')) {
+            return abort(503);
+        }
         $routes = Route::with(['vehicle', 'company', 'branch'])->paginate(10);
         return view('fleet.routes.index', compact('routes'));
     }
@@ -27,6 +31,9 @@ class RouteController extends Controller
      */
     public function create()
     {
+          if (!Gate::allows('routes-create')) {
+            return abort(503);
+        }
         $vehicles = Vehicle::where('status', 'active')->get();
         return view('fleet.routes.create', compact('vehicles'));
     }
@@ -39,6 +46,9 @@ class RouteController extends Controller
      */
     public function store(Request $request)
     {
+          if (!Gate::allows('routes-create')) {
+            return abort(503);
+        }
         $request->validate([
             'route_name' => 'required|string|max:255',
             'vehicle_id' => 'required|exists:fleet_vehicles,id',
@@ -63,6 +73,9 @@ class RouteController extends Controller
      */
     public function show(Route $route)
     {
+          if (!Gate::allows('routes-view')) {
+            return abort(503);
+        }
         $route->load(['vehicle', 'company', 'branch']);
         return view('fleet.routes.show', compact('route'));
     }
@@ -75,6 +88,9 @@ class RouteController extends Controller
      */
     public function edit(Route $route)
     {
+          if (!Gate::allows('routes-edit')) {
+            return abort(503);
+        }
         $vehicles = Vehicle::where('status', 'active')->get();
         return view('fleet.routes.edit', compact('route', 'vehicles'));
     }
@@ -88,6 +104,9 @@ class RouteController extends Controller
      */
     public function update(Request $request, Route $route)
     {
+          if (!Gate::allows('routes-edit')) {
+            return abort(503);
+        }
         $request->validate([
             'route_name' => 'required|string|max:255',
             'vehicle_id' => 'required|exists:fleet_vehicles,id',
@@ -112,6 +131,9 @@ class RouteController extends Controller
      */
     public function destroy(Route $route)
     {
+          if (!Gate::allows('routes-delete')) {
+            return abort(503);
+        }
         $route->delete();
 
         return redirect()->route('fleet.routes.index')

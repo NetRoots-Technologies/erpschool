@@ -76,9 +76,13 @@ Requisition
 
 
 <div class="container-fluid">
-    <button type="button" id="add-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#iModal">
+
+    @if (Gate::allows('Requisitions-create'))
+         <button type="button" id="add-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#iModal">
         <i class="fa fa-plus"></i> Add
     </button>
+    @endif
+   
 
     <div class="row justify-content-center my-4">
         <div class="col-12">
@@ -98,6 +102,8 @@ Requisition
 <script defer>
     $(document).ready(function(){
             'use strict';
+            const editPermission = @json(Gate::allows("Requisitions-edit"));
+            const deletePermission = @json(Gate::allows("Requisitions-delete"));
             const uri = @json(route('datatable.data.requisitions'));
             const changeStatusUri = @json(route('inventory.requisitions.change.status'));
             const deleteUri = @json(route('inventory.requisitions.destroy'));
@@ -228,7 +234,15 @@ Requisition
                     },
                     { data: null, title: 'Action', orderable: false,
                         render: function (data, type, row, meta) {
-                            return `<span class="btn btn-sm btn-warning edit-item" data-id="${row.id}" data-name="${row.name}"><i class="fa fa-pencil"></i></span> <span data-uri="${deleteUri}/${row.id}" class="btn btn-sm btn-danger delete-item"><i class="fa fa-trash"></i></span>`;
+                            let html = '';
+                            if(editPermission){
+                                html += `<span class="btn btn-sm btn-warning edit-item" data-id="${row.id}" data-name="${row.name}"><i class="fa fa-pencil"></i></span>`;
+                              
+                            }
+                            if(deletePermission){
+                                html +=  `<span data-uri="${deleteUri}/${row.id}" class="btn btn-sm btn-danger delete-item"><i class="fa fa-trash"></i></span>`;
+                            }
+                            return html;
                         }
                     }
 

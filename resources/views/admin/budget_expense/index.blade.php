@@ -4,11 +4,11 @@
 @section('content')
     <div class="container-fluid">
         <div class="row w-100 text-center">
-            {{-- @if (Gate::allows('InventoryCategory-create')) --}}
+            @if (Gate::allows('expense create'))
                 <div class="col-auto mb-3">
                     <a href="{{route('inventory.expense.create')}}" class="btn btn-primary">Add Expense</a>
                 </div>
-            {{-- @endif --}}
+            @endif
             <div class="col-12">
                 <div class="card basic-form">
                     <div class="card-body">

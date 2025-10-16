@@ -96,9 +96,12 @@
 
 
     <div class="container-fluid">
-        <button type="button" id="add-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#iModal">
+        @if (Gate::allows('Supplier-create'))
+            <button type="button" id="add-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#iModal">
             <i class="fa fa-plus"></i> Add
         </button>
+        @endif
+        
 
         <div class="row justify-content-center my-4">
             <div class="col-12">
@@ -125,6 +128,9 @@
             const lastIndex = currectUri.split('/').pop();
             const type = @json($type);
             console.log(type);
+            const editPermission = @json(Gate::allows('Supplier-edit'));
+
+            
 
             $('#branches, #items').select2({
                 placeholder: "Select an option",
@@ -293,7 +299,11 @@
                         title: 'Action',
                         orderable: false,
                         render: function(data, type, row, meta) {
-                            return `<span class="btn btn-sm btn-warning edit-item" data-id="${row.id}" data-name="${row.name}"><i class="fa fa-pencil"></i>`
+                            let html = ''; 
+                            if(editPermission){
+                              html += `<span class="btn btn-sm btn-warning edit-item" data-id="${row.id}" data-name="${row.name}"><i class="fa fa-pencil"></i>`
+                            }
+                            return html;
                                 // </span> <span data-uri="${deleteUri}/${row.id}" class="btn btn-sm btn-danger delete-item"><i class="fa fa-trash"></i></span>;
                         }
                     }

@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers\Admin;
 
-use Carbon\Carbon;
-use App\Models\Budget;
-use Illuminate\Http\Request;
-use App\Models\DepartmentBudget;
-use Yajra\DataTables\DataTables;
-use Illuminate\Support\Facades\DB;
-use App\Models\SupplementaryBudget;
 use App\Http\Controllers\Controller;
+use App\Models\Budget;
+use App\Models\DepartmentBudget;
+use App\Models\SupplementaryBudget;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
+use Yajra\DataTables\DataTables;
 
 
 
@@ -19,6 +20,10 @@ class SuppliementaryBudgetController extends Controller
 
     public function index(Request $request)
     {
+        if (!Gate::allows('supplementory list')) {
+            return abort(503);
+        }
+
         if ($request->ajax()) {
             $data = SupplementaryBudget::with(['budget', 'category', 'subcategory', 'requestedByUser', 'approvedByUser']);
             // dd($data->get()->toArray());
@@ -82,6 +87,11 @@ class SuppliementaryBudgetController extends Controller
 
     public function create()
     {
+
+         if (!Gate::allows('supplementory create')) {
+            return abort(503);
+        }
+
         $budgets = Budget::all();
         return view('admin.supplementary_budgets.create', compact('budgets'));
     }
@@ -89,7 +99,9 @@ class SuppliementaryBudgetController extends Controller
     public function store(Request $request)
     {
 
-
+         if (!Gate::allows('supplementory create')) {
+            return abort(503);
+        }
         $request->validate([
             'budget_id' => 'required|exists:sub_budgets,id',
             'category_id' => 'required|exists:b_category,id',
@@ -112,12 +124,20 @@ class SuppliementaryBudgetController extends Controller
 
     public function edit(SupplementaryBudget $supplementaryBudget)
     {
+        if (!Gate::allows('supplementory edit')) {
+            return abort(503);
+        }
+
         $departmentBudgets = DepartmentBudget::all();
         return view('admin.supplementary_budgets.edit', compact('supplementaryBudget', 'departmentBudgets'));
     }
 
     public function update(Request $request, SupplementaryBudget $supplementaryBudget)
     {
+        if (!Gate::allows('supplementory edit')) {
+            return abort(503);
+        }
+
         $request->validate([
             'department_budget_id' => 'required|exists:department_budgets,id',
             'requested_amount' => 'required|numeric|min:1',
@@ -130,6 +150,9 @@ class SuppliementaryBudgetController extends Controller
 
     public function destroy(SupplementaryBudget $supplementaryBudget)
     {
+         if (!Gate::allows('supplementory delete')) {
+            return abort(503);
+        }
         $supplementaryBudget->delete();
         return redirect()->route('inventory.supplementory.index')->with('success', 'Deleted successfully');
     }
@@ -137,6 +160,10 @@ class SuppliementaryBudgetController extends Controller
     // Show requests List
     public function requestList(Request $request)
     {
+
+        if (!Gate::allows('supplementory request')) {
+            return abort(503);
+        }
         if ($request->ajax()) {
             $data = SupplementaryBudget::with(['budget', 'category', 'subcategory', 'requestedByUser', 'approvedByUser']);
             return DataTables::of($data)
@@ -184,14 +211,23 @@ class SuppliementaryBudgetController extends Controller
 
                 ->addColumn('action', function ($row) {
 
-                    if ($row->status == 'approved') {
+                    $btn = '';
+
+                    if (Gate::allows('supplementory request approved')) {
+                         if ($row->status == 'approved') {
                         $btn  = '<button type="button" class="btn btn-sm btn-primary" disabled>Approve</button> ';
                     } else {
                         $btn  = '<a data-id="' . $row->id . '" href="' . route('inventory.supplimentary.approved.status', $row->id) . '" class="btn btn-sm btn-primary approve_status">Approve</a> ';
                     }
+                      }
+
+                      if(Gate::allows('supplementory request reject')){
+                       $btn .= '<a data-id="' . $row->id . '" href="' . route('inventory.supplimentary.reject.status', $row->id) . '" class="btn btn-sm btn-danger reject_status">Reject</a> ';
+
+                      }
+                  
 
 
-                    $btn .= '<a data-id="' . $row->id . '" href="' . route('inventory.supplimentary.reject.status', $row->id) . '" class="btn btn-sm btn-danger reject_status">Reject</a> ';
                     return $btn;
                 })
 
@@ -265,6 +301,10 @@ class SuppliementaryBudgetController extends Controller
 
     public function buildVarianceQuery()
     {
+
+          if (!Gate::allows('supplementory report')) {
+            return abort(503);
+        }
         // 1) Department Budgets (month => allocated_budget)
         $allocated = DB::table('department_budgets')
             ->select(

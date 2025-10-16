@@ -13,7 +13,7 @@
             <h3 class="text-22 text-center text-bold w-100 mb-4"> Attendance </h3>
         </div>
         <div class="row    mt-4 mb-4 ">
-@if (Gate::allows('students'))
+@if (Gate::allows('EmployeeAttendance-create'))
             <div class="col-12 text-right">
                 <a href="{!! route('hr.attendance.create') !!}" class="btn btn-primary btn-md"><b>Add Attendance</b></a>
             </div>

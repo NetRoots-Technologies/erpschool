@@ -31,7 +31,7 @@ class ProductController extends Controller
 
     public function index($type)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Products-list')) {
             return abort(503);
         }
         $query = Inventry::query();
@@ -49,7 +49,7 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Products-create')) {
             return abort(503);
         }
         // dd($request->all());
@@ -103,7 +103,7 @@ class ProductController extends Controller
 
     public function getData(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Products-list')) {
             return abort(503);
         }
         $query = Product::query()->with(['ProductItems', 'ProductItems.inventoryItems', 'branch']);
@@ -116,7 +116,7 @@ class ProductController extends Controller
 
     public function destroy(Product $product)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('Products-delete')) {
             return abort(503);
         }
         $product->delete();
@@ -126,9 +126,7 @@ class ProductController extends Controller
 
     public function calculate(Product $product)
     {
-        if (!Gate::allows('students')) {
-            return abort(503);
-        }
+       
         $maxProductsForItem = PHP_INT_MAX;
 
         foreach ($product->productItems as $productItem) {
@@ -170,9 +168,7 @@ class ProductController extends Controller
     public function productInventory(Request $request)
     {
 
-        if (!Gate::allows('students')) {
-            return abort(503);
-        }
+       
         // DB::beginTransaction();
 
         $request->validate([
@@ -278,9 +274,7 @@ class ProductController extends Controller
 
     public function productCompleted()
     {
-        if (!Gate::allows('students')) {
-            return abort(503);
-        }
+        
         $goods = Inventry::where('type', 'p')->get();
         return view('admin.inventory_management.completed_good.index', compact('goods'));
     }
@@ -288,9 +282,7 @@ class ProductController extends Controller
 
     public function getCompleted()
     {
-        if (!Gate::allows('students')) {
-            return abort(503);
-        }
+       
         $query = Inventry::where('type', 'p')->get();
 
         return response()->json(["success" => true, 'data' => $query]);

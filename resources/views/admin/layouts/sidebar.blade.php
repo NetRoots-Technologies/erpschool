@@ -42,7 +42,9 @@
 @endsection
 @php
     $company = \App\Models\Admin\Company::where('status', 1)->first();
-    $logoUrl = !empty($company->logo) ? asset($company->logo) : 'https://www.netrootstech.com/wp-content/uploads/2022/08/Netroots-logo-tm-transparent.png';
+    $logoUrl = !empty($company->logo)
+        ? asset($company->logo)
+        : 'https://www.netrootstech.com/wp-content/uploads/2022/08/Netroots-logo-tm-transparent.png';
 @endphp
 
 <div class="app-sidebar__overlay" data-bs-toggle="sidebar"></div>
@@ -53,7 +55,8 @@
                 <img src="{{ $logoUrl }}" style="height: 100px; margin-top: -35px;" class="main-logo" alt="logo">
             </a>
             <a class="desktop-logo logo-dark" href="{{ route('dashboard') }}">
-                <img src="{{ $logoUrl }}" style="height: 100px; margin-top: -35px;" class="main-logo" alt="logo">
+                <img src="{{ $logoUrl }}" style="height: 100px; margin-top: -35px;" class="main-logo"
+                    alt="logo">
             </a>
             <a class="logo-icon mobile-logo icon-light active circular-logo" href="{{ route('dashboard') }}">
                 <img src="{{ asset('logos/CSS_logo_mobile.png') }}" alt="logo">
@@ -77,7 +80,8 @@
                 </div>
             </div>
             <div class="slide-left disabled" id="slide-left">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="#7b8191" width="24" height="24" viewBox="0 0 24 24">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="#7b8191" width="24" height="24"
+                    viewBox="0 0 24 24">
                     <path d="M13.293 6.293 7.586 12l5.707 5.707 1.414-1.414L10.414 12l4.293-4.293z" />
                 </svg>
             </div>
@@ -93,7 +97,8 @@
                     </li>
                 @endcan
 
-                @canany(['Company', 'Branches', 'Category', 'Departments', 'FinancialYears', 'Designations', 'SignatoryAuthorities'])
+                @canany(['Company', 'Branches', 'Category', 'Departments', 'FinancialYears', 'Designations',
+                    'SignatoryAuthorities'])
                     <li class="side-item side-item-category">Academic</li>
                     @can('Company')
                         <li class="slide">
@@ -175,7 +180,8 @@
                                 <span class="side-menu__label">Designations</span>
                                 <i class="angle fe fe-chevron-down"></i>
                             </a>
-                            <ul class="slide-menu" style="display: {{ request()->is('hr/designation*') ? 'block' : 'none' }}">
+                            <ul class="slide-menu"
+                                style="display: {{ request()->is('hr/designation*') ? 'block' : 'none' }}">
                                 <li><a class="slide-item {{ request()->is('hr/designation*') ? 'active' : '' }}"
                                         href="{{ route('hr.designations.index') }}">Designations</a></li>
                             </ul>
@@ -237,283 +243,220 @@
                             </ul>
                         </li>
                     @endcanany
-                    @can('AcademicManagement')
-                        <li class="slide">
-                            <a class="side-menu__item slide-change {{ request()->is('academic/student-class_adjustment*', 'academic/studentDataBank*', 'academic/students*', 'academic/students_form*', 'academic/students_details*', 'academic/student-siblings-report*') ? 'active' : '' }}"
-                                data-bs-toggle="slide" href="javascript:void(0);">
-                                <i class="fa fa-graduation-cap icons8 icon-style" aria-hidden="true"></i>
-                                <span class="side-menu__label">Admission Management</span>
-                                <i class="angle fe fe-chevron-down"></i>
-                            </a>
-                            <ul class="slide-menu"
-                                style="display: {{ request()->is('academic/student-class_adjustment*', 'academic/studentDataBank*', 'academic/students*', 'academic/students_form*', 'academic/students_details*', 'academic/student-siblings-report*') ? 'block' : 'none' }}">
+                @endcanany
+                @if (Gate::allows('AcademicManagement') || Gate::allows('AttendanceManagement') || Gate::allows('StudentManagement'))
+                    <li class="slide">
+                        <a class="side-menu__item slide-change {{ request()->is('academic/student-class_adjustment*', 'academic/studentDataBank*', 'academic/students*', 'academic/students_form*', 'academic/students_details*', 'academic/student-siblings-report*') ? 'active' : '' }}"
+                            data-bs-toggle="slide" href="javascript:void(0);">
+                            <i class="fa fa-graduation-cap icons8 icon-style" aria-hidden="true"></i>
+                            <span class="side-menu__label">Admission Management</span>
+                            <i class="angle fe fe-chevron-down"></i>
+                        </a>
+                        <ul class="slide-menu"
+                            style="display: {{ request()->is('academic/student-class_adjustment*', 'academic/studentDataBank*', 'academic/students*', 'academic/students_form*', 'academic/students_details*', 'academic/student-siblings-report*') ? 'block' : 'none' }}">
+                            @if (Gate::allows('PreAdmissionForm-list'))
                                 <li><a class="slide-item {{ request()->is('academic/studentDataBank*') ? 'active' : '' }}"
-                                        href="{{ route('academic.studentDataBank.index') }}">Pre-Admission Form</a></li>
+                                        href="{{ route('academic.studentDataBank.index') }}">Pre-Admission Form</a>
+                                </li>
+                            @endif
+
+                            @if (Gate::allows('ViewStudents-list'))
                                 <li><a class="slide-item {{ request()->is('academic/students*') ? 'active' : '' }}"
                                         href="{{ route('academic.students.index') }}">Students</a></li>
+                            @endif
+
+                            @if (Gate::allows('StudentSiblingsReport-list'))
                                 <li><a class="slide-item {{ request()->is('academic/student-siblings-report*') ? 'active' : '' }}"
-                                        href="{{ route('academic.student-siblings-report') }}">Student Siblings Report</a></li>
+                                        href="{{ route('academic.student-siblings-report') }}">Student Siblings
+                                        Report</a></li>
+                            @endif
+
+                            @if (Gate::allows('StudentClassPromotion-list'))
                                 <li><a class="slide-item {{ request()->is('academic/student-class_adjustment*') ? 'active' : '' }}"
                                         href="{{ route('academic.student-class-adjustment.create') }}">Student Class
                                         Promotion</a></li>
-                            </ul>
-                        </li>
-                    @endcan
-                    @can('AttendanceManagement')
-                        <li class="slide">
-                            <a class="side-menu__item slide-change {{ request()->is('academic/student_attendance*') ? 'active' : '' }}"
-                                data-bs-toggle="slide" href="javascript:void(0);">
-                                <i class="fa fa-calendar icons8 icon-style" aria-hidden="true"></i>
-                                <span class="side-menu__label">Attendance Management</span>
-                                <i class="angle fe fe-chevron-down"></i>
-                            </a>
-                            <ul class="slide-menu"
-                                style="display: {{ request()->is('academic/student_attendance*') ? 'block' : 'none' }}">
-                                <li><a class="slide-item {{ request()->is('academic/student_attendance/create') ? 'active' : '' }}"
-                                        href="{{ route('academic.student_attendance.create') }}">Student Attendance</a></li>
-                                <li><a class="slide-item {{ request()->is('academic/student_attendance') ? 'active' : '' }}"
-                                        href="{{ route('academic.student_attendance.index') }}">Attendance Report</a></li>
-                            </ul>
-                        </li>
-                    @endcan
-                    @can('StudentManagement')
-                        <li class="slide">
-                            <a class="side-menu__item slide-change {{ request()->is('academic/student_view*', 'academic/assign_timetable*', 'academic/assign_class*', 'academic/subject-type*', 'academic/class_timetable*', 'academic/teachers*', 'academic/timetables*') ? 'active' : '' }}"
-                                data-bs-toggle="slide" href="javascript:void(0);">
-                                <i class="fa fa-child icons8 icon-style" aria-hidden="true"></i>
-                                <span class="side-menu__label">Student Management</span>
-                                <i class="angle fe fe-chevron-down"></i>
-                            </a>
-                            <ul class="slide-menu"
-                                style="display: {{ request()->is('academic/student_view*', 'academic/assign_timetable*', 'academic/assign_class*', 'academic/subject-type*', 'academic/class_timetable*', 'academic/teachers*', 'academic/timetables*') ? 'block' : 'none' }}">
-                                <li><a class="slide-item {{ request()->is('academic/assign_class*') ? 'active' : '' }}"
-                                        href="{{ route('academic.assign_class.index') }}">Assign Class & Section</a></li>
-                                <li><a class="slide-item {{ request()->is('academic/student_view*') ? 'active' : '' }}"
-                                        href="{{ route('academic.student_view.index') }}">View Students</a></li>
-                                <li><a class="slide-item {{ request()->is('academic/timetables*') ? 'active' : '' }}"
-                                        href="{{ route('academic.timetables.index') }}">Timetables</a></li>
-                                <li><a class="slide-item {{ request()->is('academic/subject-type*') ? 'active' : '' }}"
-                                        href="{{ route('academic.subject-type.index') }}">Subject Type</a></li>
-                                <li><a class="slide-item {{ request()->is('academic/class_timetable*') ? 'active' : '' }}"
-                                        href="{{ route('academic.class_timetable.index') }}">Class Timetable</a></li>
-                                <li><a class="slide-item {{ request()->is('academic/assign_timetable*') ? 'active' : '' }}"
-                                        href="{{ route('academic.assign_timetable.index') }}">Assign Timetable</a></li>
-                                <li><a class="slide-item {{ request()->is('academic/teachers*') ? 'active' : '' }}"
-                                        href="{{ route('academic.teachers.index') }}">Teachers</a></li>
-                            </ul>
-                        </li>
-                    @endcan
-                @endcanany
+                            @endif
 
-                {{-- @canany(['Employees', 'WorkShift', 'Attendance', 'Payroll', 'SalaryTaxLab', 'Overtime'])
+
+
+
+                        </ul>
+                    </li>
+                @endif
+                @can('AttendanceManagement')
+                    <li class="slide">
+                        <a class="side-menu__item slide-change {{ request()->is('academic/student_attendance*') ? 'active' : '' }}"
+                            data-bs-toggle="slide" href="javascript:void(0);">
+                            <i class="fa fa-calendar icons8 icon-style" aria-hidden="true"></i>
+                            <span class="side-menu__label">Attendance Management</span>
+                            <i class="angle fe fe-chevron-down"></i>
+                        </a>
+                        <ul class="slide-menu"
+                            style="display: {{ request()->is('academic/student_attendance*') ? 'block' : 'none' }}">
+                            <li><a class="slide-item {{ request()->is('academic/student_attendance/create') ? 'active' : '' }}"
+                                    href="{{ route('academic.student_attendance.create') }}">Student Attendance</a></li>
+                            <li><a class="slide-item {{ request()->is('academic/student_attendance') ? 'active' : '' }}"
+                                    href="{{ route('academic.student_attendance.index') }}">Attendance Report</a></li>
+                        </ul>
+                    </li>
+                @endcan
+                @can('StudentManagement')
+                    <li class="slide">
+                        <a class="side-menu__item slide-change {{ request()->is('academic/student_view*', 'academic/assign_timetable*', 'academic/assign_class*', 'academic/subject-type*', 'academic/class_timetable*', 'academic/teachers*', 'academic/timetables*') ? 'active' : '' }}"
+                            data-bs-toggle="slide" href="javascript:void(0);">
+                            <i class="fa fa-child icons8 icon-style" aria-hidden="true"></i>
+                            <span class="side-menu__label">Student Management</span>
+                            <i class="angle fe fe-chevron-down"></i>
+                        </a>
+                        <ul class="slide-menu"
+                            style="display: {{ request()->is('academic/student_view*', 'academic/assign_timetable*', 'academic/assign_class*', 'academic/subject-type*', 'academic/class_timetable*', 'academic/teachers*', 'academic/timetables*') ? 'block' : 'none' }}">
+                            <li><a class="slide-item {{ request()->is('academic/assign_class*') ? 'active' : '' }}"
+                                    href="{{ route('academic.assign_class.index') }}">Assign Class & Section</a></li>
+                            <li><a class="slide-item {{ request()->is('academic/student_view*') ? 'active' : '' }}"
+                                    href="{{ route('academic.student_view.index') }}">View Students</a></li>
+                            <li><a class="slide-item {{ request()->is('academic/timetables*') ? 'active' : '' }}"
+                                    href="{{ route('academic.timetables.index') }}">Timetables</a></li>
+                            <li><a class="slide-item {{ request()->is('academic/subject-type*') ? 'active' : '' }}"
+                                    href="{{ route('academic.subject-type.index') }}">Subject Type</a></li>
+                            <li><a class="slide-item {{ request()->is('academic/class_timetable*') ? 'active' : '' }}"
+                                    href="{{ route('academic.class_timetable.index') }}">Class Timetable</a></li>
+                            <li><a class="slide-item {{ request()->is('academic/assign_timetable*') ? 'active' : '' }}"
+                                    href="{{ route('academic.assign_timetable.index') }}">Assign Timetable</a></li>
+                            <li><a class="slide-item {{ request()->is('academic/teachers*') ? 'active' : '' }}"
+                                    href="{{ route('academic.teachers.index') }}">Teachers</a></li>
+                        </ul>
+                    </li>
+                @endcan
+
+
+                @if (Gate::allows('Employees'))
                     <li class="side-item side-item-category">HR Management</li>
                     <li class="slide ">
-                        <a class="side-menu__item {{ request()->is('hr/employee') ? 'active' : '' }}" data-bs-toggle="slide"
-                            href="javascript:void(0);">
+
+                        <a class="side-menu__item {{ request()->is('hr/employee') ? 'active' : '' }}"
+                            data-bs-toggle="slide" href="javascript:void(0);">
                             <i class="fa fa-user-circle-o icons8 icon-style" aria-hidden="true"></i>
                             <span class="side-menu__label">Employees</span>
                             <i class="angle fe fe-chevron-down"></i></a>
-                        <ul class="slide-menu" style="display: {{ request()->is('hr/employee') ? 'block' : 'none' }}">
-                            @if (Gate::allows('Employee-list') || Gate::allows('Employee-create'))
-                                <li><a class="slide-item  {{ request()->is('hr/employee') ? 'active' : '' }}"
-                                        href="{{route('hr.employee.index')}}">Employees </a></li>
-                            @endif
+                        <ul class="slide-menu"
+                            style="display: {{ request()->is('hr/employee') ? 'block' : 'none' }}">
+                            <li><a class="slide-item  {{ request()->is('hr/employee') ? 'active' : '' }}"
+                                    href="{{ route('hr.employee.index') }}">Employees </a></li>
                         </ul>
                     </li>
                 @endif
 
-                @if (Gate::allows('workShift'))
+                @if (Gate::allows('WorkShift'))
                     <li class="slide ">
-                        <a class="side-menu__item {{ request()->is('hr/work_shifts*') ? 'active' : '' }}" data-bs-toggle="slide"
-                            href="javascript:void(0);">
+
+                        <a class="side-menu__item {{ request()->is('hr/work_shifts*') ? 'active' : '' }}"
+                            data-bs-toggle="slide" href="javascript:void(0);">
                             <i class="fa fa-clock-o icons8 icon-style" aria-hidden="true"></i>
                             <span class="side-menu__label">Work Shift</span>
                             <i class="angle fe fe-chevron-down"></i></a>
-                        <ul class="slide-menu" style="display: {{ request()->is('hr/work_shifts*') ? 'block' : 'none' }}">
-                            @if (Gate::allows('workShift-create') || Gate::allows('workShift-view'))
-                                <li><a class="slide-item {{ request()->is('hr/work_shifts*') ? 'active' : '' }}"
-                                        href="{{ route('hr.work_shifts.index') }}">Work Shift</a></li>
-                            </ul>
-                        </li>
-                    @endcan
-                    @can('Attendance')
-                        <li class="slide">
-                            <a class="side-menu__item {{ request()->is('hr/attendance*') ? 'active' : '' }}"
-                                data-bs-toggle="slide" href="javascript:void(0);">
-                                <i class="fa fa-calendar icons8 icon-style" aria-hidden="true"></i>
-                                <span class="side-menu__label">Attendance</span>
-                                <i class="angle fe fe-chevron-down"></i>
-                            </a>
-                            <ul class="slide-menu" style="display: {{ request()->is('hr/attendance*') ? 'block' : 'none' }}">
+                        <ul class="slide-menu"
+                            style="display: {{ request()->is('hr/work_shifts*') ? 'block' : 'none' }}">
+                            <li><a class="slide-item {{ request()->is('hr/work_shifts*') ? 'active' : '' }}"
+                                    href="{{ route('hr.work_shifts.index') }}">Work Shift</a></li>
+                        </ul>
+                    </li>
+                @endif
+
+                @if (Gate::allows('Attendance'))
+                    <li class="slide ">
+                        <a class="side-menu__item {{ request()->is('hr/attendance*') ? 'active' : '' }}"
+                            data-bs-toggle="slide" href="javascript:void(0);">
+                            <i class="fa fa-calendar icons8 icon-style" aria-hidden="true"></i>
+                            <span class="side-menu__label">Attendance</span>
+                            <i class="angle fe fe-chevron-down"></i></a>
+                        <ul class="slide-menu"
+                            style="display: {{ request()->is('hr/attendance*') ? 'block' : 'none' }}">
+                            @can('EmployeeAttendance-list')
                                 <li><a class="slide-item {{ request()->is('hr/attendance') ? 'active' : '' }}"
                                         href="{{ route('hr.attendance.index') }}">Employee Attendance</a></li>
+                            @endcan
+
+                            @can('AttendanceDashboard-list')
                                 <li><a class="slide-item {{ request()->is('hr/attendance/dashboard') ? 'active' : '' }}"
-                                        href="{{ route('hr.attendanceDashboard.dashboard') }}">Attendance Dashboard</a></li>
-                                <li><a class="slide-item {{ request()->is('hr/attendance/detail') ? 'active' : '' }}"
-                                        href="{{ route('hr.attendance.detail') }}">Attendance Report</a></li>
-                            </ul>
-                        </li>
-                    @endcan
-                    @can('Payroll')
-                        <li class="slide">
-                            <a class="side-menu__item {{ request()->is('hr/payroll*', 'hr/salary_slip*') ? 'active' : '' }}"
-                                data-bs-toggle="slide" href="javascript:void(0);">
-                                <i class="fa fa-money icons8 icon-style" aria-hidden="true"></i>
-                                <span class="side-menu__label">Payroll</span>
-                                <i class="angle fe fe-chevron-down"></i>
-                            </a>
-                            <ul class="slide-menu"
-                                style="display: {{ request()->is('hr/payroll*', 'hr/salary_slip*') ? 'block' : 'none' }}">
+                                        href="{{ route('hr.attendanceDashboard.dashboard') }}">Attendance Dashboard</a>
+                                </li>
+                            @endcan
+                            @can('AttendanceReport-list')
+                                <li>
+                                    <a class="slide-item {{ request()->is('hr/attendance/detail') ? 'active' : '' }}"
+                                        href="{{ route('hr.attendance.detail') }}">Attendance Report</a>
+                                </li>
+                            @endcan
+
+
+                        </ul>
+                    </li>
+                @endif
+                @if (Gate::allows('Payroll'))
+                    <li class="slide ">
+                        <a class="side-menu__item {{ request()->is('hr/payroll*', 'hr/salary_slip') ? 'active' : '' }}"
+                            data-bs-toggle="slide" href="javascript:void(0);">
+                            <i class="fa fa-money icons8 icon-style" aria-hidden="true"></i>
+                            <span class="side-menu__label">PayRoll</span>
+                            <i class="angle fe fe-chevron-down"></i></a>
+                        <ul class="slide-menu"
+                            style="display: {{ request()->is('hr/payroll*') ? 'block' : 'none' }}">
+                            @if (Gate::allows('Payroll-index'))
                                 <li><a class="slide-item {{ request()->is('hr/payroll') ? 'active' : '' }}"
-                                        href="{{ route('hr.payroll.index') }}">Payroll</a></li>
+                                        href="{{ route('hr.payroll.index') }}">PayRoll</a></li>
+                            @endif
+                            @if (Gate::allows('Payroll-approve'))
                                 <li><a class="slide-item {{ request()->is('hr/payroll_approve') ? 'active' : '' }}"
-                                        href="{{ route('hr.payroll.approve') }}">Payroll Approve</a></li>
+                                        href="{{ route('hr.payroll.approve') }}">PayRoll Approve</a></li>
+                            @endif
+                            @if (Gate::allows('Payroll-slip'))
                                 <li><a class="slide-item {{ request()->is('hr/salary_slip') ? 'active' : '' }}"
-                                        href="{{ route('hr.salary_slip.index') }}">Payroll Slip</a></li>
+                                        href="{{ route('hr.salary_slip.index') }}">PayRoll Slip</a></li>
+                            @endif
+                            @if (Gate::allows('Payroll-report'))
                                 <li><a class="slide-item {{ request()->is('hr/payroll_report') ? 'active' : '' }}"
-                                        href="{{ route('hr.payroll.report') }}">Payroll Report</a></li>
-                            </ul>
-                        </li>
-                    @endcan
-                    @can('SalaryTaxLab')
-                        <li class="slide">
-                            <a class="side-menu__item {{ request()->is('hr/salary-tax*') ? 'active' : '' }}"
-                                data-bs-toggle="slide" href="javascript:void(0);">
-                                <i class="fa fa-chart-bar icons8 icon-style" aria-hidden="true"></i>
-                                <span class="side-menu__label">Tax Slab</span>
-                                <i class="angle fe fe-chevron-down"></i>
-                            </a>
-                            <ul class="slide-menu" style="display: {{ request()->is('hr/salary-tax*') ? 'block' : 'none' }}">
-                                <li><a class="slide-item {{ request()->is('hr/salary-tax') ? 'active' : '' }}"
-                                        href="{{ route('hr.salary-tax.index') }}">Salary Tax Slab</a></li>
-                            </ul>
-                        </li>
-                    @endcan
-                    @can('Overtime')
-                        <li class="slide">
-                            <a class="side-menu__item {{ request()->is('hr/overtime*') ? 'active' : '' }}"
-                                data-bs-toggle="slide" href="javascript:void(0);">
-                                <i class="fa fa-clock icons8 icon-style" aria-hidden="true"></i>
-                                <span class="side-menu__label">Overtime</span>
-                                <i class="angle fe fe-chevron-down"></i>
-                            </a>
-                            <ul class="slide-menu" style="display: {{ request()->is('hr/overtime*') ? 'block' : 'none' }}">
-                                <li><a class="slide-item {{ request()->is('hr/overtime') ? 'active' : '' }}"
-                                        href="{{ route('hr.overtime.index') }}">Overtime</a></li>
-                            </ul>
-                        </li>
-                    @endcan
-                @endcanany --}}
-
-                   {{-- @if (
-                    Gate::allows('agent') || Gate::allows('employee') || Gate::allows('teacher') ||
-                    Gate::allows('agent_comission')
-                ) --}}
-                <li class="side-item side-item-category">HR Management</li>
-                <li class="slide ">
-                    <a class="side-menu__item {{ request()->is('hr/employee') ? 'active' : '' }}" data-bs-toggle="slide"
-                        href="javascript:void(0);">
-                        <i class="fa fa-user-circle-o icons8 icon-style" aria-hidden="true"></i>
-                        <span class="side-menu__label">Employees</span>
-                        <i class="angle fe fe-chevron-down"></i></a>
-                    <ul class="slide-menu" style="display: {{ request()->is('hr/employee') ? 'block' : 'none' }}">
-                        <li><a class="slide-item  {{ request()->is('hr/employee') ? 'active' : '' }}"
-                                href="{{route('hr.employee.index')}}">Employees </a></li>
-                    </ul>
-                </li>
-            {{-- @endif --}}
-            {{-- @if (Gate::allows('workShift')) --}}
-                <li class="slide ">
-                    <a class="side-menu__item {{ request()->is('hr/work_shifts*') ? 'active' : '' }}" data-bs-toggle="slide"
-                        href="javascript:void(0);">
-                        <i class="fa fa-clock-o icons8 icon-style" aria-hidden="true"></i>
-                        <span class="side-menu__label">Work Shift</span>
-                        <i class="angle fe fe-chevron-down"></i></a>
-                    <ul class="slide-menu" style="display: {{ request()->is('hr/work_shifts*') ? 'block' : 'none' }}">
-                        <li><a class="slide-item {{ request()->is('hr/work_shifts*') ? 'active' : '' }}"
-                                href="{{route('hr.work_shifts.index')}}">Work Shift</a></li>
-                    </ul>
-                </li>
-            {{-- @endif --}}
-            {{-- @if (Gate::allows('attendance')) --}}
-                <li class="slide ">
-                    <a class="side-menu__item {{ request()->is('hr/attendance*') ? 'active' : '' }}" data-bs-toggle="slide"
-                        href="javascript:void(0);">
-                        <i class="fa fa-calendar icons8 icon-style" aria-hidden="true"></i>
-                        <span class="side-menu__label">Attendance</span>
-                        <i class="angle fe fe-chevron-down"></i></a>
-                    <ul class="slide-menu" style="display: {{ request()->is('hr/attendance*') ? 'block' : 'none' }}">
-                        <li><a class="slide-item {{ request()->is('hr/attendance') ? 'active' : '' }}"
-                                href="{{ route('hr.attendance.index') }}">Employee Attendance</a></li>
-                        <li><a class="slide-item {{ request()->is('hr/attendance/dashboard') ? 'active' : '' }}"
-                                href="{{ route('hr.attendanceDashboard.dashboard') }}">Attendance Dashboard</a>
-                        </li>
-                        <li>
-                            <a class="slide-item {{ request()->is('hr/attendance/detail') ? 'active' : '' }}"
-                                href="{{ route('hr.attendance.detail') }}">Attendance Report</a>
-                        </li>
-                    </ul>
-                </li>
-            {{-- @endif --}}
-            {{-- @if (Gate::allows('payroll')) --}}
-                <li class="slide ">
-                    <a class="side-menu__item {{ request()->is('hr/payroll*', 'hr/salary_slip') ? 'active' : '' }}"
-                        data-bs-toggle="slide" href="javascript:void(0);">
-                        <i class="fa fa-money icons8 icon-style" aria-hidden="true"></i>
-                        <span class="side-menu__label">PayRoll</span>
-                        <i class="angle fe fe-chevron-down"></i></a>
-                    <ul class="slide-menu" style="display: {{ request()->is('hr/payroll*') ? 'block' : 'none' }}">
-                        {{-- @if (Gate::allows('payroll-index')) --}}
-                            <li><a class="slide-item {{ request()->is('hr/payroll') ? 'active' : '' }}"
-                                    href="{{ route('hr.payroll.index') }}">PayRoll</a></li>
-                        {{-- @endif
-                        @if (Gate::allows('payroll-approve')) --}}
-                            <li><a class="slide-item {{ request()->is('hr/payroll_approve') ? 'active' : '' }}"
-                                    href="{{ route('hr.payroll.approve') }}">PayRoll Approve</a></li>
-                        {{-- @endif
-                        @if (Gate::allows('payroll-slip')) --}}
-                            <li><a class="slide-item {{ request()->is('hr/salary_slip') ? 'active' : '' }}"
-                                    href="{{ route('hr.salary_slip.index') }}">PayRoll Slip</a></li>
-                        {{-- @endif
-                        @if (Gate::allows('payroll-report')) --}}
-                            <li><a class="slide-item {{ request()->is('hr/payroll_report') ? 'active' : '' }}"
-                                    href="{{ route('hr.payroll.report') }}">PayRoll Report</a></li>
-                        {{-- @endif --}}
-                    </ul>
-                </li>
-            {{-- @endif
-            @if (Gate::allows('salary-tax')) --}}
-                <li class="slide">
-                    <a class="side-menu__item {{ request()->is('hr/salary-tax*') ? 'active' : '' }}" data-bs-toggle="slide"
-                        href="javascript:void(0);">
-                        <i class="fa fa-chart-bar icons8 icon-style" aria-hidden="true"></i>
-                        <span class="side-menu__label ">Tax Slab</span>
-                        <i class="angle fe fe-chevron-down"></i>
-                    </a>
-                    <ul class="slide-menu" style="display: {{ request()->is('hr/salary-tax*') ? 'block' : 'none' }}">
-                        {{-- <li><a class="slide-item" href="{{route('hr.tax-slabs.index')}}">Rental Tax
+                                        href="{{ route('hr.payroll.report') }}">PayRoll Report</a></li>
+                            @endif
+                        </ul>
+                    </li>
+                @endif
+                @if (Gate::allows('salary-tax'))
+                    <li class="slide">
+                        <a class="side-menu__item {{ request()->is('hr/salary-tax*') ? 'active' : '' }}"
+                            data-bs-toggle="slide" href="javascript:void(0);">
+                            <i class="fa fa-chart-bar icons8 icon-style" aria-hidden="true"></i>
+                            <span class="side-menu__label ">Tax Slab</span>
+                            <i class="angle fe fe-chevron-down"></i>
+                        </a>
+                        <ul class="slide-menu"
+                            style="display: {{ request()->is('hr/salary-tax*') ? 'block' : 'none' }}">
+                            {{-- <li><a class="slide-item" href="{{route('hr.tax-slabs.index')}}">Rental Tax
                                 Slab</a></li> --}}
-                        <li><a class="slide-item {{ request()->is('hr/salary-tax') ? 'active' : '' }}"
-                                href="{{ route('hr.salary-tax.index') }}">Salary Tax Slab</a></li>
-                    </ul>
-                </li>
-            {{-- @endif --}}
-            <li class="slide">
-                <a class="side-menu__item {{ request()->is('hr/overtime*') ? 'active' : '' }}" data-bs-toggle="slide"
-                    href="javascript:void(0);">
-                    <i class="fa fa-clock icons8 icon-style" aria-hidden="true"></i>
-                    <span class="side-menu__label ">Overtime</span>
-                    <i class="angle fe fe-chevron-down"></i>
-                </a>
-                <ul class="slide-menu" style="display: {{ request()->is('hr/salary-tax*') ? 'block' : 'none' }}">
-                    {{-- <li><a class="slide-item" href="{{route('hr.tax-slabs.index')}}">Rental Tax
-                            Slab</a></li> --}}
-                    <li><a class="slide-item {{ request()->is('hr/overtime') ? 'active' : '' }}"
-                            href="{{ route('hr.overtime.index') }}">Overtime</a></li>
-                </ul>
-            </li>
+                            <li><a class="slide-item {{ request()->is('hr/salary-tax') ? 'active' : '' }}"
+                                    href="{{ route('hr.salary-tax.index') }}">Salary Tax Slab</a></li>
+                        </ul>
+                    </li>
+                @endif
 
-                {{-- @if (Gate::allows('hr-reports')) --}}
+                @if (Gate::allows('Overtime'))
+                    <li class="slide">
+                        <a class="side-menu__item {{ request()->is('hr/overtime*') ? 'active' : '' }}"
+                            data-bs-toggle="slide" href="javascript:void(0);">
+                            <i class="fa fa-clock icons8 icon-style" aria-hidden="true"></i>
+                            <span class="side-menu__label ">Overtime</span>
+                            <i class="angle fe fe-chevron-down"></i>
+                        </a>
+                        <ul class="slide-menu"
+                            style="display: {{ request()->is('hr/salary-tax*') ? 'block' : 'none' }}">
+                            {{-- <li><a class="slide-item" href="{{route('hr.tax-slabs.index')}}">Rental Tax
+                            Slab</a></li> --}}
+                            <li><a class="slide-item {{ request()->is('hr/overtime') ? 'active' : '' }}"
+                                    href="{{ route('hr.overtime.index') }}">Overtime</a></li>
+                        </ul>
+                    </li>
+                @endif
+
+                @if (Gate::allows('Reports'))
                     <li class="side-item side-item-category">HR Reports</li>
                     <li class="slide">
                         <a class="side-menu__item {{ request()->is('hr/overtime-report*', 'hr/employeeBenefit/*') ? 'active' : '' }}"
@@ -524,24 +467,37 @@
                         </a>
                         <ul class="slide-menu"
                             style="display: {{ request()->is('hr/overtime-report*', 'hr/employeeBenefit/*') ? 'block' : 'none' }}">
+                            @can('OvertimeReport-list')
+                                <li><a class="slide-item {{ request()->is('hr/overtime-report-view') ? 'active' : '' }}"
+                                        href="{{ route('hr.overtime-report-view') }}">Overtime</a></li>
+                            @endcan
 
-                            <li><a class="slide-item {{ request()->is('hr/overtime-report-view') ? 'active' : '' }}"
-                                    href="{{ route('hr.overtime-report-view') }}">Overtime</a></li>
-                            <li><a class="slide-item {{ request()->is('hr/employeeBenefit/EOBI') ? 'active' : '' }}"
-                                    href="{{ route('hr.employeeBenefit', ['EOBI']) }}">EOBI</a></li>
-                            <li><a class="slide-item {{ request()->is('hr/employeeBenefit/PF') ? 'active' : '' }}"
-                                    href="{{ route('hr.employeeBenefit', ['PF']) }}">Provident Fund</a></li>
-                            <li><a class="slide-item {{ request()->is('hr/employeeBenefit/SS') ? 'active' : '' }}"
-                                    href="{{ route('hr.employeeBenefit', ['SS']) }}">Social Security</a></li>
+                            @can('EOBIReport-list')
+                                <li><a class="slide-item {{ request()->is('hr/employeeBenefit/EOBI') ? 'active' : '' }}"
+                                        href="{{ route('hr.employeeBenefit', ['EOBI']) }}">EOBI</a></li>
+                            @endcan
+
+                            @can('PFReport-list')
+                                <li><a class="slide-item {{ request()->is('hr/employeeBenefit/PF') ? 'active' : '' }}"
+                                        href="{{ route('hr.employeeBenefit', ['PF']) }}">Provident Fund</a></li>
+                            @endcan
+
+                            @can('SSReport-list')
+                                <li><a class="slide-item {{ request()->is('hr/employeeBenefit/SS') ? 'active' : '' }}"
+                                        href="{{ route('hr.employeeBenefit', ['SS']) }}">Social Security</a></li>
+                            @endcan
                         </ul>
                     </li>
-                {{-- @endcan --}}
-
-               
+                @endif
 
 
 
-                @canany(['ExamTerms-list', 'TestTypes-list', 'ExamDetails-list', 'Components-list', 'SubComponents-list', 'Skills-list', 'SkillEvaluationsKey-list', 'SkillEvaluation-list', 'Behaviours-list', 'EffortLevels-list', 'GradingPolicies-list', 'AcademicEvaluationsKey-list', 'SkillGroups-list', 'SkillTypes-list', 'ExamSchedules-list', 'MarksInput-list'])
+
+
+                @canany(['ExamTerms-list', 'TestTypes-list', 'ExamDetails-list', 'Components-list',
+                    'SubComponents-list', 'Skills-list', 'SkillEvaluationsKey-list', 'SkillEvaluation-list',
+                    'EffortLevels-list', 'GradingPolicies-list', 'SkillGroups-list', 'SkillTypes-list',
+                    'ExamSchedules-list', 'MarksInput-list'])
                     <li class="side-item side-item-category">Exam</li>
                     <li class="slide">
                         <a class="side-menu__item {{ request()->is('exam/exam_terms*') || request()->is('exam/test_types*') || request()->is('exam/exam_details*') || request()->is('exam/components*') || request()->is('exam/skill_evaluations_key*') || request()->is('exam/skill_evaluation*') || request()->is('exam/academic_evaluations_key*') || request()->is('exam/skill_groups*') || request()->is('exam/class_subjects*') || request()->is('exam/skill_types*') || request()->is('exam/exam_schedules*') || request()->is('exam/sub_components*') || request()->is('exam/skills*') || request()->is('exam/behaviours*') || request()->is('exam/effort_levels*') || request()->is('exam/grading_policies*') || request()->is('exam/marks_input*') || request()->is('reports/student/exam') ? 'active' : '' }}"
@@ -551,7 +507,7 @@
                             <i class="angle fe fe-chevron-down"></i>
                         </a>
                         <ul class="slide-menu"
-                            style="display: {{ request()->is('exam/exam_terms*') || request()->is('exam/test_types*') || request()->is('exam/exam_details*') || request()->is('exam/components*') || request()->is('exam/skill_evaluations_key*') || request()->is('exam/skill_evaluation*') || request()->is('exam/academic_evaluations_key*') || request()->is('exam/skill_groups*') || request()->is('exam/class_subjects*') || request()->is('exam/skill_types*') || request()->is('exam/exam_schedules*') || request()->is('exam/sub_components*') || request()->is('exam/skills*') || request()->is('exam/behaviours*') || request()->is('exam/effort_levels*') || request()->is('exam/grading_policies*') || request()->is('exam/marks_input*') || request()->is('reports/student/exam')  ? 'block' : 'none' }}">
+                            style="display: {{ request()->is('exam/exam_terms*') || request()->is('exam/test_types*') || request()->is('exam/exam_details*') || request()->is('exam/components*') || request()->is('exam/skill_evaluations_key*') || request()->is('exam/skill_evaluation*') || request()->is('exam/academic_evaluations_key*') || request()->is('exam/skill_groups*') || request()->is('exam/class_subjects*') || request()->is('exam/skill_types*') || request()->is('exam/exam_schedules*') || request()->is('exam/sub_components*') || request()->is('exam/skills*') || request()->is('exam/behaviours*') || request()->is('exam/effort_levels*') || request()->is('exam/grading_policies*') || request()->is('exam/marks_input*') || request()->is('reports/student/exam') ? 'block' : 'none' }}">
                             @can('ExamTerms-list')
                                 <li><a class="slide-item {{ request()->is('exam/exam_terms*') ? 'active' : '' }}"
                                         href="{{ route('exam.exam_terms.index') }}">Exam Term</a></li>
@@ -576,7 +532,7 @@
                                 <li><a class="slide-item {{ request()->is('exam/skills*') ? 'active' : '' }}"
                                         href="{{ route('exam.skills.index') }}">Skills</a></li>
                             @endcan
-                              @can('SkillGroups-list')
+                            @can('SkillGroups-list')
                                 <li><a class="slide-item {{ request()->is('exam/skill_groups*') ? 'active' : '' }}"
                                         href="{{ route('exam.skill_groups.index') }}">Skill Group</a></li>
                             @endcan
@@ -587,7 +543,8 @@
 
                             @can('SkillEvaluationsKey-list')
                                 <li><a class="slide-item {{ request()->is('exam/skill_evaluations_key*') ? 'active' : '' }}"
-                                        href="{{ route('exam.skill_evaluations_key.index') }}">Skill Evaluation Key</a></li>
+                                        href="{{ route('exam.skill_evaluations_key.index') }}">Skill Evaluation Key</a>
+                                </li>
                             @endcan
                             @can('SkillEvaluation-list')
                                 <li><a class="slide-item {{ request()->is('exam/skill_evaluation*') ? 'active' : '' }}"
@@ -597,8 +554,11 @@
                                 <li><a class="slide-item {{ request()->is('exam/behaviours*') ? 'active' : '' }}"
                                         href="{{ route('exam.behaviours.index') }}">Behaviours</a></li>
                             @endcan --}}
-                             <li><a class="slide-item {{ request()->is('exam/class_subjects*') ? 'active' : '' }}"
-                            href="{{ route('exam.class_subjects.index') }}">Class Subjects</a></li>
+                            @can('class-subjects-list')
+                                <li><a class="slide-item {{ request()->is('exam/class_subjects*') ? 'active' : '' }}"
+                                        href="{{ route('exam.class_subjects.index') }}">Class Subjects</a></li>
+                            @endcan
+
                             @can('EffortLevels-list')
                                 <li><a class="slide-item {{ request()->is('exam/effort_levels*') ? 'active' : '' }}"
                                         href="{{ route('exam.effort_levels.index') }}">Effort Levels</a></li>
@@ -612,7 +572,7 @@
                                         href="{{ route('exam.academic_evaluations_key.index') }}">Academic Evaluation Key</a>
                                 </li>
                             @endcan --}}
-                              
+
 
                             @can('ExamSchedules-list')
                                 <li><a class="slide-item {{ request()->is('exam/exam_schedules*') ? 'active' : '' }}"
@@ -622,131 +582,197 @@
                                 <li><a class="slide-item {{ request()->is('exam/marks_input*') ? 'active' : '' }}"
                                         href="{{ route('exam.marks_input.index') }}">Marks Input</a></li>
                             @endcan
+                            @can('Student Exam Report')
+                                <li>
+                                    <a class="slide-item {{ request()->is('reports/student/exam') ? 'active' : '' }}"
+                                        href="{{ route('reports.std.exam.index') }}">
+                                        Exam Report
+                                    </a>
+                                </li>
+                            @endcan
 
-                            <li>
-                                <a class="slide-item {{ request()->is('reports/student/exam') ? 'active' : '' }}"
-                                    href="{{ route('reports.std.exam.index') }}">
-                                    Exam Report
-                                </a>
-                            </li>
                         </ul>
                     </li>
                 @endcanany
 
-                {{-- Fee Management Section --}}
-                <li class="side-item side-item-category">Fee Management</li>
-                <li class="slide">
-                    <a class="side-menu__item {{ request()->is('admin/fee-management*') ? 'active' : '' }}"
-                        data-bs-toggle="slide" href="javascript:void(0);">
-                        <i class="fa fa-money icons8 icon-style" aria-hidden="true"></i>
-                        <span class="side-menu__label">Fee Management</span>
-                        <i class="angle fe fe-chevron-down"></i>
-                    </a>
-                    <ul class="slide-menu" style="display: {{ request()->is('admin/fee-management*') ? 'block' : 'none' }}">
-                        <li><a class="slide-item {{ request()->is('admin/fee-management') ? 'active' : '' }}"
-                                href="{{ route('admin.fee-management.index') }}">Dashboard</a></li>
-                        <li><a class="slide-item {{ request()->is('admin/fee-management/categories*') ? 'active' : '' }}"
-                                href="{{ route('admin.fee-management.categories') }}">Fee Categories</a></li>
-                        <li><a class="slide-item {{ request()->is('admin/fee-management/structures*') ? 'active' : '' }}"
-                                href="{{ route('admin.fee-management.structures') }}">Fee Structures</a></li>
-                        <li><a class="slide-item {{ request()->is('admin/fee-management/collections*') ? 'active' : '' }}"
-                                href="{{ route('admin.fee-management.collections') }}">Fee Collections</a></li>
-                        <li><a class="slide-item {{ request()->is('admin/fee-management/discounts*') ? 'active' : '' }}"
-                                href="{{ route('admin.fee-management.discounts') }}">Fee Discounts</a></li>
-                        <li><a class="slide-item {{ request()->is('admin/fee-management/billing*') ? 'active' : '' }}"
-                                href="{{ route('admin.fee-management.billing') }}">Fee Billing</a></li>
-                        <li><a class="slide-item {{ request()->is('admin/fee-management/reports*') ? 'active' : '' }}"
-                                href="{{ route('admin.fee-management.reports') }}">Reports</a></li>
-                    </ul>
-                </li>
+                @if (Gate::allows('Fee'))
+                    {{-- Fee Management Section --}}
+                    <li class="side-item side-item-category">Fee Management</li>
+                    <li class="slide">
+                        <a class="side-menu__item {{ request()->is('admin/fee-management*') ? 'active' : '' }}"
+                            data-bs-toggle="slide" href="javascript:void(0);">
+                            <i class="fa fa-money icons8 icon-style" aria-hidden="true"></i>
+                            <span class="side-menu__label">Fee Management</span>
+                            <i class="angle fe fe-chevron-down"></i>
+                        </a>
+                        <ul class="slide-menu"
+                            style="display: {{ request()->is('admin/fee-management*') ? 'block' : 'none' }}">
+                            <li><a class="slide-item {{ request()->is('admin/fee-management') ? 'active' : '' }}"
+                                    href="{{ route('admin.fee-management.index') }}">Dashboard</a></li>
+                            <li><a class="slide-item {{ request()->is('admin/fee-management/categories*') ? 'active' : '' }}"
+                                    href="{{ route('admin.fee-management.categories') }}">Fee Categories</a></li>
+                            <li><a class="slide-item {{ request()->is('admin/fee-management/structures*') ? 'active' : '' }}"
+                                    href="{{ route('admin.fee-management.structures') }}">Fee Structures</a></li>
+                            <li><a class="slide-item {{ request()->is('admin/fee-management/collections*') ? 'active' : '' }}"
+                                    href="{{ route('admin.fee-management.collections') }}">Fee Collections</a>
+                            </li>
+                            <li><a class="slide-item {{ request()->is('admin/fee-management/discounts*') ? 'active' : '' }}"
+                                    href="{{ route('admin.fee-management.discounts') }}">Fee Discounts</a></li>
+                            <li><a class="slide-item {{ request()->is('admin/fee-management/billing*') ? 'active' : '' }}"
+                                    href="{{ route('admin.fee-management.billing') }}">Fee Billing</a></li>
+                            <li><a class="slide-item {{ request()->is('admin/fee-management/reports*') ? 'active' : '' }}"
+                                    href="{{ route('admin.fee-management.reports') }}">Reports</a></li>
+                        </ul>
+                    </li>
+                @endif
+
 
                 {{-- Fleet Management Section --}}
-                <li class="side-item side-item-category">Fleet Management</li>
-                <li class="slide">
-                    <a class="side-menu__item {{ request()->is('fleet*') ? 'active' : '' }}"
-                        data-bs-toggle="slide" href="javascript:void(0);">
-                        <i class="fa fa-bus icons8 icon-style" aria-hidden="true"></i>
-                        <span class="side-menu__label">Fleet Management</span>
-                        <i class="angle fe fe-chevron-down"></i>
-                    </a>
-                    <ul class="slide-menu" style="display: {{ request()->is('fleet*') ? 'block' : 'none' }}">
-                        <li><a class="slide-item {{ request()->is('fleet/dashboard') ? 'active' : '' }}"
-                                href="{{ route('fleet.dashboard') }}">Dashboard</a></li>
-                        <li><a class="slide-item {{ request()->is('fleet/vehicles*') ? 'active' : '' }}"
-                                href="{{ route('fleet.vehicles.index') }}">Vehicles</a></li>
-                        <li><a class="slide-item {{ request()->is('fleet/drivers*') ? 'active' : '' }}"
-                                href="{{ route('fleet.drivers.index') }}">Drivers</a></li>
-                        <li><a class="slide-item {{ request()->is('fleet/routes*') ? 'active' : '' }}"
-                                href="{{ route('fleet.routes.index') }}">Routes</a></li>
-                        <li><a class="slide-item {{ request()->is('fleet/maintenance*') ? 'active' : '' }}"
-                                href="{{ route('fleet.maintenance.index') }}">Maintenance</a></li>
-                        <li><a class="slide-item {{ request()->is('fleet/fuel*') ? 'active' : '' }}"
-                                href="{{ route('fleet.fuel.index') }}">Fuel Records</a></li>
-                        <li><a class="slide-item {{ request()->is('fleet/expenses*') ? 'active' : '' }}"
-                                href="{{ route('fleet.expenses.index') }}">Expenses</a></li>
-                        <li><a class="slide-item {{ request()->is('fleet/transportation*') ? 'active' : '' }}"
-                                href="{{ route('fleet.transportation.index') }}">Student Transportation</a></li>
-                    </ul>
-                </li>
+                @if (Gate::allows('Fleet'))
+                    <li class="side-item side-item-category">Fleet Management</li>
+                    <li class="slide">
+                        <a class="side-menu__item {{ request()->is('fleet*') ? 'active' : '' }}"
+                            data-bs-toggle="slide" href="javascript:void(0);">
+                            <i class="fa fa-bus icons8 icon-style" aria-hidden="true"></i>
+                            <span class="side-menu__label">Fleet Management</span>
+                            <i class="angle fe fe-chevron-down"></i>
+                        </a>
+                        <ul class="slide-menu" style="display: {{ request()->is('fleet*') ? 'block' : 'none' }}">
+                            @if (Gate::allows('fleet-dashboard'))
+                                <li><a class="slide-item {{ request()->is('fleet/dashboard') ? 'active' : '' }}"
+                                        href="{{ route('fleet.dashboard') }}">Dashboard</a></li>
+                            @endif
+
+                            @if (Gate::allows('vahicals-list'))
+                                <li><a class="slide-item {{ request()->is('fleet/vehicles*') ? 'active' : '' }}"
+                                        href="{{ route('fleet.vehicles.index') }}">Vehicles</a></li>
+                            @endif
+
+                            @if (Gate::allows('drivers-list'))
+                                <li><a class="slide-item {{ request()->is('fleet/drivers*') ? 'active' : '' }}"
+                                        href="{{ route('fleet.drivers.index') }}">Drivers</a></li>
+                            @endif
+
+                            @if (Gate::allows('routes-list'))
+                                <li><a class="slide-item {{ request()->is('fleet/routes*') ? 'active' : '' }}"
+                                        href="{{ route('fleet.routes.index') }}">Routes</a></li>
+                            @endif
+                            @if (Gate::allows('Fleet-maintenance-list'))
+                                <li><a class="slide-item {{ request()->is('fleet/maintenance*') ? 'active' : '' }}"
+                                        href="{{ route('fleet.maintenance.index') }}">Maintenance</a></li>
+                            @endif
+
+                            @if (Gate::allows('Fule-record-list'))
+                                <li><a class="slide-item {{ request()->is('fleet/fuel*') ? 'active' : '' }}"
+                                        href="{{ route('fleet.fuel.index') }}">Fuel Records</a></li>
+                            @endif
+
+                            @if (Gate::allows('Fleet-expense-list'))
+                                <li><a class="slide-item {{ request()->is('fleet/expenses*') ? 'active' : '' }}"
+                                        href="{{ route('fleet.expenses.index') }}">Expenses</a></li>
+                            @endif
+
+                            @if (Gate::allows('students-transport-list'))
+                                <li><a class="slide-item {{ request()->is('fleet/transportation*') ? 'active' : '' }}"
+                                        href="{{ route('fleet.transportation.index') }}">Student
+                                        Transportation</a></li>
+                            @endif
+
+                        </ul>
+                    </li>
+                @endif
+
 
                 {{-- Accounts & Finance Section --}}
-                <li class="side-item side-item-category">Accounts & Finance</li>
-                <li class="slide">
-                    <a class="side-menu__item {{ request()->is('accounts*') ? 'active' : '' }}"
-                        data-bs-toggle="slide" href="javascript:void(0);">
-                        <i class="fa fa-calculator icons8 icon-style" aria-hidden="true"></i>
-                        <span class="side-menu__label">Accounts & Finance</span>
-                        <i class="angle fe fe-chevron-down"></i>
-                    </a>
-                    <ul class="slide-menu" style="display: {{ request()->is('accounts*') ? 'block' : 'none' }}">
-                        <li><a class="slide-item {{ request()->is('accounts/dashboard') ? 'active' : '' }}"
-                                href="{{ route('accounts.dashboard') }}">Dashboard</a></li>
-                        
-                        {{-- Account Groups & Chart of Accounts --}}
-                        <li><a class="slide-item {{ request()->is('accounts/groups*') ? 'active' : '' }}"
-                                href="{{ route('accounts.groups.index') }}">Account Groups</a></li>
-                        <li><a class="slide-item {{ request()->is('accounts/chart-of-accounts*') ? 'active' : '' }}"
-                                href="{{ route('accounts.coa.index') }}">Chart of Accounts</a></li>
-                        <li><a class="slide-item {{ request()->is('accounts/journal-entries*') ? 'active' : '' }}"
-                                href="{{ route('accounts.journal.index') }}">Journal Entries</a></li>
-                        
-                        {{-- Payables --}}
-                        <li><a class="slide-item {{ request()->is('accounts/payables') ? 'active' : '' }}"
-                                href="{{ route('accounts.payables.index') }}">Accounts Payable</a></li>
-                        <li><a class="slide-item {{ request()->is('accounts/payables/vendors*') ? 'active' : '' }}"
-                                href="{{ route('accounts.payables.vendors.index') }}">Vendors</a></li>
-                        <li><a class="slide-item {{ request()->is('accounts/payables/bills*') ? 'active' : '' }}"
-                                href="{{ route('accounts.payables.bills.index') }}">Bills</a></li>
-                        
-                        {{-- Receivables --}}
-                        <li><a class="slide-item {{ request()->is('accounts/receivables') ? 'active' : '' }}"
-                                href="{{ route('accounts.receivables.index') }}">Accounts Receivable</a></li>
-                        <li><a class="slide-item {{ request()->is('accounts/receivables/customers*') ? 'active' : '' }}"
-                                href="{{ route('accounts.receivables.customers.index') }}">Customers</a></li>
-                        <li><a class="slide-item {{ request()->is('accounts/receivables/invoices*') ? 'active' : '' }}"
-                                href="{{ route('accounts.receivables.invoices.index') }}">Invoices</a></li>
-                        
-                        {{-- Cost & Profit Centers --}}
-                        <li><a class="slide-item {{ request()->is('accounts/cost-centers*') ? 'active' : '' }}"
-                                href="{{ route('accounts.cost_centers.index') }}">Cost Centers</a></li>
-                        <li><a class="slide-item {{ request()->is('accounts/profit-centers*') ? 'active' : '' }}"
-                                href="{{ route('accounts.profit_centers.index') }}">Profit Centers</a></li>
-                        
-                        {{-- Reports --}}
-                        <li><a class="slide-item {{ request()->is('accounts/reports/trial-balance*') ? 'active' : '' }}"
-                                href="{{ route('accounts.reports.trial_balance') }}">Trial Balance</a></li>
-                        <li><a class="slide-item {{ request()->is('accounts/reports/balance-sheet*') ? 'active' : '' }}"
-                                href="{{ route('accounts.reports.balance_sheet') }}">Balance Sheet</a></li>
-                        <li><a class="slide-item {{ request()->is('accounts/reports/income-statement*') ? 'active' : '' }}"
-                                href="{{ route('accounts.reports.income_statement') }}">Income Statement</a></li>
-                        <li><a class="slide-item {{ request()->is('accounts/reports/cash-flow*') ? 'active' : '' }}"
-                                href="{{ route('accounts.reports.cash_flow') }}">Cash Flow</a></li>
-                        <li><a class="slide-item {{ request()->is('accounts/reports/aged-payables*') ? 'active' : '' }}"
-                                href="{{ route('accounts.reports.aged_payables') }}">Aged Payables</a></li>
-                        <li><a class="slide-item {{ request()->is('accounts/reports/aged-receivables*') ? 'active' : '' }}"
-                                href="{{ route('accounts.reports.aged_receivables') }}">Aged Receivables</a></li>
-                    </ul>
-                </li>
+                @if (Gate::allows('Accounts') || Gate::allows('Assets') || Gate::allows('AccountReports'))
+
+
+                    <li class="side-item side-item-category">Accounts & Finance</li>
+                    <li class="slide">
+                        <a class="side-menu__item {{ request()->is('accounts*') ? 'active' : '' }}"
+                            data-bs-toggle="slide" href="javascript:void(0);">
+                            <i class="fa fa-calculator icons8 icon-style" aria-hidden="true"></i>
+                            <span class="side-menu__label">Accounts & Finance</span>
+                            <i class="angle fe fe-chevron-down"></i>
+                        </a>
+                        <ul class="slide-menu" style="display: {{ request()->is('accounts*') ? 'block' : 'none' }}">
+                            <li><a class="slide-item {{ request()->is('accounts/dashboard') ? 'active' : '' }}"
+                                    href="{{ route('accounts.dashboard') }}">Dashboard</a></li>
+
+                            {{-- Account Groups & Chart of Accounts --}}
+                            <li><a class="slide-item {{ request()->is('accounts/groups*') ? 'active' : '' }}"
+                                    href="{{ route('accounts.groups.index') }}">Account Groups</a></li>
+
+                            @if (Gate::allows('ChartsOfAccounts-list'))
+                                <li><a class="slide-item {{ request()->is('accounts/chart-of-accounts*') ? 'active' : '' }}"
+                                        href="{{ route('accounts.coa.index') }}">Chart of Accounts</a></li>
+                            @endif
+
+                            @if (Gate::allows('JournalEntry-list'))
+                                <li><a class="slide-item {{ request()->is('accounts/journal-entries*') ? 'active' : '' }}"
+                                        href="{{ route('accounts.journal.index') }}">Journal Entries</a></li>
+                            @endif
+
+
+
+                            {{-- Payables --}}
+                            <li><a class="slide-item {{ request()->is('accounts/payables') ? 'active' : '' }}"
+                                    href="{{ route('accounts.payables.index') }}">Accounts Payable</a></li>
+                            <li><a class="slide-item {{ request()->is('accounts/payables/vendors*') ? 'active' : '' }}"
+                                    href="{{ route('accounts.payables.vendors.index') }}">Vendors</a></li>
+                            <li><a class="slide-item {{ request()->is('accounts/payables/bills*') ? 'active' : '' }}"
+                                    href="{{ route('accounts.payables.bills.index') }}">Bills</a></li>
+
+                            {{-- Receivables --}}
+                            <li><a class="slide-item {{ request()->is('accounts/receivables') ? 'active' : '' }}"
+                                    href="{{ route('accounts.receivables.index') }}">Accounts Receivable</a></li>
+                            <li><a class="slide-item {{ request()->is('accounts/receivables/customers*') ? 'active' : '' }}"
+                                    href="{{ route('accounts.receivables.customers.index') }}">Customers</a></li>
+                            <li><a class="slide-item {{ request()->is('accounts/receivables/invoices*') ? 'active' : '' }}"
+                                    href="{{ route('accounts.receivables.invoices.index') }}">Invoices</a></li>
+
+                            {{-- Cost & Profit Centers --}}
+                            <li><a class="slide-item {{ request()->is('accounts/cost-centers*') ? 'active' : '' }}"
+                                    href="{{ route('accounts.cost_centers.index') }}">Cost Centers</a></li>
+                            <li><a class="slide-item {{ request()->is('accounts/profit-centers*') ? 'active' : '' }}"
+                                    href="{{ route('accounts.profit_centers.index') }}">Profit Centers</a></li>
+
+                            {{-- Reports --}}
+                            @if (Gate::allows('TrialBalance-list'))
+                                <li><a class="slide-item {{ request()->is('accounts/reports/trial-balance*') ? 'active' : '' }}"
+                                        href="{{ route('accounts.reports.trial_balance') }}">Trial Balance</a>
+                                </li>
+                            @endif
+
+                            @if (Gate::allows('BalanceSheet-list'))
+                                <li><a class="slide-item {{ request()->is('accounts/reports/balance-sheet*') ? 'active' : '' }}"
+                                        href="{{ route('accounts.reports.balance_sheet') }}">Balance Sheet</a>
+                                </li>
+                            @endif
+
+                            @if (Gate::allows('ProfitLoss-list'))
+                                <li><a class="slide-item {{ request()->is('accounts/reports/income-statement*') ? 'active' : '' }}"
+                                        href="{{ route('accounts.reports.income_statement') }}">Income
+                                        Statement</a></li>
+
+                                <li><a class="slide-item {{ request()->is('accounts/reports/cash-flow*') ? 'active' : '' }}"
+                                        href="{{ route('accounts.reports.cash_flow') }}">Cash Flow</a></li>
+                                <li><a class="slide-item {{ request()->is('accounts/reports/aged-payables*') ? 'active' : '' }}"
+                                        href="{{ route('accounts.reports.aged_payables') }}">Aged Payables</a>
+                                </li>
+                                <li><a class="slide-item {{ request()->is('accounts/reports/aged-receivables*') ? 'active' : '' }}"
+                                        href="{{ route('accounts.reports.aged_receivables') }}">Aged
+                                        Receivables</a></li>
+                            @endif
+
+
+
+
+
+
+                        </ul>
+                    </li>
+                @endif
 
                 @canany(['EmployeeWelfare', 'EOBI', 'ProfitFunds', 'SocialSecurity'])
                     <li class="side-item side-item-category">Funds</li>
@@ -767,8 +793,8 @@
                     @endcan
                     @can('EOBI')
                         <li class="slide">
-                            <a class="side-menu__item {{ request()->is('hr/eobis*') ? 'active' : '' }}" data-bs-toggle="slide"
-                                href="javascript:void(0);">
+                            <a class="side-menu__item {{ request()->is('hr/eobis*') ? 'active' : '' }}"
+                                data-bs-toggle="slide" href="javascript:void(0);">
                                 <i class="fa fa-handshake-o icons8 icon-style" aria-hidden="true"></i>
                                 <span class="side-menu__label">EOBI</span>
                                 <i class="angle fe fe-chevron-down"></i>
@@ -787,7 +813,8 @@
                                 <span class="side-menu__label">Provident Fund</span>
                                 <i class="angle fe fe-chevron-down"></i>
                             </a>
-                            <ul class="slide-menu" style="display: {{ request()->is('hr/profit-funds*') ? 'block' : 'none' }}">
+                            <ul class="slide-menu"
+                                style="display: {{ request()->is('hr/profit-funds*') ? 'block' : 'none' }}">
                                 <li><a class="slide-item {{ request()->is('hr/profit-funds*') ? 'active' : '' }}"
                                         href="{{ route('hr.profit-funds.index') }}">Provident Fund</a></li>
                             </ul>
@@ -810,7 +837,7 @@
                     @endcan
                 @endcanany
 
-                {{-- @if (Gate::allows('Leaves')) --}}
+                @if (Gate::allows('Leave Settings'))
                     <li class="side-item side-item-category ">Leave Management</li>
                     <li class="slide">
                         <a class="side-menu__item {{ request()->is('hr/qouta_sections*') || request()->is('hr/holidays*') || request()->is('hr/leave_requests*') || request()->is('hr/manage_leaves*') ? 'active' : '' }}"
@@ -821,28 +848,32 @@
                         </a>
                         <ul class="slide-menu "
                             style="display: {{ request()->is('hr/qouta_sections*') || request()->is('hr/holidays*') || request()->is('hr/leave_requests*') || request()->is('hr/manage_leaves*') ? 'block' : 'none' }}">
-                            {{-- @if (Gate::allows('qouta_section')) --}}
+                            @if (Gate::allows('Quota list'))
                                 <li><a class="slide-item {{ request()->is('hr/qouta_sections*') ? 'active' : '' }}"
-                                        href="{{ route('hr.qouta_sections.index') }}">Permanent Employees Quota</a>
+                                        href="{{ route('hr.qouta_sections.index') }}">Permanent Employees
+                                        Quota</a>
                                 </li>
-                            {{-- @endif --}}
-                            {{-- @if (Gate::allows('holidays')) --}}
+                            @endif
+                            @if (Gate::allows('Holiday list'))
                                 <li><a class="slide-item {{ request()->is('hr/holidays*') ? 'active' : '' }}"
                                         href="{{ route('hr.holidays.index') }}">Gazetted Holidays</a></li>
-                            {{-- @endif --}}
-                            <li><a class="slide-item {{ request()->is('hr/leave_requests*') ? 'active' : '' }}"
-                                    href="{{ route('hr.leave_requests.index') }}">Leave Request</a></li>
-                            {{-- @if (Gate::allows('leave-approve')) --}}
+                            @endif
+                            @if (Gate::allows('Leave Request List'))
+                                <li><a class="slide-item {{ request()->is('hr/leave_requests*') ? 'active' : '' }}"
+                                        href="{{ route('hr.leave_requests.index') }}">Leave Request</a></li>
+                            @endif
+
+                            @if (Gate::allows('Manage Leave List'))
                                 <li><a class="slide-item {{ request()->is('hr/manage_leaves*') ? 'active' : '' }}"
                                         href="{{ route('hr.manage_leaves.index') }}">Manage Leaves</a></li>
-                            {{-- @endif --}}
+                            @endif
                         </ul>
                     </li>
-                {{-- @endif --}}
+                @endif
 
 
-                      {{-- ================= BUDGET MANAGEMENT ================= --}}
-                @canany(['Budget', 'InventoryCategory', 'expense'])
+                {{-- ================= BUDGET MANAGEMENT ================= --}}
+                @canany(['Budget', 'supplementory', 'expense', 'BudgetCategory'])
 
                     @php
                         // Any of these routes should keep the Budget Management group open
@@ -856,6 +887,8 @@
                             'inventory.supplimentory.budget.report',
                         );
                     @endphp
+
+
                     <li class="side-item side-item-category">Budegt Management</li>
                     <li class="slide">
                         <a class="side-menu__item {{ $isBudgetOpen ? 'active' : '' }}" data-bs-toggle="slide"
@@ -868,8 +901,8 @@
                         {{-- @dd(auth()->user()->getAllPermissions()->pluck('name'));</li> --}}
                         {{-- @dd(auth()->user()->hasPermissionTo('Budget')); --}}
                         <ul class="slide-menu" style="display: {{ $isBudgetOpen ? 'block' : 'none' }}">
-                            
-                            @can('Budget')
+
+                            @can('Budget-list')
                                 <li>
                                     <a class="slide-item {{ request()->routeIs('inventory.budget.index') ? 'active' : '' }}"
                                         href="{{ route('inventory.budget.index') }}">
@@ -879,12 +912,15 @@
                             @endcan
 
                             {{-- Visible without the Budget permission per your current code --}}
-                            <li>
-                                <a class="slide-item {{ request()->routeIs('inventory.List.ofAssignDepartment') ? 'active' : '' }}"
-                                    href="{{ route('inventory.List.ofAssignDepartment') }}">
-                                    Assign Department List
-                                </a>
-                            </li>
+                            @can('Budget-list')
+                                <li>
+                                    <a class="slide-item {{ request()->routeIs('inventory.List.ofAssignDepartment') ? 'active' : '' }}"
+                                        href="{{ route('inventory.List.ofAssignDepartment') }}">
+                                        Assign Department List
+                                    </a>
+                                </li>
+                            @endcan
+
 
                             @can('BudgetCategory')
                                 <li>
@@ -903,27 +939,33 @@
                                     </a>
                                 </li>
                             @endcan
+                            @can('supplementory list')
+                                <li>
+                                    <a class="slide-item {{ request()->routeIs('inventory.supplementory.index') ? 'active' : '' }}"
+                                        href="{{ route('inventory.supplementory.index') }}">
+                                        Supplementary Budget
+                                    </a>
+                                </li>
+                            @endcan
 
-                            <li>
-                                <a class="slide-item {{ request()->routeIs('inventory.supplementory.index') ? 'active' : '' }}"
-                                    href="{{ route('inventory.supplementory.index') }}">
-                                    Supplementary Budget
-                                </a>
-                            </li>
+                            @can('supplementory request')
+                                <li>
+                                    <a class="slide-item {{ request()->routeIs('inventory.supplimentary.requests.list') ? 'active' : '' }}"
+                                        href="{{ route('inventory.supplimentary.requests.list') }}">
+                                        Request List
+                                    </a>
+                                </li>
+                            @endcan
 
-                            <li>
-                                <a class="slide-item {{ request()->routeIs('inventory.supplimentary.requests.list') ? 'active' : '' }}"
-                                    href="{{ route('inventory.supplimentary.requests.list') }}">
-                                    Request List
-                                </a>
-                            </li>
+                            @can('supplementory report')
+                                <li>
+                                    <a class="slide-item {{ request()->routeIs('inventory.supplimentory.budget.report') ? 'active' : '' }}"
+                                        href="{{ route('inventory.supplimentory.budget.report') }}">
+                                        Supplementary Report
+                                    </a>
+                                </li>
+                            @endcan
 
-                            <li>
-                                <a class="slide-item {{ request()->routeIs('inventory.supplimentory.budget.report') ? 'active' : '' }}"
-                                    href="{{ route('inventory.supplimentory.budget.report') }}">
-                                    Supplementary Report
-                                </a>
-                            </li>
 
                         </ul>
                     </li>
@@ -936,7 +978,7 @@
                 {{-- @dd(auth()->user()->getAllPermissions()->pluck('name')); --}}
                 {{-- Maintenance Management Section --}}
                 <li class="side-item side-item-category" style="display: none;">Maintenance Management</li>
-                <li class="slide" style="display: none;" >
+                <li class="slide" style="display: none;">
                     <a class="side-menu__item {{ request()->is('maintainer*') ? 'active' : '' }}"
                         data-bs-toggle="slide" href="javascript:void(0);">
                         <i class="fa fa-money icons8 icon-style" aria-hidden="true"></i>
@@ -1032,106 +1074,141 @@
 
                             {{-- If your template supports an "open" class, prefer that. Using inline display for compatibility. --}}
                             <ul class="slide-menu" style="display: {{ $isCafeOpen ? 'block' : 'none' }}">
-                                <li>
+
+                                @can("RawMaterialItems-list")
+                                     <li>
                                     <a class="slide-item {{ request()->routeIs('inventory.items.index') && $type === 'food' ? 'active' : '' }}"
                                         href="{{ route('inventory.items.index', ['type' => 'food']) }}">
                                         Raw Material & Items
                                     </a>
                                 </li>
-
-                                <li>
+                                @endcan
+                               
+                                @can("Supplier-list")
+                                    <li>
                                     <a class="slide-item {{ request()->routeIs('inventory.suppliers.index') && $type === 'food' ? 'active' : '' }}"
                                         href="{{ route('inventory.suppliers.index', ['type' => 'food']) }}">
                                         Suppliers
                                     </a>
                                 </li>
-
-                                <li>
+                                @endcan
+                                
+                                @can("Requisitions-list")
+                                    <li>
                                     <a class="slide-item {{ request()->routeIs('inventory.requisitions.index') && $type === 'food' ? 'active' : '' }}"
                                         href="{{ route('inventory.requisitions.index', ['type' => 'food']) }}">
                                         Requisitions
                                     </a>
                                 </li>
+                                @endcan
 
-                                <li>
-                                    <a class="slide-item {{ request()->routeIs('inventory.requisitions.approval') && $type === 'food' ? 'active' : '' }}"
-                                        href="{{ route('inventory.requisitions.approval', ['type' => 'food']) }}">
-                                        Requisition Approval
-                                    </a>
-                                </li>
+                                @can("RequisitionApproval-list")
+                                    <li>
+                                        <a class="slide-item {{ request()->routeIs('inventory.requisitions.approval') && $type === 'food' ? 'active' : '' }}"
+                                            href="{{ route('inventory.requisitions.approval', ['type' => 'food']) }}">
+                                            Requisition Approval
+                                        </a>
+                                    </li>
+                                @endcan
 
-                                <li>
+                                
+                                    @can("Quotes-list")
+                                        <li>
                                     <a class="slide-item {{ request()->routeIs('inventory.quotes.index') && $type === 'food' ? 'active' : '' }}"
                                         href="{{ route('inventory.quotes.index', ['type' => 'food']) }}">
                                         Quotes
                                     </a>
                                 </li>
+                                    @endcan
 
-                                <li>
+                                    @can("PurchaseOrders-list")
+                                        <li>
                                     <a class="slide-item {{ request()->routeIs('inventory.purchase_order.index') && $type === 'food' ? 'active' : '' }}"
                                         href="{{ route('inventory.purchase_order.index', ['type' => 'food']) }}">
                                         Purchase Order
                                     </a>
                                 </li>
+                                    @endcan
 
-                                <li>
+                                
+                                @can("GRN-list")
+                                  <li>
                                     <a class="slide-item {{ request()->routeIs('inventory.grn') && $type === 'food' ? 'active' : '' }}"
                                         href="{{ route('inventory.grn', ['type' => 'food']) }}">
                                         GRN
                                     </a>
-                                </li>
-
-                                <li>
+                                </li>  
+                                @endcan
+                                
+                                @can('inventory-list')
+                                   <li>
                                     <a class="slide-item {{ request()->routeIs('inventory.inventry.index') && $type === 'food' ? 'active' : '' }}"
                                         href="{{ route('inventory.inventry.index', ['type' => 'food']) }}">
                                         Inventory
                                     </a>
-                                </li>
-
-                                <li>
+                                </li> 
+                                @endcan
+                                
+                                @can("Products-list")
+                                     <li>
                                     <a class="slide-item {{ request()->routeIs('inventory.product.index') && $type === 'food' ? 'active' : '' }}"
                                         href="{{ route('inventory.product.index', ['type' => 'food']) }}">
                                         Products
                                     </a>
                                 </li>
-
-
-                                <li>
+                                @endcan
+                               
+                                @can("CompletedProducts-list")
+                                    <li>
                                     <a class="slide-item {{ request()->routeIs('inventory.product.productCompleted') ? 'active' : '' }}"
                                         href="{{ route('inventory.product.productCompleted') }}">
                                         Completed Goods
                                     </a>
                                 </li>
-                                <li>
+                                @endcan
+
+                                @can("StudentMeal-list")
+                                    <li>
                                     <a class="slide-item {{ request()->routeIs('inventory.school_lunch.school_lunch') ? 'active' : '' }}"
                                         href="{{ route('inventory.school_lunch.school_lunch') }}">
                                         Student Meal
                                     </a>
                                 </li>
-                                <li>
+                                @endcan
+                                
+                                @can("StudentMealAssigned-list")
+                                    <li>
                                     <a class="slide-item {{ request()->routeIs('inventory.school_lunch.view', 'inventory.school_lunch.get_assigned_student') ? 'active' : '' }}"
                                         href="{{ route('inventory.school_lunch.view') }}">
                                         Student Meal Assigned
                                     </a>
                                 </li>
-                                <li>
+                                @endcan
+
+                                @can("StaffMeal-list")
+                                     <li>
                                     <a class="slide-item {{ request()->routeIs('inventory.staff_lunch.emp_index') ? 'active' : '' }}"
                                         href="{{ route('inventory.staff_lunch.emp_index') }}">
                                         Staff Meal
                                     </a>
                                 </li>
-                                <li>
+                                @endcan
+                                
+                                @can("StaffMealAssigned-list")
+                                    <li>
                                     <a class="slide-item {{ request()->routeIs('inventory.staff_lunch.emp_view') ? 'active' : '' }}"
                                         href="{{ route('inventory.staff_lunch.emp_view') }}">
                                         Staff Meal Assigned
                                     </a>
                                 </li>
+                                @endcan
+                                
                             </ul>
                         </li>
                     @endcan
 
                     {{-- ================= STATIONERY INVENTORY ================= --}}
-                    @can('StationeryInventory')
+                    @can('CafeInventory')
                         <li class="slide">
                             <a class="side-menu__item {{ $isStationeryOpen ? 'active' : '' }}" data-bs-toggle="slide"
                                 href="javascript:void(0);">
@@ -1200,7 +1277,7 @@
                     @endcan
 
                     {{-- ================= POINT OF SALE ================= --}}
-                    @can('POS')
+                    @can('CafeInventory')
                         <li class="slide">
                             <a class="side-menu__item {{ $isPOSOpen ? 'active' : '' }}" data-bs-toggle="slide"
                                 href="javascript:void(0);">
@@ -1250,7 +1327,8 @@
                 @endcan
             </ul>
             <div class="slide-right" id="slide-right">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="#7b8191" width="24" height="24" viewBox="0 0 24 24">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="#7b8191" width="24" height="24"
+                    viewBox="0 0 24 24">
                     <path d="M10.707 17.707 16.414 12l-5.707-5.707-1.414 1.414L13.586 12l-4.293 4.293z" />
                 </svg>
             </div>

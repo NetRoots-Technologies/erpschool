@@ -12,18 +12,14 @@ class DesignationService
 
     public function store($request)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+        
         $designation = Designation::create(['name' => $request->name, 'department_id' => $request->selectDepartment]);
     }
 
 
     public function getdata()
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+        
         $data = Designation::orderby('id', 'DESC');
 
         return Datatables::of($data)->addIndexColumn()
@@ -38,13 +34,17 @@ class DesignationService
             ->addColumn('action', function ($row) {
 
                 $btn = ' <form class="delete_form" data-route="' . route("hr.designations.destroy", $row->id) . '"   id="designation-' . $row->id . '"  method="POST"> ';
-                // if (Gate::allows('company-edit'))
+                if(auth()->user()->can('Designations-edit')){
                 $btn = $btn . '<a  data-id="' . $row->id . '" class="btn btn-primary text-white btn-sm designation_edit"  data-designation-edit=\'' . $row . '\'>Edit</a>';
 
-                // if (Gate::allows('company-delete'))
-                $btn = $btn . ' <button data-id="designation-' . $row->id . '" type="button" class="btn btn-danger delete btn-sm "" >Delete</button>';
+                }
+
+               if(auth()->user()->can('Designations-delete')){
+                 $btn = $btn . ' <button data-id="designation-' . $row->id . '" type="button" class="btn btn-danger delete btn-sm "" >Delete</button>';
                 $btn = $btn . method_field('DELETE') . '' . csrf_field();
                 $btn = $btn . ' </form>';
+               }
+               
                 return $btn;
             })
             ->rawColumns(['action', 'status'])
@@ -53,18 +53,14 @@ class DesignationService
 
     public function edit($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+        
         return Designation::find($id);
     }
 
 
     public function update($request, $id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+        
         $data = Designation::find($id);
         $data->name = $request->name;
         $data->department_id = $request->selectDepartment;
@@ -73,9 +69,7 @@ class DesignationService
 
     public function destroy($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+        
         $Designation = Designation::findOrFail($id);
         if ($Designation)
             $Designation->delete();
@@ -83,9 +77,7 @@ class DesignationService
 
     public function changeStatus($request)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+        
         $designation = Designation::find($request->id);
         if ($designation) {
             $designation->status = ($request->status == 'active') ? 1 : 0;

@@ -15,6 +15,8 @@ use Illuminate\Support\Facades\Gate;
 
 class AssignClassController extends Controller
 {
+    protected $AssignClassService;
+    
     public function __construct(AssignClassService $assignClassService)
     {
         $this->AssignClassService = $assignClassService;

@@ -31,7 +31,7 @@ class MealBatchController extends Controller
 
     public function index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('StudentMeal-list')) {
             return abort(503);
         }
         $branches = Branch::where('status', 1)->with('classes')->get();
@@ -55,7 +55,7 @@ class MealBatchController extends Controller
 
     public function store(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('StudentMeal-list')) {
             return abort(503);
         }
         $request->validate([
@@ -190,14 +190,14 @@ class MealBatchController extends Controller
 
     public function view()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('StudentMealAssigned-list')) {
             return abort(503);
         }
         return view('admin.inventory_management.school_lunch.view');
     }
     public function getAssigned()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('StudentMeal-list')) {
             return abort(503);
         }
         // $food_batches = MealBatch::with(['user', 'branch', 'class', 'product', 'section', 'mealBatchDetails'])
@@ -205,9 +205,7 @@ class MealBatchController extends Controller
         //     ->get();
 
 
-        if (!Gate::allows('students')) {
-            return abort(503);
-        }
+       
 
         // $food_batches = MealBatch::with(['user', 'branch', 'class', 'product', 'section', 'mealBatchDetails'])
         //     ->where('parent_type', AcademicClass::class)
@@ -252,7 +250,7 @@ class MealBatchController extends Controller
 
     public function get_assigned_student(Request $request, $classId, $sectionId, $date = null)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('StudentMeal-list')) {
             abort(503);
         }
 
@@ -281,7 +279,7 @@ class MealBatchController extends Controller
     //for employees
     public function emp_index()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('StaffMeal-list')) {
             return abort(503);
         }
         $branches = Branch::where('status', 1)->with('department')->get();
@@ -293,7 +291,7 @@ class MealBatchController extends Controller
 
     public function emp_store(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('StaffMealAssigned-list')) {
             return abort(503);
         }
         $request->validate([
@@ -371,14 +369,14 @@ class MealBatchController extends Controller
     }
     public function emp_view()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('StudentMeal-list')) {
             return abort(503);
         }
         return view('admin.inventory_management.staff_lunch.view');
     }
     public function empGetAssigned()
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('StudentMeal-list')) {
             return abort(503);
         }
         $food_batches = MealBatch::with(['user', 'branch', 'department', 'product', 'mealBatchDetails'])

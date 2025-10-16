@@ -11,9 +11,7 @@ class ExamTermService
 {
     public function store($request)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+        
         //dd($request->all());
         ExamTerm::create([
             'session_id' => $request->get('session_id'),
@@ -38,9 +36,7 @@ class ExamTermService
 
     public function getData()
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+        
         $data = ExamTerm::with('AcademicSession', 'branch')->orderBy('created_at', 'desc')->get();
 
 
@@ -48,17 +44,16 @@ class ExamTermService
             ->addColumn('action', function ($row) {
                 $btn = '<div style="display: flex;">';
 
-                //                if (Gate::allows('Employee-edit'))
+            if (Gate::allows('ExamTerms-edit')){
                 $btn .= '<a href="' . route("exam.exam_terms.edit", $row->id) . '" class="btn btn-primary btn-sm"  style="margin-right: 4px;">Edit</a>';
-
-                //                if (Gate::allows('Employee-destroy')) {
+              }
+                if (Gate::allows('ExamTerms-delete')) {
                 $btn .= '<form method="POST" onsubmit="return confirm(\'Are you sure you want to Delete this?\');" action="' . route("exam.exam_terms.destroy", $row->id) . '">';
                 $btn .= '<button type="submit" class="btn btn-danger btn-sm" style="margin-right: 4px;">Delete</button>';
                 $btn .= method_field('DELETE') . csrf_field();
                 $btn .= '</form>';
-                //                }
                 $btn .= '</div>';
-
+                 }
                 return $btn;
 
             })->addColumn('active', function ($row) {
@@ -87,9 +82,7 @@ class ExamTermService
 
     public function update($request, $id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+        
         $examTerm = ExamTerm::find($id);
         $examTerm->update([
             'session_id' => $request->get('session_id'),
@@ -114,9 +107,7 @@ class ExamTermService
 
     public function destroy($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+        
         $examTerm = ExamTerm::find($id);
         if ($examTerm) {
             $examTerm->delete();

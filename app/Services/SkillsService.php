@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Services;
+
 use App\Models\Exam\Skills;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\Auth;
@@ -30,31 +31,29 @@ class SkillsService
     // }
 
 
-public function store($request)
-{
-    $logs = [
-        'user_id'    => Auth::id() ?? 'N/A',
-        'old_name'   => 'N/A',
-        'old_status' => 'N/A',
-        'date_time'  => now()->toDateTimeString(),
-    ];
+    public function store($request)
+    {
+        $logs = [
+            'user_id'    => Auth::id() ?? 'N/A',
+            'old_name'   => 'N/A',
+            'old_status' => 'N/A',
+            'date_time'  => now()->toDateTimeString(),
+        ];
 
-    return Skills::create([
-        'name'         => strtolower(trim($request->name)),
-        'class_id'     => $request->class_id,
-        'course_id'   => $request->course_id,
-        'component_id' => $request->component_id,
-        'logs'         => json_encode([$logs]),
-    ]);
-}
+        return Skills::create([
+            'name'         => strtolower(trim($request->name)),
+            'class_id'     => $request->class_id,
+            'course_id'   => $request->course_id,
+            'component_id' => $request->component_id,
+            'logs'         => json_encode([$logs]),
+        ]);
+    }
 
 
     public function getdata()
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
-     $data = Skills::with(['class', 'subject', 'component'])->orderBy('id', 'DESC')->get();
+
+        $data = Skills::with(['class', 'subject', 'component'])->orderBy('id', 'DESC')->get();
 
         return Datatables::of($data)
             ->addIndexColumn()
@@ -69,26 +68,32 @@ public function store($request)
             })
             ->addColumn('status', function ($row) {
                 return $row->status == 1
-                    ? '<button type="button" class="btn btn-success btn-sm change-status" data-id="'.$row->id.'" data-status="inactive">Active</button>'
-                    : '<button type="button" class="btn btn-warning btn-sm change-status" data-id="'.$row->id.'" data-status="active">Inactive</button>';
+                    ? '<button type="button" class="btn btn-success btn-sm change-status" data-id="' . $row->id . '" data-status="inactive">Active</button>'
+                    : '<button type="button" class="btn btn-warning btn-sm change-status" data-id="' . $row->id . '" data-status="active">Inactive</button>';
             })
             ->addColumn('action', function ($row) {
-                $btn = '<form class="delete_form" data-route="' . route("exam.skills.destroy", $row->id) . '" id="skills-' . $row->id . '" method="POST">';
-                $btn .= '<a data-id="' . $row->id . '" class="btn btn-primary text-white btn-sm skills_edit" data-skills-edit=\'' . $row . '\'>Edit</a>';
-                $btn .= method_field('DELETE') . csrf_field();
-                $btn .= '</form>';
+
+                $btn = '';
+                if (auth()->user()->can('Skills-edit')) {
+                    $btn .= '<a data-id="' . $row->id . '" class="btn btn-primary text-white btn-sm skills_edit" data-skills-edit=\'' . $row . '\'>Edit</a>';
+                }
+                if (auth()->user()->can('Skills-delete')) {
+                    $btn .= '<form class="delete_form" data-route="' . route("exam.skills.destroy", $row->id) . '" id="skills-' . $row->id . '" method="POST">';
+                    $btn .=' <button data-id="branch-' . $row->id . '" type="submit" class="btn btn-danger delete btn-sm "" >Delete</button>';
+
+                    $btn .= method_field('DELETE') . csrf_field();
+                    $btn .= '</form>';
+                }
+
                 return $btn;
             })
-            ->rawColumns(['status','action'])
+            ->rawColumns(['status', 'action'])
             ->make(true);
-
     }
 
     public function update($request, $id, $image = null)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+
         $skills = Skills::find($id);
         if ($skills) {
             $current_logs = [
@@ -107,18 +112,15 @@ public function store($request)
         return null;
     }
 
-    public function destroy($id)
-    {
-        if (!Gate::allows('Dashboard-list')) {
+    public function destroy($id) {
+        if (!Gate::allows('Skills-delete')) {
             return abort(503);
         }
     }
 
     public function changeStatus($request)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+
         $skills = Skills::find($request->id);
         if ($skills) {
             $current_logs = [
@@ -137,4 +139,3 @@ public function store($request)
         return null;
     }
 }
-

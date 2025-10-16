@@ -11,9 +11,7 @@ class overTimeService
 {
     public function store($request)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+
         foreach ($request['employee_id'] as $key => $employee) {
             OverTime::create([
                 'branch_id' => $request['branch_id'],
@@ -32,45 +30,44 @@ class overTimeService
 
     public function getdata()
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+
         $data = OverTime::with('employee', 'branch')->orderBy('created_at', 'desc')->get();
 
 
         return Datatables::of($data)->addIndexColumn()
             ->addColumn('action', function ($row) {
                 $btn = '<div style="display: flex;">';
+                if (auth()->can()->can('Overtime-edit')) {
+                    $btn .= '<a href="' . route("hr.overtime.edit", $row->id) . '" class="btn btn-primary btn-sm"  style="margin-right: 4px;">Edit</a>';
+                }
 
-                $btn .= '<a href="' . route("hr.overtime.edit", $row->id) . '" class="btn btn-primary btn-sm"  style="margin-right: 4px;">Edit</a>';
+                if (auth()->can()->can('Overtime-Overtime-delete')) {
+                    $btn .= '<form method="POST" onsubmit="return confirm(\'Are you sure you want to Delete this?\');" action="' . route("hr.overtime.destroy", $row->id) . '">';
+                    $btn .= '<button type="submit" class="btn btn-danger btn-sm" style="margin-right: 4px;">Delete</button>';
+                    $btn .= method_field('DELETE') . csrf_field();
+                    $btn .= '</form>';
 
-                $btn .= '<form method="POST" onsubmit="return confirm(\'Are you sure you want to Delete this?\');" action="' . route("hr.overtime.destroy", $row->id) . '">';
-                $btn .= '<button type="submit" class="btn btn-danger btn-sm" style="margin-right: 4px;">Delete</button>';
-                $btn .= method_field('DELETE') . csrf_field();
-                $btn .= '</form>';
+                    $btn .= '</div>';
+                }
 
-                $btn .= '</div>';
+
 
                 return $btn;
-
             })->addColumn('branch', function ($row) {
                 if ($row->branch) {
                     return $row->branch->name;
-
                 } else {
                     return "N/A";
                 }
             })->addColumn('employee', function ($row) {
                 if ($row->employee) {
                     return $row->employee->name;
-
                 } else {
                     return "N/A";
                 }
             })->addColumn('allow', function ($row) {
                 if ($row->action == 'yes') {
                     return 'Yes';
-
                 } elseif ($row->action == 'no') {
                     return 'No';
                 } else {
@@ -85,9 +82,7 @@ class overTimeService
 
     public function update($request, $id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+
         $overtime = OverTime::find($id);
 
         $overtime_data = [
@@ -103,14 +98,10 @@ class overTimeService
 
     public function destroy($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+
         $overtime = OverTime::find($id);
         if ($overtime) {
             $overtime->delete();
         }
     }
-
 }
-

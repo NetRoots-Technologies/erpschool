@@ -22,19 +22,18 @@ class CompanyService
 
     public function create()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Company-create')) {
             return abort(503);
         }
-        // return Permission::with('child')->where('main', 1)->get();
-
     }
 
     public function store($request, $image = null)
     {
-        if (!Gate::allows('Dashboard-list')) {
+
+        if (!Gate::allows('Company-create')) {
             return abort(503);
         }
-        // return 'hello';
+
         $logoPath = null;
         if ($request->hasFile('logo')) {
             $logoFileName = time() . '.' . $request->file('logo')->getClientOriginalExtension();
@@ -42,13 +41,12 @@ class CompanyService
             $logoPath = 'logos/' . $logoFileName;
         }
         Company::create(['name' => $request->name, 'logo' => $logoPath, 'voucher_image' => $image]);
-
     }
 
 
     public function getdata()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Company-list')) {
             return abort(503);
         }
         $data = Company::orderby('id', 'DESC');
@@ -61,15 +59,34 @@ class CompanyService
                 return $statusButton;
             })
             ->addColumn('action', function ($row) {
+                $btn  = "";
 
-                $btn = ' <form class="delete_form" data-route="' . route("admin.company.destroy", $row->id) . '"   id="company-' . $row->id . '"  method="POST"> ';
-                // if (Gate::allows('company-edit'))
-                $btn = $btn . '<a  data-id="' . $row->id . '" class="btn btn-primary text-white  btn-sm company_edit"  data-company-edit=\'' . $row . '\'>Edit</a>';
+                if (auth()->user()->can('Company-edit')) {
+                    $payload = e(json_encode($row)); // safely encode $row
+                    $btn .= '<button type="button"
+                        data-id="' . $row->id . '"
+                        class="btn btn-primary text-white btn-sm company_edit me-1"
+                        data-company-edit=\'' . $payload . '\'>
+                        <i class="fa fa-edit"></i> Edit
+                 </button>';
+                }
 
-                // if (Gate::allows('company-delete'))
-                $btn = $btn . ' <button data-id="company-' . $row->id . '" type="button" class="btn btn-danger delete btn-sm "" >Delete</button>';
-                $btn = $btn . method_field('DELETE') . '' . csrf_field();
-                $btn = $btn . ' </form>';
+                if (auth()->user()->can('Company-delete')) {
+                    $btn .= '<form class="delete_form"
+                         data-route="' . route('admin.company.destroy', $row->id) . '"
+                         id="company-' . $row->id . '"
+                         method="POST"
+                         style="display:inline-block; margin-left:5px;">'
+                        . csrf_field()
+                        . method_field('DELETE') . '
+              <button data-id="company-' . $row->id . '"
+                      type="button"
+                      class="btn btn-danger btn-sm delete">
+                      <i class="fa fa-trash"></i> Delete
+              </button>
+            </form>';
+                }
+
                 return $btn;
             })
             ->rawColumns(['action', 'status'])
@@ -78,7 +95,7 @@ class CompanyService
 
     public function edit($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Company-edit')) {
             return abort(503);
         }
         return Company::find($id);
@@ -87,7 +104,7 @@ class CompanyService
 
     public function update($request, $id, $image = null)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Company-edit')) {
             return abort(503);
         }
         $company = Company::find($id);
@@ -113,7 +130,7 @@ class CompanyService
 
     public function destroy($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Company-delete')) {
             return abort(503);
         }
         $Company = Company::findOrFail($id);
@@ -123,9 +140,6 @@ class CompanyService
 
     public function changeStatus($request)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
         $company = Company::find($request->id);
         if ($company) {
             $company->status = ($request->status == 'active') ? 1 : 0;
@@ -134,4 +148,3 @@ class CompanyService
         }
     }
 }
-

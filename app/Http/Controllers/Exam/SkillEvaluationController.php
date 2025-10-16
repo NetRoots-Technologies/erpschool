@@ -25,7 +25,7 @@ class SkillEvaluationController extends Controller
 
     public function getData()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('SkillEvaluation-list')) {
             return abort(503);
         }
         $skillEvaluation = $this->skillEvaluationService->getdata();
@@ -38,7 +38,7 @@ class SkillEvaluationController extends Controller
      */
     public function index()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('SkillEvaluation-list')) {
             return abort(503);
         }
         $skillEvaluations = SkillEvaluation::with([
@@ -54,7 +54,7 @@ class SkillEvaluationController extends Controller
     public function listing($id)
     {
 
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('SkillEvaluation-list')) {
             return abort(503);
         }
         $skillEvaluations = SkillEvaluation::where('student_id', $id)->with([
@@ -78,7 +78,7 @@ class SkillEvaluationController extends Controller
      */
     public function create()
     {
-      if (!Gate::allows('Dashboard-list')) {
+      if (!Gate::allows('SkillEvaluation-create')) {
             return abort(503);
         }
         $companies = Company::all();
@@ -95,7 +95,7 @@ class SkillEvaluationController extends Controller
      */
     public function store(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('SkillEvaluation-create')) {
             return abort(503);
         }
     return $this->skillEvaluationService->store($request);    }
@@ -108,7 +108,7 @@ class SkillEvaluationController extends Controller
      */
     public function show($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('SkillEvaluation-list')) {
             return abort(503);
         }
     }
@@ -121,7 +121,7 @@ class SkillEvaluationController extends Controller
      */
     public function edit($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('SkillEvaluation-edit')) {
             return abort(503);
         }
     }
@@ -135,7 +135,7 @@ class SkillEvaluationController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('SkillEvaluation-edit')) {
             return abort(503);
         }
         return $skillEvaluation = $this->skillEvaluationService->update($request, $id);
@@ -150,7 +150,7 @@ class SkillEvaluationController extends Controller
      */
     public function destroy($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('SkillEvaluation-delete')) {
             return abort(503);
         }
         return $skillEvaluation = $this->skillEvaluationService->destroy($id);
@@ -159,14 +159,14 @@ class SkillEvaluationController extends Controller
 
     public function changeStatus(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('SkillEvaluation-list')) {
             return abort(503);
         }
         return $skillEvaluation = $this->skillEvaluationService->changeStatus($request);
     }
     public function handleBulkAction(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('SkillEvaluation-list')) {
             return abort(503);
         }
         $ids = $request->get('ids');

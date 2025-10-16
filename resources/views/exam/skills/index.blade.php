@@ -19,7 +19,7 @@ Skills
         <h3 class="text-22 text-center text-bold w-100 mb-4">Skills</h3>
     </div>
     <div class="row    mt-4 mb-4 ">
-@if (Gate::allows('students'))
+@if (Gate::allows('Skills-create'))
         <div class="col-12 text-right">
             <a class="btn btn-primary btn-md text-white" data-toggle="modal" data-target="#createModal1"><b>Add Skill</b></a>
         </div>
@@ -447,6 +447,7 @@ Skills
 
         $('#file-datatable tbody').on('click', '.delete', function () {
             var data = $(this).data('id');
+            
             $('#' + data).submit();
         });
 
@@ -463,7 +464,7 @@ Skills
                     },
                     success: function (result) {
                         tableData.ajax.reload();
-                        toastr.success("Test Type Deleted successfully.")
+                        toastr.success("Skills Deleted successfully.")
                     }
                 });
             }

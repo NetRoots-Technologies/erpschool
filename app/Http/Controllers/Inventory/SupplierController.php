@@ -29,7 +29,7 @@ class SupplierController extends Controller
 
     public function index($type)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Supplier-list')) {
             return abort(503);
         }
 
@@ -48,7 +48,7 @@ class SupplierController extends Controller
      */
     public function store(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Supplier-create')) {
             return abort(503);
         }
 
@@ -101,7 +101,7 @@ class SupplierController extends Controller
      */
     public function destroy(Supplier $supplier)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Supplier-delete')) {
             return abort(503);
         }
         $supplier->delete();
@@ -110,7 +110,7 @@ class SupplierController extends Controller
 
     public function getData(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Supplier-list')) {
             return abort(503);
         }
         $query = Supplier::query();

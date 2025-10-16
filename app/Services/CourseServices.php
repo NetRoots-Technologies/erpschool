@@ -14,26 +14,20 @@ class CourseServices
 
     public function index()
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         return Course::all();
     }
 
 
     public function create()
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
 
     }
 
     public function store($request)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         $coursetype = Course::create([
             'name' => $request->name,
             'subject_code' => $request->subject_code,
@@ -49,9 +43,7 @@ class CourseServices
 
     public function user_deactive($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         $user = User::find($id);
         if ($user) {
             $user->active = 0;
@@ -62,9 +54,7 @@ class CourseServices
 
     public function user_active($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         $user = User::find($id);
         if ($user) {
             $user->active = 1;
@@ -76,9 +66,7 @@ class CourseServices
 
     public function getdata()
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         $data = Course::with('courseType', 'company', 'branch')->orderBy('created_at', 'desc');
         
         // if (Auth::check()) {
@@ -95,11 +83,13 @@ class CourseServices
             ->addColumn('action', function ($row) {
                 $btn = '<div style="display: flex;">';
 
-
+                if(auth()->user()->can('Subjects-edit')){
                 $btn .= '<a href="' . route("academic.subjects.edit", $row->id) . '" class="btn btn-primary btn-sm"  style="margin-right: 4px;">Edit</a>';
 
+                }
 
-                $btn .= '<form method="POST" onsubmit="return confirm(\'Are you sure you want to Delete this?\');" action="' . route("academic.subjects.destroy", $row->id) . '">';
+                if(auth()->user()->can('Subjects-delete')){
+                  $btn .= '<form method="POST" onsubmit="return confirm(\'Are you sure you want to Delete this?\');" action="' . route("academic.subjects.destroy", $row->id) . '">';
                 $btn .= '<button type="button" class="btn btn-danger btn-sm deleteBtn"
                 data-id="' . $row->id . '"
                 data-url="' . route("academic.subjects.destroy", $row->id) . '"
@@ -111,7 +101,9 @@ class CourseServices
                 $btn .= '</form>';
 
 
-                $btn .= '</div>';
+                $btn .= '</div>';  
+                }
+                
 
                 return $btn;
 
@@ -164,9 +156,7 @@ class CourseServices
 
     public function edit($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         return Agent::find($id);
 
 
@@ -174,9 +164,7 @@ class CourseServices
 
     public function update($request, $id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         $data = Course::find($id);
         $input = $request->all();
         $data->update($input);
@@ -185,9 +173,7 @@ class CourseServices
 
     public function destroy($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         $course = Course::findOrFail($id);
 
         if ($course)
@@ -197,9 +183,7 @@ class CourseServices
 
     public function changeStatus($request)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         $coursetype = Course::find($request->id);
         if ($coursetype) {
             $coursetype->status = ($request->status == 'active') ? 1 : 0;

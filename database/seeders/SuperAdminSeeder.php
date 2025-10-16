@@ -116,25 +116,7 @@ class SuperAdminSeeder extends Seeder
             ],
             'Payroll' => ['Payroll-list', 'Payroll-approve', 'Payroll-slip', 'Payroll-report'],
             'Overtime' => ['Overtime-list', 'Overtime-create', 'Overtime-edit', 'Overtime-delete'],
-
-            // Fee Management
-            'Fee' => [
-                'FeeSections-list', 'FeeSections-create', 'FeeSections-edit', 'FeeSections-delete',
-                'AccountHead-list', 'AccountHead-create', 'AccountHead-edit', 'AccountHead-delete',
-                'FeeHeads-list', 'FeeHeads-create', 'FeeHeads-edit', 'FeeHeads-delete',
-                'FeeCategory-list', 'FeeCategory-create', 'FeeCategory-edit', 'FeeCategory-delete',
-                'FeeStructure-list', 'FeeStructure-create', 'FeeStructure-edit', 'FeeStructure-delete',
-                'FeeCollection-list', 'FeeCollection-create', 'FeeCollection-edit', 'FeeCollection-delete',
-                'FeeDiscount-list', 'FeeDiscount-create', 'FeeDiscount-edit', 'FeeDiscount-delete',
-                'FeeTerm-list', 'FeeTerm-create', 'FeeTerm-edit', 'FeeTerm-delete',
-                'StudentRegularFee-list', 'StudentRegularFee-create', 'StudentRegularFee-edit', 'StudentRegularFee-delete',
-                'BillGeneration-list', 'BillGeneration-create', 'BillGeneration-edit', 'BillGeneration-delete',
-                'Banks-list', 'Banks-create', 'Banks-edit', 'Banks-delete',
-                'BanksBranches-list', 'BanksBranches-create', 'BanksBranches-edit', 'BanksBranches-delete',
-                'BanksAccounts-list', 'BanksAccounts-create', 'BanksAccounts-edit', 'BanksAccounts-delete',
-                'BanksFile-list',
-            ],
-
+            
             // Exam Management
             'Exam' => [
                 'ExamTerms-list', 'ExamTerms-create', 'ExamTerms-edit', 'ExamTerms-delete',
@@ -145,10 +127,8 @@ class SuperAdminSeeder extends Seeder
                 'Skills-list', 'Skills-create', 'Skills-edit', 'Skills-delete',
                 'SkillEvaluationsKey-list', 'SkillEvaluationsKey-create', 'SkillEvaluationsKey-edit', 'SkillEvaluationsKey-delete',
                 'SkillEvaluation-list', 'SkillEvaluation-create', 'SkillEvaluation-edit', 'SkillEvaluation-delete',
-                'Behaviours-list', 'Behaviours-create', 'Behaviours-edit', 'Behaviours-delete',
                 'EffortLevels-list', 'EffortLevels-create', 'EffortLevels-edit', 'EffortLevels-delete',
                 'GradingPolicies-list', 'GradingPolicies-create', 'GradingPolicies-edit', 'GradingPolicies-delete',
-                'AcademicEvaluationsKey-list', 'AcademicEvaluationsKey-create', 'AcademicEvaluationsKey-edit', 'AcademicEvaluationsKey-delete',
                 'SkillGroups-list', 'SkillGroups-create', 'SkillGroups-edit', 'SkillGroups-delete',
                 'SkillTypes-list', 'SkillTypes-create', 'SkillTypes-edit', 'SkillTypes-delete',
                 'ExamSchedules-list', 'ExamSchedules-create', 'ExamSchedules-edit', 'ExamSchedules-delete',
@@ -166,11 +146,11 @@ class SuperAdminSeeder extends Seeder
                 'TrialBalance-list', 'BalanceSheet-list', 'ProfitLoss-list', 'ChartOfAccounts-list',
             ],
 
-            'Assets' => [
-                'AssetType-list', 'AssetType-create', 'AssetType-edit', 'AssetType-delete',
-                'Assets-list', 'Assets-create', 'Assets-edit', 'Assets-delete',
-                'AssetsBulk-list', 'AssetsBulk-create', 'AssetsBulk-edit', 'AssetsBulk-delete',
-            ],
+            // 'Assets' => [
+            //     'AssetType-list', 'AssetType-create', 'AssetType-edit', 'AssetType-delete',
+            //     'Assets-list', 'Assets-create', 'Assets-edit', 'Assets-delete',
+            //     'AssetsBulk-list', 'AssetsBulk-create', 'AssetsBulk-edit', 'AssetsBulk-delete',
+            // ],
 
             // Administrative
             'Company' => ['Company-list', 'Company-create', 'Company-edit', 'Company-delete'],
@@ -216,16 +196,16 @@ class SuperAdminSeeder extends Seeder
                 'StaffMeal-list', 'StaffMealAssigned-list',
             ],
 
-            'StationeryInventory' => [
-                'Items-create', 'Items-edit', 'Items-delete', 'Items-list',
-                'Suppliers-create', 'Suppliers-edit', 'Suppliers-delete', 'Suppliers-list',
-                'StoreInventory-list', 'Bundles-list',
-            ],
+            // 'StationeryInventory' => [
+            //     'Items-create', 'Items-edit', 'Items-delete', 'Items-list',
+            //     'Suppliers-create', 'Suppliers-edit', 'Suppliers-delete', 'Suppliers-list',
+            //     'StoreInventory-list', 'Bundles-list',
+            // ],
 
-            'POS' => [
-                'POSFood-list', 'POSFood-create', 'POSFood-edit', 'POSFood-delete',
-                'POSUniform-list', 'POSUniform-create', 'POSUniform-edit', 'POSUniform-delete',
-            ],
+            // 'POS' => [
+            //     'POSFood-list', 'POSFood-create', 'POSFood-edit', 'POSFood-delete',
+            //     'POSUniform-list', 'POSUniform-create', 'POSUniform-edit', 'POSUniform-delete',
+            // ],
 
             // Special Permissions
             'students' => ['students', 'students-list', 'students-create', 'students-edit', 'students-delete'],

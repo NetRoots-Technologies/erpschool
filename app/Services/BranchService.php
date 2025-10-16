@@ -17,17 +17,13 @@ class BranchService
 
     public function index()
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+        
     }
 
 
     public function store($request)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+        
         //dd($request->all());
         $schoolIds = $request->get('selectSchool');
         $branch = Branch::create([
@@ -56,9 +52,7 @@ class BranchService
 
     public function getdata()
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+        
         
         $data = Branch::with('company', 'schoolBranch')->OrderBy('created_at', 'desc');
 
@@ -95,14 +89,17 @@ class BranchService
             ->addColumn('action', function ($row) {
 
                 $btn = ' <form class="delete_form" data-route="' . route("admin.branches.destroy", $row->id) . '"   id="branche-' . $row->id . '"  method="POST"> ';
-                // if (Gate::allows('branches-edit'))
+                if (auth()->user()->can('Branches-create')){
                 $btn = $btn . '<a  data-id="' . $row->id . '" class="btn btn-primary text-white  btn-sm branches_edit"  data-branch-edit=\'' . $row . '\'>Edit</a>';
 
+                }
 
-                // if (Gate::allows('branches-delete'))
-                $btn = $btn . ' <button data-id="branch-' . $row->id . '" type="submit" class="btn btn-danger delete btn-sm "" >Delete</button>';
-                $btn = $btn . method_field('DELETE') . '' . csrf_field();
-                $btn = $btn . ' </form>';
+                if (auth()->user()->can('Branches-delete')){
+                    $btn = $btn . ' <button data-id="branch-' . $row->id . '" type="submit" class="btn btn-danger delete btn-sm "" >Delete</button>';
+                    $btn = $btn . method_field('DELETE') . '' . csrf_field();
+                    $btn = $btn . ' </form>';
+                }
+                
                 return $btn;
             })
             ->rawColumns(['action', 'status', 'sync_Data'])
@@ -111,18 +108,14 @@ class BranchService
 
     public function edit($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+        
         return Branch::find($id);
     }
 
 
     public function update($request, $id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+        
         $branch = Branch::find($id);
 
         if ($request->has('selectSchool')) {
@@ -150,9 +143,7 @@ class BranchService
 
     public function destroy($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+        
         $Branch = Branch::findOrFail($id);
         if ($Branch) {
             $Branch->schoolBranch()->delete();
@@ -163,9 +154,7 @@ class BranchService
 
     public function changeStatus($request)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+        
         $branch = Branch::find($request->id);
         if ($branch) {
             $branch->status = ($request->status == 'active') ? 1 : 0;

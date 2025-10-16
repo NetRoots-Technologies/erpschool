@@ -93,7 +93,7 @@ class SchoolTypeService
 
     public function destroy($id)
     {
-
+        
         $school = SchoolType::findOrFail($id);
         if ($school)
             $school->delete();

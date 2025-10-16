@@ -23,7 +23,7 @@ class QuottaController extends Controller
      */
     public function index()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Quota list')) {
             return abort(503);
         }
         return view('hr.quota_settings.index');
@@ -36,7 +36,7 @@ class QuottaController extends Controller
      */
     public function create()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Quota create')) {
             return abort(503);
         }
         $departments = Department::all();
@@ -52,7 +52,7 @@ class QuottaController extends Controller
      */
     public function store(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Quota create')) {
             return abort(503);
         }
         try {
@@ -73,7 +73,7 @@ class QuottaController extends Controller
      */
     public function show($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Quota list')) {
             return abort(503);
         }
     }
@@ -86,7 +86,7 @@ class QuottaController extends Controller
      */
     public function edit($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Quota edit')) {
             return abort(503);
         }
         $departments = Department::all();
@@ -107,7 +107,7 @@ class QuottaController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Quota edit')) {
             return abort(503);
         }
         $this->QuottaService->update($request, $id);
@@ -124,7 +124,7 @@ class QuottaController extends Controller
      */
     public function destroy($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Quota delete')) {
             return abort(503);
         }
         $this->QuottaService->destroy($id);
@@ -135,7 +135,7 @@ class QuottaController extends Controller
 
     public function getData()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Quota list')) {
             return abort(503);
         }
         $quota = $this->QuottaService->getdata();

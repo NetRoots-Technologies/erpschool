@@ -27,7 +27,7 @@ class RequisitionController extends Controller
 
     public function index($type)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Requisitions-list')) {
             return abort(503);
         }
         $branches = Branches::active()->get();
@@ -43,7 +43,7 @@ class RequisitionController extends Controller
     }
     public function approval($type)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('RequisitionApproval-list')) {
             return abort(503);
         }
 
@@ -53,7 +53,7 @@ class RequisitionController extends Controller
 
     public function store(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Requisitions-create')) {
             return abort(503);
         }
         DB::beginTransaction();
@@ -88,7 +88,7 @@ class RequisitionController extends Controller
 
     public function destroy(Requisition $requisition)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Requisitions-delete')) {
             return abort(503);
         }
         $requisition->delete();
@@ -99,7 +99,7 @@ class RequisitionController extends Controller
     {
 
         // dd($request);
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Requisitions-list')) {
             return abort(503);
         }
         $query = Requisition::latest()
@@ -121,7 +121,7 @@ class RequisitionController extends Controller
     }
     public function changeStatus(Request $request, Requisition $requisition)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('RequisitionApproval-edit')) {
             return abort(503);
         }
         $requisition->status = $request->status;

@@ -14,28 +14,19 @@ use Illuminate\Support\Facades\Gate;
 class WorkShiftService
 {
 
-    public function index()
-    {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
-    }
+    public function index() {}
 
 
     public function create()
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+
         // return Permission::with('child')->where('main', 1)->get();
 
     }
 
     public function store($request)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+
 
         $WorkShift = WorkShift::create(['name' => $request->name, 'start_time' => $request->start_time, 'end_time' => $request->end_time]);
 
@@ -49,17 +40,12 @@ class WorkShiftService
             'Sun' => $request->sunday,
             'work_shift_id' => $WorkShift->id,
         ]);
-
-
-
     }
 
 
     public function getdata()
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+
         $data = WorkShift::with('workdays')->get();
         //        $data=ShiftDays::with('workDay')->get();
         return Datatables::of($data)->addIndexColumn()
@@ -70,8 +56,9 @@ class WorkShiftService
             ->addColumn('action', function ($row) {
 
                 $btn = ' <form class="delete_form" data-route="' . route("hr.work_shifts.destroy", $row->id) . '"   id="work_shift-' . $row->id . '"  method="POST"> ';
-                // if (Gate::allows('company-edit'))
-                $btn .= '<a data-id="' . $row->id . '" class="btn btn-primary text-white btn-sm workShift_edit" data-workshift-edit=\'' . $row . '\'>Edit</a>';
+                if (Gate::allows('WorkShift-edit')) {
+                    $btn .= '<a data-id="' . $row->id . '" class="btn btn-primary text-white btn-sm workShift_edit" data-workshift-edit=\'' . $row . '\'>Edit</a>';
+                }
 
                 $btn .= ' ';
                 // Active/Inactive button
@@ -83,10 +70,11 @@ class WorkShiftService
 
                 $btn .= ' ';
 
-                // if (Gate::allows('company-delete'))
-                $btn = $btn . ' <button data-id="work_shift-' . $row->id . '" type="button" class="btn btn-danger delete btn-sm "" >Delete</button>';
-                $btn = $btn . method_field('DELETE') . '' . csrf_field();
-                $btn = $btn . ' </form>';
+                if (Gate::allows('WorkShift-delete')) {
+                    $btn = $btn . ' <button data-id="work_shift-' . $row->id . '" type="button" class="btn btn-danger delete btn-sm "" >Delete</button>';
+                    $btn = $btn . method_field('DELETE') . '' . csrf_field();
+                    $btn = $btn . ' </form>';
+                }
                 return $btn;
             })
             ->rawColumns(['action'])
@@ -95,20 +83,15 @@ class WorkShiftService
 
     public function edit($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+
         // dd(34);
         $workday = WorkShift::with('workDay')->find($id);
-
     }
 
 
     public function update($request, $id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+
         $workShift = WorkShift::findOrFail($id);
         $workShift->update([
             'name' => $request->name,
@@ -135,9 +118,7 @@ class WorkShiftService
 
     public function destroy($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+
         $WrokShift = Workshift::findOrFail($id);
         if ($WrokShift)
             $WrokShift->delete();
@@ -145,9 +126,7 @@ class WorkShiftService
 
     public function changeStatus($request)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+
         $WorkShift = WorkShift::find($request->id);
         if ($WorkShift) {
             $WorkShift->status = ($request->status == 'active') ? 1 : 0;
@@ -155,6 +134,4 @@ class WorkShiftService
             return $WorkShift;
         }
     }
-
 }
-

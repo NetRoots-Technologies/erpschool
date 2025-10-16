@@ -20,7 +20,7 @@ class EmployeeWelfareController extends Controller
      */
     public function index()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('EmployeeWelfare-list')) {
             return abort(503);
         }
         return view('hr.employee_welfare.index');
@@ -33,7 +33,7 @@ class EmployeeWelfareController extends Controller
      */
     public function create()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('EmployeeWelfare-list')) {
             return abort(503);
         }
         $employees = Employees::all();
@@ -50,7 +50,7 @@ class EmployeeWelfareController extends Controller
      */
     public function store(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('EmployeeWelfare-list')) {
             return abort(503);
         }
         try {
@@ -77,7 +77,7 @@ class EmployeeWelfareController extends Controller
      */
     public function show($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('EmployeeWelfare-list')) {
             return abort(503);
         }
     }
@@ -90,7 +90,7 @@ class EmployeeWelfareController extends Controller
      */
     public function edit($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('EmployeeWelfare-list')) {
             return abort(503);
         }
         $employeeWelfare = EmployeeWelfare::find($id);
@@ -112,7 +112,7 @@ class EmployeeWelfareController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('EmployeeWelfare-list')) {
             return abort(503);
         }
     }
@@ -125,7 +125,7 @@ class EmployeeWelfareController extends Controller
      */
     public function destroy($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('EmployeeWelfare-list')) {
             return abort(503);
         }
         $employeeWelfare = EmployeeWelfare::find($id);
@@ -138,7 +138,7 @@ class EmployeeWelfareController extends Controller
 
     public function employeeWelfareData(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('EmployeeWelfare-list')) {
             return abort(503);
         }
         $data = $request->all();
@@ -157,7 +157,7 @@ class EmployeeWelfareController extends Controller
 
     public function getData()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('EmployeeWelfare-list')) {
             return abort(503);
         }
         $data = DB::table('employee_welfare')

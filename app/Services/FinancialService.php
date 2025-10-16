@@ -12,26 +12,20 @@ class FinancialService
 
     public function index()
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
     }
 
 
     public function store($request)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         $financial = Financial::create(['name' => $request->name, 'start_date' => $request->start_date, 'end_date' => $request->end_date]);
     }
 
 
     public function getdata()
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         $data = Financial::orderby('id', 'DESC');
 
         return Datatables::of($data)->addIndexColumn()
@@ -67,9 +61,7 @@ class FinancialService
 
     public function update($request, $id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         $data = Financial::find($id);
         $input = $request->all();
         $data->update($input);
@@ -78,9 +70,7 @@ class FinancialService
 
     public function destroy($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         $Financial = Financial::findOrFail($id);
         if ($Financial)
             $Financial->delete();
@@ -90,9 +80,7 @@ class FinancialService
 
     public function changeStatus($request)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         $financialYear = Financial::find($request->id);
         if ($financialYear) {
             $financialYear->status = ($request->status == 'active') ? 1 : 0;

@@ -54,7 +54,7 @@ class EmployeeController extends Controller
     public function index()
     {
 
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Employees-list')) {
             return abort(503);
         }
 
@@ -70,7 +70,7 @@ class EmployeeController extends Controller
      */
     public function create()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Employees-create')) {
             return abort(503);
         }
         $nationalities = UserHelper::getNationalities();
@@ -98,7 +98,7 @@ class EmployeeController extends Controller
      */
     public function store(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Employees-create')) {
             return abort(503);
         }
         DB::beginTransaction();
@@ -127,7 +127,7 @@ class EmployeeController extends Controller
      */
     public function show($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Employees-list')) {
             return abort(503);
         }
     }
@@ -140,7 +140,7 @@ class EmployeeController extends Controller
      */
     public function edit($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Employees-edit')) {
             return abort(503);
         }
         $pakistaniBanks = UserHelper::getPakistaniBanks();
@@ -184,7 +184,7 @@ class EmployeeController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Employees-edit')) {
             return abort(503);
         }
         $user = User::where('employee_id', $id)->first();
@@ -214,7 +214,7 @@ class EmployeeController extends Controller
 
     public function getData()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Employees-list')) {
             return abort(503);
         }
         $employee = $this->EmployeeServices->getdata();
@@ -223,34 +223,28 @@ class EmployeeController extends Controller
 
     public function get_employee_attendance()
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+        
         $employee_attendance = $this->EmployeeServices->get_employee_attendance();
         return $employee_attendance;
     }
 
     public function employee_attendance()
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+        
         $attendance = $this->EmployeeServices->employee_attendance();
         return $attendance;
     }
 
     public function sync_employee_attendance()
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+        
         $attendance = $this->EmployeeServices->sync_employee_attendance();
         return $attendance;
     }
 
     public function destroy($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Employees-delete')) {
             return abort(503);
         }
         $this->EmployeeServices->destroy($id);
@@ -261,9 +255,7 @@ class EmployeeController extends Controller
 
     public function fetchBranches(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         $branches = Branch::where('company_id', $request->companyid)->get();
         return response()->json($branches);
     }
@@ -271,9 +263,7 @@ class EmployeeController extends Controller
 
     public function fetchDepartment(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+        
         $departments = Departments::where('company_id', $request->companyid)->get();
         //        dd($departments);
         return response()->json($departments);
@@ -288,7 +278,7 @@ class EmployeeController extends Controller
 
     public function handleBulkAction(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Employees-list')) {
             return abort(503);
         }
         $ids = $request->get('ids');
@@ -304,9 +294,7 @@ class EmployeeController extends Controller
 
     public function addAttendance($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         ini_set('max_execution_time', 200);
 
         $branch = Branch::where('status', 1)->find($id);
@@ -373,9 +361,7 @@ class EmployeeController extends Controller
 
     public function syncData(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         $id = $request->get('id');
         //
 //        $employees_id = OtherBranch::where('branch_id',$id)->pluck('employee_id');
@@ -387,7 +373,7 @@ class EmployeeController extends Controller
 
     public function changeStatus(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Employees-list')) {
             return abort(503);
         }
         return $employee = $this->EmployeeServices->changeStatus($request);
@@ -397,7 +383,7 @@ class EmployeeController extends Controller
 
     public function import(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Employees-list')) {
             return abort(503);
         }
         try {
@@ -410,9 +396,7 @@ class EmployeeController extends Controller
 
     public function fetchSection(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         $request->validate([
             'class_id' => 'required|integer|exists:classes,id',
         ]);
@@ -426,7 +410,7 @@ class EmployeeController extends Controller
 
     public function addBankDetails($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Employees-list')) {
             return abort(503);
         }
         $employee = Employees::findOrFail($id);
@@ -437,7 +421,7 @@ class EmployeeController extends Controller
 
     public function saveBankDetails(Request $request, $id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Employees-Bank-Details')) {
             return abort(503);
         }
         $request->validate([
@@ -461,7 +445,7 @@ class EmployeeController extends Controller
 
     public function exportbulkfile()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Employees-list')) {
             return abort(503);
         }
         return Excel::download(new EmployeeSampleExport, 'employee_bulk_sample.xlsx');
@@ -469,7 +453,7 @@ class EmployeeController extends Controller
 
     public function importBulkFile(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Employees-list')) {
             return abort(503);
         }
         $request->validate([

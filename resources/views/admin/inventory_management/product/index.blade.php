@@ -112,9 +112,12 @@ Product
 </div>
 
 <div class="container-fluid">
-    <button type="button" id="add-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#iModal">
+    @if (Gate::allows('Products-create'))
+         <button type="button" id="add-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#iModal">
         <i class="fa fa-plus"></i> Add
     </button>
+    @endif
+   
 
     <div class="row justify-content-center my-4">
         <div class="col-12">
@@ -143,6 +146,10 @@ Product
         const currectUri = window.location.href;
         const lastIndex = currectUri.split('/').pop();
         let global_count = 0
+
+        const viewPermissions = @json(Gate::allows('Products-list'));
+        const editPermissions = @json(Gate::allows('Products-edit'));
+        const deletePermissions = @json(Gate::allows('Products-delete'));
 
         $('#addItem').select2({
             placeholder: "Select an Ingredient",
@@ -441,19 +448,25 @@ Product
                 className: 'text-center',
                 orderable: false,
                 render: function (data, type, row, meta) {
-                    $(".inventoryProductsName").val(row.name);
-                    return `
-                        <div class="text-center">
-                            <button type="button" class="btn btn-sm btn-success inventoryProductBtn" data-id="${row.id}" data-name="${row.name}" data-branch="${row.branch_id}" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#inventoryProductsModal">
+                        $(".inventoryProductsName").val(row.name);
+                    let loadHtml = '<div class="text-center">';
+                   
+                    if(viewPermissions){
+                        loadHtml+=`<button type="button" class="btn btn-sm btn-success inventoryProductBtn" data-id="${row.id}" data-name="${row.name}" data-branch="${row.branch_id}" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#inventoryProductsModal">
                                 <i class="fa fa-plus-circle"></i>
-                            </button>
-                            <span class="btn btn-sm btn-warning edit-item" data-id="${row.id}" data-name="${row.name}" data-branch="${row.branch_id}">
+                            </button>`;
+                    }
+                    if(editPermissions){
+                        loadHtml+=`<span class="btn btn-sm btn-warning edit-item" data-id="${row.id}" data-name="${row.name}" data-branch="${row.branch_id}">
                                 <i class="fa fa-pencil"></i>
-                            </span>
-                            <span data-uri="${deleteUri}/${row.id}" class="btn btn-sm btn-danger delete-item">
+                            </span>`;
+                    }
+                    if(deletePermissions){
+                        loadHtml+=`<span data-uri="${deleteUri}/${row.id}" class="btn btn-sm btn-danger delete-item">
                                 <i class="fa fa-trash"></i>
-                            </span>
-                        </div>`;
+                            </span>`;
+                    }
+                    return loadHtml+= `</div>`;
                 }
             }
 

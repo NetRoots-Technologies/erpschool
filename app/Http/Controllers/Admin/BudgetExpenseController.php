@@ -2,16 +2,17 @@
 
 namespace App\Http\Controllers\Admin;
 
-use Mpdf\Tag\B;
-use App\Models\Budget;
+use App\Http\Controllers\Controller;
 use App\Models\BCategory;
-use Illuminate\Http\Request;
+use App\Models\Budget;
 use App\Models\BudgetExpense;
 use App\Models\DepartmentBudget;
-use Yajra\DataTables\DataTables;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
+use Mpdf\Tag\B;
+use Yajra\DataTables\DataTables;
 
 class BudgetExpenseController extends Controller
 {
@@ -23,7 +24,11 @@ class BudgetExpenseController extends Controller
     public function index(Request $request)
     {
 
-      
+        if (!Gate::allows('expense list')) {
+            return abort(503);
+        }
+
+
         $budgets = BudgetExpense::with('budget', 'category', 'subcategory');
         if ($request->ajax()) {
 
@@ -39,11 +44,18 @@ class BudgetExpenseController extends Controller
                     return $row->subcategory->title ?? '-';
                 })
                 ->addColumn('action', function ($row) {
-                    $btn  = '<a href="' . route("inventory.expense.edit", $row->id) . '" class="btn btn-primary me-2 btn-sm text-white">Edit</a>';
-                    $btn .= '<form class="delete_form d-inline" data-route="' . route("inventory.expense.destroy", $row->id) . '" id="budget-expense-' . $row->id . '" method="POST">';
-                    $btn .= method_field('DELETE') . csrf_field();
-                    $btn .= '<button data-id="budget-expense-' . $row->id . '" type="button" class="btn btn-danger delete btn-sm">Delete</button>';
-                    $btn .= '</form>';
+
+                    $btn = '';
+                    if (Gate::allows('expense edit')) {
+                        $btn  .= '<a href="' . route("inventory.expense.edit", $row->id) . '" class="btn btn-primary me-2 btn-sm text-white">Edit</a>';
+                    }
+                    if (Gate::allows('expense delete')) {
+                        $btn .= '<form class="delete_form d-inline" data-route="' . route("inventory.expense.destroy", $row->id) . '" id="budget-expense-' . $row->id . '" method="POST">';
+                        $btn .= method_field('DELETE') . csrf_field();
+                        $btn .= '<button data-id="budget-expense-' . $row->id . '" type="button" class="btn btn-danger delete btn-sm">Delete</button>';
+                        $btn .= '</form>';
+                    }
+
                     return $btn;
                 })
                 ->rawColumns(['action', 'budget_title', 'category_name', 'subcategory_name'])
@@ -64,6 +76,10 @@ class BudgetExpenseController extends Controller
      */
     public function create()
     {
+
+        if (!Gate::allows('expense create')) {
+            return abort(503);
+        }
         $budgets = Budget::all();
         return view('admin.budget_expense.create', compact('budgets'));
     }
@@ -95,23 +111,23 @@ class BudgetExpenseController extends Controller
     public function getAllowedAmount(Request $request)
     {
 
-        
+
         $record = DepartmentBudget::where('budget_id', $request->budget_id)
             ->where('category_id', $request->category_id)
             ->where('sub_category_id', $request->subcategory_id)
             ->first();
 
-            $spent = BudgetExpense::where('budget_id', $request->budget_id)
+        $spent = BudgetExpense::where('budget_id', $request->budget_id)
             ->where('category_id', $request->category_id)
             ->where('subcategory_id', $request->subcategory_id)
             ->sum('expense_amount');
 
 
-               
-                if($spent > 0){
-                    $rem = (int)$record->amount - (int)$spent;
-                }
-            
+
+        if ($spent > 0) {
+            $rem = (int)$record->amount - (int)$spent;
+        }
+
         return response()->json([
             'allowed_amount' => $record ? $record->amount : 0,
             'rem_amount' => $rem ?? $record->amount,
@@ -127,7 +143,9 @@ class BudgetExpenseController extends Controller
      */
     public function store(Request $request)
     {
-        
+        if (!Gate::allows('expense create')) {
+            return abort(503);
+        }
         $request->validate([
             'budget_id' => 'required',
             'category_id' => 'required',
@@ -177,25 +195,29 @@ class BudgetExpenseController extends Controller
      * @param  \App\Models\BudgetExpense  $budgetExpense
      * @return \Illuminate\Http\Response
      */
-    public function edit(BudgetExpense $budgetExpense , $id)
+    public function edit(BudgetExpense $budgetExpense, $id)
     {
-    
-            $budgets = Budget::get();
-            $categories = BCategory::whereIn('id', DepartmentBudget::pluck('category_id'))->get();
-            $subcategoy = BCategory::whereIn('id', DepartmentBudget::pluck('sub_category_id'))->get();
-            $expense = BudgetExpense::with('budget')->findOrFail($id);
 
-            $departmentBudget = DepartmentBudget::where('budget_id', $expense->budget_id)
+        if (!Gate::allows('expense edit')) {
+            return abort(503);
+        }
+
+        $budgets = Budget::get();
+        $categories = BCategory::whereIn('id', DepartmentBudget::pluck('category_id'))->get();
+        $subcategoy = BCategory::whereIn('id', DepartmentBudget::pluck('sub_category_id'))->get();
+        $expense = BudgetExpense::with('budget')->findOrFail($id);
+
+        $departmentBudget = DepartmentBudget::where('budget_id', $expense->budget_id)
             ->where('category_id', $expense->category_id)
             ->where('sub_category_id', $expense->subcategory_id)
             ->first();
 
-           $allocatedAmount = $departmentBudget->amount ?? 0;
+        $allocatedAmount = $departmentBudget->amount ?? 0;
 
-           
-            
-         
-          return view('admin.budget_expense.edit', compact('budgets' , 'expense' , 'categories' , 'subcategoy' , 'allocatedAmount'));
+
+
+
+        return view('admin.budget_expense.edit', compact('budgets', 'expense', 'categories', 'subcategoy', 'allocatedAmount'));
     }
 
     /**
@@ -205,9 +227,11 @@ class BudgetExpenseController extends Controller
      * @param  \App\Models\BudgetExpense  $budgetExpense
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, BudgetExpense $budgetExpense , $id)
+    public function update(Request $request, BudgetExpense $budgetExpense, $id)
     {
-        
+        if (!Gate::allows('expense edit')) {
+            return abort(503);
+        }
         $expense = BudgetExpense::findOrFail($id);
 
         $request->validate([
@@ -220,15 +244,15 @@ class BudgetExpenseController extends Controller
 
         // same allocated vs spent check here
         $allocated = DepartmentBudget::where('budget_id', $request->budget_id)
-                        ->where('category_id', $request->category_id)
-                        ->where('sub_category_id', $request->subcategory_id)
-                        ->sum('amount');
+            ->where('category_id', $request->category_id)
+            ->where('sub_category_id', $request->subcategory_id)
+            ->sum('amount');
 
         $spent = BudgetExpense::where('budget_id', $request->budget_id)
-                        ->where('category_id', $request->category_id)
-                        ->where('subcategory_id', $request->subcategory_id)
-                        ->where('id','!=',$id)
-                        ->sum('expense_amount');
+            ->where('category_id', $request->category_id)
+            ->where('subcategory_id', $request->subcategory_id)
+            ->where('id', '!=', $id)
+            ->sum('expense_amount');
 
         $remaining = $allocated - $spent;
 
@@ -239,7 +263,6 @@ class BudgetExpenseController extends Controller
         $expense->update($request->all());
 
         return redirect()->route('inventory.expense.index')->with('success', 'Expense Updated Successfully');
-    
     }
 
     /**
@@ -248,14 +271,16 @@ class BudgetExpenseController extends Controller
      * @param  \App\Models\BudgetExpense  $budgetExpense
      * @return \Illuminate\Http\Response
      */
-    public function destroy(BudgetExpense $budgetExpense , $id)
+    public function destroy(BudgetExpense $budgetExpense, $id)
     {
-        
+        if (!Gate::allows('expense delete')) {
+            return abort(503);
+        }
         $budget = BudgetExpense::findOrFail($id);
         $budget->delete();
-        
+
         return response()->json([
-            'success'=> true,
+            'success' => true,
 
         ]);
     }

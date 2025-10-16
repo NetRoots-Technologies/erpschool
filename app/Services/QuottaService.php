@@ -15,9 +15,7 @@ class QuottaService
 
     public function store($request)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+
         $quota = Quotta::create([
             'leave_type' => $request->name,
             'permitted_days' => $request->permit_days,
@@ -35,29 +33,26 @@ class QuottaService
 
     public function edit($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+
         return Quotta::with('department')->find($id);
     }
 
     public function getdata()
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+
         $data = Quotta::orderby('id', 'DESC');
         return Datatables::of($data)->addIndexColumn()
 
 
             ->addColumn('action', function ($row) {
                 //                $btn = '<form method="POST" onsubmit="return confirm(\'Are you sure you want to Delete this?\');" action="' . route("hr.qouta_sections.destroy", $row->id) . '">';
-                // if (Gate::allows('company-edit'))
-                $btn = '<a href="' . route("hr.qouta_sections.edit", $row->id) . '" class="btn btn-primary ml-2 mr-2 btn-sm">Edit</a>';
+                if (Gate::allows('Quota edit')) {
+                    $btn = '<a href="' . route("hr.qouta_sections.edit", $row->id) . '" class="btn btn-primary ml-2 mr-2 btn-sm">Edit</a>';
+                }
                 // if (Gate::allows('company-delete'))
-//                $btn .= '<button data-id="quota-' . $row->id . '" type="submit" class="btn btn-danger delete btn-sm">Delete</button>';
-//                $btn .= method_field('DELETE') . csrf_field();
-//                $btn .= '</form>';
+                //                $btn .= '<button data-id="quota-' . $row->id . '" type="submit" class="btn btn-danger delete btn-sm">Delete</button>';
+                //                $btn .= method_field('DELETE') . csrf_field();
+                //                $btn .= '</form>';
                 return $btn;
             })
 
@@ -67,9 +62,7 @@ class QuottaService
 
     public function update($request, $id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+
         $quota = Quotta::findOrFail($id);
 
         $quota->update([
@@ -93,12 +86,8 @@ class QuottaService
 
     public function destroy($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+
         $quota = Quotta::find($id);
         $quota->delete();
     }
-
 }
-

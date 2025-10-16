@@ -14,35 +14,27 @@ class RolesServise
 
     public function index()
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         return Permission::with('child')->where('main', 1)->get();
     }
 
     public function apiindex()
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         return Role::all();
 
     }
 
     public function create()
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         return Permission::with('child')->where('main', 1)->get();
 
     }
 
     public function store($request)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         $permissions = [];
         $permissions = $request->permisions;
         $role = Role::create(['name' => $request->name, 'guard_name' => 'web']);
@@ -53,9 +45,7 @@ class RolesServise
 
     public function getdata()
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
 
         $data = Role::select('id', 'name')->orderby('id', 'DESC')->get();
 
@@ -78,9 +68,7 @@ class RolesServise
 
     public function edit($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         return Role::find($id);
 
 
@@ -88,9 +76,7 @@ class RolesServise
 
     public function AllowedPermissions($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         return Permission::join('role_has_permissions', 'role_has_permissions.permission_id', '=', 'permissions.id')
             ->where(['role_has_permissions.role_id' => $id])
             ->get()->pluck('name', 'id');
@@ -99,9 +85,7 @@ class RolesServise
 
     public function update($request, $id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         $role = Role::find($id);
         $role->name = $request->name;
         $role->save();
@@ -111,9 +95,7 @@ class RolesServise
 
     public function destroy($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         $role = Role::findOrFail($id);
         if ($role)
             $role->delete();

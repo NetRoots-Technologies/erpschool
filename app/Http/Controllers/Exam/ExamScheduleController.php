@@ -41,7 +41,7 @@ class ExamScheduleController extends Controller
      */
     public function index()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('ExamSchedules-list')) {
             return abort(503);
         }
         return view('exam.exam_schedule.index');
@@ -55,7 +55,7 @@ class ExamScheduleController extends Controller
     public function create()
     {
 
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('ExamSchedules-create')) {
             return abort(503);
         }
         $companies = Company::where('status', 1)->get();
@@ -73,7 +73,7 @@ class ExamScheduleController extends Controller
 
     public function store(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('ExamSchedules-create')) {
             return abort(503);
         }
         $this->ExamScheduleService->store($request);
@@ -89,7 +89,7 @@ class ExamScheduleController extends Controller
      */
     public function show($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('ExamSchedules-list')) {
             return abort(503);
         }
     }
@@ -102,7 +102,7 @@ class ExamScheduleController extends Controller
      */
     public function edit($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('ExamSchedules-edit')) {
             return abort(503);
         }
         $components = Component::where('status', 1)->get();
@@ -122,7 +122,7 @@ class ExamScheduleController extends Controller
     {
 
         // dd($request->all(), $id);
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('ExamSchedules-edit')) {
             return abort(503);
         }
         $rules = [
@@ -171,7 +171,7 @@ class ExamScheduleController extends Controller
      */
     public function destroy($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('ExamSchedules-delete')) {
             return abort(503);
         }
         $this->ExamScheduleService->destroy($id);
@@ -181,7 +181,7 @@ class ExamScheduleController extends Controller
 
     public function fetchExamTerm(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('ExamSchedules-list')) {
             return abort(503);
         }
         $examTerm = ExamTerm::where('branch_id', $request->branch_id)->get();
@@ -190,7 +190,7 @@ class ExamScheduleController extends Controller
 
     public function classSubjectData(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('ExamSchedules-list')) {
             return abort(503);
         }
         $data = $request->all();
@@ -209,7 +209,7 @@ class ExamScheduleController extends Controller
 
     public function fetch_class_subject(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('ExamSchedules-list')) {
             return abort(503);
         }
         $data = $request->all();
@@ -227,7 +227,7 @@ class ExamScheduleController extends Controller
 
     public function fetch_class_subjects(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('ExamSchedules-list')) {
             return abort(503);
         }
         $data = $request->all();
@@ -249,7 +249,7 @@ class ExamScheduleController extends Controller
     public function component_data(Request $request)
     {
 
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('ExamSchedules-list')) {
             return abort(503);
         }
         $data = $request->all();
@@ -260,7 +260,7 @@ class ExamScheduleController extends Controller
 
     public function getData()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('ExamSchedules-list')) {
             return abort(503);
         }
         $data = ExamSchedule::with([
@@ -291,11 +291,20 @@ class ExamScheduleController extends Controller
             })
             ->addColumn('action', function ($row) {
                 $btn = '<div style="display: flex;">';
+               if (Gate::allows('ExamSchedules-edit')) {
                 $btn .= '<a href="' . route("exam.exam_schedules.edit", $row->id) . '" class="btn btn-primary btn-sm" style="margin-right: 4px;">Edit</a>';
+          
+              }
+
+                if(Gate::allows('ExamSchedules-delete')){
                 $btn .= '<form method="POST" onsubmit="return confirm(\'Are you sure?\');" action="' . route("exam.exam_schedules.destroy", $row->id) . '">';
                 $btn .= method_field('DELETE') . csrf_field();
                 $btn .= '<button type="submit" class="btn btn-danger btn-sm">Delete</button>';
-                $btn .= '</form></div>';
+                $btn .= '</form>';
+
+                }
+                
+                $btn .= '</div>';
                 return $btn;
             })
             ->rawColumns(['action'])
@@ -304,7 +313,7 @@ class ExamScheduleController extends Controller
 
     public function getDataOnEdit($exam_schedule_id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('ExamSchedules-list')) {
             return abort(503);
         }
         $data = ExamSchedule::findOrFail($exam_schedule_id);

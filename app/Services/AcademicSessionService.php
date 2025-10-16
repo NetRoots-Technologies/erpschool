@@ -14,9 +14,7 @@ class AcademicSessionService
 
     public function store($request)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         //        dd($request->all());
         $academicSession = AcademicSession::create(['name' => $request->name, 'start_date' => $request->start_date, 'end_date' => $request->end_date]);
     }
@@ -24,9 +22,7 @@ class AcademicSessionService
     //,'company_id'=> $request->company_id,'school_id' => $request->school_type_id
     public function getdata()
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         $data = AcademicSession::with(relations: 'company')->orderby('id', 'DESC');
 
         return Datatables::of($data)->addIndexColumn()
@@ -34,8 +30,10 @@ class AcademicSessionService
             ->addColumn('action', function ($row) {
                 $btn = '<form class="delete_form" data-route="' . route("academic.academic-session.destroy", $row->id) . '" id="academic-' . $row->id . '" method="POST">';
 
-                // Edit button
+                if(auth()->user()->can('AcademicSession-edit')){
                 $btn .= '<a data-id="' . $row->id . '" class="btn btn-primary text-white btn-sm academic_session_edit" data-academic-session-edit=\'' . $row . '\'>Edit</a>';
+
+                }
 
                 $btn .= ' ';
                 // Active/Inactive button
@@ -48,10 +46,13 @@ class AcademicSessionService
                 $btn .= ' ';
 
                 // Delete button
-                $btn .= '<button data-id="academic-' . $row->id . '" type="button" class="btn btn-danger delete btn-sm">Delete</button>';
+                if(auth()->user()->can('AcademicSession-delete')){
+                     $btn .= '<button data-id="academic-' . $row->id . '" type="button" class="btn btn-danger delete btn-sm">Delete</button>';
 
                 $btn .= method_field('DELETE') . csrf_field();
                 $btn .= '</form>';
+                }
+               
 
                 return $btn;
             })
@@ -69,9 +70,7 @@ class AcademicSessionService
 
     public function update($request, $id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         $data = AcademicSession::find($id);
         $data->update(['name' => $request->name, 'start_date' => $request->start_date, 'end_date' => $request->end_date]);
 
@@ -80,9 +79,7 @@ class AcademicSessionService
 
     public function destroy($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         $academicSession = AcademicSession::findOrFail($id);
         if ($academicSession)
             $academicSession->delete();
@@ -92,9 +89,7 @@ class AcademicSessionService
 
     public function changeStatus($request)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         $academicSession = AcademicSession::find($request->id);
         if ($academicSession) {
             $academicSession->status = ($academicSession->status == 1) ? 0 : 1;

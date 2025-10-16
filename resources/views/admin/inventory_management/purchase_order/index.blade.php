@@ -56,10 +56,10 @@
                                     name="total_amount" readonly required>
                             </div>
 
-                        <div class="col-6 mb-3">
-                            <label for="description" class="form-label">Comments</label>
-                            <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
-                        </div>
+                            <div class="col-6 mb-3">
+                                <label for="description" class="form-label">Comments</label>
+                                <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
+                            </div>
 
 
                             <div class="col-12 mb-3">
@@ -80,9 +80,13 @@
 
     <div class="container-fluid">
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <button type="button" id="add-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#iModal">
-                <i class="fa fa-plus"></i> Add
-            </button>
+            @if (Gate::allows('PurchaseOrders-create'))
+                <button type="button" id="add-button" class="btn btn-primary" data-bs-toggle="modal"
+                    data-bs-target="#iModal">
+                    <i class="fa fa-plus"></i> Add
+                </button>
+            @endif
+
 
             <form action="{{ route('inventory.purchase_order.uploadPurchase') }}" method="POST" id="upload-form"
                 enctype="multipart/form-data">
@@ -127,12 +131,18 @@
 
             const pdfUri = @json(route('inventory.purchase_order.pdf'));
             const printUri = @json(route('inventory.purchase_order.print'));
-            const showData  = @json(route('inventory.purchase_order.show'));
+            const showData = @json(route('inventory.purchase_order.show'));
 
 
             const getQuote = @json(route('inventory.get.quote'));
             const branches = @json($branches);
             const delivery_status = @json($delivery_status);
+
+            const deletePermissions = @json(Gate::allows('PurchaseOrders-delete'));
+            const viewPermissions = @json(Gate::allows('PurchaseOrders-view'));
+            const pdfPermissions = @json(Gate::allows('PurchaseOrders-pdf'));
+            const printPermissions = @json(Gate::allows('PurchaseOrders-print'));
+
             // const viewPath = @json(route('inventory.purchase_order.view'));
             const type = @json($type);
 
@@ -363,7 +373,7 @@
                             return `<span class="badge bg-warning rounded-pill m-1">${row.delivery_status}</span>`;
                         },
                     },
-                         {
+                    {
                         data: 'description',
                         title: 'Comments',
                         render: function(data, type, row, meta) {
@@ -394,23 +404,30 @@
                         width: "10%",
                         orderable: false,
                         render: function(data, type, row, meta) {
-                            return `
-                      <span data-uri="${deleteUri}/${row.id}" class="btn btn-sm btn-danger delete-item">
-                        <i class="fa fa-trash"></i>
-                        </span>
 
-                        <span data-uri="${pdfUri}/${row.id}" class="btn btn-sm btn-secondary generate-pdf">
-                        <i class="fa fa-file-pdf-o"></i>
-                        </span>
+                            let html = "";
 
-                        <span data-uri="${printUri}/${row.id}" class="btn btn-sm btn-info print-item">
-                        <i class="fa fa-print"></i>
-                        </span>
-
-                        <a href="${showData}/${row.id}" class="btn btn-sm btn-info view-item" title="View">
+                            if (deletePermissions) {
+                                html += `<span data-uri="${deleteUri}/${row.id}" class="btn btn-sm btn-danger delete-item">
+                                        <i class="fa fa-trash"></i>
+                                        </span>`;
+                            }
+                            if (viewPermissions) {
+                                html += `<a href="${showData}/${row.id}" class="btn btn-sm btn-info view-item" title="View">
                             <i class="fa fa-eye"></i>
-                        </a>
-                        `;
+                        </a>`;
+                            }
+                            if (pdfPermissions) {
+                                html += `<span data-uri="${pdfUri}/${row.id}" class="btn btn-sm btn-secondary generate-pdf">
+                        <i class="fa fa-file-pdf-o"></i>
+                        </span>`;
+                            }
+                            if (printPermissions) {
+                                html += `<span data-uri="${printUri}/${row.id}" class="btn btn-sm btn-info print-item">
+                        <i class="fa fa-print"></i>
+                        </span>`;
+                            }
+                            return html;
                         }
                     },
                 ],

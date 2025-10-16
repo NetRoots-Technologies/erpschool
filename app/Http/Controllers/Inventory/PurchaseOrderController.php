@@ -40,7 +40,7 @@ class PurchaseOrderController extends Controller
 
     public function index($type)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('PurchaseOrders-list')) {
             return abort(503);
         }
         $mappedType = $type == 'food' ? 'F' : 'S';
@@ -60,15 +60,13 @@ class PurchaseOrderController extends Controller
     }
     public function approval()
     {
-        if (!Gate::allows('students')) {
-            return abort(503);
-        }
+        
         return view('admin.inventory_management.requisition.approval');
     }
 
     public function view($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('PurchaseOrders-list')) {
             return abort(503);
         }
         $delivery_status = config('constants.delivery_status');
@@ -95,7 +93,7 @@ class PurchaseOrderController extends Controller
     {
 
         // dd($request);
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('PurchaseOrders-create')) {
             return abort(503);
         }
         DB::beginTransaction();
@@ -161,7 +159,7 @@ class PurchaseOrderController extends Controller
 
     public function destroy(PurchaseOrder $purchaseOrder)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('PurchaseOrders-delete')) {
             return abort(503);
         }
         $purchaseOrder->delete();
@@ -192,7 +190,7 @@ class PurchaseOrderController extends Controller
 
     public function getData(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('PurchaseOrders-list')) {
             return abort(503);
         }
         $supplier = PurchaseOrder::select([
@@ -268,9 +266,7 @@ class PurchaseOrderController extends Controller
 
     public function changeStatus(PurchaseOrder $purchaseOrder, $status)
 {
-    if (!Gate::allows('students')) {
-        return abort(503);
-    }
+    
     DB::beginTransaction();
 
     try {
@@ -425,9 +421,7 @@ class PurchaseOrderController extends Controller
 
     public function changePaymentStatus(PurchaseOrder $purchaseOrder, $status)
     {
-        if (!Gate::allows('students')) {
-            return abort(503);
-        }
+        
         DB::beginTransaction();
         try {
             $this->payment_status = config('constants.payment_status');
@@ -448,10 +442,7 @@ class PurchaseOrderController extends Controller
     public function changePaymentMethod(PurchaseOrder $purchaseOrder, $status)
     {
 
-        // dd($status,$purchaseOrder);
-        if (!Gate::allows('students')) {
-            return abort(503);
-        }
+       
         // DB::beginTransaction();
         // Using new accounts system
         try {
@@ -508,7 +499,7 @@ class PurchaseOrderController extends Controller
 
     public function grn($type)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('GRN-list')) {
             return abort(503);
         }
 
@@ -533,7 +524,7 @@ class PurchaseOrderController extends Controller
     }
     public function grnDetail($id)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('GRN-list')) {
             return abort(503);
         }
         $purchaseOrder = PurchaseOrder::where('id', $id)
@@ -560,7 +551,7 @@ class PurchaseOrderController extends Controller
 
     public function uploadPurchase(Request $request)
     {
-        if (!Gate::allows('students')) {
+        if (!Gate::allows('PurchaseOrders-edit')) {
             return abort(503);
         }
         try {

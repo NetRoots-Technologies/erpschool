@@ -29,11 +29,11 @@
             <h3 class="text-22 text-center text-bold w-100 mb-4">Social Security</h3>
         </div>
         <div class="row    mt-4 mb-4 ">
-@if (Gate::allows('students'))
-            <div class="col-12 text-right">
-                <a href="{!! route('hr.social-security.create') !!}" class="btn btn-primary btn-md"><b>Add Social Security</b></a>
-            </div>
-           @endif
+            @if (Gate::allows('SocialSecurity-create'))
+                <div class="col-12 text-right">
+                    <a href="{!! route('hr.social-security.create') !!}" class="btn btn-primary btn-md"><b>Add Social Security</b></a>
+                </div>
+            @endif
         </div>
         <div class="row w-100 text-center">
             <div class="col-12">
@@ -41,30 +41,30 @@
                     <div class="card-body table-responsive">
                         <table class="w-100 table border-top-0 table-bordered   border-bottom " id="data_table">
                             <thead>
-                            <tr>
+                                <tr>
 
-                                <th class="heading_style">No</th>
-                                <th class="heading_style">Branch</th>
-                                <th class="heading_style">Employee</th>
-                                <th class="heading_style">Security(%)</th>
-                                <th class="heading_style">Action</th>
+                                    <th class="heading_style">No</th>
+                                    <th class="heading_style">Branch</th>
+                                    <th class="heading_style">Employee</th>
+                                    <th class="heading_style">Security(%)</th>
+                                    <th class="heading_style">Action</th>
 
-                            </tr>
+                                </tr>
                             </thead>
                             <tbody>
                             </tbody>
                             <tfoot align="right">
-                            <tr>
+                                <tr>
 
-                                <th></th>
-                                {{--                                <th></th>--}}
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
+                                    <th></th>
+                                    {{--                                <th></th> --}}
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
 
 
-                            </tr>
+                                </tr>
                             </tfoot>
                             <tr class="bg-info">
 
@@ -91,24 +91,21 @@
 @section('js')
 
     <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.colVis.min.js"></script>
-    {{--<script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>--}}
+    {{-- <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script> --}}
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
-    {{--<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>--}}
+    {{-- <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script> --}}
     <script type="text/javascript">
-
-        $(document).ready(function () {
+        $(document).ready(function() {
             var dataTable = $('#data_table').DataTable({
                 "processing": true,
                 "serverSide": true,
                 "pageLength": 100,
                 dom: 'Bfrtip',
-                buttons: [
-                    {
+                buttons: [{
                         extend: 'collection',
                         className: "btn-light",
                         text: 'Export',
-                        buttons: [
-                            {
+                        buttons: [{
                                 extend: 'excel',
                                 exportOptions: {
                                     columns: ':visible'
@@ -134,27 +131,47 @@
                         columns: ':not(:first-child)'
                     }
                 ],
-                "columnDefs": [
-                    { 'visible': false }
-                ],
+                "columnDefs": [{
+                    'visible': false
+                }],
                 ajax: {
                     "url": "{{ route('datatable.data.socialSecurityData') }}",
                     "type": "POST",
-                    "data": { _token: "{{ csrf_token() }}" }
+                    "data": {
+                        _token: "{{ csrf_token() }}"
+                    }
                 },
                 "columns": [
 
-                    { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
-                    { data: 'branch', name: 'branch' },
-                    { data: 'employee', name: 'employee' },
-                    { data: 'percentage', name: 'percentage' },
-                    {data: 'action', name: 'action', orderable: false, searchable: false},
+                    {
+                        data: 'DT_RowIndex',
+                        name: 'DT_RowIndex',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'branch',
+                        name: 'branch'
+                    },
+                    {
+                        data: 'employee',
+                        name: 'employee'
+                    },
+                    {
+                        data: 'percentage',
+                        name: 'percentage'
+                    },
+                    {
+                        data: 'action',
+                        name: 'action',
+                        orderable: false,
+                        searchable: false
+                    },
 
                 ],
-                order:[1,'desc']
+                order: [1, 'desc']
             });
 
         });
-
     </script>
 @endsection

@@ -16,9 +16,7 @@ class ExamDetailService
 
     public function store(\Symfony\Component\HttpFoundation\Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+
 
         // basic validation (adjust rules to your database tables if you want 'exists:...')
         $request->validate([
@@ -42,7 +40,7 @@ class ExamDetailService
                 'exam_term_id' => $examType,
                 'initial' => $request->initial,
                 'test_name' => $request->test_name,
-                'user_id'=>Auth::id()
+                'user_id' => Auth::id()
             ]);
 
             foreach ($request->rows as $row) {
@@ -71,10 +69,8 @@ class ExamDetailService
 
     public function getData()
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
-        $data = $data = ExamDetail::with(['testType', 'examType','user'])
+
+        $data = $data = ExamDetail::with(['testType', 'examType', 'user'])
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -84,22 +80,23 @@ class ExamDetailService
             ->addColumn('action', function ($row) {
                 $btn = '<div style="display: flex;">';
 
-                //                if (Gate::allows('Employee-edit'))
-                $btn .= '<a href="' . route("exam.exam_details.edit", $row->id) . '" class="btn btn-primary btn-sm"  style="margin-right: 4px;">View</a>';
+                if (Gate::allows('ExamDetails-list')) {
+                    $btn .= '<a href="' . route("exam.exam_details.edit", $row->id) . '" class="btn btn-primary btn-sm"  style="margin-right: 4px;">View</a>';
+                }
 
-                //                if (Gate::allows('Employee-destroy')) {
-                $btn .= '<form method="POST"  action="' . route("exam.exam_details.destroy", $row->id) . '">';
-                $btn .= '<button type="button" 
+                if (Gate::allows('ExamDetails-list')) {
+                    $btn .= '<form method="POST"  action="' . route("exam.exam_details.destroy", $row->id) . '">';
+                    $btn .= '<button type="button" 
                         data-id="' . $row->id . '" 
                         class="btn btn-danger btn-sm delete-btn" 
                         style="margin-right: 4px;">Delete</button>';
-                $btn .= method_field('DELETE') . csrf_field();
-                $btn .= '</form>';
-                //                }
-                $btn .= '</div>';
+                    $btn .= method_field('DELETE') . csrf_field();
+                    $btn .= '</form>';
+                    $btn .= '</div>';
+                }
+
 
                 return $btn;
-
             })->addColumn('active', function ($row) {
                 $statusButton = ($row->active == 1)
                     ? '<button type="button" class="btn btn-success btn-sm change-status" data-id="' . $row->id . '" data-status="inactive">Active</button>'
@@ -108,7 +105,7 @@ class ExamDetailService
                 return $statusButton;
             })
             ->addColumn('createdBy', function ($row) {
-                    return $row->user->name;    
+                return $row->user->name;
             })
             ->addColumn('testType', function ($row) {
                 if ($row->testType) {
@@ -128,9 +125,7 @@ class ExamDetailService
 
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+
 
         $examDetail = ExamDetail::findOrFail($id);
 
@@ -180,14 +175,10 @@ class ExamDetailService
 
     public function destroy($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+
         $examDetail = ExamDetail::find($id);
         if ($examDetail) {
             $examDetail->delete();
         }
     }
-
 }
-

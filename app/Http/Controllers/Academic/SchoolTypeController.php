@@ -11,11 +11,13 @@ use Illuminate\Support\Facades\Gate;
 
 class SchoolTypeController extends Controller
 {
+
+    protected $SchoolTypeService;
     public function __construct(SchoolTypeService $schoolTypeService)
     {
         $this->SchoolTypeService = $schoolTypeService;
 
-         $this->middleware('can:SchoolType-list')->only(['index', 'getData']);
+        $this->middleware('can:SchoolType-list')->only(['index', 'getData']);
         $this->middleware('can:SchoolType-create')->only(['create', 'store']);
         $this->middleware('can:SchoolType-edit')->only(['edit', 'update', 'changeStatus']);
         $this->middleware('can:SchoolType-delete')->only(['destroy', 'handleBulkAction']);

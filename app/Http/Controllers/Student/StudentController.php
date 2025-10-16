@@ -46,7 +46,7 @@ class StudentController extends Controller
     public function index()
     {
 
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('ViewStudents-list')) {
             return abort(503);
         }
         $courses = Course::all();
@@ -63,9 +63,9 @@ class StudentController extends Controller
      */
     public function create()
     {
-        // if (!Gate::allows('Students-create')) {
-        //     return abort(503);
-        // }
+        if (!Gate::allows('ViewStudents-create')) {
+            return abort(503);
+        }
 
         $data = $this->StudentServices->create();
         $companies = Company::where('status', 1)->get();
@@ -77,7 +77,7 @@ class StudentController extends Controller
 
     public function states(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('ViewStudents-create')) {
             return abort(503);
         }
         return $this->StudentServices->get_state($request->id);
@@ -87,7 +87,7 @@ class StudentController extends Controller
 
     public function cities(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('ViewStudents-create')) {
             return abort(503);
         }
         return $this->StudentServices->get_city($request->id);
@@ -102,9 +102,9 @@ class StudentController extends Controller
      */
     public function store(Request $request)
     {
-        // if (!Gate::allows('Students-create')) {
-        //     return abort(503);
-        // }
+        if (!Gate::allows('ViewStudents-create')) {
+            return abort(503);
+        }
 
         $student = $this->StudentServices->store($request);
 
@@ -127,7 +127,7 @@ class StudentController extends Controller
      */
     public function show($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('ViewStudents-list')) {
             return abort(503);
         }
         $data = $this->StudentServices->edit($id);
@@ -142,7 +142,7 @@ class StudentController extends Controller
      */
     public function edit($id)
     {
-        if (!Gate::allows('Students-edit')) {
+        if (!Gate::allows('ViewStudents-edit')) {
             return abort(503);
         }
         $student = Students::with('student_siblings', 'student_schools', 'student_emergency_contacts', 'AcademicClass')->find($id);
@@ -166,7 +166,7 @@ class StudentController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('Students-edit')) {
+        if (!Gate::allows('ViewStudents-edit')) {
             return abort(503);
         }
 
@@ -186,18 +186,16 @@ class StudentController extends Controller
 
     public function get_data_student(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
         $student = $this->StudentServices->getData($request);
         return $student;
     }
 
     public function destroy($id)
     {
-        if (!Gate::allows('Students-delete')) {
+        if (!Gate::allows('ViewStudents-delete')) {
             return abort(503);
         }
+
         $student = $this->StudentServices->destroy($id);
         return redirect()->route('academic.students.index')
             ->with('success', 'Student deleted successfully');
@@ -205,7 +203,7 @@ class StudentController extends Controller
 
     public function handleBulkAction(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('ViewStudents-list')) {
             return abort(503);
         }
         $ids = $request->input('ids');
@@ -220,7 +218,7 @@ class StudentController extends Controller
 
     public function report()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('StudentSiblingsReport-list')) {
             return abort(503);
         }
         return view('acadmeic.sibling_report.index');
@@ -229,7 +227,7 @@ class StudentController extends Controller
 
     public function getStudentSiblingData()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('ViewStudents-create')) {
             return abort(503);
         }
         return $this->StudentServices->StudentSiblingData();
@@ -237,7 +235,7 @@ class StudentController extends Controller
 
     public function fetch_siblingClass(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('ViewStudents-create')) {
             return abort(503);
         }
         $students = Students::with('AcademicClass')->where('id', $request->student_id)->first();
@@ -246,7 +244,7 @@ class StudentController extends Controller
 
     public function fetch_siblingDob(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('ViewStudents-create')) {
             return abort(503);
         }
         $student = Students::with('AcademicClass')->where('id', $request->student_id)->first();
@@ -265,7 +263,7 @@ class StudentController extends Controller
 
     public function fetchStudentData(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('ViewStudents-create')) {
             return abort(503);
         }
         
@@ -297,7 +295,7 @@ class StudentController extends Controller
 
     public function StudentRollNo(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('ViewStudents-create')) {
             return abort(503);
         }
         $data = $request->all();
@@ -320,7 +318,7 @@ class StudentController extends Controller
 
     public function EmpCode(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('ViewStudents-create')) {
             return abort(503);
         }
         $branch = Branch::find($request->branch_id);
@@ -351,7 +349,7 @@ class StudentController extends Controller
 
     public function fetchCnicStudentData(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('ViewStudents-create')) {
             return abort(503);
         }
         $getSameCnicStudents = Students::with('AcademicClass:id,name')->where('father_cnic', $request->cnic)->get();
@@ -361,7 +359,7 @@ class StudentController extends Controller
 
     public function existingStudentLedger()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('ViewStudents-create')) {
             return abort(503);
         }
         try {
@@ -385,7 +383,7 @@ class StudentController extends Controller
 
     public function fetchStudents(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('ViewStudents-create')) {
             return abort(503);
         }
         $request->validate([
@@ -419,7 +417,7 @@ class StudentController extends Controller
 
     public function exportbulkfile()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('ViewStudents-create')) {
             return abort(503);
         }
         return Excel::download(new StudentSampleExport, 'student_bulk_sample.xlsx');
@@ -427,7 +425,7 @@ class StudentController extends Controller
 
     public function importBulkFile(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('ViewStudents-create')) {
             return abort(503);
         }
         $request->validate([

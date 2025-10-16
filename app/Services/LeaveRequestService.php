@@ -24,9 +24,7 @@ class LeaveRequestService
 
     public function store($request)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         $uploadedFile = $request->file('employee_image');
         $fileNameToStore = null;
 
@@ -171,9 +169,7 @@ class LeaveRequestService
 
     public function getData()
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         $data = LeaveRequest::with('workShift', 'quota', 'employee')->get();
 
         return Datatables::of($data)->addIndexColumn()
@@ -239,18 +235,14 @@ class LeaveRequestService
 
     public function edit($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         $leaveRequests = LeaveRequest::with('workShift', 'quota', 'employee')->find($id);
         return $leaveRequests;
     }
 
     public function update($request, $id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         $leaveRequest = LeaveRequest::find($id);
         $uploadedFile = $request->file('employee_image');
         $fileNameToStore = null;
@@ -284,18 +276,14 @@ class LeaveRequestService
 
     public function destroy($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         $leaveRequest = LeaveRequest::find($id);
         $leaveRequest->delete();
     }
 
     public function employee_leave($request)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         $compensatoryQuota = Quotta::where('compensatory_status', 1)->get();
 
         $employee = Employees::find($request->employee_id);

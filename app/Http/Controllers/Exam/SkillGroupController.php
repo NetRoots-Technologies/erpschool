@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Gate;
 
 class SkillGroupController extends Controller
 {
+
+    protected $skillGroupService;
     public function __construct(skillGroupService $skillGroupService)
     {
         $this->skillGroupService = $skillGroupService;
@@ -22,7 +24,7 @@ class SkillGroupController extends Controller
      */
     public function index()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('SkillGroups-list')) {
             return abort(503);
         }
         $companies = Company::where('status', 1)->get();
@@ -37,7 +39,7 @@ class SkillGroupController extends Controller
      */
     public function create()
     {
-       if (!Gate::allows('Dashboard-list')) {
+       if (!Gate::allows('SkillGroups-create')) {
             return abort(503);
         }
     }
@@ -50,7 +52,7 @@ class SkillGroupController extends Controller
      */
     public function store(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('SkillGroups-create')) {
             return abort(503);
         }
         return $this->skillGroupService->store($request);
@@ -65,7 +67,7 @@ class SkillGroupController extends Controller
      */
     public function show($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('SkillGroups-list')) {
             return abort(503);
         }
     }
@@ -78,7 +80,7 @@ class SkillGroupController extends Controller
      */
     public function edit($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('SkillGroups-edit')) {
             return abort(503);
         }
     }
@@ -92,7 +94,7 @@ class SkillGroupController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('SkillGroups-edit')) {
             return abort(503);
         }
         return $this->skillGroupService->update($request, $id);
@@ -108,7 +110,7 @@ class SkillGroupController extends Controller
     public function destroy($id)
     {
 
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('SkillGroups-delete')) {
             return abort(503);
         }
         return $this->skillGroupService->destroy($id);
@@ -119,7 +121,7 @@ class SkillGroupController extends Controller
 
     public function getdata()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('SkillGroups-list')) {
             return abort(503);
         }
         return $this->skillGroupService->getdata();
@@ -127,7 +129,7 @@ class SkillGroupController extends Controller
 
     public function changeStatus(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('SkillGroups-list')) {
             return abort(503);
         }
         return $class = $this->skillGroupService->changeStatus($request);
@@ -136,7 +138,7 @@ class SkillGroupController extends Controller
 
     public function handleBulkAction(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('SkillGroups-list')) {
             return abort(503);
         }
         $ids = $request->get('ids');

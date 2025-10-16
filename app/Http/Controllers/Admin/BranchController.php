@@ -45,7 +45,7 @@ class BranchController extends Controller
 
     public function index()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Branches-list')) {
             return abort(503);
         }
         $company = collect();
@@ -76,7 +76,7 @@ class BranchController extends Controller
      */
     public function create()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Branches-create')) {
             return abort(503);
         }
     }
@@ -89,7 +89,7 @@ class BranchController extends Controller
      */
     public function store(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Branches-create')) {
             return abort(503);
         }
         DB::beginTransaction();
@@ -142,7 +142,7 @@ class BranchController extends Controller
      */
     public function edit($id)
     {
-if (!Gate::allows('Dashboard-list')) {
+if (!Gate::allows('Branches-edit')) {
             return abort(503);
         }
     }
@@ -156,7 +156,7 @@ if (!Gate::allows('Dashboard-list')) {
      */
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Branches-edit')) {
             return abort(503);
         }
         $this->BranchService->update($request, $id);
@@ -164,7 +164,7 @@ if (!Gate::allows('Dashboard-list')) {
 
     public function getdata()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Branches-list')) {
             return abort(503);
         }
         return $this->BranchService->getdata();
@@ -178,7 +178,7 @@ if (!Gate::allows('Dashboard-list')) {
      */
     public function destroy($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Branches-delete')) {
             return abort(503);
         }
         return $this->BranchService->destroy($id);
@@ -187,7 +187,7 @@ if (!Gate::allows('Dashboard-list')) {
 
     public function changeStatus(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Branches-edit')) {
             return abort(503);
         }
         return $branch = $this->BranchService->changeStatus($request);
@@ -197,7 +197,7 @@ if (!Gate::allows('Dashboard-list')) {
     public function handleBulkAction(Request $request)
     {
 
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Branches-list')) {
             return abort(503);
         }
         $ids = $request->get('ids');
@@ -210,7 +210,7 @@ if (!Gate::allows('Dashboard-list')) {
 
     public function syncData(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Branches-list')) {
             return abort(503);
         }
         try {
@@ -231,7 +231,7 @@ if (!Gate::allows('Dashboard-list')) {
     public function exportBulkFile()
     {
 
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Branches-list')) {
             return abort(503);
         }
            return Excel::download(new \App\Exports\BranchSampleExport, 'Branch_bulk_sample.xlsx');
@@ -240,7 +240,7 @@ if (!Gate::allows('Dashboard-list')) {
 
    public function importBulkFile(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Branches-list')) {
             return abort(503);
         }
         $request->validate([

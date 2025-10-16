@@ -22,7 +22,7 @@ class DepartmentController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-
+    protected $DepartmentService;
     public function __construct(DepartmentService $DepartmentService)
     {
         $this->DepartmentService = $DepartmentService;
@@ -30,7 +30,7 @@ class DepartmentController extends Controller
 
     public function index()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Departments-create')) {
             return abort(503);
         }
         $user = Auth::user();
@@ -63,31 +63,25 @@ class DepartmentController extends Controller
      */
     public function create()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Departments-create')) {
             return abort(503);
         }
     }
 
     public function company(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+
         return $this->DepartmentService->company($request);
     }
 
-  public function getdepartments(Request $request)    
+    public function getdepartments(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
-        // dd($request->all());
-      return $this->DepartmentService->getdepartments($request);
+        return $this->DepartmentService->getdepartments($request);
     }
 
     public function getdata()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Departments-list')) {
             return abort(503);
         }
         return $this->DepartmentService->getdata();
@@ -101,7 +95,7 @@ class DepartmentController extends Controller
      */
     public function store(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Departments-create')) {
             return abort(503);
         }
         return $this->DepartmentService->store($request);
@@ -115,7 +109,7 @@ class DepartmentController extends Controller
      */
     public function show($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Departments-list')) {
             return abort(503);
         }
     }
@@ -128,7 +122,7 @@ class DepartmentController extends Controller
      */
     public function edit($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Departments-edit')) {
             return abort(503);
         }
     }
@@ -142,7 +136,7 @@ class DepartmentController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Departments-edit')) {
             return abort(503);
         }
         return $this->DepartmentService->update($request, $id);
@@ -156,7 +150,7 @@ class DepartmentController extends Controller
      */
     public function destroy($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Departments-delete')) {
             return abort(503);
         }
         return $this->DepartmentService->destroy($id);
@@ -164,50 +158,49 @@ class DepartmentController extends Controller
 
     public function changeStatus(Request $request)
     {
-if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Departments-list')) {
             return abort(503);
         }
         return $department = $this->DepartmentService->changeStatus($request);
-
-
     }
 
 
-        public function exportbulkfile(){
-            if (!Gate::allows('Dashboard-list')) {
+    public function exportbulkfile()
+    {
+        if (!Gate::allows('Departments-list')) {
             return abort(503);
         }
         return Excel::download(new DepartmentSampleExport, 'Department_bulk_sample.xlsx');
     }
 
-//     public function importBulkFile(Request $request)
-//     {
-//         try {
-//             // Minimal check to avoid runtime errors
-//             if (!$request->hasFile('import_file')) {
-//                 return back()->with('error', 'No file uploaded.');
-//             }
+    //     public function importBulkFile(Request $request)
+    //     {
+    //         try {
+    //             // Minimal check to avoid runtime errors
+    //             if (!$request->hasFile('import_file')) {
+    //                 return back()->with('error', 'No file uploaded.');
+    //             }
 
-//             // Excel::import(new DepartmentExcelImport, $request->file('import_file'));
+    //             // Excel::import(new DepartmentExcelImport, $request->file('import_file'));
 
-//          Excel::import(new DepartmentImport, $request->file('import_file'));
-//                 return back()->with('success', 'Department imported successfully!');
-//         } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
-//             $failures = $e->failures();
-//             $firstError = !empty($failures) && !empty($failures[0]->errors())
-//                 ? $failures[0]->errors()[0]
-//                 : 'Validation failed.';
-//             return back()->with('error', 'Import Failed: ' . $firstError);
-//         } catch (\Exception $e) {
-//             Log::error('Department Import Exception: ' . $e->getMessage());
-//             return back()->with('error', 'Import Failed: ' . $e->getMessage());
-//         }
-// }
+    //          Excel::import(new DepartmentImport, $request->file('import_file'));
+    //                 return back()->with('success', 'Department imported successfully!');
+    //         } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+    //             $failures = $e->failures();
+    //             $firstError = !empty($failures) && !empty($failures[0]->errors())
+    //                 ? $failures[0]->errors()[0]
+    //                 : 'Validation failed.';
+    //             return back()->with('error', 'Import Failed: ' . $firstError);
+    //         } catch (\Exception $e) {
+    //             Log::error('Department Import Exception: ' . $e->getMessage());
+    //             return back()->with('error', 'Import Failed: ' . $e->getMessage());
+    //         }
+    // }
 
 
-public function importBulkFile(Request $request)
+    public function importBulkFile(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Departments-list')) {
             return abort(503);
         }
         try {
@@ -242,8 +235,4 @@ public function importBulkFile(Request $request)
             return back()->with('error', 'Import Failed: ' . $e->getMessage());
         }
     }
-
-
-
 }
-

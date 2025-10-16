@@ -14,6 +14,8 @@ use Illuminate\Http\Request;
 
 class ClassSubjectController extends Controller
 {
+    protected $ClassSubjectService;
+
     public function __construct(ClassSubjectService $classSubjectService)
     {
         $this->ClassSubjectService = $classSubjectService;
@@ -26,7 +28,7 @@ class ClassSubjectController extends Controller
      */
     public function index()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('class-subjects-list')) {
             return abort(503);
         }
         return view('exam.class_subject.index');
@@ -40,7 +42,7 @@ class ClassSubjectController extends Controller
      */
     public function create()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('class-subjects-create')) {
             return abort(503);
         }
         $classes = AcademicClass::where('status', 1)->get();
@@ -59,7 +61,7 @@ class ClassSubjectController extends Controller
      */
     public function store(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('class-subjects-create')) {
             return abort(503);
         }
         $this->ClassSubjectService->store($request);
@@ -74,7 +76,7 @@ class ClassSubjectController extends Controller
      */
     public function show($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('class-subjects-list')) {
             return abort(503);
         }
     }
@@ -87,7 +89,7 @@ class ClassSubjectController extends Controller
      */
     public function edit($id)
     {
-       if (!Gate::allows('Dashboard-list')) {
+       if (!Gate::allows('class-subjects-edit')) {
             return abort(503);
         }
         $classSubject = ClassSubject::find($id);
@@ -108,7 +110,7 @@ class ClassSubjectController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('class-subjects-edit')) {
             return abort(503);
         }
         $this->ClassSubjectService->update($request, $id);
@@ -123,7 +125,7 @@ class ClassSubjectController extends Controller
      */
     public function destroy($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('class-subjects-delete')) {
             return abort(503);
         }
         $this->ClassSubjectService->destroy($id);
@@ -132,7 +134,7 @@ class ClassSubjectController extends Controller
 
     public function handleBulkAction(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('class-subjects-list')) {
             return abort(503);
         }
         $ids = $request->get('ids');
@@ -146,7 +148,7 @@ class ClassSubjectController extends Controller
     }
     public function getData()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('class-subjects-list')) {
             return abort(503);
         }
         return $this->ClassSubjectService->getdata();

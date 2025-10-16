@@ -23,7 +23,7 @@ use Illuminate\Support\Facades\Auth;
 
 class ClassController extends Controller
 {
-
+    protected $ClassService;
     public function __construct(ClassService $classService)
     {
         $this->ClassService = $classService;

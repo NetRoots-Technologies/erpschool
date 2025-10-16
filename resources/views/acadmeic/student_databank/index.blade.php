@@ -29,7 +29,7 @@
             <h3 class="text-22 text-center text-bold w-100 mb-4"> Pre_Admission Form </h3>
         </div>
         <div class="row    mt-4 mb-4 ">
-@if (Gate::allows('students'))
+@if (Gate::allows('PreAdmissionForm-create'))
              <div class="row mt-4 mb-4 justify-content-start gap-4">
                 <div class="col-auto p-0">
                     <a href="{!! route('academic.studentDataBank.create') !!}" class="btn btn-primary btn-md"><b>Add Student</b></a>

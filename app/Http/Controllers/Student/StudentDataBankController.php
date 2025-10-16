@@ -33,7 +33,7 @@ class StudentDataBankController extends Controller
      */
     public function index()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('PreAdmissionForm-list')) {
             return abort(503);
         }
         return view('acadmeic.student_databank.index');
@@ -46,7 +46,7 @@ class StudentDataBankController extends Controller
      */
     public function create()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('PreAdmissionForm-create')) {
             return abort(503);
         }
         $year = Carbon::now()->format('y');
@@ -69,7 +69,7 @@ class StudentDataBankController extends Controller
      */
     public function store(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('PreAdmissionForm-create')) {
             return abort(503);
         }
         // dd($request->all());
@@ -85,7 +85,7 @@ class StudentDataBankController extends Controller
      */
     public function show($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('PreAdmissionForm-list')) {
             return abort(503);
         }
     }
@@ -98,7 +98,7 @@ class StudentDataBankController extends Controller
      */
     public function edit($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('PreAdmissionForm-edit')) {
             return abort(503);
         }
         $studentDatabank = StudentDataBank::find($id);
@@ -115,7 +115,7 @@ class StudentDataBankController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('PreAdmissionForm-edit')) {
             return abort(503);
         }
         $this->StudentDataBankService->update($request, $id);
@@ -132,7 +132,7 @@ class StudentDataBankController extends Controller
      */
     public function destroy($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('PreAdmissionForm-delete')) {
             return abort(503);
         }
         $this->StudentDataBankService->destroy($id);
@@ -143,7 +143,7 @@ class StudentDataBankController extends Controller
 
     public function getData()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('PreAdmissionForm-list')) {
             return abort(503);
         }
         $data = $this->StudentDataBankService->getData();
@@ -152,7 +152,7 @@ class StudentDataBankController extends Controller
 
     public function addStudent($id = 0)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('PreAdmissionForm-list')) {
             return abort(503);
         }
         $studentDatabank = StudentDataBank::find($id);
@@ -168,7 +168,7 @@ class StudentDataBankController extends Controller
 
     public function handleBulkAction(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('PreAdmissionForm-list')) {
             return abort(503);
         }
         $ids = $request->input('ids');
@@ -182,7 +182,7 @@ class StudentDataBankController extends Controller
 
     public function exportBulkFile()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('PreAdmissionForm-list')) {
             return abort(503);
         }
         return Excel::download(new PreAdmissionExport, 'preadmission_sample.xlsx');
@@ -190,7 +190,7 @@ class StudentDataBankController extends Controller
 
     public function importBulkFile(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('PreAdmissionForm-list')) {
             return abort(503);
         }
         $request->validate([

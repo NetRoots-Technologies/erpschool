@@ -14,17 +14,13 @@ class skillEvaluationKeyService
 
     public function store($request)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+        
         SkillEvaluationKey::create(['key' => $request->key, 'abbr' => $request->abbr, 'user_id' => Auth::id()]);
     }
 
     public function getdata()
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+        
         $data = SkillEvaluationKey::with('user')->orderby('id', 'DESC')->get();
         return Datatables::of($data)->addIndexColumn()
             ->addColumn('status', function ($row) {
@@ -37,13 +33,17 @@ class skillEvaluationKeyService
             ->addColumn('action', function ($row) {
 
                 $btn = ' <form class="delete_form" data-route="' . route("exam.skill_evaluations_key.destroy", $row->id) . '"   id="skillEvaluation-' . $row->id . '"  method="POST"> ';
-                // if (Gate::allows('company-edit'))
+                if (Gate::allows('SkillEvaluationsKey-edit')){
                 $btn = $btn . '<a  data-id="' . $row->id . '" class="btn btn-primary text-white  btn-sm skillEvaluationKey_edit"  data-skill_evaluation-edit=\'' . $row . '\'>Edit</a>';
 
-                // if (Gate::allows('company-delete'))
-                $btn = $btn . ' <button data-id="skillEvaluation-' . $row->id . '" type="button" class="btn btn-danger delete btn-sm "" >Delete</button>';
+                }
+
+                if (Gate::allows('SkillEvaluationsKey-delete')){
+                      $btn = $btn . ' <button data-id="skillEvaluation-' . $row->id . '" type="button" class="btn btn-danger delete btn-sm "" >Delete</button>';
                 $btn = $btn . method_field('DELETE') . '' . csrf_field();
                 $btn = $btn . ' </form>';
+                }
+              
                 return $btn;
             })
             ->addColumn('user', function ($row) {
@@ -63,9 +63,7 @@ class skillEvaluationKeyService
 
     public function update($request, $id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+        
         $skillEvaluation = SkillEvaluationKey::find($id);
         $skillEvaluation->abbr = $request->abbr;
         $skillEvaluation->key = $request->key;
@@ -76,9 +74,7 @@ class skillEvaluationKeyService
 
     public function destroy($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+        
         $skillEvaluation = SkillEvaluationKey::findOrFail($id);
         if ($skillEvaluation)
             $skillEvaluation->delete();
@@ -86,9 +82,7 @@ class skillEvaluationKeyService
 
     public function changeStatus($request)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+        
         $skillEvaluation = SkillEvaluationKey::find($request->id);
         if ($skillEvaluation) {
             $skillEvaluation->status = ($request->status == 'active') ? 1 : 0;

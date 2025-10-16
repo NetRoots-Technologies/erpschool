@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Fleet;
 
 use App\Http\Controllers\Controller;
-use App\Models\Student\Students;
-use App\Models\Fleet\Vehicle;
 use App\Models\Fleet\Route;
 use App\Models\Fleet\Transportation;
+use App\Models\Fleet\Vehicle;
+use App\Models\Student\Students;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
 
 class StudentTransportController extends Controller
 {
@@ -18,12 +20,16 @@ class StudentTransportController extends Controller
      */
     public function index()
     {
+
+        if (!Gate::allows('students-transport-list')) {
+            return abort(503);
+        }
         $transportations = Transportation::with(['student.AcademicClass', 'student.academicSession', 'vehicle', 'route'])
             ->paginate(10);
-        
+
         $vehicles = Vehicle::where('status', 'active')->get();
         $routes = Route::where('status', 'active')->get();
-        
+
         return view('fleet.transportation.index', compact('transportations', 'vehicles', 'routes'));
     }
 
@@ -34,14 +40,17 @@ class StudentTransportController extends Controller
      */
     public function create()
     {
+        if (!Gate::allows('students-transport-create')) {
+            return abort(503);
+        }
         $students = Students::where('is_active', 1)
             ->whereDoesntHave('transportations')
             ->with(['AcademicClass', 'academicSession'])
             ->get();
-        
+
         $vehicles = Vehicle::where('status', 'active')->get();
         $routes = Route::where('status', 'active')->get();
-        
+
         return view('fleet.transportation.create', compact('students', 'vehicles', 'routes'));
     }
 
@@ -53,6 +62,9 @@ class StudentTransportController extends Controller
      */
     public function store(Request $request)
     {
+        if (!Gate::allows('students-transport-create')) {
+            return abort(503);
+        }
         $request->validate([
             'student_id' => 'required|exists:students,id',
             'vehicle_id' => 'required|exists:fleet_vehicles,id',
@@ -116,7 +128,7 @@ class StudentTransportController extends Controller
         } catch (\Exception $e) {
             \Log::error('Transportation fee accounting failed: ' . $e->getMessage());
         }
-        
+
         return redirect()->route('fleet.transportation.index')
             ->with('success', 'Transportation assignment created successfully.');
     }
@@ -129,6 +141,9 @@ class StudentTransportController extends Controller
      */
     public function show($id)
     {
+        if (!Gate::allows('students-transport-view')) {
+            return abort(503);
+        }
         $transportation = Transportation::with(['student.AcademicClass', 'student.academicSession', 'vehicle', 'route'])
             ->findOrFail($id);
         return view('fleet.transportation.show', compact('transportation'));
@@ -142,11 +157,14 @@ class StudentTransportController extends Controller
      */
     public function edit($id)
     {
+        if (!Gate::allows('students-transport-edit')) {
+            return abort(503);
+        }
         $transportation = Transportation::with(['student.AcademicClass', 'student.academicSession', 'vehicle', 'route'])
             ->findOrFail($id);
         $vehicles = Vehicle::where('status', 'active')->get();
         $routes = Route::where('status', 'active')->get();
-        
+
         return view('fleet.transportation.edit', compact('transportation', 'vehicles', 'routes'));
     }
 
@@ -159,6 +177,9 @@ class StudentTransportController extends Controller
      */
     public function update(Request $request, $id)
     {
+        if (!Gate::allows('students-transport-edit')) {
+            return abort(503);
+        }
         $request->validate([
             'vehicle_id' => 'required|exists:fleet_vehicles,id',
             'route_id' => 'required|exists:fleet_routes,id',
@@ -193,10 +214,13 @@ class StudentTransportController extends Controller
      */
     public function destroy($id)
     {
+        if (!Gate::allows('students-transport-delete')) {
+            return abort(503);
+        }
         // Delete transportation assignment
         $transportation = Transportation::findOrFail($id);
         $transportation->delete();
-        
+
         return redirect()->route('fleet.transportation.index')
             ->with('success', 'Transportation assignment deleted successfully.');
     }

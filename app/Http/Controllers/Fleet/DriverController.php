@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers\Fleet;
 
-use App\Http\Controllers\Controller;
 use App\Models\Fleet\Driver;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Gate;
 
 class DriverController extends Controller
 {
@@ -15,6 +16,9 @@ class DriverController extends Controller
      */
     public function index()
     {
+        if (!Gate::allows('drivers-list')) {
+            return abort(503);
+        }
         $drivers = Driver::with(['company', 'branch'])->paginate(10);
         return view('fleet.drivers.index', compact('drivers'));
     }
@@ -26,6 +30,9 @@ class DriverController extends Controller
      */
     public function create()
     {
+        if (!Gate::allows('drivers-create')) {
+            return abort(503);
+        }
         return view('fleet.drivers.create');
     }
 
@@ -37,6 +44,9 @@ class DriverController extends Controller
      */
     public function store(Request $request)
     {
+        if (!Gate::allows('drivers-create')) {
+            return abort(503);
+        }
         $request->validate([
             'driver_name' => 'required|string|max:255',
             'driver_phone' => 'required|string|max:20',
@@ -63,6 +73,9 @@ class DriverController extends Controller
      */
     public function show(Driver $driver)
     {
+        if (!Gate::allows('drivers-view')) {
+            return abort(503);
+        }
         $driver->load(['company', 'branch']);
         return view('fleet.drivers.show', compact('driver'));
     }
@@ -75,6 +88,9 @@ class DriverController extends Controller
      */
     public function edit(Driver $driver)
     {
+        if (!Gate::allows('drivers-edit')) {
+            return abort(503);
+        }
         return view('fleet.drivers.edit', compact('driver'));
     }
 
@@ -87,6 +103,9 @@ class DriverController extends Controller
      */
     public function update(Request $request, Driver $driver)
     {
+        if (!Gate::allows('drivers-edit')) {
+            return abort(503);
+        }
         $request->validate([
             'driver_name' => 'required|string|max:255',
             'driver_phone' => 'required|string|max:20',
@@ -113,6 +132,9 @@ class DriverController extends Controller
      */
     public function destroy(Driver $driver)
     {
+        if (!Gate::allows('drivers-delete')) {
+            return abort(503);
+        }
         $driver->delete();
 
         return redirect()->route('fleet.drivers.index')

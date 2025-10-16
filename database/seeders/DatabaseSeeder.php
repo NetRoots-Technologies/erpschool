@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
     {
         // ONLY call the SuperAdminSeeder - it handles everything!
         $this->call(SuperAdminSeeder::class);
+        $this->call(MissingPermissionsSeeder::class);
 
         // Optional: Call other essential seeders if needed
         // $this->call(CountrySeeder::class);

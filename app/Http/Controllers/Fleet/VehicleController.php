@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers\Fleet;
 
-use App\Http\Controllers\Controller;
-use App\Models\Fleet\Vehicle;
 use App\Models\Fleet\Driver;
 use Illuminate\Http\Request;
+use App\Models\Fleet\Vehicle;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Gate;
 
 class VehicleController extends Controller
 {
@@ -16,6 +17,9 @@ class VehicleController extends Controller
      */
     public function index()
     {
+           if (!Gate::allows('vahicals-list')) {
+            return abort(503);
+        }
         $vehicles = Vehicle::with(['driver', 'company', 'branch'])->paginate(10);
         return view('fleet.vehicles.index', compact('vehicles'));
     }
@@ -27,6 +31,9 @@ class VehicleController extends Controller
      */
     public function create()
     {
+           if (!Gate::allows('vahicals-create')) {
+            return abort(503);
+        }
         return view('fleet.vehicles.create');
     }
 
@@ -38,6 +45,9 @@ class VehicleController extends Controller
      */
     public function store(Request $request)
     {
+           if (!Gate::allows('vahicals-create')) {
+            return abort(503);
+        }
         $request->validate([
             'vehicle_number' => 'required|string|max:255|unique:fleet_vehicles',
             'vehicle_type' => 'required|in:bus,van,car,mini_bus',
@@ -61,6 +71,9 @@ class VehicleController extends Controller
      */
     public function show(Vehicle $vehicle)
     {
+           if (!Gate::allows('vahicals-view')) {
+            return abort(503);
+        }
         $vehicle->load(['driver', 'company', 'branch', 'routes']);
         return view('fleet.vehicles.show', compact('vehicle'));
     }
@@ -73,6 +86,9 @@ class VehicleController extends Controller
      */
     public function edit(Vehicle $vehicle)
     {
+           if (!Gate::allows('vahicals-edit')) {
+            return abort(503);
+        }
         return view('fleet.vehicles.edit', compact('vehicle'));
     }
 
@@ -84,7 +100,12 @@ class VehicleController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, Vehicle $vehicle)
-    {
+    {   
+
+           if (!Gate::allows('vahicals-edit')) {
+            return abort(503);
+        }
+
         $request->validate([
             'vehicle_number' => 'required|string|max:255|unique:fleet_vehicles,vehicle_number,' . $vehicle->id,
             'vehicle_type' => 'required|in:bus,van,car,mini_bus',
@@ -108,6 +129,10 @@ class VehicleController extends Controller
      */
     public function destroy(Vehicle $vehicle)
     {
+
+           if (!Gate::allows('vahicals-delete')) {
+            return abort(503);
+        }
         $vehicle->delete();
 
         return redirect()->route('fleet.vehicles.index')

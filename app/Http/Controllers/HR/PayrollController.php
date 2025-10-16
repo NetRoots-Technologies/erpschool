@@ -39,7 +39,7 @@ class PayrollController extends Controller
     public function index()
     {
 
-       if (!Gate::allows('Dashboard-list')) {
+       if (!Gate::allows('Payroll-list')) {
             return abort(503);
         }
 
@@ -55,7 +55,7 @@ class PayrollController extends Controller
     {
 
       
-       if (!Gate::allows('Dashboard-list')) {
+       if (!Gate::allows('Payroll-list')) {
             return abort(503);
         }
 
@@ -118,7 +118,7 @@ class PayrollController extends Controller
 
        
 
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Payroll-list')) {
             return abort(503);
         }
 
@@ -505,7 +505,7 @@ class PayrollController extends Controller
 
     public function store(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Payroll-list')) {
             return abort(503);
         }
 

@@ -12,31 +12,29 @@ use Illuminate\Support\Facades\Gate;
 class MarksInputService
 {
     public function store($request)
-{
-    if (!Gate::allows('Dashboard-list')) {
-        return abort(503);
-    }
+    {
 
-    // $validated = $request->validate([
-    //     'company_id' => 'required',
-    //     'sessions_id' => 'required',
-    //     'branch_id' => 'required',
-    //     'class_id' => 'required',
-    //     'section_id' => 'required',
-    //     'course_id' => 'required',
-    //     'component_id' => 'required',
-    //     'sub_component_id' => 'required',
-    //     'allocated_marks' => 'required|array',
-    //     'allocated_marks.*' => 'nullable|numeric|min:0',
-    //     'max_marks' => 'required|array',
-    //     'max_marks.*' => 'nullable|numeric|min:0',
-    // ]);
+
+        // $validated = $request->validate([
+        //     'company_id' => 'required',
+        //     'sessions_id' => 'required',
+        //     'branch_id' => 'required',
+        //     'class_id' => 'required',
+        //     'section_id' => 'required',
+        //     'course_id' => 'required',
+        //     'component_id' => 'required',
+        //     'sub_component_id' => 'required',
+        //     'allocated_marks' => 'required|array',
+        //     'allocated_marks.*' => 'nullable|numeric|min:0',
+        //     'max_marks' => 'required|array',
+        //     'max_marks.*' => 'nullable|numeric|min:0',
+        // ]);
 
 
         // dd($request->all() , $validated, "io");
-    // dd($request);
+        // dd($request);
 
-    // try {
+        // try {
         // DB::beginTransaction();
 
         // Step 1: Create mark_input record
@@ -77,19 +75,17 @@ class MarksInputService
 
         // DB::commit();
         return redirect()->back()->with('success', 'Marks saved successfully!');
-    // } catch (\Exception $e) {
-    //     DB::rollBack();
-    //     \Log::error("Error saving marks: " . $e->getMessage());
-    //     return back()->withErrors(['error' => 'Failed to save: ' . $e->getMessage()]);
-    // }
-}
+        // } catch (\Exception $e) {
+        //     DB::rollBack();
+        //     \Log::error("Error saving marks: " . $e->getMessage());
+        //     return back()->withErrors(['error' => 'Failed to save: ' . $e->getMessage()]);
+        // }
+    }
 
 
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+
         $marksInput = MarkInput::find($id);
         $marksInput->company_id = $request->company_id;
         $marksInput->session_id = $request->session_id;
@@ -104,22 +100,21 @@ class MarksInputService
 
     public function getData()
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+
         $data = MarkInput::with(['academicSession', 'company', 'branch', 'section', 'fetchClass', 'subject', 'component'])->orderBy('created_at', 'desc');
 
         return DataTables::of($data)->addIndexColumn()
             ->addColumn('action', function ($row) {
                 $btn = '<div style="display: flex;">';
-                //                if (Gate::allows('Employee-edit'))
+                if (Gate::allows('MarksInput-edit')) {
+                }
                 $btn .= '<a href="' . route("exam.marks_input.edit", $row->id) . '" class="btn btn-primary btn-sm"  style="margin-right: 4px;">Edit</a>';
-                //                if (Gate::allows('Employee-destroy')) {
-                $btn .= '<form method="POST" onsubmit="return confirm(\'Are you sure you want to Delete this?\');" action="' . route("exam.marks_input.destroy", $row->id) . '">';
-                $btn .= '<button type="submit" class="btn btn-danger btn-sm" style="margin-right: 4px;">Delete</button>';
-                $btn .= method_field('DELETE') . csrf_field();
-                $btn .= '</form>';
-                //                }
+                if (Gate::allows('MarksInput-delete')) {
+                    $btn .= '<form method="POST" onsubmit="return confirm(\'Are you sure you want to Delete this?\');" action="' . route("exam.marks_input.destroy", $row->id) . '">';
+                    $btn .= '<button type="submit" class="btn btn-danger btn-sm" style="margin-right: 4px;">Delete</button>';
+                    $btn .= method_field('DELETE') . csrf_field();
+                    $btn .= '</form>';
+                }
                 $btn .= '</div>';
 
                 return $btn;
@@ -187,9 +182,7 @@ class MarksInputService
 
     public function delete($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+
         $marksInput = MarkInput::find($id);
         if ($marksInput) {
             $marksInput->delete();
@@ -199,4 +192,3 @@ class MarksInputService
         }
     }
 }
-

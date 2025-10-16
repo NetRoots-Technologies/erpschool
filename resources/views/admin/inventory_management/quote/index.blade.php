@@ -69,9 +69,13 @@
 
 
     <div class="container-fluid">
-        <button type="button" id="add-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#iModal">
-            <i class="fa fa-plus"></i> Add
-        </button>
+
+        @if (Gate::allows('Quotes-create'))
+            <button type="button" id="add-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#iModal">
+                <i class="fa fa-plus"></i> Add
+            </button>
+        @endif
+
 
         <div class="row justify-content-center my-4">
             <div class="col-12">
@@ -93,6 +97,9 @@
             'use strict';
 
             const uri = @json(route('datatable.data.quotes'));
+            const editPermissiom = @json(Gate::allows('Quotes-edit'));
+            const viewPermissiom = @json(Gate::allows('Quotes-list'));
+            const deletePermissiom = @json(Gate::allows('Quotes-delete'));
             const changeStatusUri = @json(route('inventory.quotes.change.status'));
             const deleteUri = @json(route('inventory.quotes.destroy'));
             const branches = @json($branches);
@@ -141,7 +148,7 @@
             })
 
             $('#supplier').on('change', function() {
-                
+
                 let supplier_id = $(this).val();
                 let supplier = suppliers[supplier_id]
                 $(`#items`).empty();
@@ -278,11 +285,22 @@
                         width: "15%",
                         orderable: false,
                         render: function(data, type, row, meta) {
-                            return `
-    <span class="btn btn-sm btn-warning edit-item" data-id="${row.id}"><i class="fa fa-pencil"></i></span> 
-    <span data-uri="${deleteUri}/${row.id}" class="btn btn-sm btn-danger delete-item"><i class="fa fa-trash"></i></span> 
-    <span class="btn btn-sm btn-info view-item" data-id="${row.id}"><i class="fa fa-eye"></i></span>
-`;
+                            let html = '';
+                            if (editPermissiom) {
+                                html +=
+                                    `<span class="btn btn-sm btn-warning edit-item" data-id="${row.id}"><i class="fa fa-pencil"></i></span> `;
+                            }
+                            if (deletePermissiom) {
+                                html +=
+                                    `<span data-uri="${deleteUri}/${row.id}" class="btn btn-sm btn-danger delete-item"><i class="fa fa-trash"></i></span> `;
+
+                            }
+                            if (viewPermissiom) {
+                                html +=
+                                    `<span class="btn btn-sm btn-info view-item" data-id="${row.id}"><i class="fa fa-eye"></i></span>`;
+
+                            }
+                            return html;
                         }
                     },
                 ],
@@ -399,9 +417,9 @@
 
                     <span class="col-1 mb-3">
                     ${!isEdit ? `
-                                        <button type="button" class="btn btn-mx btn-danger btn-remove-item mt-4">
-                                        <i class="fa fa-times"></i>
-                                        </button>` : ''
+                                            <button type="button" class="btn btn-mx btn-danger btn-remove-item mt-4">
+                                            <i class="fa fa-times"></i>
+                                            </button>` : ''
                     }
                     </span>
                 </div>
@@ -433,8 +451,8 @@
                         </span>
                         <span class="col-1 mb-3">
                              ${!isEdit ? `<button type="button" class="btn btn-mx btn-danger btn-remove-item mt-4">
-                                                        <i class="fa fa-times"></i>
-                                                    </button>` : ''}
+                                                            <i class="fa fa-times"></i>
+                                                        </button>` : ''}
                             </span>
                         </div>
                         `

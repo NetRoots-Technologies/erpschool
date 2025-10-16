@@ -27,13 +27,15 @@ class CourseController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+    protected $CourseServices;
     public function __construct(CourseServices $CourseServices)
     {
         $this->CourseServices = $CourseServices;
     }
     public function index()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Subjects-list')) {
             return abort(503);
         }
 
@@ -49,7 +51,7 @@ class CourseController extends Controller
      */
     public function create()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Subjects-create')) {
             return abort(503);
         }
         $companies = Company::where('status', 1)->get();
@@ -64,7 +66,7 @@ class CourseController extends Controller
 
     public function getData()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Subjects-list')) {
             return abort(503);
         }
         $Users = $this->CourseServices->getdata();
@@ -78,7 +80,7 @@ class CourseController extends Controller
      */
     public function store(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Subjects-create')) {
             return abort(503);
         }
 
@@ -97,7 +99,7 @@ class CourseController extends Controller
      */
     public function show($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Subjects-list')) {
             return abort(503);
         }
     }
@@ -110,7 +112,7 @@ class CourseController extends Controller
      */
     public function edit($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Subjects-edit')) {
             return abort(503);
         }
         $course = Course::find($id);
@@ -133,7 +135,7 @@ class CourseController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Subjects-edit')) {
             return abort(503);
         }
 
@@ -152,7 +154,7 @@ class CourseController extends Controller
      */
     public function destroy($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Subjects-delete')) {
             return abort(503);
         }
 
@@ -164,7 +166,7 @@ class CourseController extends Controller
 
     public function changeStatus(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Subjects-list')) {
             return abort(503);
         }
         return $coursetype = $this->CourseServices->changeStatus($request);
@@ -173,7 +175,7 @@ class CourseController extends Controller
 
     public function fetchAcademicClass(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Subjects-list')) {
             return abort(503);
         }
         $class = AcademicClass::where('branch_id', $request->branch_id)->get();
@@ -183,7 +185,7 @@ class CourseController extends Controller
     public function fetchAcademicClasses(Request $request)
     {
 
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Subjects-list')) {
             return abort(503);
         }
         $class = AcademicClass::where('branch_id', $request->branch_id)->get();
@@ -192,7 +194,7 @@ class CourseController extends Controller
 
     public function exportbulkfile()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Subjects-list')) {
             return abort(503);
         }
         return Excel::download(new CourseSampleExport, 'Course_bulk_sample.xlsx');
@@ -200,7 +202,7 @@ class CourseController extends Controller
 
     public function importBulkFile(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Subjects-list')) {
             return abort(503);
         }
         try {
@@ -225,7 +227,7 @@ class CourseController extends Controller
 
     public function fetchSubject(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Subjects-list')) {
             return abort(503);
         }
         return Course::where('class_id', $request->id)->get();

@@ -14,9 +14,7 @@ class ComponentService
 {
     public function store($request)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+        
         $component = Component::create([
             'name' => $request->name,
             'user_id' => Auth::id(),
@@ -40,9 +38,7 @@ class ComponentService
 
     public function getdata()
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+        
         $data = Component::with('user')->orderby('id', 'DESC');
         return Datatables::of($data)->addIndexColumn()
             ->addColumn('status', function ($row) {
@@ -52,31 +48,19 @@ class ComponentService
 
                 return $statusButton;
             })
-            //            ->addColumn('action', function ($row) {
-//
-//                $btn = ' <form class="delete_form" data-route="' . route("exam.components.destroy", $row->id) . '"   id="component-' . $row->id . '"  method="POST"> ';
-//                // if (Gate::allows('company-edit'))
-//                $btn = $btn . '<a  data-id="' . $row->id . '" class="btn btn-primary text-white  btn-sm component_edit"  data-component-edit=\'' . $row . '\'>Edit</a>';
-//
-//                // if (Gate::allows('company-delete'))
-//                $btn = $btn . ' <button data-id="component-' . $row->id . '" type="button" class="btn btn-danger delete btn-sm "" >Delete</button>';
-//                $btn = $btn . method_field('DELETE') . '' . csrf_field();
-//                $btn = $btn . ' </form>';
-//                return $btn;
-//            })
             ->addColumn('action', function ($row) {
                 $btn = '<div style="display: flex;">';
 
-                //                if (Gate::allows('Employee-edit'))
+            if (Gate::allows('Components-edit')){
                 $btn .= '<a href="' . route("exam.components.edit", $row->id) . '" class="btn btn-primary btn-sm"  style="margin-right: 4px;">Edit</a>';
+                }
 
-                //                if (Gate::allows('Employee-destroy'))
+                if (Gate::allows('Components-delete'))
                 {
                     $btn .= '<form method="POST" onsubmit="return confirm(\'Are you sure you want to Delete this?\');" action="' . route("exam.components.destroy", $row->id) . '">';
                     $btn .= '<button type="submit" class="btn btn-danger btn-sm" style="margin-right: 4px;">Delete</button>';
                     $btn .= method_field('DELETE') . csrf_field();
                     $btn .= '<button type="button" class="btn btn-info clone-btn btn-sm" style="margin-right: 4px;" data-id=' . $row->id . '>Clone</button>';
-
                     $btn .= '</form>';
                 }
 
@@ -85,13 +69,7 @@ class ComponentService
                 return $btn;
 
             })
-            // ->addColumn('active', function ($row) {
-            //     $statusButton = ($row->active == 1)
-            //         ? '<button type="button" class="btn btn-success btn-sm change-status" data-id="' . $row->id . '" data-status="inactive">Active</button>'
-            //         : '<button type="button" class="btn btn-warning btn-sm change-status" data-id="' . $row->id . '" data-status="active">Inactive</button>';
-
-            //     return $statusButton;
-            // })
+            
             ->addColumn('user', function ($row) {
                 if ($row->user) {
                     return $row->user->name;
@@ -116,9 +94,7 @@ class ComponentService
 
     public function update($request, $id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+        
         $component = Component::find($id);
         $component->name = $request->name;
         $component->user_id = Auth::id();
@@ -150,9 +126,7 @@ class ComponentService
 
     public function destroy($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+        
         $component = Component::with('componentData')->findOrFail($id);
         if ($component) {
             $component->delete();
@@ -164,9 +138,7 @@ class ComponentService
 
     public function changeStatus($request)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+        
         $component = Component::find($request->id);
         if ($component) {
             $component->status = ($request->status == 'active') ? 1 : 0;

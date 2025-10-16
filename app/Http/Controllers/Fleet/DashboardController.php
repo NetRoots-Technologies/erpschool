@@ -2,21 +2,27 @@
 
 namespace App\Http\Controllers\Fleet;
 
-use App\Http\Controllers\Controller;
-use App\Models\Fleet\Vehicle;
-use App\Models\Fleet\Driver;
-use App\Models\Fleet\Route;
-use App\Models\Fleet\Maintenance;
 use App\Models\Fleet\Fuel;
-use App\Models\Fleet\Expense;
-// Transportation model removed - using simple checkbox approach
+use App\Models\Fleet\Route;
+use App\Models\Fleet\Driver;
 use Illuminate\Http\Request;
+use App\Models\Fleet\Expense;
+use App\Models\Fleet\Vehicle;
+use App\Models\Student\Students;
+// Transportation model removed - using simple checkbox approach
+use App\Models\Fleet\Maintenance;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Gate;
 
 class DashboardController extends Controller
 {
     public function index()
     {
+
+       if (!Gate::allows('fleet-dashboard')) {
+            return abort(503);
+        }
         // Get basic statistics
         $stats = [
             'total_vehicles' => Vehicle::count(),

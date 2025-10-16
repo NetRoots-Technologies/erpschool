@@ -19,18 +19,14 @@ class DepartmentService
 
     public function create()
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+
         // return Permission::with('child')->where('main', 1)->get();
         return Company::where('status', 1)->get();
     }
 
     public function company($request)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+
         $html = "<option value='' selected disabled>Select Branch</option> ";
 
 
@@ -44,9 +40,7 @@ class DepartmentService
 
     public function getdepartments(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+
         $html = "<option value='' selected disabled>Select Department</option>";
 
         // Filter by both branch_id and company_id
@@ -67,9 +61,7 @@ class DepartmentService
 
     public function store($request)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+
         //dd($request->all());
         $main = $request->input('main');
         $categoryIds = $request->input('selectCategory'); // This is an array
@@ -92,9 +84,7 @@ class DepartmentService
 
     public function getdata()
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+
         $data = Department::with('branch.company')->OrderBy('created_at', 'desc');
 
         //To Check Department show only of his company and branch
@@ -109,7 +99,6 @@ class DepartmentService
             if (!is_null($branch_id)) {
                 $data->where('branch_id', $branch_id);
             }
-
         }
 
         return Datatables::of($data)->addIndexColumn()
@@ -119,18 +108,14 @@ class DepartmentService
                         return $row->branch->company->name;
                     else
                         return "N/A";
-
                 } else {
                     return "N/A";
                 }
-
-
             })->addColumn('branch', function ($row) {
                 if ($row->branch)
                     return $row->branch->name;
                 else
                     return "N/A";
-
             })
             ->addColumn('status', function ($row) {
                 $statusButton = ($row->status == 1)
@@ -143,14 +128,18 @@ class DepartmentService
 
 
                 $btn = ' <form class="delete_form" data-route="' . route("admin.departments.destroy", $row->id) . '"   id="department-' . $row->id . '"  method="POST"> ';
-                //                if (Gate::allows('branches-edit'))
-                $btn = $btn . '<a  data-id="' . $row->id . '" class="btn btn-primary text-white  btn-sm department_edit"  data-department-edit=\'' . $row . '\'>Edit</a>';
+                if (auth()->user()->can('Departments-edit')) {
+                    $btn = $btn . '<a  data-id="' . $row->id . '" class="btn btn-primary text-white  btn-sm department_edit"  data-department-edit=\'' . $row . '\'>Edit</a>';
+                }
 
 
-                //                if (Gate::allows('branches-delete'))
-                $btn = $btn . ' <button data-id="department-' . $row->id . '" type="button" class="btn btn-danger delete btn-sm "" >Delete</button>';
-                $btn = $btn . method_field('DELETE') . '' . csrf_field();
-                $btn = $btn . ' </form>';
+                if (auth()->user()->can('Departments-delete')) {
+                    $btn = $btn . ' <button data-id="department-' . $row->id . '" type="button" class="btn btn-danger delete btn-sm "" >Delete</button>';
+                    $btn = $btn . method_field('DELETE') . '' . csrf_field();
+                    $btn = $btn . ' </form>';
+                }
+
+
                 return $btn;
             })
             ->rawColumns(['action', 'status'])
@@ -159,18 +148,14 @@ class DepartmentService
 
     public function edit($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+
         return Department::find($id);
     }
 
 
     public function update($request, $id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+
         $categoryIds = $request->input('selectCategory');
         $department = Department::find($id);
         $department->category_id = $categoryIds;
@@ -183,9 +168,7 @@ class DepartmentService
 
     public function destroy($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+
         $Department = Department::findOrFail($id);
         if ($Department)
             $Department->delete();
@@ -194,9 +177,7 @@ class DepartmentService
 
     public function changeStatus($request)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+
         $department = Department::find($request->id);
         if ($department) {
             $department->status = ($request->status == 'active') ? 1 : 0;
@@ -205,4 +186,3 @@ class DepartmentService
         }
     }
 }
-

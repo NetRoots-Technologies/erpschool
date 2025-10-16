@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Gate;
 
 class AssignTimeTableController extends Controller
 {
+    protected $AssignTimeTableService;
     public function __construct(AssignTimeTableService $assignTimeTableService)
     {
         $this->AssignTimeTableService = $assignTimeTableService;

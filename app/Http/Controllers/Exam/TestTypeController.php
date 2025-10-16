@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Gate;
 
 class TestTypeController extends Controller
 {
-
+    protected $TestTypeService;
     public function __construct(TestTypeService $testTypeService)
     {
         $this->TestTypeService = $testTypeService;
@@ -18,7 +18,7 @@ class TestTypeController extends Controller
 
     public function getData()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('TestTypes-list')) {
             return abort(503);
         }
         $testType = $this->TestTypeService->getdata();
@@ -31,7 +31,7 @@ class TestTypeController extends Controller
      */
     public function index()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('TestTypes-list')) {
             return abort(503);
         }
         return view('exam.test_type.index');
@@ -44,7 +44,7 @@ class TestTypeController extends Controller
      */
     public function create()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('TestTypes-craete')) {
             return abort(503);
         }
     }
@@ -57,6 +57,9 @@ class TestTypeController extends Controller
      */
     public function store(Request $request)
     {
+        if (!Gate::allows('TestTypes-craete')) {
+            return abort(503);
+        }
         return $this->TestTypeService->store($request);
 
     }
@@ -69,7 +72,7 @@ class TestTypeController extends Controller
      */
     public function show($id)
     {
-       if (!Gate::allows('Dashboard-list')) {
+       if (!Gate::allows('TestTypes-list')) {
             return abort(503);
         }
     }
@@ -82,7 +85,7 @@ class TestTypeController extends Controller
      */
     public function edit($id)
     {
-       if (!Gate::allows('Dashboard-list')) {
+       if (!Gate::allows('TestTypes-edit')) {
             return abort(503);
         }
     }
@@ -96,7 +99,7 @@ class TestTypeController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('TestTypes-edit')) {
             return abort(503);
         }
         return $testType = $this->TestTypeService->update($request, $id);
@@ -111,7 +114,7 @@ class TestTypeController extends Controller
      */
     public function destroy($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('TestTypes-delete')) {
             return abort(503);
         }
         return $this->TestTypeService->destroy($id);
@@ -120,14 +123,14 @@ class TestTypeController extends Controller
 
     public function changeStatus(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('TestTypes-list')) {
             return abort(503);
         }
         return $testType = $this->TestTypeService->changeStatus($request);
     }
     public function handleBulkAction(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('TestTypes-list')) {
             return abort(503);
         }
         $ids = $request->get('ids');

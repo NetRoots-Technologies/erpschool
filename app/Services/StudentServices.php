@@ -32,18 +32,14 @@ class StudentServices
 
     public function apiindex()
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+        
         return Students::all();
 
     }
 
     public function create()
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+        
 
         $data['student'] = Students::first();
         $data['country'] = Country::all();
@@ -59,9 +55,7 @@ class StudentServices
 
     public function store($request)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+        
         DB::beginTransaction();
         try {
 
@@ -195,9 +189,7 @@ class StudentServices
 
     public function getData()
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+        
         $data = Students::with('branch', 'student_siblings', 'student_schools', 'student_emergency_contacts')->orderBy('created_at', 'desc')->get();
 
 
@@ -205,16 +197,18 @@ class StudentServices
             ->addColumn('action', function ($row) {
                 $btn = '<div style="display: flex;">';
 
-                //                if (Gate::allows('Employee-edit'))
+                if(auth()->user()->can('ViewStudents-edit')){
                 $btn .= '<a href="' . route("academic.students.edit", $row->id) . '" class="btn btn-primary btn-sm"  style="margin-right: 4px;">Edit</a>';
 
-                //                if (Gate::allows('Employee-destroy')) {
-                $btn .= '<form method="POST" action="' . route("academic.students.destroy", $row->id) . '">';
+                }
+
+                if(auth()->user()->can('ViewStudents-delete')){
+$btn .= '<form method="POST" action="' . route("academic.students.destroy", $row->id) . '">';
                 $btn .= '<button type="submit" class="btn btn-danger btn-sm deleteBtn" data-id="' . $row->id . '" data-url="' . route("academic.students.destroy", $row->id) . '" style="margin-right: 4px;">Delete</button>';
                 $btn .= '</form>';
-                //                }
-    
                 $btn .= '</div>';
+                }
+                
 
                 return $btn;
 
@@ -245,9 +239,7 @@ class StudentServices
 
     public function update($request, $id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+        
         //        dd($request->student_gender);
         $guardianName = $request->guardian_name;
         $guardianCnic = $request->guardian_cnic;
@@ -394,9 +386,7 @@ class StudentServices
 
     private function addNewStudentPictures($request, $student)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+        
         $studentPictures = $student->studentPictures ?: new StudentPictures();
 
         if ($request->hasfile('school_leaving_certificate')) {
@@ -429,9 +419,7 @@ class StudentServices
 
     private function uploadFile($file, $destinationPath)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+        
         $filename = $file->getClientOriginalName();
         $filename = preg_replace("/[^A-Za-z0-9 ]/", '', $filename);
         $filename = preg_replace("/\s+/", '-', $filename);
@@ -444,9 +432,7 @@ class StudentServices
 
     public function destroy($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+        
         $student = Students::find($id);
         // $student->student_transports()->delete(); // Transportation module not fully implemented
         $student->student_siblings()->delete();
@@ -460,9 +446,7 @@ class StudentServices
 
     public function get_state($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+        
         $html = "<option value=''> Select State </option>";
         $state = State::where('country_id', $id)->get();
         foreach ($state as $item) {
@@ -474,9 +458,7 @@ class StudentServices
 
     public function get_city($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+        
         $html = "<option value=''> Select State </option>";
         $city = City::where('state_id', $id)->get();
         foreach ($city as $item) {
@@ -488,9 +470,7 @@ class StudentServices
 
     public function StudentSiblingData()
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+        
         $data = Students::orderBy('father_cnic')->get();
 
         return Datatables::of($data)

@@ -12,27 +12,25 @@ use Illuminate\Support\Facades\Gate;
 class SkillEvaluationService
 {
 
-   public function store($request)
-{
-    if (!Gate::allows('Dashboard-list')) {
-        return abort(503);
+    public function store($request)
+    {
+
+        // Create new SkillEvaluation record
+        for ($i = 0; $i < count($request->subject_id); $i++) {
+            SkillEvaluation::create([
+                'student_id'              => $request->student_id,
+                'user_id'                 => Auth::id(), // logged-in user
+                'subject_id'              => $request->subject_id[$i] ?? null,
+                'skill_group_id'          => $request->skill_group_id[$i] ?? null,
+                'skill_id'                => $request->skill_id[$i] ?? null,
+                'skill_evaluation_key_id' => isset($request->skill_evaluation_key_id[$i]) ? trim($request->skill_evaluation_key_id[$i], '}') : null,
+                'logs'                    => json_encode($request->all()), // optional: store full logs
+            ]);
+        }
+
+
+        return redirect()->route('exam.skill_evaluation.index')->with('success', 'Skill Evaluation created successfully.');
     }
-    // Create new SkillEvaluation record
-   for ($i = 0; $i < count($request->subject_id); $i++) {
-    SkillEvaluation::create([
-        'student_id'              => $request->student_id,
-        'user_id'                 => Auth::id(), // logged-in user
-        'subject_id'              => $request->subject_id[$i] ?? null,
-        'skill_group_id'          => $request->skill_group_id[$i] ?? null,
-        'skill_id'                => $request->skill_id[$i] ?? null,
-        'skill_evaluation_key_id' => isset($request->skill_evaluation_key_id[$i]) ? trim($request->skill_evaluation_key_id[$i], '}') : null,
-        'logs'                    => json_encode($request->all()), // optional: store full logs
-    ]);
-}
-
-
-    return redirect()->route('exam.skill_evaluation.index')->with('success', 'Skill Evaluation created successfully.');
-}
 
 
     public function getdata()
@@ -52,13 +50,16 @@ class SkillEvaluationService
             ->addColumn('action', function ($row) {
 
                 $btn = ' <form class="delete_form" data-route="' . route("exam.skill_evaluations.destroy", $row->id) . '"   id="skillEvaluation-' . $row->id . '"  method="POST"> ';
-                // if (Gate::allows('company-edit'))
-                $btn = $btn . '<a  data-id="' . $row->id . '" class="btn btn-primary text-white  btn-sm skillEvaluation_edit"  data-skill_evaluation-edit=\'' . $row . '\'>Edit</a>';
+                if (Gate::allows('SkillEvaluation-edit')) {
+                    $btn = $btn . '<a  data-id="' . $row->id . '" class="btn btn-primary text-white  btn-sm skillEvaluation_edit"  data-skill_evaluation-edit=\'' . $row . '\'>Edit</a>';
+                }
 
-                // if (Gate::allows('company-delete'))
-                $btn = $btn . ' <button data-id="skillEvaluation-' . $row->id . '" type="button" class="btn btn-danger delete btn-sm "" >Delete</button>';
-                $btn = $btn . method_field('DELETE') . '' . csrf_field();
-                $btn = $btn . ' </form>';
+                if (Gate::allows('SkillEvaluation-delete')) {
+                    $btn = $btn . ' <button data-id="skillEvaluation-' . $row->id . '" type="button" class="btn btn-danger delete btn-sm "" >Delete</button>';
+                    $btn = $btn . method_field('DELETE') . '' . csrf_field();
+                    $btn = $btn . ' </form>';
+                }
+
                 return $btn;
             })
             ->addColumn('user', function ($row) {
@@ -111,7 +112,4 @@ class SkillEvaluationService
             return $skillEvaluation;
         }
     }
-
-
 }
-

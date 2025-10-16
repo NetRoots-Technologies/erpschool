@@ -12,25 +12,19 @@ class PermissionServices
 
     public function index()
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         $data = Permission::select('id', 'name')->get();
     }
 
     public function apiindex()
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         return Permission::all();
     }
 
     public function create()
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
     }
 
     public function store($request)
@@ -86,9 +80,7 @@ class PermissionServices
 
     public function getdata()
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
 
         return DataTables::of(Permission::query())
             ->addColumn('action', function ($row) {

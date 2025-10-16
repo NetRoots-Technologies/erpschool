@@ -30,7 +30,7 @@ class CompanyController extends Controller
 
     public function getData()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Company-list')) {
             return abort(503);
         }
         $Company = $this->CompanyService->getdata();
@@ -51,7 +51,7 @@ class CompanyController extends Controller
      */
     public function create()
     {
-       if (!Gate::allows('Dashboard-list')) {
+       if (!Gate::allows('Company-create')) {
             return abort(503);
         }
 
@@ -66,7 +66,7 @@ class CompanyController extends Controller
      */
     public function store(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Company-create')) {
             return abort(503);
         }
         $image = null;
@@ -99,7 +99,7 @@ class CompanyController extends Controller
      */
     public function edit($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Company-edit')) {
             return abort(503);
         }
         return view('admin.comapny.edit');
@@ -114,7 +114,7 @@ class CompanyController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Company-edit')) {
             return abort(503);
         }
         $image = '';
@@ -134,7 +134,7 @@ class CompanyController extends Controller
     public function destroy($id)
     {
 
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Company-delete')) {
             return abort(503);
         }
         return $this->CompanyService->destroy($id);
@@ -143,7 +143,7 @@ class CompanyController extends Controller
 
     public function changeStatus(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Company')) {
             return abort(503);
         }
         return $company = $this->CompanyService->changeStatus($request);
@@ -152,7 +152,7 @@ class CompanyController extends Controller
     public function handleBulkAction(Request $request)
     {
 
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Company')) {
             return abort(503);
         }
         $ids = $request->get('ids');
@@ -168,7 +168,7 @@ class CompanyController extends Controller
     // Download Company Sample Bulk File (only Company Name)
     public function exportBulkFile()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Company')) {
             return abort(503);
         }
         return Excel::download(new CompanySampleExport, 'company_bulk_sample.xlsx');
@@ -177,7 +177,7 @@ class CompanyController extends Controller
     // Import Company Bulk File (only Company Name)
     public function importBulkFile(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Company')) {
             return abort(503);
         }
         $request->validate([

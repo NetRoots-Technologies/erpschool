@@ -26,7 +26,7 @@ class ComponentController extends Controller
 
     public function getData()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Components-list')) {
             return abort(503);
         }
         $component = $this->componentService->getdata();
@@ -39,7 +39,7 @@ class ComponentController extends Controller
      */
     public function index()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Components-list')) {
             return abort(503);
         }
         $sessions = AcademicSession::all();
@@ -55,7 +55,7 @@ class ComponentController extends Controller
      */
     public function create()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Components-create')) {
             return abort(503);
         }
         $companies = Company::where('status', 1)->get();
@@ -72,7 +72,7 @@ class ComponentController extends Controller
      */
     public function store(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Components-create')) {
             return abort(503);
         }
         try {
@@ -94,7 +94,7 @@ class ComponentController extends Controller
      */
     public function show($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Components-list')) {
             return abort(503);
         }
     }
@@ -107,7 +107,7 @@ class ComponentController extends Controller
      */
     public function edit($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Components-edit')) {
             return abort(503);
         }
         $component = Component::with('componentData.test_type')->find($id);
@@ -127,7 +127,7 @@ class ComponentController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Components-edit')) {
             return abort(503);
         }
         try {
@@ -148,7 +148,7 @@ class ComponentController extends Controller
      */
     public function destroy($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Components-delete')) {
             return abort(503);
         }
         try {
@@ -161,7 +161,7 @@ class ComponentController extends Controller
 
     public function changeStatus(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Components-list')) {
             return abort(503);
         }
         return $component = $this->componentService->changeStatus($request);
@@ -169,7 +169,7 @@ class ComponentController extends Controller
     public function handleBulkAction(Request $request)
     {
 
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Components-list')) {
             return abort(503);
         }
         $ids = $request->get('ids');
@@ -184,9 +184,7 @@ class ComponentController extends Controller
 
     public function fetchComponentSubject(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         $component = Component::where('subject_id', $request->course_id)->get();
 
         return response()->json($component);
@@ -217,7 +215,7 @@ class ComponentController extends Controller
 
     // public function changeStatus($request)
     // {
-    //     if (!Gate::allows('Dashboard-list')) {
+    //     if (!Gate::allows('Components-list')) {
     //         return abort(503);
     //     }
     //     $testType = TestType::find($request->id);

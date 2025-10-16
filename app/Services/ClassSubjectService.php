@@ -19,9 +19,7 @@ class ClassSubjectService
 {
     public function store($request)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+        
         $fields = ['skill', 'acd', 'compulsory'];
 
         foreach ($fields as $field) {
@@ -47,9 +45,7 @@ class ClassSubjectService
 
     public function getdata()
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+        
         $data = ClassSubject::with('user', 'company', 'branch', 'Subject', 'AcademicClass')->orderBy('created_at', 'desc');
 
         // if (Auth::check()) {
@@ -66,13 +62,19 @@ class ClassSubjectService
         return \Yajra\DataTables\DataTables::of($data)->addIndexColumn()
             ->addColumn('action', function ($row) {
                 $btn = '<div style="display: flex;">';
-
+                if(auth()->user()->can('class-subjects-edit')){
                 $btn .= '<a href="' . route("exam.class_subjects.edit", $row->id) . '" class="btn btn-primary btn-sm"  style="margin-right: 4px;">Edit</a>';
 
-                $btn .= '<form method="POST" onsubmit="return confirm(\'Are you sure you want to Delete this?\');" action="' . route("exam.class_subjects.destroy", $row->id) . '">';
+                }
+
+                if(auth()->user()->can('class-subjects-delete')){
+                      $btn .= '<form method="POST" onsubmit="return confirm(\'Are you sure you want to Delete this?\');" action="' . route("exam.class_subjects.destroy", $row->id) . '">';
                 $btn .= '<button type="submit" class="btn btn-danger btn-sm" style="margin-right: 4px;">Delete</button>';
                 $btn .= method_field('DELETE') . csrf_field();
                 $btn .= '</form>';
+                }
+
+              
 
                 $btn .= '</div>';
 
@@ -135,9 +137,7 @@ class ClassSubjectService
 
     public function update($request, $id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+        
         $fields = ['skill', 'acd', 'compulsory'];
 
         foreach ($fields as $field) {
@@ -166,9 +166,7 @@ class ClassSubjectService
 
     public function destroy($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+        
         $classSubject = ClassSubject::find($id);
         if ($classSubject) {
             $classSubject->delete();

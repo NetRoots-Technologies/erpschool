@@ -13,9 +13,7 @@ class StudentDataBankService
 
     public function store($request)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+
         $studentDatabank = StudentDataBank::create([
             'reference_no' => $request->get('reference_no'),
             'student_name' => trim($request->get('first_name') . ' ' . $request->get('last_name')),
@@ -44,17 +42,21 @@ class StudentDataBankService
 
     public function getData()
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+
         $data = StudentDataBank::orderBy('created_at', 'desc')->get();
 
 
         return Datatables::of($data)->addIndexColumn()
             ->addColumn('action', function ($row) {
                 $btn = '<div style="display: flex;justify-content:center">';
+                if(auth()->user()->can('PreAdmissionForm-create')){
                 $btn .= '<a href="' . route("academic.add-student", $row->id) . '" class="btn btn-success btn-sm"  style="margin-right: 4px;">Add </a>';
+
+                }
+                if(auth()->user()->can('PreAdmissionForm-edit')){
                 $btn .= '<a href="' . route("academic.studentDataBank.edit", $row->id) . '" class="btn btn-primary btn-sm"  style="margin-right: 4px;">Edit</a>';
+
+                }
                 // $btn .= '<form method="POST" action="' . route("academic.studentDataBank.destroy", $row->id) . '">';
                 // $btn .= '<button type="submit" class="btn btn-danger btn-sm deleteBtn"
                 // data-id="' . $row->id . '"
@@ -90,9 +92,7 @@ class StudentDataBankService
 
     public function update($request, $id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+
         $studentDatabank = StudentDataBank::find($id);
 
         $studentDatabank->update([
@@ -120,9 +120,7 @@ class StudentDataBankService
 
     public function destroy($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+
         $studentDatabank = StudentDataBank::find($id);
         if ($studentDatabank) {
             $studentDatabank->delete();

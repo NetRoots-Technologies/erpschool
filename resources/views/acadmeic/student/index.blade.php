@@ -49,7 +49,7 @@ All Students
     </div>
     <div class="row mt-4 mb-4 align-items-center justify-content-start">
         {{-- Add Student Button --}}
-        @if (Gate::allows('Students-create'))
+        @if (Gate::allows('ViewStudents-create'))
          <div class="col-auto">
             <a href="{{ route('academic.students.create') }}" class="btn btn-primary btn-md">
                 <b>Add Student</b>

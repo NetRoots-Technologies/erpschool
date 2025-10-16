@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Services;
+
 use App\Models\Exam\GradingPolicies;
 use Yajra\DataTables\DataTables;
 use Illuminate\Support\Facades\Auth;
@@ -10,9 +11,7 @@ class GradingPoliciesService
 {
     public function store($request)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+
         $logs = [
             'user_id' => Auth::user()->id ?? 'N/A',
             'old_acadmeic_session_id' => 'N/A',
@@ -40,9 +39,7 @@ class GradingPoliciesService
 
     public function getdata()
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+
         $data = GradingPolicies::with('academic_session', 'academic_class')->orderby('id', 'DESC');
         return Datatables::of($data)->addIndexColumn()
             ->addColumn('academic_session', function ($row) {
@@ -75,10 +72,12 @@ class GradingPoliciesService
             })
             ->addColumn('action', function ($row) {
                 $btn = ' <form class="delete_form" data-route="' . route("exam.grading_policies.destroy", $row->id) . '"   id="grading_policies_' . $row->id . '"  method="POST"> ';
-                // if (Gate::allows('company-edit'))
-                $btn = $btn . '<a  data-id="' . $row->id . '" class="btn btn-primary text-white btn-sm grading_policies_edit" data-grading_policies_edit=\'' . $row . '\'>Edit</a>';
-                $btn = $btn . method_field('DELETE') . '' . csrf_field();
-                $btn = $btn . ' </form>';
+                if (Gate::allows('GradingPolicies-edit')) {
+                    $btn = $btn . '<a  data-id="' . $row->id . '" class="btn btn-primary text-white btn-sm grading_policies_edit" data-grading_policies_edit=\'' . $row . '\'>Edit</a>';
+                    $btn = $btn . method_field('DELETE') . '' . csrf_field();
+                    $btn = $btn . ' </form>';
+                }
+
                 return $btn;
             })
             ->rawColumns(['academic_session', 'academic_class', 'grade', 'marks_range', 'marks_from', 'marks_to', 'description', 'action', 'status'])
@@ -87,9 +86,7 @@ class GradingPoliciesService
 
     public function update($request, $id, $image = null)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+
         $grading_policies = GradingPolicies::find($id);
         if ($grading_policies) {
             $current_logs = [
@@ -121,18 +118,11 @@ class GradingPoliciesService
         return null;
     }
 
-    public function destroy($id)
-    {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
-    }
+    public function destroy($id) {}
 
     public function changeStatus($request)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+
         $grading_policies = GradingPolicies::find($request->id);
         if ($grading_policies) {
             $current_logs = [
@@ -157,4 +147,3 @@ class GradingPoliciesService
         return null;
     }
 }
-

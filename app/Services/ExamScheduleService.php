@@ -8,9 +8,7 @@ use Illuminate\Support\Facades\Validator;
 class ExamScheduleService{
     public function store($request)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         // dd($request->all());
         $validator = Validator::make($request->all(), [
                 'company_id'     => 'required|exists:company,id',
@@ -48,9 +46,7 @@ class ExamScheduleService{
 
     public function destroy($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         $examSchedule = ExamSchedule::find($id);
         if ($examSchedule) {
             $examSchedule->delete();

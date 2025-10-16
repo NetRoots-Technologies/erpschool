@@ -25,7 +25,7 @@ class EffortLevelsController extends Controller
 
     public function getData()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('EffortLevels-list')) {
             return abort(503);
         }
         $effort_levels = $this->effort_levels_service->getdata();
@@ -38,6 +38,9 @@ class EffortLevelsController extends Controller
      */
     public function index()
     {
+          if (!Gate::allows('EffortLevels-list')) {
+            return abort(503);
+        }
     
     $effortLevels = EffortLevel::with(['student.AcademicClass','student.section','student.branch.company', 'course', 'user'])->get();
     // dd($effortLevels);
@@ -54,6 +57,10 @@ class EffortLevelsController extends Controller
      */
     public function create()
     {
+
+          if (!Gate::allows('EffortLevels-create')) {
+            return abort(503);
+        }
         $companies = Company::all();
         return view('exam.effort_levels.create', compact('companies'));
     }
@@ -62,6 +69,10 @@ class EffortLevelsController extends Controller
 
 public function store(Request $request)
 {
+
+      if (!Gate::allows('EffortLevels-create')) {
+            return abort(503);
+        }
    
     foreach ($request->students as $key => $st) {
     
@@ -87,7 +98,7 @@ public function store(Request $request)
      */
     public function show($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('EffortLevels-list')) {
             return abort(503);
         }
     }
@@ -100,7 +111,7 @@ public function store(Request $request)
      */
     public function edit($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('EffortLevels-edit')) {
             return abort(503);
         }
     }
@@ -114,7 +125,7 @@ public function store(Request $request)
      */
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('EffortLevels-edit')) {
             return abort(503);
         }
         $request->validate([
@@ -137,7 +148,7 @@ public function store(Request $request)
      */
     public function destroy($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('EffortLevels-delete')) {
             return abort(503);
         }
         return $this->effort_levels_service->destroy($id);
@@ -145,14 +156,14 @@ public function store(Request $request)
 
     public function changeStatus(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('EffortLevels-list')) {
             return abort(503);
         }
         return $effort_levels = $this->effort_levels_service->changeStatus($request);
     }
     public function handleBulkAction(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('EffortLevels-list')) {
             return abort(503);
         }
         $ids = $request->get('ids');

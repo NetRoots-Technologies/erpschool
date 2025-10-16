@@ -25,7 +25,6 @@ class SocialSecurityService
 
             $SocialSecurity->save();
         }
-
     }
 
 
@@ -39,12 +38,17 @@ class SocialSecurityService
         return Datatables::of($data)->addIndexColumn()
             ->addColumn('action', function ($row) {
                 $btn = ' <form  method="POST" onsubmit="return confirm(' . "'Are you sure you want to Delete this?'" . ');"  action="' . route("hr.social-security.destroy", $row->id) . '"> ';
+                if (Gate::allows('SocialSecurity-edit')) {
+                    $btn = $btn . '<a href="' . route("hr.social-security.edit", $row->id) . '" class="btn btn-primary  ml-2 mr-2 btn-sm">Edit</a>';
+                }
 
-                $btn = $btn . '<a href="' . route("hr.social-security.edit", $row->id) . '" class="btn btn-primary  ml-2 mr-2 btn-sm">Edit</a>';
+                if (Gate::allows('SocialSecurity-delete')) {
+                    $btn = $btn . ' <button  type="submit" class="btn btn-danger btn-sm "" >Delete</button>';
+                    $btn = $btn . method_field('DELETE') . '' . csrf_field();
+                    $btn = $btn . ' </form>';
+                }
 
-                $btn = $btn . ' <button  type="submit" class="btn btn-danger btn-sm "" >Delete</button>';
-                $btn = $btn . method_field('DELETE') . '' . csrf_field();
-                $btn = $btn . ' </form>';
+
                 return $btn;
             })->addColumn('employee', function ($row) {
                 if ($row->employee) {
@@ -90,6 +94,4 @@ class SocialSecurityService
             $social->delete();
         }
     }
-
 }
-

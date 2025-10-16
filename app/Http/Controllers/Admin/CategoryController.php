@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Gate;
 class CategoryController extends Controller
 {
 
+    protected $CategoryService;
     public function __construct(CategoryService $categoryService)
     {
         $this->CategoryService = $categoryService;
@@ -35,7 +36,7 @@ class CategoryController extends Controller
      */
     public function create()
     {
-        if (!Gate::allows('Category-list')) {
+        if (!Gate::allows('Category-create')) {
             return abort(403);
         }
     }
@@ -48,7 +49,7 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        if (!Gate::allows('Category-list')) {
+        if (!Gate::allows('Category-create')) {
             return abort(403);
         }
     }
@@ -56,7 +57,7 @@ class CategoryController extends Controller
 
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('Category-list')) {
+        if (!Gate::allows('Category-edit')) {
             return abort(403);
         }
         

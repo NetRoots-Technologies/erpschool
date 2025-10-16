@@ -16,72 +16,72 @@ use Illuminate\Support\Facades\Auth;
 class SignatoryAuthorityController extends Controller
 {
 
-public function index(){
-    if (!Gate::allows('Dashboard-list')) {
+    public function index()
+    {
+        if (!Gate::allows('SignatoryAuthorities-list')) {
             return abort(503);
         }
-    return view('admin.approval_authorities.index');
-}
+        return view('admin.approval_authorities.index');
+    }
 
     public function getData()
- {
-if (!Gate::allows('Dashboard-list')) {
+    {
+        if (!Gate::allows('SignatoryAuthorities-list')) {
             return abort(503);
         }
-    
-    $data = ApprovalAuthority::with(['company', 'branch', 'role', 'user'])->orderBy('id', 'asc');
 
-    if (Auth::check()) {
-        $company_id = Auth::user()->company_id;
-        $branch_id = Auth::user()->branch_id;
-        if (!is_null($company_id)) {
-            $data->where('company_id', $company_id);
+        $data = ApprovalAuthority::with(['company', 'branch', 'role', 'user'])->orderBy('id', 'asc');
+
+        if (Auth::check()) {
+            $company_id = Auth::user()->company_id;
+            $branch_id = Auth::user()->branch_id;
+            if (!is_null($company_id)) {
+                $data->where('company_id', $company_id);
+            }
+
+            if (!is_null($branch_id)) {
+                $data->where('branch_id', $branch_id);
+            }
         }
 
-        if (!is_null($branch_id)) {
-            $data->where('branch_id', $branch_id);
-        }
+        return datatables()->of($data)
+            ->addIndexColumn()
 
-    }
-    
-    return datatables()->of($data)
-        ->addIndexColumn()
-        
-        // Use addColumn instead of editColumn for related model fields
-        ->addColumn('company', fn($row) => $row->company->name ?? '-')
-        ->addColumn('branch', fn($row) => $row->branch->name ?? '-')
-        ->addColumn('role', fn($row) => $row->role->name ?? '-')
-        ->addColumn('user', fn($row) => $row->user->name ?? '-')
+            // Use addColumn instead of editColumn for related model fields
+            ->addColumn('company', fn($row) => $row->company->name ?? '-')
+            ->addColumn('branch', fn($row) => $row->branch->name ?? '-')
+            ->addColumn('role', fn($row) => $row->role->name ?? '-')
+            ->addColumn('user', fn($row) => $row->user->name ?? '-')
 
-        ->addColumn('status', function ($row) {
-            return $row->is_active
-                ? '<span class="badge bg-success">Active</span>'
-                : '<span class="badge bg-secondary">Inactive</span>';
-        })
+            ->addColumn('status', function ($row) {
+                return $row->is_active
+                    ? '<span class="badge bg-success">Active</span>'
+                    : '<span class="badge bg-secondary">Inactive</span>';
+            })
 
-        // ->addColumn('action', function ($row) {
-        //     $editUrl = route('admin.signatory-authorities.edit', $row->id);
-        //     $deleteUrl = route('admin.signatory-authorities.destroy', $row->id);
+            // ->addColumn('action', function ($row) {
+            //     $editUrl = route('admin.signatory-authorities.edit', $row->id);
+            //     $deleteUrl = route('admin.signatory-authorities.destroy', $row->id);
 
-        //     return '
-        //         <a href="' . $editUrl . '" class="btn btn-sm btn-primary">Edit</a>
-        //         <form method="POST" action="' . $deleteUrl . '" style="display:inline-block;">
-        //             ' . method_field('DELETE') . csrf_field() . '
-        //             <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm(\'Are you sure?\')">Delete</button>
-        //         </form>
-        //     ';
-        // })
+            //     return '
+            //         <a href="' . $editUrl . '" class="btn btn-sm btn-primary">Edit</a>
+            //         <form method="POST" action="' . $deleteUrl . '" style="display:inline-block;">
+            //             ' . method_field('DELETE') . csrf_field() . '
+            //             <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm(\'Are you sure?\')">Delete</button>
+            //         </form>
+            //     ';
+            // })
 
-        ->rawColumns(['status'])
-        ->make(true);
+            ->rawColumns(['status'])
+            ->make(true);
     }
 
 
 
 
-   public function create()
+    public function create()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('SignatoryAuthorities-create')) {
             return abort(503);
         }
         $companies = Company::all();
@@ -92,9 +92,9 @@ if (!Gate::allows('Dashboard-list')) {
         return view('admin.approval_authorities.create', compact('companies', 'roles', 'users'));
     }
 
-   public function store(Request $request)
+    public function store(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('SignatoryAuthorities-create')) {
             return abort(503);
         }
         $request->validate([
@@ -106,8 +106,8 @@ if (!Gate::allows('Dashboard-list')) {
                 Rule::unique('approval_authorities')
                     ->where(function ($query) use ($request) {
                         return $query->where('company_id', $request->company_id)
-                                ->where('branch_id', $request->branch_id)
-                                ->where('user_id', $request->user_id);
+                            ->where('branch_id', $request->branch_id)
+                            ->where('user_id', $request->user_id);
                     }),
             ],
         ]);
@@ -117,9 +117,9 @@ if (!Gate::allows('Dashboard-list')) {
         return redirect()->route('admin.signatory-authorities.index')->with('success', 'Authority added successfully.');
     }
 
-       public function edit($id)
+    public function edit($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('SignatoryAuthorities-edit')) {
             return abort(503);
         }
         $authority = ApprovalAuthority::findOrFail($id);
@@ -133,7 +133,7 @@ if (!Gate::allows('Dashboard-list')) {
 
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('SignatoryAuthorities-edit')) {
             return abort(503);
         }
         $authority = ApprovalAuthority::findOrFail($id);
@@ -154,7 +154,7 @@ if (!Gate::allows('Dashboard-list')) {
 
     public function destroy($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('SignatoryAuthorities-delte')) {
             return abort(503);
         }
         $authority = ApprovalAuthority::findOrFail($id);
@@ -162,6 +162,4 @@ if (!Gate::allows('Dashboard-list')) {
 
         return redirect()->back()->with('success', 'Signatory authority deleted successfully.');
     }
-
 }
-

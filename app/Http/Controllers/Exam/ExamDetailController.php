@@ -29,7 +29,7 @@ class ExamDetailController extends Controller
      */
     public function index()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('ExamDetails-list')) {
             return abort(503);
         }
         return view('exam.exam_details.index');
@@ -42,7 +42,7 @@ class ExamDetailController extends Controller
      */
     public function create()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('ExamDetails-create')) {
             return abort(503);
         }
         $testTypes = TestType::where('status', 1)->get();
@@ -60,7 +60,7 @@ class ExamDetailController extends Controller
     public function store(Request $request)
     {
         // dd($request->all());
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('ExamDetails-create')) {
             return abort(503);
         }
         $this->ExamDetailService->store($request);
@@ -75,7 +75,7 @@ class ExamDetailController extends Controller
      */
     public function show($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('ExamDetails-list')) {
             return abort(503);
         }
     }
@@ -88,7 +88,7 @@ class ExamDetailController extends Controller
      */
     public function edit($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('ExamDetails-edit')) {
             return abort(503);
         }
 
@@ -126,7 +126,7 @@ class ExamDetailController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('ExamDetails-edit')) {
             return abort(503);
         }
         $this->ExamDetailService->update($request, $id);
@@ -141,7 +141,7 @@ class ExamDetailController extends Controller
      */
     public function destroy($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('ExamDetails-delete')) {
             return abort(503);
         }
         $this->ExamDetailService->destroy($id);
@@ -151,7 +151,7 @@ class ExamDetailController extends Controller
 
     public function getData()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('ExamDetails-list')) {
             return abort(503);
         }
         return $this->ExamDetailService->getData();
@@ -159,7 +159,7 @@ class ExamDetailController extends Controller
 
     public function changeStatus(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('ExamDetails-list')) {
             return abort(503);
         }
         return $testType = $this->ExamDetailService->changeStatus($request);
@@ -168,7 +168,7 @@ class ExamDetailController extends Controller
 
     public function handleBulkAction(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('ExamDetails-list')) {
             return abort(503);
         }
         $ids = $request->get('ids');
@@ -183,7 +183,7 @@ class ExamDetailController extends Controller
 
     public function getClass($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('ExamDetails-list')) {
             return abort(503);
         }
         return AcademicClass::where('branch_id', $id)->get();

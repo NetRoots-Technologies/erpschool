@@ -16,7 +16,7 @@ Grading Policies
         <h3 class="text-22 text-center text-bold w-100 mb-4">Grading Policies</h3>
     </div>
     <div class="row    mt-4 mb-4 ">
-        @if (Gate::allows('students'))
+        @if (Gate::allows('GradingPolicies-create'))
             <div class="col-12 text-right">
                 <a class="btn btn-primary btn-md text-white" data-toggle="modal" data-target="#createModal1"><b>Add Grading Policy</b></a>
             </div>

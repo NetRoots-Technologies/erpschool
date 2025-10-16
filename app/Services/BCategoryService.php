@@ -38,10 +38,16 @@ class BCategoryService
         })
             ->addColumn('action', function ($row) {
             $btn  = '<form class="delete_form d-inline" data-route="' . route("inventory.category.destroy", $row->id) . '" id="category-' . $row->id . '" method="POST">';
-            $btn .= '<a href="' . route("inventory.category.edit", $row->id) . '"class="btn btn-primary me-2 btn-sm text-white">Edit</a>';
+        if (Gate::allows('BudgetCategory-edit')) {
+           $btn .= '<a href="' . route("inventory.category.edit", $row->id) . '"class="btn btn-primary me-2 btn-sm text-white">Edit</a>';
+           
+        }
+        if (Gate::allows('BudgetCategory-delete')) {
             $btn .= '<button data-id="category-' . $row->id . '" type="button" class="btn btn-danger delete btn-sm">Delete</button>';
             $btn .= method_field('DELETE') . csrf_field();
             $btn .= '</form>';
+        }
+            
                 return $btn;
             })
 

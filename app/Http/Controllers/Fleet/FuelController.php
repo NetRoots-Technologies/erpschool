@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Fleet;
 
-use App\Http\Controllers\Controller;
 use App\Models\Fleet\Fuel;
-use App\Models\Fleet\Vehicle;
 use App\Models\Fleet\Driver;
 use Illuminate\Http\Request;
+use App\Models\Fleet\Vehicle;
+use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Gate;
 
 class FuelController extends Controller
 {
@@ -17,6 +19,9 @@ class FuelController extends Controller
      */
     public function index()
     {
+         if (!Gate::allows('Fule-record-list')) {
+            return abort(503);
+        }
         $fuels = Fuel::with(['vehicle', 'driver', 'company', 'branch'])->paginate(10);
         return view('fleet.fuel.index', compact('fuels'));
     }
@@ -28,6 +33,9 @@ class FuelController extends Controller
      */
     public function create()
     {
+         if (!Gate::allows('Fule-record-craete')) {
+            return abort(503);
+        }
         return view('fleet.fuel.create');
     }
 
@@ -39,6 +47,9 @@ class FuelController extends Controller
      */
     public function store(Request $request)
     {
+         if (!Gate::allows('Fule-record-craete')) {
+            return abort(503);
+        }
         $request->validate([
             'vehicle_id' => 'required|exists:fleet_vehicles,id',
             'driver_id' => 'nullable|exists:fleet_drivers,id',
@@ -82,6 +93,9 @@ class FuelController extends Controller
      */
     public function show(Fuel $fuel)
     {
+        if (!Gate::allows('Fule-record-view')) {
+            return abort(503);
+        }
         $fuel->load(['vehicle', 'driver', 'company', 'branch']);
         return view('fleet.fuel.show', compact('fuel'));
     }
@@ -94,6 +108,9 @@ class FuelController extends Controller
      */
     public function edit(Fuel $fuel)
     {
+        if (!Gate::allows('Fule-record-edit')) {
+            return abort(503);
+        }
         return view('fleet.fuel.edit', compact('fuel'));
     }
 
@@ -106,6 +123,9 @@ class FuelController extends Controller
      */
     public function update(Request $request, Fuel $fuel)
     {
+        if (!Gate::allows('Fule-record-edit')) {
+            return abort(503);
+        }
         $request->validate([
             'vehicle_id' => 'required|exists:fleet_vehicles,id',
             'driver_id' => 'nullable|exists:fleet_drivers,id',
@@ -133,6 +153,9 @@ class FuelController extends Controller
      */
     public function destroy(Fuel $fuel)
     {
+        if (!Gate::allows('Fule-record-delete')) {
+            return abort(503);
+        }
         $fuel->delete();
 
         return redirect()->route('fleet.fuel.index')

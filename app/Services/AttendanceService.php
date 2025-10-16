@@ -18,9 +18,7 @@ class AttendanceService
 
     public function fetchDepartment($request)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+    
         $departments = Department::where('branch_id', $request->branch_id)->get();
         return $departments;
 
@@ -28,18 +26,14 @@ class AttendanceService
 
     public function fetchEmployee($request)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+    
         $employees = Employees::where('status', 1)->where('department_id', $request->department_id)->get();
         return $employees;
     }
 
     public function store($request)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+    
         $errors = new MessageBag();
 
         foreach ($request->get('employee_id') as $key => $employeeId) {
@@ -74,9 +68,7 @@ class AttendanceService
 
     public function getdata($request)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+    
         if (!empty($request->from_date)) {
             $data = Attendance::with('branch', 'employee')
                 ->whereBetween('attendance_date', array($request->from_date, $request->to_date))
@@ -87,9 +79,9 @@ class AttendanceService
         return Datatables::of($data)->addIndexColumn()
             ->addColumn('action', function ($row) {
                 $btn = ' <form  method="POST" onsubmit="return confirm(' . "'Are you sure you want to Delete this?'" . ');"  action="' . route("hr.attendance.destroy", $row->id) . '"> ';
-                if (Gate::allows('attendance-edit'))
+                if (Gate::allows('EmployeeAttendance-edit'))
                     $btn = $btn . '<a href="' . route("hr.attendance.edit", $row->id) . '" class="btn btn-primary  ml-2 mr-2 btn-sm">Edit</a>';
-                if (Gate::allows('attendance-delete'))
+                if (Gate::allows('EmployeeAttendance-delete'))
                     $btn = $btn . ' <button  type="submit" class="btn btn-danger btn-sm "" >Delete</button>';
                 $btn = $btn . method_field('DELETE') . '' . csrf_field();
                 $btn = $btn . ' </form>';
@@ -139,9 +131,7 @@ class AttendanceService
 
     public function update($request, $id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+    
         $attendance = Attendance::find($id);
 
         $attendance_data = [
@@ -160,9 +150,7 @@ class AttendanceService
 
     public function destroy($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+    
         $attendance = Attendance::find($id);
         if ($attendance) {
             $attendance->delete();

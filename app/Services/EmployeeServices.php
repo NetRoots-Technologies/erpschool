@@ -44,26 +44,20 @@ class EmployeeServices
 
     public function index()
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         return Employees::all();
     }
 
     public function create()
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         $type = EmployeeTypes::all();
         return view('hr.employee.create', compact('type'));
     }
 
     public function sync_employee_attendance() //hr.sync_employee_attendance
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         $zk = new ZKTeco($this->ip, $this->port);
 
         if ($zk->connect()) {
@@ -130,18 +124,14 @@ class EmployeeServices
 
     public function employee_attendance()
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         $attendance = HrmEmployeeAttendance::with('user_name')->get();
         return view('hr.zkt.ZktShowAttendence', compact('attendance'));
     }
 
     public function store($request)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         $request->validate([
             'email_address' => 'required|email|unique:users,email',
         ]);
@@ -385,9 +375,7 @@ class EmployeeServices
 
     public function getdata()
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         $data = Employees::with('company', 'branch', 'department')->orderBy('created_at', 'desc')->get();
 
 
@@ -431,7 +419,7 @@ class EmployeeServices
                 }
 
 
-                if (Gate::allows('Employees-edit')) {
+                if (Gate::allows('Employees-Bank-Details')) {
                     $btn .= '<a href="' . route("hr.addEditBankDetail", $row->id) . '" class="btn btn-info btn-sm" style="margin-right: 4px;">Bank Detail</a>';
                 }
 
@@ -495,17 +483,13 @@ class EmployeeServices
 
     public function edit($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         return Employees::with('educations', 'workExperince', 'employeeFamily', 'providentFund', 'Otherbranch', 'employeeAllowance', 'employeeWelfare')->find($id);
     }
 
     public function update($request, $id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         //        dd($request->all());
         $employee = Employees::findOrFail($id);
 
@@ -765,9 +749,7 @@ class EmployeeServices
 
     public function destroy($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         $employee = Employees::find($id);
         $employee->workExperince()->delete();
         $employee->educations()->delete();
@@ -786,9 +768,7 @@ class EmployeeServices
 
     public function changeStatus($request)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         $employee = Employees::find($request->id);
         if ($employee) {
             $employee->status = ($request->status == 'active') ? 1 : 0;

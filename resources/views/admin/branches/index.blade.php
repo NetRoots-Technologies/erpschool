@@ -33,15 +33,14 @@ Branches
 
     <div class="row mt-4 mb-4 justify-content-start gap-4">
         {{-- Add branch --}}
-        {{-- @if (Gate::allows('branch-create'))--}}
-
+        @if (Gate::allows('Branches-create'))
         <div class="col-auto p-0">
             <a class="btn btn-primary btn-md text-white" style="margin-left: 15px;" data-toggle="modal"
                 data-target="#createModal1">
                 <b>Add Branches</b>
             </a>
         </div>
-        {{--@endif--}}
+        @endif
 
         {{-- Download Sample Bulk File --}}
         <div class="col-auto p-0" style="display: none;">

@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Fleet;
 
 use App\Http\Controllers\Controller;
+use App\Models\Fleet\Driver;
 use App\Models\Fleet\Expense;
 use App\Models\Fleet\Vehicle;
-use App\Models\Fleet\Driver;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
 
 class ExpenseController extends Controller
 {
@@ -17,6 +19,9 @@ class ExpenseController extends Controller
      */
     public function index()
     {
+        if (!Gate::allows('Fleet-expense-list')) {
+            return abort(503);
+        }
         $expenses = Expense::with(['vehicle', 'driver', 'company', 'branch'])->paginate(10);
         return view('fleet.expenses.index', compact('expenses'));
     }
@@ -28,6 +33,9 @@ class ExpenseController extends Controller
      */
     public function create()
     {
+        if (!Gate::allows('Fleet-expense-create')) {
+            return abort(503);
+        }
         return view('fleet.expenses.create');
     }
 
@@ -39,6 +47,9 @@ class ExpenseController extends Controller
      */
     public function store(Request $request)
     {
+        if (!Gate::allows('Fleet-expense-create')) {
+            return abort(503);
+        }
         $request->validate([
             'vehicle_id' => 'required|exists:fleet_vehicles,id',
             'driver_id' => 'nullable|exists:fleet_drivers,id',
@@ -81,6 +92,10 @@ class ExpenseController extends Controller
      */
     public function show(Expense $expense)
     {
+
+        if (!Gate::allows('Fleet-expense-view')) {
+            return abort(503);
+        }
         $expense->load(['vehicle', 'driver', 'company', 'branch']);
         return view('fleet.expenses.show', compact('expense'));
     }
@@ -93,6 +108,9 @@ class ExpenseController extends Controller
      */
     public function edit(Expense $expense)
     {
+        if (!Gate::allows('Fleet-expense-edit')) {
+            return abort(503);
+        }
         return view('fleet.expenses.edit', compact('expense'));
     }
 
@@ -105,6 +123,9 @@ class ExpenseController extends Controller
      */
     public function update(Request $request, Expense $expense)
     {
+          if (!Gate::allows('Fleet-expense-edit')) {
+            return abort(503);
+        }
         $request->validate([
             'vehicle_id' => 'required|exists:fleet_vehicles,id',
             'driver_id' => 'nullable|exists:fleet_drivers,id',
@@ -131,6 +152,9 @@ class ExpenseController extends Controller
      */
     public function destroy(Expense $expense)
     {
+          if (!Gate::allows('Fleet-expense-delete')) {
+            return abort(503);
+        }
         $expense->delete();
 
         return redirect()->route('fleet.expenses.index')

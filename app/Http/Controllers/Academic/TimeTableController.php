@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Gate;
 class TimeTableController extends Controller
 {
 
+    protected $TimeTableService;
     public function __construct(TimeTableService $timeTableService)
     {
         $this->TimeTableService = $timeTableService;
@@ -29,7 +30,9 @@ class TimeTableController extends Controller
      */
     public function index()
     {
-       
+        if (!Gate::allows('Timetable-list')) {
+            return abort(503);
+        }
         return view('acadmeic.timetable.index');
     }
 
@@ -40,6 +43,10 @@ class TimeTableController extends Controller
      */
     public function create()
     {
+
+          if (!Gate::allows('Timetable-create')) {
+            return abort(503);
+        }
       
         $sessions = UserHelper::session_name();
         $schools = SchoolType::where('status', 1)->get();
@@ -56,6 +63,11 @@ class TimeTableController extends Controller
      */
     public function store(Request $request)
     {
+
+        
+          if (!Gate::allows('Timetable-create')) {
+            return abort(503);
+        }
       
         try {
             $this->TimeTableService->store($request);
@@ -86,6 +98,9 @@ class TimeTableController extends Controller
     public function edit($id)
     {
        
+          if (!Gate::allows('Timetable-edit')) {
+            return abort(503);
+        }
         $timetable = TimeTable::with('company', 'branch', 'school', 'session')->find($id);
 
         $sessions = UserHelper::session_name();
@@ -104,7 +119,9 @@ class TimeTableController extends Controller
      */
     public function update(Request $request, $id)
     {
-      
+      if (!Gate::allows('Timetable-edit')) {
+            return abort(503);
+        }
         $this->TimeTableService->update($request, $id);
         return redirect()->route('academic.timetables.index')->with('success', 'TimeTable updated successfully');
 
@@ -118,7 +135,9 @@ class TimeTableController extends Controller
      */
     public function destroy($id)
     {
-      
+      if (!Gate::allows('Timetable-delete')) {
+            return abort(503);
+        }
         $this->TimeTableService->destroy($id);
         return redirect()->route('academic.timetables.index')->with('success', 'TimeTable Deleted successfully');
 
@@ -126,7 +145,9 @@ class TimeTableController extends Controller
 
     public function getData()
     {
-       
+       if (!Gate::allows('Timetable-list')) {
+            return abort(503);
+        }
         $timetable = $this->TimeTableService->getdata();
         return $timetable;
     }

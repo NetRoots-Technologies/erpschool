@@ -22,7 +22,7 @@ class AttendanceDashboard extends Controller
 {
     public function index(Request $request)
     {
-if (!Gate::allows('Dashboard-list')) {
+if (!Gate::allows('AttendanceDashboard-list')) {
             return abort(503);
         }
         //        try {
@@ -252,7 +252,7 @@ if (!Gate::allows('Dashboard-list')) {
 
     public function attendanceDetail(Request $request, $employeeId = 0)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('AttendanceReport-list')) {
             return abort(503);
         }
         try {
@@ -427,7 +427,7 @@ if (!Gate::allows('Dashboard-list')) {
 
     public function exportPdf(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('AttendanceReport-list')) {
             return abort(503);
         }
         //        try {
@@ -455,7 +455,7 @@ if (!Gate::allows('Dashboard-list')) {
 
     public function exportPdf1(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('AttendanceReport-list')) {
             return abort(503);
         }
         try {

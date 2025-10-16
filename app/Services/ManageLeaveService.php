@@ -21,9 +21,7 @@ class ManageLeaveService
 
     public function getData()
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+        
         $data = LeaveRequest::with(['workShift', 'quota', 'employee', 'approvalRequests.approvalAuthority.user'])->get();
         //dd($data);
         return Datatables::of($data)->addIndexColumn()
@@ -106,9 +104,7 @@ class ManageLeaveService
 
     public function status($request, $id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+        
         $leaveRequest = LeaveRequest::find($id);
 
         $user = Auth::user();

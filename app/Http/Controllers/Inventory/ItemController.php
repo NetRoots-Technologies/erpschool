@@ -24,7 +24,8 @@ class ItemController extends Controller
     }
     public function index($type)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        
+        if (!Gate::allows('RawMaterialItems-list')) {
             return abort(503);
         }
         // if (!Gate::allows('item')) {
@@ -37,7 +38,7 @@ class ItemController extends Controller
 
     public function store(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('RawMaterialItems-create')) {
             return abort(503);
         }
         // if (!Gate::allows('item-store')) {
@@ -79,7 +80,7 @@ class ItemController extends Controller
      */
     public function destroy(Item $item)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('RawMaterialItems-delete')) {
             return abort(503);
         }
         // if (!Gate::allows('item-delete')) {
@@ -101,7 +102,7 @@ class ItemController extends Controller
 
     public function getData(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('RawMaterialItems-list')) {
             return abort(503);
         }
         $query = Item::query();

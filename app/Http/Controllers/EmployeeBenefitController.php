@@ -17,7 +17,7 @@ class EmployeeBenefitController extends Controller
      */
     public function index($type)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('EOBIReport-list') || !Gate::allows('PFReport-list') || !Gate::allows('SSReport-list')) {
             return abort(503);
         }
         $currentYear = date('Y');
@@ -28,7 +28,7 @@ class EmployeeBenefitController extends Controller
 
     public function show()
     {
-        if (!Gate::allows('Dashboard-list')) {
+         if (!Gate::allows('EOBIReport-list') || !Gate::allows('PFReport-list') || !Gate::allows('SSReport-list')) {
             return abort(503);
         }
         $request = request();

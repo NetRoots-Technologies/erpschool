@@ -46,7 +46,7 @@ Item
 
 
 <div class="container-fluid">
-@if (Gate::allows('students'))
+@if (Gate::allows('RawMaterialItems-create'))
     <button type="button" id="add-button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#iModal">
         <i class="fa fa-plus"></i> Add
     </button>
@@ -77,6 +77,7 @@ Item
             const changeStatusUri = @json(route('inventory.items.change.status'));
             const deleteUri = @json(route('inventory.items.destroy'));
             const type = @json($type);
+            const canEditRawMaterial = @json(Gate::allows('RawMaterialItems-edit'));
 
             $(`#measuring_unit`).select2({
                 placeholder: "Select A Unit",
@@ -163,7 +164,12 @@ Item
 
                     { data: null, title: 'Action', orderable: false,
                         render: function (data, type, row, meta) {
-                            return `<a class="btn btn-sm btn-warning edit-item" data-id="${row.id}" data-name="${row.name}" data-unit="${row.measuring_unit}"><i class="fa fa-pencil"></i></a>`;
+                            let html = '';
+                        if(canEditRawMaterial){
+                            html += `<a class="btn btn-sm btn-warning edit-item" data-id="${row.id}" data-name="${row.name}" data-unit="${row.measuring_unit}"><i class="fa fa-pencil"></i></a>`;
+                        }
+
+                        return html;
                             // <span data-uri="${deleteUri}/${row.id}" class="btn btn-sm btn-danger delete-item"><i class="fa fa-trash"></i></span>
                         }},
                 ],

@@ -30,7 +30,7 @@
 
     <div class="row mt-4 mb-4">
         <div class="col-12 text-right">
-            @if (Gate::allows('students'))
+            @if (Gate::allows('ExamSchedules-create'))
 
             <a href="{{ route('exam.exam_schedules.create') }}" class="btn btn-primary btn-md"><b>Add Exam Schedule</b></a>
             @endif

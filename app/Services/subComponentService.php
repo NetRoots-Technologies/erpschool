@@ -13,9 +13,7 @@ class subComponentService
 {
     public function store($request)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         foreach ($request->get('test_type_id') as $key => $testType)
             $subComponent = SubComponent::create([
                 'test_type_id' => $testType,
@@ -28,18 +26,18 @@ class subComponentService
 
     public function getdata()
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         $data = SubComponent::with('component', 'user', 'test_type')->orderby('id', 'DESC')->get();
         return Datatables::of($data)->addIndexColumn()
             ->addColumn('action', function ($row) {
                 $btn = '<div style="display: flex;">';
 
-                //                if (Gate::allows('Employee-edit'))
+                               if (Gate::allows('SubComponents-edit')){
                 $btn .= '<a href="' . route("exam.sub_components.edit", $row->id) . '" class="btn btn-primary btn-sm"  style="margin-right: 4px;">Edit</a>';
 
-                //                if (Gate::allows('Employee-destroy'))
+                               }
+
+                if (Gate::allows('SubComponents-delete'))
                 {
                     $btn .= '<form method="POST" onsubmit="return confirm(\'Are you sure you want to Delete this?\');" action="' . route("exam.sub_components.destroy", $row->id) . '">';
                     $btn .= '<button type="submit" class="btn btn-danger btn-sm" style="margin-right: 4px;">Delete</button>';
@@ -116,9 +114,7 @@ class subComponentService
 
     public function destroy($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+       
         $subComponent = SubComponent::findOrFail($id);
         if ($subComponent) {
             $subComponent->delete();

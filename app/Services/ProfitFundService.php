@@ -12,9 +12,7 @@ class ProfitFundService
 
     public function store($request)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+        
         //dd($request->all());
         foreach ($request['employee_id'] as $key => $employee) {
             ProfitFund::create([
@@ -29,9 +27,7 @@ class ProfitFundService
 
     public function getdata()
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+        
         ProfitFund::with('employee')->get();
 
         $data = DB::table('provident_funds')
@@ -60,9 +56,7 @@ class ProfitFundService
 
     public function update($request, $id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+        
         $profit_fund = ProfitFund::find($id);
 
         $profitFund = [
@@ -78,9 +72,7 @@ class ProfitFundService
 
     public function destroy($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+        
         $profitFund = ProfitFund::find($id);
         if ($profitFund) {
             $profitFund->delete();

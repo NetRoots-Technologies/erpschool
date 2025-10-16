@@ -17,9 +17,7 @@ class HolidayService
 
     public function store($request)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+
         $isRecurring = $request->has('is_recurring') ? $request->is_recurring : 0;
 
         $holiday = new Holiday();
@@ -38,20 +36,21 @@ class HolidayService
     }
     public function getdata()
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+
         $data = Holiday::all();
 
         return Datatables::of($data)->addIndexColumn()
             ->addColumn('action', function ($row) {
                 $btn = ' <form  method="POST" onsubmit="return confirm(' . "'Are you sure you want to Delete this?'" . ');"  action="' . route("hr.holidays.destroy", $row->id) . '"> ';
-                //   if (Gate::allows('Employee-edit'))
-                $btn = $btn . '<a href="' . route("hr.holidays.edit", $row->id) . '" class="btn btn-primary  ml-2 mr-2 btn-sm">Edit</a>';
-                //   if (Gate::allows('Employee-destroy'))
-                $btn = $btn . ' <button  type="submit" class="btn btn-danger btn-sm "" >Delete</button>';
-                $btn = $btn . method_field('DELETE') . '' . csrf_field();
-                $btn = $btn . ' </form>';
+                if (Gate::allows('Holiday edit')) {
+                    $btn = $btn . '<a href="' . route("hr.holidays.edit", $row->id) . '" class="btn btn-primary  ml-2 mr-2 btn-sm">Edit</a>';
+                }
+                if (Gate::allows('Holiday delete')) {
+                    $btn = $btn . ' <button  type="submit" class="btn btn-danger btn-sm "" >Delete</button>';
+                    $btn = $btn . method_field('DELETE') . '' . csrf_field();
+                    $btn = $btn . ' </form>';
+                }
+
                 return $btn;
             })
             ->addColumn('recurring', function ($row) {
@@ -75,17 +74,13 @@ class HolidayService
 
     public function edit($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+
         return Holiday::find($id);
     }
 
     public function update($request, $id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+
         $holiday = Holiday::findOrFail($id);
         $isRecurring = $request->has('is_recurring') ? $request->is_recurring : 0;
 
@@ -101,18 +96,11 @@ class HolidayService
 
         $holiday->is_recurring = $isRecurring;
         $holiday->save();
-
     }
     public function destroy($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+
         $holiday = Holiday::findOrFail($id);
         $holiday->delete();
     }
-
-
 }
-
-

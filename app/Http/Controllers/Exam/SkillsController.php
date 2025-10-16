@@ -22,7 +22,7 @@ class SkillsController extends Controller
 
     public function getData()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Skills-list')) {
             return abort(503);
         }
         $skills = $this->skillsService->getdata();
@@ -53,7 +53,7 @@ class SkillsController extends Controller
 
        public function index()
         {
-            if (!Gate::allows('Dashboard-list')) {
+            if (!Gate::allows('Skills-list')) {
                 return abort(503);
             }
 
@@ -71,7 +71,7 @@ class SkillsController extends Controller
      */
     public function create()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Skills-create')) {
             return abort(503);
         }
     }
@@ -84,7 +84,7 @@ class SkillsController extends Controller
      */
     // public function store(Request $request)
     // {
-    //     if (!Gate::allows('Dashboard-list')) {
+    //     if (!Gate::allows('Skills-list')) {
     //         return abort(503);
     //     }
     //     $request->validate([
@@ -94,7 +94,7 @@ class SkillsController extends Controller
     // }
     public function store(Request $request)
 {
-    if (!Gate::allows('Dashboard-list')) {
+    if (!Gate::allows('Skills-create')) {
         return abort(503);
     }
     // dd($request->all());
@@ -118,7 +118,7 @@ class SkillsController extends Controller
      */
     public function show($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Skills-list')) {
             return abort(503);
         }
     }
@@ -131,7 +131,7 @@ class SkillsController extends Controller
      */
     public function edit($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Skills-edit')) {
             return abort(503);
         }
     }
@@ -145,7 +145,7 @@ class SkillsController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Skills-edit')) {
             return abort(503);
         }
         $request->validate([
@@ -165,7 +165,7 @@ class SkillsController extends Controller
      */
     public function destroy($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Skills-delete')) {
             return abort(503);
         }
         return $this->skillsService->destroy($id);
@@ -174,14 +174,14 @@ class SkillsController extends Controller
 
     public function changeStatus(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Skills-list')) {
             return abort(503);
         }
         return $skills = $this->skillsService->changeStatus($request);
     }
     public function handleBulkAction(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Skills-list')) {
             return abort(503);
         }
         $ids = $request->get('ids');

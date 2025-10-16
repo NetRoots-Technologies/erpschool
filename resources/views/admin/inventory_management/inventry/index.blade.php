@@ -65,6 +65,7 @@ Inventry
             'use strict';
 
             const uri = @json(route('datatable.data.inventory'));
+            const editPermssion = @json(Gate::allows('inventory-edit'));
             const type = @json($type);
             const changeStatusUri = "";
             const deleteUri = "";
@@ -164,7 +165,11 @@ Inventry
                     }},
                     { data: null, title: 'Action', orderable: false,
                         render: function (data, type, row, meta) {
-                            return `<a class="btn btn-sm btn-warning edit-item" data-id="${row.id}" data-sale_price="${row.sale_price}" data-expiry_date="${row.expiry_date}"><i class="fa fa-pencil"></i></a>`;
+                            html = '';
+                            if(editPermssion){
+                                html +=`<a class="btn btn-sm btn-warning edit-item" data-id="${row.id}" data-sale_price="${row.sale_price}" data-expiry_date="${row.expiry_date}"><i class="fa fa-pencil"></i></a>`;
+                            }
+                            return html;
                     }},
                 ],
                 paging: true,

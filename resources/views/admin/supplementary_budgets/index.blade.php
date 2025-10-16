@@ -6,7 +6,10 @@
         <div class="row w-100 text-center">
 
             <div class="col-auto mb-3">
+
+                @if(Gate::allows('supplementory create'))
                 <a href="{{ route('inventory.supplementory.create') }}" class="btn btn-primary">Add supplementary Request</a>
+@endif
 
             </div>
 

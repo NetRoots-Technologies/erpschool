@@ -3,10 +3,11 @@
 namespace App\Http\Controllers\Fleet;
 
 use App\Http\Controllers\Controller;
+use App\Models\Fleet\Driver;
 use App\Models\Fleet\Maintenance;
 use App\Models\Fleet\Vehicle;
-use App\Models\Fleet\Driver;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class MaintenanceController extends Controller
 {
@@ -17,6 +18,9 @@ class MaintenanceController extends Controller
      */
     public function index()
     {
+        if (!Gate::allows('Fleet-maintenance-list')) {
+            return abort(503);
+        }
         $maintenances = Maintenance::with(['vehicle', 'driver', 'company', 'branch'])->paginate(10);
         return view('fleet.maintenance.index', compact('maintenances'));
     }
@@ -28,6 +32,9 @@ class MaintenanceController extends Controller
      */
     public function create()
     {
+        if (!Gate::allows('Fleet-maintenance-create')) {
+            return abort(503);
+        }
         return view('fleet.maintenance.create');
     }
 
@@ -39,6 +46,10 @@ class MaintenanceController extends Controller
      */
     public function store(Request $request)
     {
+
+    if (!Gate::allows('Fleet-maintenance-create')) {
+            return abort(503);
+        }
         $request->validate([
             'vehicle_id' => 'required|exists:fleet_vehicles,id',
             'driver_id' => 'nullable|exists:fleet_drivers,id',
@@ -83,6 +94,10 @@ class MaintenanceController extends Controller
      */
     public function show(Maintenance $maintenance)
     {
+    if (!Gate::allows('Fleet-maintenance-view')) {
+            return abort(503);
+        }
+
         $maintenance->load(['vehicle', 'driver', 'company', 'branch']);
         return view('fleet.maintenance.show', compact('maintenance'));
     }
@@ -95,6 +110,9 @@ class MaintenanceController extends Controller
      */
     public function edit(Maintenance $maintenance)
     {
+    if (!Gate::allows('Fleet-maintenance-edit')) {
+            return abort(503);
+        }
         return view('fleet.maintenance.edit', compact('maintenance'));
     }
 
@@ -107,6 +125,9 @@ class MaintenanceController extends Controller
      */
     public function update(Request $request, Maintenance $maintenance)
     {
+    if (!Gate::allows('Fleet-maintenance-edit')) {
+            return abort(503);
+        }
         $request->validate([
             'vehicle_id' => 'required|exists:fleet_vehicles,id',
             'driver_id' => 'nullable|exists:fleet_drivers,id',
@@ -135,6 +156,9 @@ class MaintenanceController extends Controller
      */
     public function destroy(Maintenance $maintenance)
     {
+    if (!Gate::allows('Fleet-maintenance-delete')) {
+            return abort(503);
+        }
         $maintenance->delete();
 
         return redirect()->route('fleet.maintenance.index')

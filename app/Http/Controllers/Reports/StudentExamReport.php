@@ -1,18 +1,19 @@
 <?php
 namespace App\Http\Controllers\Reports;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Models\Admin\Branch;
-use App\Models\Academic\AcademicClass; 
-use App\Models\Academic\Section;
-use App\Models\Student\Students;
-use App\Models\Admin\Course;
-use App\Models\Exam\EffortLevel;
-use App\Models\Exam\SkillType;
 use DataTables;
+use App\Models\Admin\Branch;
+use App\Models\Admin\Course;
+use Illuminate\Http\Request;
+use App\Models\Exam\SkillType;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\Academic\Section;
+use App\Models\Exam\EffortLevel;
+use App\Models\Student\Students;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Gate;
 use App\Models\Academic\ActiveSession;
+use App\Models\Academic\AcademicClass; 
 
 
 
@@ -20,6 +21,10 @@ class StudentExamReport extends Controller
 {
    public function index()
     {
+
+          if (!Gate::allows('Student Exam Report')) {
+            return abort(503);
+        }
         $branches = Branch::select('id','name')->orderBy('name')->get();
         return view('reports.students.exam_report', compact('branches'));
     }
