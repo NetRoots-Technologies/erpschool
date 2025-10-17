@@ -100,23 +100,39 @@ class ExamScheduleController extends Controller
      * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
-    {
-        if (!Gate::allows('ExamSchedules-edit')) {
-            return abort(503);
+        public function edit($id)
+        {
+            if (!Gate::allows('ExamSchedules-edit')) {
+                return abort(503);
+            }
+
+            $exam_schedule_detail = ExamSchedule::findOrFail($id);
+
+            $companyId = $exam_schedule_detail->company_id;
+            $branchId  = $exam_schedule_detail->branch_id;
+            $classId   = $exam_schedule_detail->class_id;
+
+            $companies = Company::where('status', 1)->get();
+            $tests     = TestType::all(); // Test types
+
+            $classSubject = ClassSubject::with('Subject')
+                ->where('branch_id', $branchId)
+                ->where('class_id', $classId)
+                ->get();
+
+            // If exam_terms are branch-specific, keep where; otherwise remove the line
+            $examTerms = \DB::table('exam_terms')
+                ->select('id', 'term_desc')
+                // ->where('branch_id', $branchId)
+                ->get();
+
+            $components = Component::where('status', 1)->get();
+
+            return view('exam.exam_schedule.edit', compact(
+                'companies', 'tests', 'exam_schedule_detail', 'components', 'classSubject', 'examTerms'
+            ));
         }
-        $components = Component::where('status', 1)->get();
-        $exam_schedule_detail = ExamSchedule::findOrFail($id);
-        $branch_id = $exam_schedule_detail->branch_id;
-        $class_id = $exam_schedule_detail->class_id;
-        $companies = Company::where('status', 1)->get();
-        $tests = ExamDetail::all();
-        $classSubject = ClassSubject::with('Subject')
-            ->where('branch_id', $branch_id)
-            ->where('class_id', $class_id)
-            ->get();
-        return view('exam.exam_schedule.edit', compact('companies', 'tests', 'exam_schedule_detail', 'components', 'classSubject'));
-    }
+
 
     public function update(Request $request, $id)
     {
@@ -275,7 +291,7 @@ class ExamScheduleController extends Controller
 
         return Datatables::of($data)->addIndexColumn()
             ->addColumn('test_type', function ($row) {
-                return is_object($row->testType) ? ($row->testType->test_name ?? 'N/A') : 'Invalid Data';
+                return is_object($row->testType) ? ($row->testType->name ?? 'N/A') : 'Invalid Data';
             })
             ->addColumn('company', fn($row) => $row->company->name ?? 'N/A')
             ->addColumn('branch', fn($row) => $row->branch->name ?? 'N/A')

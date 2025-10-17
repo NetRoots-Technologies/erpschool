@@ -178,9 +178,9 @@ class SuperAdminSeeder extends Seeder
 
             // Inventory Management
             'Budget' => ['Budget-create', 'Budget-edit', 'Budget-delete', 'Budget-list'],
-            'InventoryCategory' => ['InventoryCategory-create', 'InventoryCategory-edit', 'InventoryCategory-delete', 'InventoryCategory-list'],
-            'Vendor' => ['Vendor-create', 'Vendor-edit', 'Vendor-delete', 'Vendor-list'],
-            'VendorCategory' => ['VendorCategory-create', 'VendorCategory-edit', 'VendorCategory-delete', 'VendorCategory-list'],
+            // 'InventoryCategory' => ['InventoryCategory-create', 'InventoryCategory-edit', 'InventoryCategory-delete', 'InventoryCategory-list'],
+            // 'Vendor' => ['Vendor-create', 'Vendor-edit', 'Vendor-delete', 'Vendor-list'],
+            // 'VendorCategory' => ['VendorCategory-create', 'VendorCategory-edit', 'VendorCategory-delete', 'VendorCategory-list'],
 
             'CafeInventory' => [
                 'RawMaterialItems-create', 'RawMaterialItems-edit', 'RawMaterialItems-delete', 'RawMaterialItems-list',

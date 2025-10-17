@@ -76,13 +76,14 @@
 
                                     </div>
                                     <div class="row mt-3">
-
                                         <div class="col-md-6">
                                             <label for="branches"><b>Class: *</b></label>
                                             <select required name="class_id"
                                                     class="form-select select2 basic-single mt-3 class_select"
                                                     aria-label=".form-select-lg example">
-
+                                                    @foreach($classes as $class)
+                                                        <option value="{{$class->id}}" {{$course->class_id == $class->id ? 'selected' : ''}}>{{$class->name}}</option>
+                                                    @endforeach
                                             </select>
                                         </div>
 

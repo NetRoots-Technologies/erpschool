@@ -24,7 +24,6 @@ class ExamSchedule extends Model
         'exam_term_id',
         'test_type_id',
         'class_id',
-        // 'subject_id',
         'course_id',
         'component_id',
         'marks',
@@ -44,7 +43,7 @@ class ExamSchedule extends Model
 
     public function testType()
     {
-        return $this->belongsTo(ExamDetail::class,'test_type_id');
+        return $this->belongsTo(TestType::class,'test_type_id');
     }
 
     public function examTerm()

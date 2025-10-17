@@ -654,7 +654,7 @@ Classes
 
                 var url = "{{ route('academic.classes.index') }}";
                 $.ajax({
-                    type: "put",
+                    type: "post",
                     "url": url + '/' + id,
                     data: $('#editform').serialize() + '&_method=PUT',
                     success: function (response) {
