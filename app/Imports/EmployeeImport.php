@@ -55,7 +55,9 @@ class EmployeeImport implements ToCollection
         'Applied before at cornerstone?',
         'Were you ever employed here?',
         'Engagements in any other business or employment?',
-        'Skills or training related to the position?'
+        'Skills or training related to the position?',
+            'Marital Status' // ✅ Add this line
+
     ];
 
     protected $providentFundPercentage;
@@ -165,7 +167,9 @@ class EmployeeImport implements ToCollection
                 'emp_id'=>$item['Employee ID'],
                 'job_seeking' => $item['Job Type'],
                 'skills' => $item['Skills or training related to the position?'],
-                'martial_status' => $item['Martial Status'],
+                // 'martial_status' => $item['Martial Status'],
+                'martial_status' => $item['Marital Status'],
+
                 'specialization_subject' => $item['Specialization'],
                 'work_shift_id' => WorkShift::where('name', trim($item['Work Shift']))->first()->id
             ]);
