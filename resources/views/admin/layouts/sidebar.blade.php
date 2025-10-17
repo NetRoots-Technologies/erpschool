@@ -595,7 +595,7 @@
                     </li>
                 @endcanany
 
-                @if (Gate::allows('Fee'))
+                @if (Gate::allows('Fee Management'))
                     {{-- Fee Management Section --}}
                     <li class="side-item side-item-category">Fee Management</li>
                     <li class="slide">
@@ -607,21 +607,41 @@
                         </a>
                         <ul class="slide-menu"
                             style="display: {{ request()->is('admin/fee-management*') ? 'block' : 'none' }}">
-                            <li><a class="slide-item {{ request()->is('admin/fee-management') ? 'active' : '' }}"
+                            @can('fee-dashboard')
+                                <li><a class="slide-item {{ request()->is('admin/fee-management') ? 'active' : '' }}"
                                     href="{{ route('admin.fee-management.index') }}">Dashboard</a></li>
-                            <li><a class="slide-item {{ request()->is('admin/fee-management/categories*') ? 'active' : '' }}"
+                            @endcan
+
+                            @can('fee-Categories-list')
+                                 <li><a class="slide-item {{ request()->is('admin/fee-management/categories*') ? 'active' : '' }}"
                                     href="{{ route('admin.fee-management.categories') }}">Fee Categories</a></li>
-                            <li><a class="slide-item {{ request()->is('admin/fee-management/structures*') ? 'active' : '' }}"
+                            @endcan
+
+                            @can('fee-structures-list')
+                                <li><a class="slide-item {{ request()->is('admin/fee-management/structures*') ? 'active' : '' }}"
                                     href="{{ route('admin.fee-management.structures') }}">Fee Structures</a></li>
-                            <li><a class="slide-item {{ request()->is('admin/fee-management/collections*') ? 'active' : '' }}"
-                                    href="{{ route('admin.fee-management.collections') }}">Fee Collections</a>
-                            </li>
-                            <li><a class="slide-item {{ request()->is('admin/fee-management/discounts*') ? 'active' : '' }}"
+                            @endcan
+
+                            @can('fee-collections-list')
+                                <li><a class="slide-item {{ request()->is('admin/fee-management/collections*') ? 'active' : '' }}"
+                                    href="{{ route('admin.fee-management.collections') }}">Fee Collections</a></li>
+                            @endcan
+
+                            @can('fee-discount-list')
+                                  <li><a class="slide-item {{ request()->is('admin/fee-management/discounts*') ? 'active' : '' }}"
                                     href="{{ route('admin.fee-management.discounts') }}">Fee Discounts</a></li>
-                            <li><a class="slide-item {{ request()->is('admin/fee-management/billing*') ? 'active' : '' }}"
+                            @endcan
+
+                            @can('fee-billing-list')
+                                <li><a class="slide-item {{ request()->is('admin/fee-management/billing*') ? 'active' : '' }}"
                                     href="{{ route('admin.fee-management.billing') }}">Fee Billing</a></li>
-                            <li><a class="slide-item {{ request()->is('admin/fee-management/reports*') ? 'active' : '' }}"
+                            @endcan
+
+                            @can('fee-report-list')
+                                <li><a class="slide-item {{ request()->is('admin/fee-management/reports*') ? 'active' : '' }}"
                                     href="{{ route('admin.fee-management.reports') }}">Reports</a></li>
+                            @endcan
+                            
                         </ul>
                     </li>
                 @endif
@@ -684,6 +704,7 @@
 
 
                 {{-- Accounts & Finance Section --}}
+                @can("Accounts")
                 <li class="side-item side-item-category">Accounts & Finance</li>
                 <li class="slide">
                     <a class="side-menu__item {{ request()->is('accounts*')|| request()->is('admin*') ? 'active' : '' }}"
@@ -748,7 +769,7 @@
 
                            <li><a class="slide-item {{ request()->is('admin/bank_accounts*') ? 'active' : '' }}"
                            href="{{ route('admin.bank_accounts.index') }}">Bank Account</a></li>
-
+                     @endcan
                     </ul>
                 </li>
 

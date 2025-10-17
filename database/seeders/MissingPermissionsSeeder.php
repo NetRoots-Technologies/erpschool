@@ -94,25 +94,39 @@ class MissingPermissionsSeeder extends Seeder
                 'inventory-edit',
                 'inventory-view',
                 'inventory-delete',
-            ]
+            ],
 
-            // Fee Management
-            // 'Fee' => [
-            //     'FeeSections-list', 'FeeSections-create', 'FeeSections-edit', 'FeeSections-delete',
-            //     'AccountHead-list', 'AccountHead-create', 'AccountHead-edit', 'AccountHead-delete',
-            //     'FeeHeads-list', 'FeeHeads-create', 'FeeHeads-edit', 'FeeHeads-delete',
-            //     'FeeCategory-list', 'FeeCategory-create', 'FeeCategory-edit', 'FeeCategory-delete',
-            //     'FeeStructure-list', 'FeeStructure-create', 'FeeStructure-edit', 'FeeStructure-delete',
-            //     'FeeCollection-list', 'FeeCollection-create', 'FeeCollection-edit', 'FeeCollection-delete',
-            //     'FeeDiscount-list', 'FeeDiscount-create', 'FeeDiscount-edit', 'FeeDiscount-delete',
-            //     'FeeTerm-list', 'FeeTerm-create', 'FeeTerm-edit', 'FeeTerm-delete',
-            //     'StudentRegularFee-list', 'StudentRegularFee-create', 'StudentRegularFee-edit', 'StudentRegularFee-delete',
-            //     'BillGeneration-list', 'BillGeneration-create', 'BillGeneration-edit', 'BillGeneration-delete',
-            //     'Banks-list', 'Banks-create', 'Banks-edit', 'Banks-delete',
-            //     'BanksBranches-list', 'BanksBranches-create', 'BanksBranches-edit', 'BanksBranches-delete',
-            //     'BanksAccounts-list', 'BanksAccounts-create', 'BanksAccounts-edit', 'BanksAccounts-delete',
-            //     'BanksFile-list',
-            // ],
+           'Fee Management' => [
+                'fee-dashboard',
+                'fee-Categories-list',
+                'fee-Categories-create',
+                'fee-Categories-edit',
+                'fee-Categories-delete',
+                'fee-Categories-view',
+                'fee-structures-list',
+                'fee-structures-create',
+                'fee-structures-edit',
+                'fee-structures-delete',
+                'fee-structures-view',
+                'fee-collections-list',
+                'fee-collections-create',
+                'fee-collections-edit',
+                "fee-collections-view",
+                'pay-challan',
+                'fee-discount-list',
+                'fee-discount-create',
+                'fee-discount-edit',
+                'fee-discount-delete',
+                'fee-billing-list',
+                'fee-billing-create',
+                'fee-billing-print',
+                'fee-report-list',
+                'fee-report-outstanding',
+                'fee-report-ledger',
+                'fee-report-income',
+            ],
+
+           
 
 
 
