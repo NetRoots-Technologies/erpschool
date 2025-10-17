@@ -51,10 +51,11 @@ class RolesServise
 
         return Datatables::of($data)->addIndexColumn()
             ->addColumn('action', function ($row) {
+                
                 $btn = ' <form class="delete_form" data-route="' . route("roles.destroy", $row->id) . '"   id="Role-' . $row->id . '"  method="POST"> ';
-                if (Gate::allows('Roles-edit'))
+                if (Gate::allows('Roles-edit') && $row->name != 'Super Admin')
                     $btn = $btn . '<a  data-id="' . $row->id . '" class="btn btn-primary text-white  btn-sm role_edit"   >Edit</a>';
-                if (Gate::allows('Roles-delete'))
+                if (Gate::allows('Roles-delete')  && $row->name != 'Super Admin')
                     $btn = $btn . ' <button data-id="Role-' . $row->id . '" type="button" class="btn btn-danger delete btn-sm "" >Delete</button>';
                 $btn = $btn . method_field('DELETE') . '' . csrf_field();
                 $btn = $btn . ' </form>';
