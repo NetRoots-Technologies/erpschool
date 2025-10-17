@@ -33,7 +33,7 @@ class FuelController extends Controller
      */
     public function create()
     {
-         if (!Gate::allows('Fule-record-craete')) {
+         if (!Gate::allows('Fule-record-create')) {
             return abort(503);
         }
         return view('fleet.fuel.create');
@@ -47,7 +47,7 @@ class FuelController extends Controller
      */
     public function store(Request $request)
     {
-         if (!Gate::allows('Fule-record-craete')) {
+         if (!Gate::allows('Fule-record-create')) {
             return abort(503);
         }
         $request->validate([
