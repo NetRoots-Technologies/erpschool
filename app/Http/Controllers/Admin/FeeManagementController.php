@@ -2,25 +2,27 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
-use App\Models\Fee\FeeCategory;
-use App\Models\Fee\FeeStructure;
-use App\Models\Fee\FeeStructureDetail;
-use App\Models\Fee\StudentFeeAssignment;
-use App\Models\Fee\FeeCollection;
-use App\Models\Fee\FeeCollectionDetail;
-use App\Models\Fee\FeeDiscount;
-use App\Models\Fee\FeeAdjustment;
-use App\Models\Fee\FeeAllocation;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
 use App\Models\Fee\FeeFactor;
 use App\Models\Fee\FeeBilling;
+use App\Models\Fee\FeeCategory;
+use App\Models\Fee\FeeDiscount;
+use App\Models\Fee\FeeStructure;
 use App\Models\Student\Students;
-use App\Models\Academic\AcademicClass;
-use App\Models\Student\AcademicSession;
-use App\Models\Academic\ActiveSession;
-use Illuminate\Http\Request;
+use App\Models\Fee\FeeAdjustment;
+use App\Models\Fee\FeeAllocation;
+use App\Models\Fee\FeeCollection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Gate;
+use App\Models\Academic\AcademicClass;
+use App\Models\Academic\ActiveSession;
+use App\Models\Fee\FeeStructureDetail;
+use App\Models\Fee\FeeCollectionDetail;
+use App\Models\Student\AcademicSession;
+use App\Models\Fee\StudentFeeAssignment;
 use Yajra\DataTables\Facades\DataTables;
 
 class FeeManagementController extends Controller
@@ -1236,10 +1238,10 @@ class FeeManagementController extends Controller
         $billing = FeeBilling::with(['student.AcademicClass' ,'student.branch','academicSession'])
             ->findOrFail($id);
 
-        // Load applicable discounts for this billing
+        
         $applicableDiscounts = $billing->getApplicableDiscounts()->load('category');
 
-        // Load transport fees for the student
+       
         $transportFees = [];
         $totalTransportFee = 0;
         if ($billing->student) {
@@ -1250,7 +1252,16 @@ class FeeManagementController extends Controller
             
             $totalTransportFee = $transportFees->sum('monthly_charges');
         }
-        return view('admin.fee-management.billing.print', compact('billing', 'applicableDiscounts', 'transportFees', 'totalTransportFee'));
+
+            // ---------- Previous Unpaid Amount ----------
+            $previousUnpaidBills = FeeBilling::where('student_id', $billing->student_id)
+                                            ->where('id', '!=' ,  $id)
+                                            ->where('outstanding_amount', '>', 0)->get();
+            $previousArrears = $previousUnpaidBills->sum('outstanding_amount');
+            $unpaidMonthsList = $previousUnpaidBills->pluck('billing_month')->filter()->unique()->values();
+            
+            // dd($previousUnpaidBills , $previousArrears , $unpaidMonthsList);
+        return view('admin.fee-management.billing.print', compact('billing', 'applicableDiscounts', 'transportFees', 'totalTransportFee' , 'previousArrears' , 'unpaidMonthsList' , 'previousUnpaidBills'));
     }
 
     /**

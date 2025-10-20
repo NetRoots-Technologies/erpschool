@@ -59,12 +59,12 @@
         }
 
         /.img {
-            
+
             /*    margin-right: 15px;*/
-            
+
         }
 
-           .section-1 .p-1 {
+        .section-1 .p-1 {
 
             margin-top: -15px;
             font-size: 8px;
@@ -301,7 +301,7 @@
         <div class="box-1">
             <div class="row">
                 <div class="section-1">
-                    
+
                     <div>
                         <h3 style="margin-top: 20px;font-weight: bold;">CORNERSTONE
                             SCHOOL<br>{!! $billing->student->branch->name ?? '' !!}</h3>
@@ -312,7 +312,7 @@
                     </div>
 
                     <div class="img" style="float: right;margin-top: 10px;margin-right: 30px;">
-                        <img src="{{asset("logos/1759388635.png")}}" style="height: 50px;">
+                        <img src="{{ asset('logos/1759388635.png') }}" style="height: 50px;">
                     </div>
                 </div>
 
@@ -380,10 +380,69 @@
                         <span style="margin-left: 283px;font-weight: bold;">Amount</span>
                     </div>
                 </div>
+                @php
+                    $paidAmount = $billing->paid_amount ?? 0;
+                    $finalAmount = $billing->getFinalAmount() + (isset($totalTransportFee) ? $totalTransportFee : 0);
+                    $outstandingAmount = $finalAmount - $paidAmount;
+                @endphp
 
-                <div class="section-6" style="float: right;padding-right: 10px;">
-                    <span>Rs. {{ number_format($billing->total_amount, 2) }}</span>
+              
+                <div class="section-6">
+
+                    <div style="display:flex; border-bottom:1px solid #ddd; padding:6px 0; margin-left: 10px;">
+                        <span style="width:70%;">
+                            Total Amount
+                            ({{ \Carbon\Carbon::parse($billing->billing_month ?? $billing->bill_date)->format('M Y') }})
+                        </span>
+                        <span style="width:27%; text-align:right;">
+                            <span>Rs. {{ number_format($billing->total_amount, 2) }}</span>
+                        </span>
+                    </div>
+
+                    @if ($billing->paid_amount > 0)
+                        <div class="allin-one" style="margin-top: 40px;">
+                            <div class="section-8"
+                                style="border-bottom: 1px solid black; border-top: 1px solid black;padding : 3px 0px;">
+                                Partial Paid Amount
+                                ({{ \Carbon\Carbon::parse($billing->billing_month ?? $billing->bill_date)->format('M Y') }})
+
+                                <span style="margin-left:202px;">
+                                    Rs.{{ number_format($billing->paid_amount, 2) }}</span>
+                            </div>
+                        </div>
+                    @endif
+
+
+
+                    {{-- List Previous Unpaid Months --}}
+                    @if (isset($previousUnpaidBills) && $previousUnpaidBills->count() > 0)
+                        @foreach ($previousUnpaidBills as $bill)
+                            <div style="display:flex; border-bottom:1px solid #ddd; padding:6px 0; margin-left: 10px;">
+                                <span style="width:70%;">
+                                    Outstanding Amount
+                                    ({{ \Carbon\Carbon::parse($bill->billing_month ?? $bill->bill_date)->format('M Y') }})
+                                </span>
+                                <span style="width:27%; text-align:right;">
+                                    Rs. {{ number_format($bill->outstanding_amount ?? 0, 2) }}
+                                </span>
+                            </div>
+                        @endforeach
+
+                        {{-- Total previous outstanding --}}
+                        {{-- <div style="display:flex; border-top:2px solid black; font-weight:bold; padding:6px 0;  margin-left: 10px;">
+                            <span style="width:70%;">Total Previous Outstanding</span>
+                            <span style="width:27%; text-align:right;">
+                                Rs. {{ number_format($previousUnpaidBills->sum('outstanding_amount'), 2) }}
+                            </span>
+                        </div> --}}
+                    @else
+                        <div style="padding:6px 0; color:#999;">No previous dues</div>
+                    @endif
                 </div>
+
+
+
+
 
 
                 @if ($applicableDiscounts && $applicableDiscounts->count() > 0)
@@ -426,29 +485,34 @@
 
 
 
+
+
+
                 @php
-                    $paidAmount = $billing->paid_amount ?? 0;
-                    $finalAmount = $billing->getFinalAmount() + (isset($totalTransportFee) ? $totalTransportFee : 0);
-                    $outstandingAmount = $finalAmount - $paidAmount;
+                   
+
+                    // Previous unpaid total
+                    $prevTotal = 0;
+                    if (!empty($previousUnpaidBills)) {
+                        foreach ($previousUnpaidBills as $pb) {
+                            $prevTotal += $pb->outstanding_amount;
+                        }
+                    }
+
+                    // Current Month Net Total
+                    $currentMonthNet = $billing->outstanding_amount;
+
+                    // Final Grand Total
+                    $grandTotal = $currentMonthNet + $prevTotal;
                 @endphp
 
 
-                <div class="allin-one" style="margin-top: 40px;">
-                    <div class="section-8"
-                        style="border-bottom: 1px solid black; border-top: 1px solid black;padding : 3px 0px;">
-                        <span>Previous Amounts </span>
-                        <span style="float: right padding-right: 256px; margin-left:255px;"> Rs.
-                            {{ number_format($outstandingAmount, 2) }}</span>
-                    </div>
-                </div>
-
-
                 <div class="section-9-9" style="justify-content: space-between; margin-top: 7px">
-                    <h6 style="margin: 10px 0px 0px 5px; display: inline;">Total Payment By Due Date
-                        ({{ $billing->bill_date ? \Carbon\Carbon::parse($billing->bill_date)->format('d M Y') : 'N/A' }}):
+                    <h6 style="margin: 10px 0px 0px 5px; display: inline;">Total Payable Payment By Due Date
+                        ({{ $billing->bill_date ? \Carbon\Carbon::parse($billing->bill_date)->format('d M Y') : 'N/A' }})
                     </h6>
-                    <span style="margin: 0px  9px 0px 0px; display: inline;float: right;"> Total: <span
-                            style="border-bottom: 2px solid black;font-weight: bold;">{!! $billing->paid_amount ?? '' !!}</span></span>
+                    <span style="margin: 0px  9px 0px 0px; display: inline;float: right;"> Rs: <span
+                            style="border-bottom: 2px solid black;font-weight: bold;">{!! $grandTotal ?? '' !!}</span></span>
                 </div>
 
 
@@ -456,7 +520,7 @@
                 <div class="section-10"
                     style="padding: 5px 20px; margin: 8px 0px 0px 8px; border: 2px solid black;width: 280px">
                     <h5 style="margin: 5px 0px;display: inline;padding-left: 50px;">Bill Valid Till:</h5>
-                    <h5 style="display: inline;float: right;margin-top: -1px; "> {!! $billing->bill_date ?? '' !!}</h5>
+                    <h5 style="display: inline;float: right;margin-top: -1px; "> ({{ $billing->bill_date ? \Carbon\Carbon::parse($billing->bill_date)->format('d M Y') : 'N/A' }})</h5>
                 </div>
 
                 <div class="bank-stamp">
@@ -501,7 +565,7 @@
                     </div>
 
                     <div class="img" style="float: right;margin-top: 10px;margin-right: 30px;">
-                        <img src="{{asset("logos/1759388635.png")}}" style="height: 50px;">
+                        <img src="{{ asset('logos/1759388635.png') }}" style="height: 50px;">
                     </div>
                 </div>
 
@@ -569,10 +633,69 @@
                         <span style="margin-left: 283px;font-weight: bold;">Amount</span>
                     </div>
                 </div>
+                @php
+                    $paidAmount = $billing->paid_amount ?? 0;
+                    $finalAmount = $billing->getFinalAmount() + (isset($totalTransportFee) ? $totalTransportFee : 0);
+                    $outstandingAmount = $finalAmount - $paidAmount;
+                @endphp
 
-                <div class="section-6" style="float: right;padding-right: 10px;">
-                    <span>Rs. {{ number_format($billing->total_amount, 2) }}</span>
+              
+                <div class="section-6">
+
+                    <div style="display:flex; border-bottom:1px solid #ddd; padding:6px 0; margin-left: 10px;">
+                        <span style="width:70%;">
+                            Total Amount
+                            ({{ \Carbon\Carbon::parse($billing->billing_month ?? $billing->bill_date)->format('M Y') }})
+                        </span>
+                        <span style="width:27%; text-align:right;">
+                            <span>Rs. {{ number_format($billing->total_amount, 2) }}</span>
+                        </span>
+                    </div>
+
+                    @if ($billing->paid_amount > 0)
+                        <div class="allin-one" style="margin-top: 40px;">
+                            <div class="section-8"
+                                style="border-bottom: 1px solid black; border-top: 1px solid black;padding : 3px 0px;">
+                                Partial Paid Amount
+                                ({{ \Carbon\Carbon::parse($billing->billing_month ?? $billing->bill_date)->format('M Y') }})
+
+                                <span style="margin-left:202px;">
+                                    Rs.{{ number_format($billing->paid_amount, 2) }}</span>
+                            </div>
+                        </div>
+                    @endif
+
+
+
+                    {{-- List Previous Unpaid Months --}}
+                    @if (isset($previousUnpaidBills) && $previousUnpaidBills->count() > 0)
+                        @foreach ($previousUnpaidBills as $bill)
+                            <div style="display:flex; border-bottom:1px solid #ddd; padding:6px 0; margin-left: 10px;">
+                                <span style="width:70%;">
+                                    Outstanding Amount
+                                    ({{ \Carbon\Carbon::parse($bill->billing_month ?? $bill->bill_date)->format('M Y') }})
+                                </span>
+                                <span style="width:27%; text-align:right;">
+                                    Rs. {{ number_format($bill->outstanding_amount ?? 0, 2) }}
+                                </span>
+                            </div>
+                        @endforeach
+
+                        {{-- Total previous outstanding --}}
+                        {{-- <div style="display:flex; border-top:2px solid black; font-weight:bold; padding:6px 0;  margin-left: 10px;">
+                            <span style="width:70%;">Total Previous Outstanding</span>
+                            <span style="width:27%; text-align:right;">
+                                Rs. {{ number_format($previousUnpaidBills->sum('outstanding_amount'), 2) }}
+                            </span>
+                        </div> --}}
+                    @else
+                        <div style="padding:6px 0; color:#999;">No previous dues</div>
+                    @endif
                 </div>
+
+
+
+
 
 
                 @if ($applicableDiscounts && $applicableDiscounts->count() > 0)
@@ -615,29 +738,34 @@
 
 
 
+
+
+
                 @php
-                    $paidAmount = $billing->paid_amount ?? 0;
-                    $finalAmount = $billing->getFinalAmount() + (isset($totalTransportFee) ? $totalTransportFee : 0);
-                    $outstandingAmount = $finalAmount - $paidAmount;
+                   
+
+                    // Previous unpaid total
+                    $prevTotal = 0;
+                    if (!empty($previousUnpaidBills)) {
+                        foreach ($previousUnpaidBills as $pb) {
+                            $prevTotal += $pb->outstanding_amount;
+                        }
+                    }
+
+                    // Current Month Net Total
+                    $currentMonthNet = $billing->outstanding_amount;
+
+                    // Final Grand Total
+                    $grandTotal = $currentMonthNet + $prevTotal;
                 @endphp
 
 
-                <div class="allin-one" style="margin-top: 40px;">
-                    <div class="section-8"
-                        style="border-bottom: 1px solid black; border-top: 1px solid black;padding : 3px 0px;">
-                        <span>Previous Amounts </span>
-                        <span style="float: right padding-right: 256px; margin-left:255px;"> Rs.
-                            {{ number_format($outstandingAmount, 2) }}</span>
-                    </div>
-                </div>
-
-
                 <div class="section-9-9" style="justify-content: space-between; margin-top: 7px">
-                    <h6 style="margin: 10px 0px 0px 5px; display: inline;">Total Payment By Due Date
-                        ({{ $billing->bill_date ? \Carbon\Carbon::parse($billing->bill_date)->format('d M Y') : 'N/A' }}):
+                    <h6 style="margin: 10px 0px 0px 5px; display: inline;">Total Payable Payment By Due Date
+                        ({{ $billing->bill_date ? \Carbon\Carbon::parse($billing->bill_date)->format('d M Y') : 'N/A' }})
                     </h6>
-                    <span style="margin: 0px  9px 0px 0px; display: inline;float: right;"> Total: <span
-                            style="border-bottom: 2px solid black;font-weight: bold;">{!! $billing->paid_amount ?? '' !!}</span></span>
+                    <span style="margin: 0px  9px 0px 0px; display: inline;float: right;"> Rs: <span
+                            style="border-bottom: 2px solid black;font-weight: bold;">{!! $grandTotal ?? '' !!}</span></span>
                 </div>
 
 
@@ -645,7 +773,7 @@
                 <div class="section-10"
                     style="padding: 5px 20px; margin: 8px 0px 0px 8px; border: 2px solid black;width: 280px">
                     <h5 style="margin: 5px 0px;display: inline;padding-left: 50px;">Bill Valid Till:</h5>
-                    <h5 style="display: inline;float: right;margin-top: -1px; "> {!! $billing->bill_date ?? '' !!}</h5>
+                    <h5 style="display: inline;float: right;margin-top: -1px; "> ({{ $billing->bill_date ? \Carbon\Carbon::parse($billing->bill_date)->format('d M Y') : 'N/A' }})</h5>
                 </div>
 
                 <div class="bank-stamp">
@@ -682,7 +810,7 @@
         <div class="box-1">
             <div class="row">
                 <div class="section-1">
-                    
+
                     <div>
                         <h3 style="margin-top: 20px;font-weight: bold;">CORNERSTONE
                             SCHOOL<br>{!! $billing->student->branch->name ?? '' !!}</h3>
@@ -693,7 +821,7 @@
                     </div>
 
                     <div class="img" style="float: right;margin-top: 10px;margin-right: 30px;">
-                        <img src="{{asset("logos/1759388635.png")}}" style="height: 50px;">
+                        <img src="{{ asset('logos/1759388635.png') }}" style="height: 50px;">
                     </div>
                 </div>
 
@@ -761,10 +889,69 @@
                         <span style="margin-left: 283px;font-weight: bold;">Amount</span>
                     </div>
                 </div>
+                @php
+                    $paidAmount = $billing->paid_amount ?? 0;
+                    $finalAmount = $billing->getFinalAmount() + (isset($totalTransportFee) ? $totalTransportFee : 0);
+                    $outstandingAmount = $finalAmount - $paidAmount;
+                @endphp
 
-                <div class="section-6" style="float: right;padding-right: 10px;">
-                    <span>Rs. {{ number_format($billing->total_amount, 2) }}</span>
+              
+                <div class="section-6">
+
+                    <div style="display:flex; border-bottom:1px solid #ddd; padding:6px 0; margin-left: 10px;">
+                        <span style="width:70%;">
+                            Total Amount
+                            ({{ \Carbon\Carbon::parse($billing->billing_month ?? $billing->bill_date)->format('M Y') }})
+                        </span>
+                        <span style="width:27%; text-align:right;">
+                            <span>Rs. {{ number_format($billing->total_amount, 2) }}</span>
+                        </span>
+                    </div>
+
+                    @if ($billing->paid_amount > 0)
+                        <div class="allin-one" style="margin-top: 40px;">
+                            <div class="section-8"
+                                style="border-bottom: 1px solid black; border-top: 1px solid black;padding : 3px 0px;">
+                                Partial Paid Amount
+                                ({{ \Carbon\Carbon::parse($billing->billing_month ?? $billing->bill_date)->format('M Y') }})
+
+                                <span style="margin-left:202px;">
+                                    Rs.{{ number_format($billing->paid_amount, 2) }}</span>
+                            </div>
+                        </div>
+                    @endif
+
+
+
+                    {{-- List Previous Unpaid Months --}}
+                    @if (isset($previousUnpaidBills) && $previousUnpaidBills->count() > 0)
+                        @foreach ($previousUnpaidBills as $bill)
+                            <div style="display:flex; border-bottom:1px solid #ddd; padding:6px 0; margin-left: 10px;">
+                                <span style="width:70%;">
+                                    Outstanding Amount
+                                    ({{ \Carbon\Carbon::parse($bill->billing_month ?? $bill->bill_date)->format('M Y') }})
+                                </span>
+                                <span style="width:27%; text-align:right;">
+                                    Rs. {{ number_format($bill->outstanding_amount ?? 0, 2) }}
+                                </span>
+                            </div>
+                        @endforeach
+
+                        {{-- Total previous outstanding --}}
+                        {{-- <div style="display:flex; border-top:2px solid black; font-weight:bold; padding:6px 0;  margin-left: 10px;">
+                            <span style="width:70%;">Total Previous Outstanding</span>
+                            <span style="width:27%; text-align:right;">
+                                Rs. {{ number_format($previousUnpaidBills->sum('outstanding_amount'), 2) }}
+                            </span>
+                        </div> --}}
+                    @else
+                        <div style="padding:6px 0; color:#999;">No previous dues</div>
+                    @endif
                 </div>
+
+
+
+
 
 
                 @if ($applicableDiscounts && $applicableDiscounts->count() > 0)
@@ -807,29 +994,34 @@
 
 
 
+
+
+
                 @php
-                    $paidAmount = $billing->paid_amount ?? 0;
-                    $finalAmount = $billing->getFinalAmount() + (isset($totalTransportFee) ? $totalTransportFee : 0);
-                    $outstandingAmount = $finalAmount - $paidAmount;
+                   
+
+                    // Previous unpaid total
+                    $prevTotal = 0;
+                    if (!empty($previousUnpaidBills)) {
+                        foreach ($previousUnpaidBills as $pb) {
+                            $prevTotal += $pb->outstanding_amount;
+                        }
+                    }
+
+                    // Current Month Net Total
+                    $currentMonthNet = $billing->outstanding_amount;
+
+                    // Final Grand Total
+                    $grandTotal = $currentMonthNet + $prevTotal;
                 @endphp
 
 
-                <div class="allin-one" style="margin-top: 40px;">
-                    <div class="section-8"
-                        style="border-bottom: 1px solid black; border-top: 1px solid black;padding : 3px 0px;">
-                        <span>Previous Amounts </span>
-                        <span style="float: right padding-right: 256px; margin-left:255px;"> Rs.
-                            {{ number_format($outstandingAmount, 2) }}</span>
-                    </div>
-                </div>
-
-
                 <div class="section-9-9" style="justify-content: space-between; margin-top: 7px">
-                    <h6 style="margin: 10px 0px 0px 5px; display: inline;">Total Payment By Due Date
-                        ({{ $billing->bill_date ? \Carbon\Carbon::parse($billing->bill_date)->format('d M Y') : 'N/A' }}):
+                    <h6 style="margin: 10px 0px 0px 5px; display: inline;">Total Payable Payment By Due Date
+                        ({{ $billing->bill_date ? \Carbon\Carbon::parse($billing->bill_date)->format('d M Y') : 'N/A' }})
                     </h6>
-                    <span style="margin: 0px  9px 0px 0px; display: inline;float: right;"> Total: <span
-                            style="border-bottom: 2px solid black;font-weight: bold;">{!! $billing->paid_amount ?? '' !!}</span></span>
+                    <span style="margin: 0px  9px 0px 0px; display: inline;float: right;"> Rs: <span
+                            style="border-bottom: 2px solid black;font-weight: bold;">{!! $grandTotal ?? '' !!}</span></span>
                 </div>
 
 
@@ -837,7 +1029,7 @@
                 <div class="section-10"
                     style="padding: 5px 20px; margin: 8px 0px 0px 8px; border: 2px solid black;width: 280px">
                     <h5 style="margin: 5px 0px;display: inline;padding-left: 50px;">Bill Valid Till:</h5>
-                    <h5 style="display: inline;float: right;margin-top: -1px; "> {!! $billing->bill_date ?? '' !!}</h5>
+                    <h5 style="display: inline;float: right;margin-top: -1px; "> ({{ $billing->bill_date ? \Carbon\Carbon::parse($billing->bill_date)->format('d M Y') : 'N/A' }})</h5>
                 </div>
 
                 <div class="bank-stamp">
