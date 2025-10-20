@@ -877,8 +877,7 @@ class FeeManagementController extends Controller
     public function getDiscountsData()
     {
         $discounts = FeeDiscount::with(['student', 'category', 'createdBy'])
-            ->select(['id', 'student_id', 'category_id', 'discount_type', 'discount_value', 'reason', 'valid_from', 'valid_to', 'created_at']);
-
+            ->select(['id', 'student_id', 'category_id', 'discount_type', 'discount_value', 'reason','show_on_voucher', 'valid_from', 'valid_to', 'created_at']);
         return DataTables::of($discounts)
             ->addColumn('action', function ($discount) {
 
@@ -931,6 +930,7 @@ class FeeManagementController extends Controller
             'category_id' => 'required|exists:fee_categories,id',
             'discount_type' => 'required|in:percentage,fixed',
             'discount_value' => 'required|numeric|min:0',
+            'show_on_voucher' => 'nullable|boolean',
             'reason' => 'required|string|max:255',
             'valid_from_month' => 'required|date_format:Y-m',
             'valid_to_month' => 'required|date_format:Y-m|after_or_equal:valid_from_month'
@@ -941,6 +941,7 @@ class FeeManagementController extends Controller
             'category_id' => $request->category_id,
             'discount_type' => $request->discount_type,
             'discount_value' => $request->discount_value,
+            'show_on_voucher' => $request->show_on_voucher,
             'reason' => $request->reason,
             'valid_from' => $request->valid_from_month . '-01', // First day of month
             'valid_to' => date('Y-m-t', strtotime($request->valid_to_month . '-01')), // Last day of month
@@ -977,7 +978,7 @@ class FeeManagementController extends Controller
             'discount_value' => 'required|numeric|min:0',
             'reason' => 'required|string|max:255',
             'valid_from_month' => 'required|date_format:Y-m',
-            'valid_to_month' => 'required|date_format:Y-m|after_or_equal:valid_from_month'
+            'valid_to_month' => 'required|date_format:Y-m|after_or_equal:valid_from_month',
         ]);
 
         $discount = FeeDiscount::findOrFail($id);
@@ -990,6 +991,8 @@ class FeeManagementController extends Controller
             'reason' => $request->reason,
             'valid_from' => $request->valid_from_month . '-01', // First day of month
             'valid_to' => date('Y-m-t', strtotime($request->valid_to_month . '-01')), // Last day of month
+            'show_on_voucher' => $request->has('show_on_voucher') ? 1 : 0, // ✅ This line handles the checkbox
+
         ]);
 
         return redirect()->route('admin.fee-management.discounts')
