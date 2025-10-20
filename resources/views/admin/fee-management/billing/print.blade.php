@@ -444,8 +444,8 @@
 
 
 
-
-                @if ($applicableDiscounts && $applicableDiscounts->count() > 0)
+                
+                @if ($applicableDiscounts && $applicableDiscounts->count() > 0 && $showDiscount->show_on_voucher == 1)
                     <div class="discount-section">
                         <div class="discount-title">Applied Discounts</div>
                         @foreach ($applicableDiscounts as $discount)
@@ -698,7 +698,7 @@
 
 
 
-                @if ($applicableDiscounts && $applicableDiscounts->count() > 0)
+                @if ($applicableDiscounts && $applicableDiscounts->count() > 0  && $showDiscount->show_on_voucher == 1)
                     <div class="discount-section">
                         <div class="discount-title">Applied Discounts</div>
                         @foreach ($applicableDiscounts as $discount)
@@ -954,7 +954,7 @@
 
 
 
-                @if ($applicableDiscounts && $applicableDiscounts->count() > 0)
+                @if ($applicableDiscounts && $applicableDiscounts->count() > 0  && $showDiscount->show_on_voucher == 1)
                     <div class="discount-section">
                         <div class="discount-title">Applied Discounts</div>
                         @foreach ($applicableDiscounts as $discount)
