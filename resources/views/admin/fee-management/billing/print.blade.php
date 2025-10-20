@@ -512,7 +512,7 @@
                         ({{ $billing->bill_date ? \Carbon\Carbon::parse($billing->bill_date)->format('d M Y') : 'N/A' }})
                     </h6>
                     <span style="margin: 0px  9px 0px 0px; display: inline;float: right;"> Rs: <span
-                            style="border-bottom: 2px solid black;font-weight: bold;">{!! $grandTotal ?? '' !!}</span></span>
+                            style="border-bottom: 2px solid black;font-weight: bold;">{{ number_format($grandTotal , 2) }}</span></span>
                 </div>
 
 
@@ -765,7 +765,7 @@
                         ({{ $billing->bill_date ? \Carbon\Carbon::parse($billing->bill_date)->format('d M Y') : 'N/A' }})
                     </h6>
                     <span style="margin: 0px  9px 0px 0px; display: inline;float: right;"> Rs: <span
-                            style="border-bottom: 2px solid black;font-weight: bold;">{!! $grandTotal ?? '' !!}</span></span>
+                            style="border-bottom: 2px solid black;font-weight: bold;">{{ number_format($grandTotal , 2) }}</span></span>
                 </div>
 
 
@@ -1021,7 +1021,7 @@
                         ({{ $billing->bill_date ? \Carbon\Carbon::parse($billing->bill_date)->format('d M Y') : 'N/A' }})
                     </h6>
                     <span style="margin: 0px  9px 0px 0px; display: inline;float: right;"> Rs: <span
-                            style="border-bottom: 2px solid black;font-weight: bold;">{!! $grandTotal ?? '' !!}</span></span>
+                            style="border-bottom: 2px solid black;font-weight: bold;">{{ number_format($grandTotal , 2) }}</span></span>
                 </div>
 
 
