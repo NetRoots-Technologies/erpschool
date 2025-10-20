@@ -107,6 +107,21 @@
                         </div>
 
                         <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="show_on_voucher">Show on Student Voucher</label><br>
+                                        <input type="checkbox" id="show_on_voucher" name="show_on_voucher" value="1"
+                                            {{ $discount->show_on_voucher ? 'checked' : '' }}>
+                                        <label for="show_on_voucher">Yes</label>
+                                        @error('show_on_voucher')
+                                            <span class="text-danger">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="valid_from_month">Valid From Month <span class="text-danger">*</span></label>

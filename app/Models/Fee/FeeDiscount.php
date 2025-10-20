@@ -21,6 +21,7 @@ class FeeDiscount extends Model
         'discount_type',
         'discount_value',
         'reason',
+        'show_on_voucher',
         'valid_from',
         'valid_to',
         'company_id',
@@ -36,6 +37,7 @@ class FeeDiscount extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
+        'show_on_voucher' => 'boolean',
     ];
 
     // Relationships

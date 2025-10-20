@@ -112,6 +112,14 @@
                             </div>
                         </div>
 
+                        <div class="form-group mt-2">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="show_on_voucher" name="show_on_voucher" value="1" {{ old('show_on_voucher') ? 'checked' : '' }}>
+                                <label class="form-check-label" for="show_on_voucher">Show on Student Voucher</label>
+                            </div>
+                        </div>
+
+
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">

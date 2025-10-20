@@ -42,6 +42,7 @@
                                     <th>Discount Value</th>
                                     <th>Valid From Month</th>
                                     <th>Valid To Month</th>
+                                    <th>Show on Voucher</th>
                                     <th>Created At</th>
                                     <th>Actions</th>
                                 </tr>
@@ -98,7 +99,7 @@
                         }
                         return 'N/A';
                     }
-                },
+                },          
                 { 
                     data: 'valid_to', 
                     name: 'valid_to',
@@ -110,6 +111,18 @@
                             return month + ' ' + year;
                         }
                         return 'N/A';
+                    }
+                },
+                 {
+                    data: 'ShowOnVoucher',
+                    name: 'show_on_voucher',
+                    render: function(data, type, row) {
+                        console.log(row);
+                        if (row.show_on_voucher) {
+                            return '<span style="display: inline-block; padding: 2px 6px; font-size: 12px; color: white; background-color: green; border-radius: 4px;">Yes</span>';
+                        } else {
+                            return '<span style="display: inline-block; padding: 2px 6px; font-size: 12px; color: white; background-color: gray; border-radius: 4px;">No</span>';
+                        }
                     }
                 },
                 { 
