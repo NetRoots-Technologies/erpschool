@@ -277,6 +277,48 @@
             }
         });
 
-    });
+     });
+
+        $(document).ready(function() {
+            // Initialize Select2 on your dropdown(s)
+            $('#class_id').select2({
+                placeholder: "Select Class",
+                allowClear: true,
+                width: '100%'  // Make it responsive to container width
+            });
+
+            // Similarly, initialize Select2 on other selects if needed
+            $('#session_id').select2({
+                placeholder: "Select Session",
+                allowClear: true,
+                width: '100%'
+            });
+
+            $('#factor_id').select2({
+                placeholder: "Select Factor",
+                allowClear: true,
+                width: '100%'
+            });
+
+            // For dynamic categories, initialize after adding new rows
+            function initCategorySelects() {
+                $('.category-select').select2({
+                    placeholder: "Select Category",
+                    allowClear: true,
+                    width: '100%'
+                });
+            }
+
+            initCategorySelects();
+
+            // Re-initialize select2 for dynamically added selects
+            $('#addCategory').click(function() {
+                // delay to ensure DOM is updated
+                setTimeout(() => {
+                    initCategorySelects();
+                }, 100);
+            });
+        });
 </script>
+
 @endsection

@@ -240,4 +240,14 @@
         });
     });
 </script>
+<script>
+    $(document).ready(function() {
+        // Initialize select2 only on student select
+        $('#student_id').select2({
+            placeholder: 'Select Student',
+            width: '100%'
+        });
+
+    });
+</script>
 @endsection

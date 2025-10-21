@@ -183,6 +183,21 @@
         });
     });
 </script>
+<script>
+            $(document).ready(function() {
+                // Initialize DataTables aur baaki code wahan rahe
+
+                // Jab modal khule to select2 initialize karo
+                $('#generateBillingModal').on('shown.bs.modal', function () {
+                    $('#billing_class_id').select2({
+                        placeholder: 'Select Class',
+                        width: '100%',
+                        dropdownParent: $('#generateBillingModal')  // Modal ke andar dropdown properly render ho
+                    });
+                });
+
+            });
+</script>
 @endsection
 
 @section('css')

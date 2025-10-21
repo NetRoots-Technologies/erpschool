@@ -714,6 +714,25 @@
         });
     });
 </script>
+<script>
+$(document).ready(function() {
+    $('#academic_class_id').select2({
+        placeholder: 'Select Class',
+        width: '100%'
+    });
+
+    $('#student_id').select2({
+        placeholder: 'Select Student',
+        width: '100%'
+    });
+
+    $('#challan_id').select2({
+        placeholder: 'Select Challan',
+        width: '100%'
+    });
+});
+</script>
+
 @endsection
 
 @section('css')

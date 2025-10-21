@@ -610,4 +610,44 @@
         });
     });
 </script>
+<script>
+    $(document).ready(function() {
+        // Initialize Select2 on relevant selects
+        $('#academic_class_id').select2({
+            placeholder: "Select Class",
+            allowClear: true,
+            width: '100%'
+        });
+
+        $('#student_id').select2({
+            placeholder: "Select Student",
+            allowClear: true,
+            width: '100%'
+        });
+
+        $('#academic_session_id').select2({
+            placeholder: "Select Session",
+            allowClear: true,
+            width: '100%'
+        });
+
+        $('#payment_method').select2({
+            placeholder: "Select Payment Method",
+            allowClear: true,
+            width: '100%'
+        });
+
+        // For dynamic fee category dropdowns use event delegation if added dynamically
+        $('#feeCategories').on('focus', '.category-select', function() {
+            if (!$(this).hasClass("select2-hidden-accessible")) {
+                $(this).select2({
+                    placeholder: "Select Category",
+                    allowClear: true,
+                    width: '100%'
+                });
+            }
+        });
+    });
+</script>
+
 @endsection
