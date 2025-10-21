@@ -63,7 +63,7 @@
                         @method('PUT')
                         
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="name">Structure Name <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control" id="name" name="name" value="{{ $structure->name }}" required>
@@ -73,10 +73,10 @@
                                 </div>
                             </div>
                             
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="class_id">Class <span class="text-danger">*</span></label>
-                                    <select class="form-control" id="academic_class_id" name="academic_class_id" required>
+                                    <select class="form-control select2" id="academic_class_id" name="academic_class_id" required>
                                         <option value="">Select Class</option>
                                         @foreach($classes as $class)
                                             <option value="{{ $class->id }}" {{ $structure->academic_class_id == $class->id ? 'selected' : '' }}>{{ $class->name }}</option>
@@ -87,6 +87,25 @@
                                     @enderror
                                 </div>
                             </div>
+
+                            
+                                 <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="student_id">Student <span class="text-danger">*</span></label>
+                                        <select class="form-control" id="student_id" name="student_id" required>
+                                            <option value="">Select Student</option>
+                                            @foreach ($students as $std)
+                                            <option value="{{ $std->id }}" {{ $structure->student_id == $std->id ? 'selected' : '' }}>{{ $std->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('student_id')
+                                            <span class="text-danger">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                                </div>
+                            
+
+
                         </div>
 
                         <div class="row">
@@ -316,5 +335,63 @@
         });
 
     });
+
+    
+       $(function () {
+        const $class   = $('#academic_class_id');
+        const $student = $('#student_id');
+
+        function resetStudents(placeholder) {
+            $student.prop('disabled', true)
+                    .empty()
+                    .append('<option value="">' + (placeholder || 'Select Student') + '</option>');
+        }
+
+        $class.on('change', function () {
+            const classId = $(this).val();
+            resetStudents('Loading...');
+
+            if (!classId) {
+            resetStudents('Select Student');
+            return;
+            }
+
+            // Build URL via route helper safely
+            const url = "{{ route('admin.fee-management.class.students', ':id') }}".replace(':id', encodeURIComponent(classId));
+
+            $.ajax({
+            url: url,
+            type: 'GET',
+            dataType: 'json',
+            success: function (res) {
+                
+                $student.empty().append('<option value="">Select Student</option>');
+                if (Array.isArray(res) && res.length) {
+                res.forEach(function (s) {
+                    $student.append('<option value="'+ s.id +'">'+ s.name +'</option>');
+                });
+                $student.prop('disabled', false);
+                } else {
+                resetStudents('No students found');
+                }
+
+                // If using Select2:
+                // $student.trigger('change.select2');
+            },
+            error: function () {
+                resetStudents('Unable to load students');
+            }
+            });
+        });
+
+  // (Optional) For edit forms with preselected values:
+  // const preClassId = '{{ old('class_id') }}';
+  // const preStudentId = '{{ old('student_id') }}';
+  // if (preClassId) {
+  //   $class.val(preClassId).trigger('change');
+  //   // set selected student after AJAX completes
+  //   $(document).one('ajaxStop', function(){ $student.val(preStudentId); });
+  // }
+});
 </script>
 @endsection

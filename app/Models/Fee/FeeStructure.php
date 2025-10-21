@@ -28,6 +28,8 @@ class FeeStructure extends Model
         'branch_id',
         'created_by',
         'updated_by',
+        'student_id',
+        'final_amount',
     ];
 
     protected $casts = [

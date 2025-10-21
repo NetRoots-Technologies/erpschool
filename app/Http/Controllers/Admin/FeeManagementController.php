@@ -43,11 +43,11 @@ class FeeManagementController extends Controller
 
         // Calculate total collected amount from all paid collections
         $totalCollected = FeeCollection::where('status', 'paid')->sum('paid_amount');
-        
+
         // Calculate pending/outstanding amount from billing records
         $pendingBillings = FeeBilling::whereIn('status', ['generated', 'partial'])->get();
         $pendingAmount = 0;
-        
+
         foreach ($pendingBillings as $billing) {
             $finalAmount = $billing->getFinalAmount();
             $paidAmount = $billing->paid_amount ?? 0;
@@ -62,7 +62,7 @@ class FeeManagementController extends Controller
         $paidBillings = FeeBilling::where('status', 'paid')->count();
         $partialBillings = FeeBilling::where('status', 'partial')->count();
         $pendingBillings = FeeBilling::where('status', 'generated')->count();
-        
+
         $data = [
             'title' => 'Fee Management Dashboard',
             'total_categories' => FeeCategory::count(),
@@ -100,19 +100,17 @@ class FeeManagementController extends Controller
             ->select(['id', 'name', 'description', 'type', 'is_mandatory', 'affects_financials', 'is_active', 'created_at']);
 
         return DataTables::of($categories)
-            ->addColumn('action', function ($category) {  
+            ->addColumn('action', function ($category) {
 
                 $editBtn = '';
                 $deleteBtn = '';
                 if (Gate::allows('fee-Categories-edit')) {
-                $editBtn .= '<a href="' . route('admin.fee-management.categories.edit', $category->id) . '" class="btn btn-sm btn-primary">Edit</a>';
-                    
-                    }
+                    $editBtn .= '<a href="' . route('admin.fee-management.categories.edit', $category->id) . '" class="btn btn-sm btn-primary">Edit</a>';
+                }
 
-                            if (Gate::allows('fee-Categories-delete')) {
-                            $deleteBtn .= '<button class="btn btn-sm btn-danger" onclick="deleteCategory(' . $category->id . ')">Delete</button>';
-                        
-                    }
+                if (Gate::allows('fee-Categories-delete')) {
+                    $deleteBtn .= '<button class="btn btn-sm btn-danger" onclick="deleteCategory(' . $category->id . ')">Delete</button>';
+                }
                 return $editBtn . ' ' . $deleteBtn;
             })
             ->addColumn('status', function ($category) {
@@ -246,14 +244,12 @@ class FeeManagementController extends Controller
                 $editBtn = "";
                 $deleteBtn = "";
 
-                if(Gate::allows('fee-structures-edit')){
-                $editBtn .= '<a href="' . route('admin.fee-management.structures.edit', $structure->id) . '" class="btn btn-sm btn-primary">Edit</a>';
-
+                if (Gate::allows('fee-structures-edit')) {
+                    $editBtn .= '<a href="' . route('admin.fee-management.structures.edit', $structure->id) . '" class="btn btn-sm btn-primary">Edit</a>';
                 }
 
-                if(Gate::allows('fee-structures-delete')){
-                $deleteBtn .= '<button class="btn btn-sm btn-danger" onclick="deleteStructure(' . $structure->id . ')">Delete</button>';
-                    
+                if (Gate::allows('fee-structures-delete')) {
+                    $deleteBtn .= '<button class="btn btn-sm btn-danger" onclick="deleteStructure(' . $structure->id . ')">Delete</button>';
                 }
 
                 return $editBtn . ' ' . $deleteBtn;
@@ -288,6 +284,20 @@ class FeeManagementController extends Controller
         return view('admin.fee-management.structures.create', compact('classes', 'sessions', 'factors', 'categories'));
     }
 
+
+    // Student Get by Class
+    public function getClassByStudent($class_id)
+    {
+
+        $students = Students::query()
+            ->where('class_id', $class_id)
+            ->get(['id', 'first_name', 'last_name'])
+            ->map(fn($s) => ['id' => $s->id, 'name' => $s->first_name . ' ' . $s->last_name])
+            ->values();
+
+        return response()->json($students);
+    }
+
     public function storeStructure(Request $request)
     {
         if (!Gate::allows('fee-structures-create')) {
@@ -307,7 +317,25 @@ class FeeManagementController extends Controller
             'categories.*.category_id' => 'required|exists:fee_categories,id',
             'categories.*.amount' => 'required|numeric|min:0',
             'categories.*.notes' => 'nullable|string',
+            'student_id' => "required",
         ]);
+
+        $finalAmount = 0;
+        $total = collect($request->categories)->sum('amount');
+        if ($total) {
+            $factor = FeeFactor::findOrFail($request->factor_id);
+
+            if ($factor->factor_value == 1.0) {
+                $finalAmount = $total / 12;
+            } elseif ($factor->factor_value == 1.2) {
+                $finalAmount = $total / 10;
+            } elseif ($factor->factor_value == 2.0) {
+                $finalAmount = $total / 6;
+            } else {
+                $finalAmount = $total; // fallback
+            }
+        }
+
 
         DB::beginTransaction();
         try {
@@ -317,10 +345,12 @@ class FeeManagementController extends Controller
                 'academic_class_id' => $request->class_id,
                 'academic_session_id' => $request->session_id,
                 'fee_factor_id' => $request->factor_id,
+                'student_id' => $request->student_id,
                 'is_active' => true,
                 'company_id' => auth()->user()->company_id ?? null,
                 'branch_id' => auth()->user()->branch_id ?? null,
                 'created_by' => auth()->id(),
+                'final_amount' => $finalAmount  ?? 0,
             ]);
 
             foreach ($request->categories as $category) {
@@ -357,12 +387,16 @@ class FeeManagementController extends Controller
         $sessions = AcademicSession::where('status', 1)->get();
         $factors = FeeFactor::where('is_active', 1)->get();
         $categories = FeeCategory::where('is_active', 1)->get();
+        $students = Students::query()
+            ->select('id', DB::raw("CONCAT(first_name, ' ', last_name) as name"))
+            ->get();
 
-        return view('admin.fee-management.structures.edit', compact('structure', 'classes', 'sessions', 'factors', 'categories'));
+        return view('admin.fee-management.structures.edit', compact('structure', 'classes', 'sessions', 'factors', 'categories', 'students'));
     }
 
     public function updateStructure(Request $request, $id)
     {
+
         if (!Gate::allows('fee-structures-edit')) {
             abort(403, 'Unauthorized access');
         }
@@ -377,7 +411,26 @@ class FeeManagementController extends Controller
             'categories.*.category_id' => 'required|exists:fee_categories,id',
             'categories.*.amount' => 'required|numeric|min:0',
             'categories.*.notes' => 'nullable|string',
+            'student_id' => "required",
         ]);
+
+
+
+        $finalAmount = 0;
+        $total = collect($request->categories)->sum('amount');
+        if ($total) {
+            $factor = FeeFactor::findOrFail($request->fee_factor_id);
+            if ($factor->factor_value == 1.0) {
+                $finalAmount = $total / 12;
+            } elseif ($factor->factor_value == 1.2) {
+                $finalAmount = $total / 10;
+            } elseif ($factor->factor_value == 2.0) {
+                $finalAmount = $total / 6;
+            } else {
+                $finalAmount = $total; // fallback
+            }
+        }
+
 
         DB::beginTransaction();
         try {
@@ -388,7 +441,9 @@ class FeeManagementController extends Controller
                 'academic_session_id' => $request->academic_session_id,
                 'fee_factor_id' => $request->fee_factor_id,
                 'description' => $request->description,
+                'student_id' => $request->student_id,
                 'updated_by' => auth()->id(),
+                'final_amount' => $finalAmount  ?? 0,
             ]);
 
             // Delete existing details
@@ -448,17 +503,15 @@ class FeeManagementController extends Controller
         return DataTables::of($collections)
             ->addColumn('action', function ($collection) {
 
-                $viewBtn = ''; 
+                $viewBtn = '';
                 $editBtn = '';
 
-                if(Gate::allows('fee-collections-view')){
-                $viewBtn .= '<a href="' . route('admin.fee-management.collections.show', $collection->id) . '" class="btn btn-sm btn-info">View</a>';
-
+                if (Gate::allows('fee-collections-view')) {
+                    $viewBtn .= '<a href="' . route('admin.fee-management.collections.show', $collection->id) . '" class="btn btn-sm btn-info">View</a>';
                 }
 
-                if(Gate::allows('fee-collections-edit')){
-                $editBtn .= '<a href="' . route('admin.fee-management.collections.edit', $collection->id) . '" class="btn btn-sm btn-primary">Edit</a>';
-
+                if (Gate::allows('fee-collections-edit')) {
+                    $editBtn .= '<a href="' . route('admin.fee-management.collections.edit', $collection->id) . '" class="btn btn-sm btn-primary">Edit</a>';
                 }
                 return $viewBtn . ' ' . $editBtn;
             })
@@ -495,7 +548,7 @@ class FeeManagementController extends Controller
                 ->where('status', 'active')
                 ->with(['vehicle', 'route'])
                 ->get();
-            
+
             $totalTransportFee = $transportFees->sum('monthly_charges');
         }
 
@@ -504,7 +557,7 @@ class FeeManagementController extends Controller
         $totalDiscount = 0;
         if ($collection->billing) {
             $discounts = $collection->billing->getApplicableDiscounts()->load('category');
-            $totalDiscount = $discounts->sum(function($discount) use ($collection) {
+            $totalDiscount = $discounts->sum(function ($discount) use ($collection) {
                 return $discount->calculateDiscount($collection->billing->total_amount);
             });
         }
@@ -537,7 +590,7 @@ class FeeManagementController extends Controller
             ->get();
 
         return response()->json([
-            'students' => $students->map(function($student) {
+            'students' => $students->map(function ($student) {
                 return [
                     'id' => $student->id,
                     'name' => $student->fullname,
@@ -552,13 +605,13 @@ class FeeManagementController extends Controller
 
     public function getSessionsByClass($classId)
     {
-       
+
 
         // Get sessions assigned to this class through ActiveSession table
         $sessions = ActiveSession::with('academicSession')
             ->where('class_id', $classId)
             ->where('status', 1)
-            ->whereHas('academicSession', function($query) {
+            ->whereHas('academicSession', function ($query) {
                 $query->where('status', 1);
             })
             ->get()
@@ -572,7 +625,7 @@ class FeeManagementController extends Controller
         }
 
         return response()->json([
-            'sessions' => $sessions->map(function($session) {
+            'sessions' => $sessions->map(function ($session) {
                 return [
                     'id' => $session->id,
                     'name' => $session->name
@@ -601,7 +654,7 @@ class FeeManagementController extends Controller
         DB::beginTransaction();
         try {
             $totalAmount = array_sum(array_column($request->collections, 'amount'));
-            
+
             // Check if there's an existing billing for this student and session
             $billing = FeeBilling::where('student_id', $request->student_id)
                 ->where('academic_session_id', $request->academic_session_id)
@@ -639,7 +692,7 @@ class FeeManagementController extends Controller
             if ($billing) {
                 $billing->paid_amount = ($billing->paid_amount ?? 0) + $totalAmount;
                 $billing->outstanding_amount = $billing->getFinalAmount() - $billing->paid_amount;
-                
+
                 if ($billing->outstanding_amount <= 0) {
                     $billing->status = 'paid';
                 } else {
@@ -652,30 +705,30 @@ class FeeManagementController extends Controller
             try {
                 \Log::info("=== FEE COLLECTION ACCOUNTING START ===");
                 \Log::info("Collection ID: {$collection->id}, Student ID: {$collection->student_id}, Amount: {$collection->paid_amount}");
-                
+
                 $student = Students::find($request->student_id);
                 $integrationController = new \App\Http\Controllers\Accounts\IntegrationController();
-                
+
                 $integrationRequest = new \Illuminate\Http\Request([
                     'student_id' => $collection->student_id,
                     'fee_amount' => $collection->paid_amount,
                     'collection_date' => $collection->collection_date,
                     'reference' => 'FEE-' . str_pad($collection->id, 6, '0', STR_PAD_LEFT) . ' - ' . ($student->fullname ?? 'Student'),
                 ]);
-                
+
                 \Log::info("Calling recordAcademicFee with data: " . json_encode($integrationRequest->all()));
-                
+
                 $response = $integrationController->recordAcademicFee($integrationRequest);
                 $responseData = $response->getData(true);
-                
+
                 \Log::info("Integration response: " . json_encode($responseData));
-                
+
                 if (isset($responseData['success']) && $responseData['success']) {
                     \Log::info("✅ Fee accounting entry created successfully for collection ID: {$collection->id}, Entry ID: " . ($responseData['entry_id'] ?? 'N/A'));
                 } else {
                     \Log::error("❌ Fee accounting integration returned error: " . ($responseData['message'] ?? 'Unknown error'));
                 }
-                
+
                 \Log::info("=== FEE COLLECTION ACCOUNTING END ===");
             } catch (\Exception $e) {
                 \Log::error("❌ Fee accounting integration EXCEPTION: " . $e->getMessage());
@@ -700,7 +753,7 @@ class FeeManagementController extends Controller
 
         $collection = FeeCollection::with(['student.AcademicClass', 'academicClass', 'academicSession', 'details.feeCategory', 'billing'])
             ->findOrFail($id);
-        
+
         // Load transport fees for the student
         $transportFees = [];
         $totalTransportFee = 0;
@@ -709,7 +762,7 @@ class FeeManagementController extends Controller
                 ->where('status', 'active')
                 ->with(['vehicle', 'route'])
                 ->get();
-            
+
             $totalTransportFee = $transportFees->sum('monthly_charges');
         }
 
@@ -718,16 +771,16 @@ class FeeManagementController extends Controller
         $totalDiscount = 0;
         if ($collection->billing) {
             $discounts = $collection->billing->getApplicableDiscounts()->load('category');
-            $totalDiscount = $discounts->sum(function($discount) use ($collection) {
+            $totalDiscount = $discounts->sum(function ($discount) use ($collection) {
                 return $discount->calculateDiscount($collection->billing->total_amount);
             });
         }
-        
+
         // If this is a challan-based collection, redirect to a different edit page
         if ($collection->billing_id) {
             return view('admin.fee-management.collections.edit-challan', compact('collection', 'transportFees', 'totalTransportFee', 'discounts', 'totalDiscount'));
         }
-        
+
         // Otherwise, use the old edit system for non-challan collections
         $students = Students::with(['AcademicClass', 'academicSession'])->get();
         $classes = AcademicClass::where('status', 1)->get();
@@ -757,7 +810,7 @@ class FeeManagementController extends Controller
             DB::beginTransaction();
 
             $collection = FeeCollection::with('billing')->findOrFail($id);
-            
+
             if (!$collection->billing_id) {
                 return back()->withErrors(['error' => 'This collection is not linked to a challan'])->withInput();
             }
@@ -799,7 +852,6 @@ class FeeManagementController extends Controller
 
             return redirect()->route('admin.fee-management.collections')
                 ->with('success', 'Challan payment updated successfully!');
-
         } catch (\Exception $e) {
             DB::rollback();
             \Log::error('Error updating challan payment: ' . $e->getMessage());
@@ -877,23 +929,21 @@ class FeeManagementController extends Controller
     public function getDiscountsData()
     {
         $discounts = FeeDiscount::with(['student', 'category', 'createdBy'])
-            ->select(['id', 'student_id', 'category_id', 'discount_type', 'discount_value', 'reason','show_on_voucher', 'valid_from', 'valid_to', 'created_at']);
+            ->select(['id', 'student_id', 'category_id', 'discount_type', 'discount_value', 'reason', 'show_on_voucher', 'valid_from', 'valid_to', 'created_at']);
         return DataTables::of($discounts)
             ->addColumn('action', function ($discount) {
 
-                $deleteBtn = ''; 
+                $deleteBtn = '';
                 $editBtn = '';
 
-                if(Gate::allows('fee-discount-edit')){
-                  $editBtn = '<a href="' . route('admin.fee-management.discounts.edit', $discount->id) . '" class="btn btn-sm btn-primary">Edit</a>';
-
+                if (Gate::allows('fee-discount-edit')) {
+                    $editBtn = '<a href="' . route('admin.fee-management.discounts.edit', $discount->id) . '" class="btn btn-sm btn-primary">Edit</a>';
                 }
 
-                if(Gate::allows('fee-discount-delete')){
-                $deleteBtn = '<button class="btn btn-sm btn-danger" onclick="deleteDiscount(' . $discount->id . ')">Delete</button>';
-
+                if (Gate::allows('fee-discount-delete')) {
+                    $deleteBtn = '<button class="btn btn-sm btn-danger" onclick="deleteDiscount(' . $discount->id . ')">Delete</button>';
                 }
-                
+
 
                 return $editBtn . ' ' . $deleteBtn;
             })
@@ -915,7 +965,7 @@ class FeeManagementController extends Controller
 
         $students = Students::with('AcademicClass')->get();
         $categories = FeeCategory::all();
-        
+
         return view('admin.fee-management.discounts.create', compact('students', 'categories'));
     }
 
@@ -961,7 +1011,7 @@ class FeeManagementController extends Controller
         $discount = FeeDiscount::findOrFail($id);
         $students = Students::with('AcademicClass')->get();
         $categories = FeeCategory::all();
-        
+
         return view('admin.fee-management.discounts.edit', compact('discount', 'students', 'categories'));
     }
 
@@ -982,7 +1032,7 @@ class FeeManagementController extends Controller
         ]);
 
         $discount = FeeDiscount::findOrFail($id);
-        
+
         $discount->update([
             'student_id' => $request->student_id,
             'category_id' => $request->category_id,
@@ -1006,21 +1056,21 @@ class FeeManagementController extends Controller
     {
         $year = date('Y', strtotime($billingMonth . '-01'));
         $month = date('m', strtotime($billingMonth . '-01'));
-        
+
         $prefix = 'CHL-' . $year . '-' . $month;
-        
+
         // Get the last challan number for this month
         $lastBilling = FeeBilling::where('challan_number', 'like', $prefix . '%')
             ->orderBy('challan_number', 'desc')
             ->first();
-        
+
         if ($lastBilling) {
             $lastNumber = intval(substr($lastBilling->challan_number, -6));
             $billNumber = $lastNumber + 1;
         } else {
             $billNumber = 1;
         }
-        
+
         return $prefix . '-' . str_pad($billNumber, 6, '0', STR_PAD_LEFT);
     }
 
@@ -1060,7 +1110,7 @@ class FeeManagementController extends Controller
 
         $billing = FeeBilling::with(['student.AcademicClass', 'academicSession'])
             ->select(['id', 'student_id', 'academic_session_id', 'challan_number', 'total_amount', 'paid_amount', 'outstanding_amount', 'due_date', 'status', 'billing_month', 'created_at']);
-            
+
         // Apply month filter if provided
         if ($request->has('filter_month') && !empty($request->filter_month)) {
             $billing->where('billing_month', $request->filter_month);
@@ -1070,8 +1120,8 @@ class FeeManagementController extends Controller
             ->addColumn('action', function ($bill) {
                 $printBtn = '';
                 if (Gate::allows('fee-billing-print')) {
-                $printBtn .= '<a href="' . route('admin.fee-management.billing.print', $bill->id) . '" class="btn btn-sm btn-success" target="_blank">Print</a>';
-        }
+                    $printBtn .= '<a href="' . route('admin.fee-management.billing.print', $bill->id) . '" class="btn btn-sm btn-success" target="_blank">Print</a>';
+                }
 
                 return $printBtn;
             })
@@ -1086,18 +1136,18 @@ class FeeManagementController extends Controller
                 $paidAmount = $bill->paid_amount ?? 0;
                 $finalAmount = $bill->getFinalAmount();
                 $outstandingAmount = $finalAmount - $paidAmount;
-                
+
                 if ($outstandingAmount <= 0) {
                     $status = 'paid';
-                        $badgeClass = 'success';
+                    $badgeClass = 'success';
                 } else if ($paidAmount > 0) {
                     $status = 'partial';
-                        $badgeClass = 'warning';
+                    $badgeClass = 'warning';
                 } else {
                     $status = 'pending';
-                        $badgeClass = 'info';
+                    $badgeClass = 'info';
                 }
-                
+
                 return '<span class="badge badge-' . $badgeClass . '">' . ucfirst($status) . '</span>';
             })
             ->rawColumns(['action', 'status'])
@@ -1106,6 +1156,7 @@ class FeeManagementController extends Controller
 
     public function generateBilling(Request $request)
     {
+
         if (!Gate::allows('fee-billing-create')) {
             abort(403, 'Unauthorized access');
         }
@@ -1119,34 +1170,25 @@ class FeeManagementController extends Controller
 
         DB::beginTransaction();
         try {
-            \Log::info('Billing generation started', [
-                'class_id' => $request->academic_class_id,
-                'session_id' => $request->academic_session_id,
-                'billing_month' => $request->billing_month
-            ]);
 
-            // Check if the class-session combination is active
             $activeSession = ActiveSession::where('class_id', $request->academic_class_id)
                 ->where('session_id', $request->academic_session_id)
                 ->where('status', 1)
                 ->first();
 
             if (!$activeSession) {
-                \Log::info('No active session found for class: ' . $request->academic_class_id . ' and session: ' . $request->academic_session_id);
                 return redirect()->route('admin.fee-management.billing')
                     ->with('error', 'No active session found for the selected class and session combination.');
             }
 
             // Get students in the specified class (session relationship is managed through ActiveSession)
-            $students = Students::where('class_id', $request->academic_class_id)
+            $student = Students::where('class_id', $request->academic_class_id)
+                ->where('id', $request->student_id)
                 ->where('is_active', 1)
-                ->get();
+                ->first();
 
-            \Log::info('Students found: ' . $students->count());
-            \Log::info('Students data: ', $students->toArray());
+            if (!$student) {
 
-            if ($students->isEmpty()) {
-                \Log::info('No students found for class: ' . $request->academic_class_id . ' and session: ' . $request->academic_session_id);
                 return redirect()->route('admin.fee-management.billing')
                     ->with('error', 'No students found for the selected class and session.');
             }
@@ -1154,75 +1196,55 @@ class FeeManagementController extends Controller
             // Get fee structure for the class and session
             $feeStructure = FeeStructure::where('academic_class_id', $request->academic_class_id)
                 ->where('academic_session_id', $request->academic_session_id)
+                ->where('student_id', $request->student_id)
                 ->where('is_active', 1)
                 ->first();
 
-            \Log::info('Fee structure found: ' . ($feeStructure ? 'Yes' : 'No'));
-
             if (!$feeStructure) {
-                \Log::info('No fee structure found for class: ' . $request->academic_class_id . ' and session: ' . $request->academic_session_id);
+                return redirect()->route('admin.fee-management.billing')->with('error', 'No fee structure found for the selected student , class and session.');
+            }
+
+
+            $existingBilling = FeeBilling::where('student_id', $student->id)
+                ->where('academic_session_id', $request->academic_session_id)
+                ->where('billing_month', $request->billing_month)
+                ->first();
+
+            if ($existingBilling) {
+
                 return redirect()->route('admin.fee-management.billing')
-                    ->with('error', 'No fee structure found for the selected class and session.');
+                    ->with('error', 'Billing already exists for student: ' . $student->first_name . ' ' . $student->last_name);
             }
+            $totalAmount = $feeStructure->final_amount;
+            
+            $challanNumber = $this->generateUniqueChallanNumber($request->billing_month);
 
-            $billingCount = 0;
+            // Create billing record
+            $billing = FeeBilling::create([
+                'student_id' => $student->id,
+                'academic_session_id' => $request->academic_session_id,
+                'challan_number' => $challanNumber,
+                'billing_month' => $request->billing_month,
+                'total_amount' => $totalAmount,
+                'bill_date' => now(),
+                'due_date' => now()->addDays(30), // 30 days from now
+                'outstanding_amount' => $totalAmount, // Initially outstanding amount equals total amount
+                'status' => 'generated',
+                'company_id' => auth()->user()->company_id ?? null,
+                'branch_id' => auth()->user()->branch_id ?? null,
+                'created_by' => auth()->id(),
+            ]);
 
-            \Log::info('Processing ' . $students->count() . ' students for billing');
+            // Apply discounts automatically
+            $billing->applyDiscounts();
 
-            foreach ($students as $student) {
-                \Log::info('Processing student: ' . $student->id . ' - ' . $student->fullname);
-                
-                // Check if billing already exists for this student, session and billing month
-                $existingBilling = FeeBilling::where('student_id', $student->id)
-                    ->where('academic_session_id', $request->academic_session_id)
-                    ->where('billing_month', $request->billing_month)
-                    ->first();
 
-                if ($existingBilling) {
-                    \Log::info('Billing already exists for student: ' . $student->id);
-                    continue; // Skip if billing already exists
-                }
-
-                // Calculate total amount from fee structure
-                $totalAmount = $feeStructure->feeStructureDetails()->sum('amount');
-                \Log::info('Total amount calculated: ' . $totalAmount);
-
-                // Generate unique challan number
-                $challanNumber = $this->generateUniqueChallanNumber($request->billing_month);
-
-                // Create billing record
-                $billing = FeeBilling::create([
-                    'student_id' => $student->id,
-                    'academic_session_id' => $request->academic_session_id,
-                    'challan_number' => $challanNumber,
-                    'billing_month' => $request->billing_month,
-                    'total_amount' => $totalAmount,
-                    'bill_date' => now(),
-                    'due_date' => now()->addDays(30), // 30 days from now
-                    'outstanding_amount' => $totalAmount, // Initially outstanding amount equals total amount
-                    'status' => 'generated',
-                    'company_id' => auth()->user()->company_id ?? null,
-                    'branch_id' => auth()->user()->branch_id ?? null,
-                    'created_by' => auth()->id(),
-                ]);
-
-                // Apply discounts automatically
-                $billing->applyDiscounts();
-
-                \Log::info('Billing created for student: ' . $student->id . ' with ID: ' . $billing->id);
-                $billingCount++;
-            }
 
             DB::commit();
 
-            if ($billingCount > 0) {
-                return redirect()->route('admin.fee-management.billing')
-                    ->with('success', "Billing generated successfully for {$billingCount} students!");
-            } else {
-                return redirect()->route('admin.fee-management.billing')
-                    ->with('warning', 'No new billing records were created. All students may already have billing for this month.');
-            }
 
+            return redirect()->route('admin.fee-management.billing')
+                ->with('success', "Billing generated successfully");
         } catch (\Exception $e) {
             DB::rollback();
             \Log::error('Billing generation error: ' . $e->getMessage());
@@ -1238,17 +1260,16 @@ class FeeManagementController extends Controller
             abort(403, 'Unauthorized access');
         }
 
-        $billing = FeeBilling::with(['student.AcademicClass' ,'student.branch','academicSession'])
+        $billing = FeeBilling::with(['student.AcademicClass', 'student.branch', 'academicSession'])
             ->findOrFail($id);
 
-        
-        $applicableDiscounts = $billing->getApplicableDiscounts()->load('category');
-        if($applicableDiscounts){
 
-            $showDiscount = DB::table('fee_discounts')->where('student_id' , $billing->student_id)->select('show_on_voucher')->first();
-           
+        $applicableDiscounts = $billing->getApplicableDiscounts()->load('category');
+        if ($applicableDiscounts) {
+
+            $showDiscount = DB::table('fee_discounts')->where('student_id', $billing->student_id)->select('show_on_voucher')->first();
         }
-       
+
         $transportFees = [];
         $totalTransportFee = 0;
         if ($billing->student) {
@@ -1256,20 +1277,20 @@ class FeeManagementController extends Controller
                 ->where('status', 'active')
                 ->with(['vehicle', 'route'])
                 ->get();
-            
+
             $totalTransportFee = $transportFees->sum('monthly_charges');
         }
 
-            // ---------- Previous Unpaid Amount ----------
-            $previousUnpaidBills = FeeBilling::where('student_id', $billing->student_id)
-                                            ->where('id', '!=' ,  $id)
-                                            ->where('outstanding_amount', '>', 0)->get();
-            $previousArrears = $previousUnpaidBills->sum('outstanding_amount');
-            $unpaidMonthsList = $previousUnpaidBills->pluck('billing_month')->filter()->unique()->values();
-            
-            
-            // dd($previousUnpaidBills , $previousArrears , $unpaidMonthsList);
-        return view('admin.fee-management.billing.print', compact('billing', 'applicableDiscounts', 'showDiscount' ,'transportFees', 'totalTransportFee' , 'previousArrears' , 'unpaidMonthsList' , 'previousUnpaidBills'));
+        // ---------- Previous Unpaid Amount ----------
+        $previousUnpaidBills = FeeBilling::where('student_id', $billing->student_id)
+            ->where('id', '!=',  $id)
+            ->where('outstanding_amount', '>', 0)->get();
+        $previousArrears = $previousUnpaidBills->sum('outstanding_amount');
+        $unpaidMonthsList = $previousUnpaidBills->pluck('billing_month')->filter()->unique()->values();
+
+
+        // dd($previousUnpaidBills , $previousArrears , $unpaidMonthsList);
+        return view('admin.fee-management.billing.print', compact('billing', 'applicableDiscounts', 'showDiscount', 'transportFees', 'totalTransportFee', 'previousArrears', 'unpaidMonthsList', 'previousUnpaidBills'));
     }
 
     /**
@@ -1282,7 +1303,7 @@ class FeeManagementController extends Controller
         }
 
         $classes = AcademicClass::where('status', 1)->get();
-        
+
         return view('admin.fee-management.collections.pay-challan', compact('classes'));
     }
 
@@ -1299,12 +1320,12 @@ class FeeManagementController extends Controller
             ->where('status', '!=', 'draft')
             ->orderBy('created_at', 'desc')
             ->get()
-            ->map(function($challan) {
+            ->map(function ($challan) {
                 // Determine correct status based on paid amount
                 $paidAmount = $challan->paid_amount ?? 0;
                 $finalAmount = $challan->getFinalAmount();
                 $outstandingAmount = $finalAmount - $paidAmount;
-                
+
                 if ($outstandingAmount <= 0) {
                     $status = 'paid';
                 } else if ($paidAmount > 0) {
@@ -1312,7 +1333,7 @@ class FeeManagementController extends Controller
                 } else {
                     $status = 'pending';
                 }
-                
+
                 return [
                     'id' => $challan->id,
                     'challan_number' => $challan->challan_number,
@@ -1341,14 +1362,14 @@ class FeeManagementController extends Controller
         try {
             $challan = FeeBilling::findOrFail($challanId);
             $applicableDiscounts = $challan->getApplicableDiscounts()->load('category');
-            
+
             $totalDiscount = 0;
             $discounts = [];
-            
-            foreach($applicableDiscounts as $discount) {
+
+            foreach ($applicableDiscounts as $discount) {
                 $discountAmount = $discount->calculateDiscount($challan->total_amount);
                 $totalDiscount += $discountAmount;
-                
+
                 $discounts[] = [
                     'category_name' => $discount->category->name ?? 'General',
                     'discount_type' => $discount->discount_type,
@@ -1356,15 +1377,14 @@ class FeeManagementController extends Controller
                     'discount_amount' => $discountAmount
                 ];
             }
-            
+
             $finalAmount = $challan->total_amount - $totalDiscount;
-            
+
             return response()->json([
                 'discounts' => $discounts,
                 'totalDiscount' => $totalDiscount,
                 'finalAmount' => $finalAmount
             ]);
-            
         } catch (\Exception $e) {
             \Log::error('Error loading challan discounts: ' . $e->getMessage());
             return response()->json(['discounts' => [], 'totalDiscount' => 0, 'finalAmount' => 0]);
@@ -1386,25 +1406,24 @@ class FeeManagementController extends Controller
                 ->where('status', 'active')
                 ->with(['vehicle', 'route'])
                 ->get();
-            
+
             $totalTransportFee = 0;
             $transportData = [];
-            
-            foreach($transportFees as $transport) {
+
+            foreach ($transportFees as $transport) {
                 $totalTransportFee += $transport->monthly_charges;
-                
+
                 $transportData[] = [
                     'vehicle_number' => $transport->vehicle->vehicle_number ?? 'N/A',
                     'route_name' => $transport->route->route_name ?? 'N/A',
                     'monthly_charges' => $transport->monthly_charges
                 ];
             }
-            
+
             return response()->json([
                 'transportFees' => $transportData,
                 'totalTransportFee' => $totalTransportFee
             ]);
-            
         } catch (\Exception $e) {
             \Log::error('Error loading student transport fees: ' . $e->getMessage());
             return response()->json(['transportFees' => [], 'totalTransportFee' => 0]);
@@ -1435,12 +1454,12 @@ class FeeManagementController extends Controller
 
             // Get the challan
             $challan = FeeBilling::findOrFail($request->challan_id);
-            
+
             // Validate payment amount
             $finalAmount = $challan->getFinalAmount();
             $currentPaidAmount = $challan->paid_amount ?? 0;
             $maxPayableAmount = $finalAmount - $currentPaidAmount;
-            
+
             if ($request->paid_amount > $maxPayableAmount) {
                 return back()->withErrors(['paid_amount' => 'Payment amount cannot exceed maximum payable amount (Rs. ' . number_format($maxPayableAmount, 2) . ')'])->withInput();
             }
@@ -1462,10 +1481,10 @@ class FeeManagementController extends Controller
             // Update challan status and outstanding amount
             $newPaidAmount = $currentPaidAmount + $request->paid_amount;
             $newOutstandingAmount = $finalAmount - $newPaidAmount;
-            
+
             $challan->paid_amount = $newPaidAmount;
             $challan->outstanding_amount = $newOutstandingAmount;
-            
+
             // Determine new status - only 3 statuses: paid, pending, partial
             if ($newOutstandingAmount <= 0) {
                 $challan->status = 'paid';
@@ -1474,36 +1493,36 @@ class FeeManagementController extends Controller
             } else {
                 $challan->status = 'pending';
             }
-            
+
             $challan->save();
 
             // ✅ ACCOUNTING INTEGRATION - Record fee collection in accounts
             try {
                 \Log::info("=== CHALLAN PAYMENT ACCOUNTING START ===");
                 \Log::info("Collection ID: {$collection->id}, Challan: {$challan->challan_number}, Student ID: {$collection->student_id}, Amount: {$collection->paid_amount}");
-                
+
                 $integrationController = new \App\Http\Controllers\Accounts\IntegrationController();
-                
+
                 $integrationRequest = new \Illuminate\Http\Request([
                     'student_id' => $collection->student_id,
                     'fee_amount' => $collection->paid_amount,
                     'collection_date' => $collection->collection_date,
                     'reference' => 'FEE-' . str_pad($collection->id, 6, '0', STR_PAD_LEFT) . ' (Challan: ' . $challan->challan_number . ')',
                 ]);
-                
+
                 \Log::info("Calling recordAcademicFee with data: " . json_encode($integrationRequest->all()));
-                
+
                 $response = $integrationController->recordAcademicFee($integrationRequest);
                 $responseData = $response->getData(true);
-                
+
                 \Log::info("Integration response: " . json_encode($responseData));
-                
+
                 if (isset($responseData['success']) && $responseData['success']) {
                     \Log::info("✅ Challan payment accounting entry created successfully, Entry ID: " . ($responseData['entry_id'] ?? 'N/A'));
                 } else {
                     \Log::error("❌ Challan payment accounting returned error: " . ($responseData['message'] ?? 'Unknown error'));
                 }
-                
+
                 \Log::info("=== CHALLAN PAYMENT ACCOUNTING END ===");
             } catch (\Exception $e) {
                 \Log::error("❌ Challan payment accounting EXCEPTION: " . $e->getMessage());
@@ -1515,7 +1534,6 @@ class FeeManagementController extends Controller
 
             return redirect()->route('admin.fee-management.collections')
                 ->with('success', 'Payment processed successfully!');
-
         } catch (\Exception $e) {
             DB::rollback();
             \Log::error('Error processing challan payment: ' . $e->getMessage());
@@ -1565,7 +1583,7 @@ class FeeManagementController extends Controller
             ->with(['student.academicClass', 'academicSession']);
 
         if ($classId) {
-            $query->whereHas('student', function($q) use ($classId) {
+            $query->whereHas('student', function ($q) use ($classId) {
                 $q->where('class_id', $classId);
             });
         }
@@ -1586,7 +1604,7 @@ class FeeManagementController extends Controller
         }
 
         $student = Students::with(['academicClass', 'academicSession'])->findOrFail($studentId);
-        
+
         $collections = FeeCollection::where('student_id', $studentId)
             ->with(['feeCollectionDetails.category'])
             ->orderBy('collection_date', 'desc')
@@ -1598,6 +1616,4 @@ class FeeManagementController extends Controller
 
         return view('admin.fee-management.reports.student-ledger', compact('student', 'collections', 'adjustments'));
     }
-
 }
-

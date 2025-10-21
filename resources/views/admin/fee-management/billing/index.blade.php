@@ -78,10 +78,10 @@
                 @csrf
                 <div class="modal-body">
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="form-group">
                                 <label for="billing_class_id" class="form-label">Class <span class="text-danger">*</span></label>
-                                <select class="form-control" id="billing_class_id" name="academic_class_id" required>
+                                <select class="form-control select2" id="billing_class_id" name="academic_class_id" required>
                                     <option value="">Select Class</option>
                                     @foreach($classes as $class)
                                         <option value="{{ $class->id }}">{{ $class->name }}</option>
@@ -89,7 +89,21 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-md-6">
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                        <label for="student_id">Student <span class="text-danger">*</span></label>
+                                        <select class="form-control select2" id="student_id" name="student_id" required>
+                                            <option value="">Select Student</option>
+                                        </select>
+                                        @error('student_id')
+                                            <span class="text-danger">{{ $message }}</span>
+                                        @enderror
+                                    </div>
+                        </div>
+
+
+                        <div class="col-md-4">
                             <div class="form-group">
                                 <label for="billing_session_id" class="form-label">Session <span class="text-danger">*</span></label>
                                 <select class="form-control" id="billing_session_id" name="academic_session_id" required>
@@ -134,6 +148,13 @@
 @section('js')
 <script>
     $(document).ready(function() {
+
+            $('.select2').select2({
+        width: '100%',
+        placeholder: "Select option",
+        allowClear: true
+    });
+
         var billingTable = $('#billingTable').DataTable({
             processing: true,
             serverSide: true,
@@ -182,6 +203,63 @@
             }
         });
     });
+
+    $(function () {
+        const $class   = $('#billing_class_id');
+        const $student = $('#student_id');
+
+        function resetStudents(placeholder) {
+            $student.prop('disabled', true)
+                    .empty()
+                    .append('<option value="">' + (placeholder || 'Select Student') + '</option>');
+        }
+
+        $class.on('change', function () {
+            const classId = $(this).val();
+            resetStudents('Loading...');
+
+            if (!classId) {
+            resetStudents('Select Student');
+            return;
+            }
+
+            // Build URL via route helper safely
+            const url = "{{ route('admin.fee-management.class.students', ':id') }}".replace(':id', encodeURIComponent(classId));
+
+            $.ajax({
+            url: url,
+            type: 'GET',
+            dataType: 'json',
+            success: function (res) {
+                
+                $student.empty().append('<option value="">Select Student</option>');
+                if (Array.isArray(res) && res.length) {
+                res.forEach(function (s) {
+                    $student.append('<option value="'+ s.id +'">'+ s.name +'</option>');
+                });
+                $student.prop('disabled', false);
+                } else {
+                resetStudents('No students found');
+                }
+
+                // If using Select2:
+                // $student.trigger('change.select2');
+            },
+            error: function () {
+                resetStudents('Unable to load students');
+            }
+            });
+        });
+
+  // (Optional) For edit forms with preselected values:
+  // const preClassId = '{{ old('class_id') }}';
+  // const preStudentId = '{{ old('student_id') }}';
+  // if (preClassId) {
+  //   $class.val(preClassId).trigger('change');
+  //   // set selected student after AJAX completes
+  //   $(document).one('ajaxStop', function(){ $student.val(preStudentId); });
+  // }
+});
 </script>
 <script>
             $(document).ready(function() {
