@@ -19,8 +19,8 @@ class CreateFleetTransportationsTable extends Migration
             $table->unsignedBigInteger('vehicle_id');
             $table->unsignedBigInteger('route_id');
             $table->unsignedBigInteger('route_point_id')->nullable();
-            $table->string('pickup_point');
-            $table->string('dropoff_point');
+            $table->string('pickup_point')->nullable();
+            $table->string('dropoff_point')->nullable();
             $table->decimal('monthly_charges', 10, 2);
             $table->enum('status', ['active', 'inactive'])->default('active');
             $table->date('start_date');

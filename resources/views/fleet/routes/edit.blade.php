@@ -35,7 +35,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="vehicle_id">Vehicle <span class="text-danger">*</span></label>
-                                    <select class="form-control @error('vehicle_id') is-invalid @enderror" 
+                                    <select class="form-control select2 @error('vehicle_id') is-invalid @enderror" 
                                             id="vehicle_id" name="vehicle_id" required>
                                         <option value="">Select Vehicle</option>
                                         @foreach(\App\Models\Fleet\Vehicle::where('status', 'active')->get() as $vehicle)
@@ -92,7 +92,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="status">Status <span class="text-danger">*</span></label>
-                                    <select class="form-control @error('status') is-invalid @enderror" 
+                                    <select class="form-control select2 @error('status') is-invalid @enderror" 
                                             id="status" name="status" required>
                                         <option value="">Select Status</option>
                                         <option value="active" {{ old('status', $route->status) == 'active' ? 'selected' : '' }}>Active</option>

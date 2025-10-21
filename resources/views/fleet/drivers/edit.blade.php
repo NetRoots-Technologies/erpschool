@@ -109,7 +109,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="status">Status <span class="text-danger">*</span></label>
-                                    <select class="form-control @error('status') is-invalid @enderror" 
+                                    <select class="form-control select2 @error('status') is-invalid @enderror" 
                                             id="status" name="status" required>
                                         <option value="">Select Status</option>
                                         <option value="active" {{ old('status', $driver->status) == 'active' ? 'selected' : '' }}>Active</option>

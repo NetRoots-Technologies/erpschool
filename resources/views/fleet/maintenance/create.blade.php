@@ -20,7 +20,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="vehicle_id">Vehicle <span class="text-danger">*</span></label>
-                                    <select class="form-control @error('vehicle_id') is-invalid @enderror" 
+                                    <select class="form-control select2 @error('vehicle_id') is-invalid @enderror" 
                                             id="vehicle_id" name="vehicle_id" required>
                                         <option value="">Select Vehicle</option>
                                         @foreach(\App\Models\Fleet\Vehicle::where('status', 'active')->get() as $vehicle)
@@ -37,7 +37,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="driver_id">Driver</label>
-                                    <select class="form-control @error('driver_id') is-invalid @enderror" 
+                                    <select class="form-control select2 @error('driver_id') is-invalid @enderror" 
                                             id="driver_id" name="driver_id">
                                         <option value="">Select Driver</option>
                                         @foreach(\App\Models\Fleet\Driver::where('status', 'active')->get() as $driver)
@@ -57,7 +57,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="maintenance_type">Maintenance Type <span class="text-danger">*</span></label>
-                                    <select class="form-control @error('maintenance_type') is-invalid @enderror" 
+                                    <select class="form-control select2 @error('maintenance_type') is-invalid @enderror" 
                                             id="maintenance_type" name="maintenance_type" required>
                                         <option value="">Select Type</option>
                                         <option value="regular" {{ old('maintenance_type') == 'regular' ? 'selected' : '' }}>Regular</option>
@@ -137,7 +137,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="status">Status <span class="text-danger">*</span></label>
-                                    <select class="form-control @error('status') is-invalid @enderror" 
+                                    <select class="form-control select2 @error('status') is-invalid @enderror" 
                                             id="status" name="status" required>
                                         <option value="">Select Status</option>
                                         <option value="completed" {{ old('status') == 'completed' ? 'selected' : '' }}>Completed</option>

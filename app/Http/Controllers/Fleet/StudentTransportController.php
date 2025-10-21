@@ -62,6 +62,8 @@ class StudentTransportController extends Controller
      */
     public function store(Request $request)
     {
+
+       
         if (!Gate::allows('students-transport-create')) {
             return abort(503);
         }
@@ -69,8 +71,8 @@ class StudentTransportController extends Controller
             'student_id' => 'required|exists:students,id',
             'vehicle_id' => 'required|exists:fleet_vehicles,id',
             'route_id' => 'required|exists:fleet_routes,id',
-            'pickup_point' => 'required|string|max:255',
-            'dropoff_point' => 'required|string|max:255',
+            'pickup_point' => 'nullable|string|max:255',
+            'dropoff_point' => 'nullable|string|max:255',
             'monthly_charges' => 'required|numeric|min:0',
             'status' => 'required|in:active,inactive',
             'notes' => 'nullable|string',
@@ -104,8 +106,8 @@ class StudentTransportController extends Controller
             'student_id' => $request->student_id,
             'vehicle_id' => $request->vehicle_id,
             'route_id' => $request->route_id,
-            'pickup_point' => $request->pickup_point,
-            'dropoff_point' => $request->dropoff_point,
+            'pickup_point' => $request->pickup_point ?? NULL,
+            'dropoff_point' => $request->dropoff_point ?? NULL,
             'monthly_charges' => $request->monthly_charges,
             'status' => $request->status,
             'start_date' => now(),
@@ -183,8 +185,8 @@ class StudentTransportController extends Controller
         $request->validate([
             'vehicle_id' => 'required|exists:fleet_vehicles,id',
             'route_id' => 'required|exists:fleet_routes,id',
-            'pickup_point' => 'required|string|max:255',
-            'dropoff_point' => 'required|string|max:255',
+            'pickup_point' => 'nullable|string|max:255',
+            'dropoff_point' => 'nullable|string|max:255',
             'monthly_charges' => 'required|numeric|min:0',
             'status' => 'required|in:active,inactive',
             'notes' => 'nullable|string',
@@ -195,8 +197,8 @@ class StudentTransportController extends Controller
         $transportation->update([
             'vehicle_id' => $request->vehicle_id,
             'route_id' => $request->route_id,
-            'pickup_point' => $request->pickup_point,
-            'dropoff_point' => $request->dropoff_point,
+            'pickup_point' => $request->pickup_point ?? NULL,
+            'dropoff_point' => $request->dropoff_point ?? NULL,
             'monthly_charges' => $request->monthly_charges,
             'status' => $request->status,
             'notes' => $request->notes,

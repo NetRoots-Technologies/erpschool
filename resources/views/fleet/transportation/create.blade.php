@@ -30,7 +30,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="student_id">Student <span class="text-danger">*</span></label>
-                                    <select class="form-control @error('student_id') is-invalid @enderror" 
+                                    <select class="form-control select2 @error('student_id') is-invalid @enderror" 
                                             id="student_id" name="student_id" required>
                                         <option value="">Select Student</option>
                                         @foreach($students as $student)
@@ -47,7 +47,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="vehicle_id">Vehicle <span class="text-danger">*</span></label>
-                                    <select class="form-control @error('vehicle_id') is-invalid @enderror" 
+                                    <select class="form-control select2 @error('vehicle_id') is-invalid @enderror" 
                                             id="vehicle_id" name="vehicle_id" required>
                                         <option value="">Select Vehicle</option>
                                         @foreach($vehicles as $vehicle)
@@ -67,7 +67,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="route_id">Route <span class="text-danger">*</span></label>
-                                    <select class="form-control @error('route_id') is-invalid @enderror" 
+                                    <select class="form-control select2 @error('route_id') is-invalid @enderror" 
                                             id="route_id" name="route_id" required>
                                         <option value="">Select Route</option>
                                         @foreach($routes as $route)
@@ -100,10 +100,11 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="pickup_point">Pickup Point <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control @error('pickup_point') is-invalid @enderror" 
+                                    <label for="pickup_point">Pickup Point <span class="text-danger"> <input type="checkbox" id="pickup_check" checked></span></label>
+
+                                    <input type="text" class="form-control  @error('pickup_point') is-invalid @enderror" 
                                            id="pickup_point" name="pickup_point" 
-                                           value="{{ old('pickup_point') }}" required>
+                                           value="{{ old('pickup_point') }}">
                                     @error('pickup_point')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -111,10 +112,10 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="dropoff_point">Drop-off Point <span class="text-danger">*</span></label>
+                                    <label for="dropoff_point">Drop-off Point <span class="text-danger"><input type="checkbox" id="dropoff_check" checked></span></label>
                                     <input type="text" class="form-control @error('dropoff_point') is-invalid @enderror" 
                                            id="dropoff_point" name="dropoff_point" 
-                                           value="{{ old('dropoff_point') }}" required>
+                                           value="{{ old('dropoff_point') }}">
                                     @error('dropoff_point')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -169,4 +170,29 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('js')
+        <script>
+            $(document).ready(function () {
+            // Pickup checkbox toggle
+            $('#pickup_check').on('change', function () {
+                if ($(this).is(':checked')) {
+                    $('#pickup_point').prop('disabled', false);
+                } else {
+                    $('#pickup_point').prop('disabled', true).val(''); // Optional: clear value
+                }
+            });
+
+            // Dropoff checkbox toggle
+            $('#dropoff_check').on('change', function () {
+                if ($(this).is(':checked')) {
+                    $('#dropoff_point').prop('disabled', false);
+                } else {
+                    $('#dropoff_point').prop('disabled', true).val(''); // Optional: clear value
+                }
+            });
+});
+
+        </script>
 @endsection

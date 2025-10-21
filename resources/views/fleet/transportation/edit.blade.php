@@ -34,7 +34,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="status">Status <span class="text-danger">*</span></label>
-                                    <select class="form-control @error('status') is-invalid @enderror" 
+                                    <select class="form-control select2 @error('status') is-invalid @enderror" 
                                             id="status" name="status" required>
                                         <option value="active" {{ old('status', $transportation->status) == 'active' ? 'selected' : '' }}>
                                             Active
@@ -55,7 +55,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="vehicle_id">Vehicle <span class="text-danger">*</span></label>
-                                    <select class="form-control @error('vehicle_id') is-invalid @enderror" 
+                                    <select class="form-control select2 @error('vehicle_id') is-invalid @enderror" 
                                             id="vehicle_id" name="vehicle_id" required>
                                         <option value="">Select Vehicle</option>
                                         @foreach($vehicles as $vehicle)
@@ -72,7 +72,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="route_id">Route <span class="text-danger">*</span></label>
-                                    <select class="form-control @error('route_id') is-invalid @enderror" 
+                                    <select class="form-control select2 @error('route_id') is-invalid @enderror" 
                                             id="route_id" name="route_id" required>
                                         <option value="">Select Route</option>
                                         @foreach($routes as $route)
@@ -92,10 +92,11 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="pickup_point">Pickup Point <span class="text-danger">*</span></label>
+                                    <label for="pickup_point">Pickup Point <span class="text-danger"> <input type="checkbox" id="pickup_check" {{  $transportation->pickup_point ? 'checked' : '' }}></span></label>
+
                                     <input type="text" class="form-control @error('pickup_point') is-invalid @enderror" 
                                            id="pickup_point" name="pickup_point" 
-                                           value="{{ old('pickup_point', $transportation->pickup_point) }}" required>
+                                           value="{{ old('pickup_point', $transportation->pickup_point) }}">
                                     @error('pickup_point')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -103,10 +104,15 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="dropoff_point">Drop-off Point <span class="text-danger">*</span></label>
+                                <label for="dropoff_point">Drop-off Point 
+                                    <span class="text-danger">
+                                    <input type="checkbox" id="dropoff_check" {{ $transportation->dropoff_point ? 'checked' : '' }}>
+                                </span>
+                            </label>
+
                                     <input type="text" class="form-control @error('dropoff_point') is-invalid @enderror" 
                                            id="dropoff_point" name="dropoff_point" 
-                                           value="{{ old('dropoff_point', $transportation->dropoff_point) }}" required>
+                                           value="{{ old('dropoff_point', $transportation->dropoff_point) }}">
                                     @error('dropoff_point')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -157,4 +163,31 @@
         </div>
     </div>
 </div>
+@endsection
+@section('js')
+        <script>
+            $(document).ready(function () {
+            // Pickup checkbox toggle
+            $('#pickup_check').on('change', function () {
+                if ($(this).is(':checked')) {
+                    $('#pickup_point').prop('disabled', false);
+                } else {
+                    $('#pickup_point').prop('disabled', true).val(''); // Optional: clear value
+                }
+            });
+
+            // Dropoff checkbox toggle
+            $('#dropoff_check').on('change', function () {
+                if ($(this).is(':checked')) {
+                    $('#dropoff_point').prop('disabled', false);
+                } else {
+                    $('#dropoff_point').prop('disabled', true).val(''); // Optional: clear value
+                }
+            });
+
+            $('#dropoff_check').trigger('change');
+            $('#pickup_check').trigger('change');
+});
+
+        </script>
 @endsection
