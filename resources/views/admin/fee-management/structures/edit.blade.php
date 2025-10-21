@@ -92,7 +92,7 @@
                                  <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="student_id">Student <span class="text-danger">*</span></label>
-                                        <select class="form-control" id="student_id" name="student_id" required>
+                                        <select class="form-control select2" id="student_id" name="student_id" required>
                                             <option value="">Select Student</option>
                                             @foreach ($students as $std)
                                             <option value="{{ $std->id }}" {{ $structure->student_id == $std->id ? 'selected' : '' }}>{{ $std->name }}</option>
@@ -112,7 +112,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="session_id">Academic Session <span class="text-danger">*</span></label>
-                                    <select class="form-control" id="academic_session_id" name="academic_session_id" required>
+                                    <select class="form-control select2" id="academic_session_id" name="academic_session_id" required>
                                         <option value="">Select Session</option>
                                         @foreach($sessions as $session)
                                             <option value="{{ $session->id }}" {{ $structure->academic_session_id == $session->id ? 'selected' : '' }}>{{ $session->name }}</option>
@@ -127,7 +127,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="factor_id">Fee Factor <span class="text-danger">*</span></label>
-                                    <select class="form-control" id="fee_factor_id" name="fee_factor_id" required>
+                                    <select class="form-control select2" id="fee_factor_id" name="fee_factor_id" required>
                                         <option value="">Select Factor</option>
                                         @foreach($factors as $factor)
                                             <option value="{{ $factor->id }}" {{ $structure->fee_factor_id == $factor->id ? 'selected' : '' }}>{{ $factor->name }}</option>
@@ -168,7 +168,7 @@
                                                 <div class="col-md-4">
                                                     <div class="form-group">
                                                         <label>Category</label>
-                                                        <select class="form-control category-select" name="categories[{{ $index }}][category_id]" required>
+                                                        <select class="form-control category-select select2" name="categories[{{ $index }}][category_id]" required>
                                                             <option value="">Select Category</option>
                                                             @foreach($categories as $category)
                                                                 <option value="{{ $category->id }}" {{ $detail->fee_category_id == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
@@ -202,7 +202,7 @@
                                             <div class="col-md-4">
                                                 <div class="form-group">
                                                     <label>Category</label>
-                                                    <select class="form-control category-select" name="categories[0][category_id]" required>
+                                                    <select class="form-control category-select select2" name="categories[0][category_id]" required>
                                                         <option value="">Select Category</option>
                                                         @foreach($categories as $category)
                                                             <option value="{{ $category->id }}">{{ $category->name }}</option>

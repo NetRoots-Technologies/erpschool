@@ -34,7 +34,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="student_id" class="form-label">Student <span class="text-danger">*</span></label>
-                                    <select class="form-control @error('student_id') is-invalid @enderror" 
+                                    <select class="form-control select2 @error('student_id') is-invalid @enderror" 
                                             id="student_id" name="student_id" required>
                                         <option value="">Select Student</option>
                                         @foreach($students as $student)
@@ -51,7 +51,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="category_id" class="form-label">Fee Category <span class="text-danger">*</span></label>
-                                    <select class="form-control @error('category_id') is-invalid @enderror" 
+                                    <select class="form-control select2 @error('category_id') is-invalid @enderror" 
                                             id="category_id" name="category_id" required>
                                         <option value="">Select Category</option>
                                         @foreach($categories as $category)
@@ -71,7 +71,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="discount_type" class="form-label">Discount Type <span class="text-danger">*</span></label>
-                                    <select class="form-control @error('discount_type') is-invalid @enderror" 
+                                    <select class="form-control select2 @error('discount_type') is-invalid @enderror" 
                                             id="discount_type" name="discount_type" required>
                                         <option value="">Select Type</option>
                                         <option value="percentage">Percentage</option>
@@ -238,16 +238,6 @@
                 return false;
             }
         });
-    });
-</script>
-<script>
-    $(document).ready(function() {
-        // Initialize select2 only on student select
-        $('#student_id').select2({
-            placeholder: 'Select Student',
-            width: '100%'
-        });
-
     });
 </script>
 @endsection

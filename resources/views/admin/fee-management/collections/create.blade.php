@@ -58,7 +58,7 @@
                             <div class="col-md-3">
                                 <div class="form-group">
                                     <label for="academic_class_id" class="form-label">Class <span class="text-danger">*</span></label>
-                                    <select class="form-control @error('academic_class_id') is-invalid @enderror" 
+                                    <select class="form-control select2 @error('academic_class_id') is-invalid @enderror" 
                                             id="academic_class_id" name="academic_class_id" required>
                                         <option value="">Select Class</option>
                                         @foreach($classes as $class)
@@ -75,7 +75,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="student_id" class="form-label">Student <span class="text-danger">*</span></label>
-                                    <select class="form-control @error('student_id') is-invalid @enderror" 
+                                    <select class="form-control select2 @error('student_id') is-invalid @enderror" 
                                             id="student_id" name="student_id" required disabled>
                                         <option value="">First select a class</option>
                                     </select>
@@ -119,7 +119,7 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="payment_method" class="form-label">Payment Method <span class="text-danger">*</span></label>
-                                    <select class="form-control @error('payment_method') is-invalid @enderror" 
+                                    <select class="form-control select2 @error('payment_method') is-invalid @enderror" 
                                             id="payment_method" name="payment_method" required>
                                         <option value="">Select Method</option>
                                         <option value="cash" {{ old('payment_method') == 'cash' ? 'selected' : '' }}>Cash</option>
@@ -154,7 +154,7 @@
                                             <div class="form-group">
                                                 <label>Category</label>
                                                 <div class="input-group">
-                                                    <select class="form-control category-select" name="collections[0][category_id]" required>
+                                                    <select class="form-control select2 category-select " name="collections[0][category_id]" required>
                                                         <option value="">Select Category</option>
                                                         @foreach($categories as $category)
                                                             <option value="{{ $category->id }}">{{ $category->name }}</option>
@@ -607,45 +607,6 @@
             $('#category_name, #category_description, #category_type').val('');
             $('#is_mandatory, #affects_financials').prop('checked', false);
             $('#affects_financials').prop('checked', true);
-        });
-    });
-</script>
-<script>
-    $(document).ready(function() {
-        // Initialize Select2 on relevant selects
-        $('#academic_class_id').select2({
-            placeholder: "Select Class",
-            allowClear: true,
-            width: '100%'
-        });
-
-        $('#student_id').select2({
-            placeholder: "Select Student",
-            allowClear: true,
-            width: '100%'
-        });
-
-        $('#academic_session_id').select2({
-            placeholder: "Select Session",
-            allowClear: true,
-            width: '100%'
-        });
-
-        $('#payment_method').select2({
-            placeholder: "Select Payment Method",
-            allowClear: true,
-            width: '100%'
-        });
-
-        // For dynamic fee category dropdowns use event delegation if added dynamically
-        $('#feeCategories').on('focus', '.category-select', function() {
-            if (!$(this).hasClass("select2-hidden-accessible")) {
-                $(this).select2({
-                    placeholder: "Select Category",
-                    allowClear: true,
-                    width: '100%'
-                });
-            }
         });
     });
 </script>

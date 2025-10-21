@@ -35,7 +35,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="student_id">Student <span class="text-danger">*</span></label>
-                                    <select class="form-control" id="student_id" name="student_id" required>
+                                    <select class="form-control select2" id="student_id" name="student_id" required>
                                         <option value="">Select Student</option>
                                         @foreach($students as $student)
                                             <option value="{{ $student->id }}" {{ $discount->student_id == $student->id ? 'selected' : '' }}>
@@ -52,7 +52,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="category_id">Fee Category <span class="text-danger">*</span></label>
-                                    <select class="form-control" id="category_id" name="category_id" required>
+                                    <select class="form-control select2" id="category_id" name="category_id" required>
                                         <option value="">Select Category</option>
                                         @foreach($categories as $category)
                                             <option value="{{ $category->id }}" {{ $discount->category_id == $category->id ? 'selected' : '' }}>

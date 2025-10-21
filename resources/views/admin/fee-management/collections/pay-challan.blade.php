@@ -66,7 +66,7 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="academic_class_id" class="form-label">Class <span class="text-danger">*</span></label>
-                                    <select class="form-control @error('academic_class_id') is-invalid @enderror" 
+                                    <select class="form-control select2 @error('academic_class_id') is-invalid @enderror" 
                                             id="academic_class_id" name="academic_class_id" required>
                                         <option value="">Select Class</option>
                                         @foreach($classes as $class)
@@ -83,7 +83,7 @@
                             <div class="col-md-5">
                                 <div class="form-group">
                                     <label for="student_id" class="form-label">Student <span class="text-danger">*</span></label>
-                                    <select class="form-control @error('student_id') is-invalid @enderror" 
+                                    <select class="form-control select2 @error('student_id') is-invalid @enderror" 
                                             id="student_id" name="student_id" required disabled>
                                         <option value="">First select a class</option>
                                     </select>
@@ -111,7 +111,7 @@
                             <div class="col-12">
                                 <div class="form-group">
                                     <label for="challan_id" class="form-label">Select Challan <span class="text-danger">*</span></label>
-                                    <select class="form-control @error('challan_id') is-invalid @enderror" 
+                                    <select class="form-control select2 @error('challan_id') is-invalid @enderror" 
                                             id="challan_id" name="challan_id" required disabled>
                                         <option value="">Select student first to load challans</option>
                                     </select>
@@ -713,24 +713,6 @@
             console.log('Form validation passed, submitting...');
         });
     });
-</script>
-<script>
-$(document).ready(function() {
-    $('#academic_class_id').select2({
-        placeholder: 'Select Class',
-        width: '100%'
-    });
-
-    $('#student_id').select2({
-        placeholder: 'Select Student',
-        width: '100%'
-    });
-
-    $('#challan_id').select2({
-        placeholder: 'Select Challan',
-        width: '100%'
-    });
-});
 </script>
 
 @endsection

@@ -93,7 +93,7 @@
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="student_id">Student <span class="text-danger">*</span></label>
-                                        <select class="form-control" id="student_id" name="student_id" required disabled>
+                                        <select class="form-control select2" id="student_id" name="student_id" required disabled>
                                             <option value="">Select Student</option>
                                         </select>
                                         @error('student_id')
@@ -107,7 +107,7 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="session_id">Academic Session <span class="text-danger">*</span></label>
-                                        <select class="form-control" id="session_id" name="session_id" required>
+                                        <select class="form-control select2" id="session_id" name="session_id" required>
                                             <option value="">Select Session</option>
                                             @foreach ($sessions as $session)
                                                 <option value="{{ $session->id }}">{{ $session->name }}</option>
@@ -122,7 +122,7 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="factor_id">Fee Factor <span class="text-danger">*</span></label>
-                                        <select class="form-control" id="factor_id" name="factor_id" required>
+                                        <select class="form-control select2" id="factor_id" name="factor_id" required>
                                             <option value="">Select Factor</option>
                                             @foreach ($factors as $factor)
                                                 <option value="{{ $factor->id }}">{{ $factor->name }}</option>
@@ -161,7 +161,7 @@
                                             <div class="col-md-4">
                                                 <div class="form-group">
                                                     <label>Category</label>
-                                                    <select class="form-control category-select"
+                                                    <select class="form-control category-select select2"
                                                         name="categories[0][category_id]" required>
                                                         <option value="">Select Category</option>
                                                         @foreach ($categories as $category)
