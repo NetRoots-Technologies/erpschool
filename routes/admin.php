@@ -51,23 +51,23 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'admin', 'as' => 'admin.'], 
 
     Route::get("walk_in_student", [DataBankController::class, 'walk_in_student_get'])->name('walk_in_student.get');
     Route::post("view_data_bank_courses1/{id}", [DataBankController::class, 'view_data_bank_courses'])->name('view_data_bank_courses');
-//
-//    Route::resource('video', \App\Http\Controllers\Admin\VideoUploadController::class);
-//    Route::resource('video_category', \App\Http\Controllers\Admin\VideoCategoryController::class);
-//    Route::get('session_videos/{id}', [VideoUploadController::class, 'session_videos'])->name('session_videos');
-//
-////
-//    Route::resource('tools', \App\Http\Controllers\Admin\ToolsController::class);
-//    Route::get('assign_tools/{student_id}', [ToolsController::class, 'assign_tools_get'])->name('assign_tools_get');
-//    Route::post('assign_tools', [ToolsController::class, 'assign_tools_post'])->name('assign_tools_post');
-//    Route::delete('assign_tools_delete/{id}', [ToolsController::class, 'assign_tools_delete'])->name('assign_tools_delete');
-//
-//    Route::get('assign_certificate/{id}', [StudentFeeController::class, 'assign_certificate'])->name('assign_certificate');
-//
+    //
+    //    Route::resource('video', \App\Http\Controllers\Admin\VideoUploadController::class);
+    //    Route::resource('video_category', \App\Http\Controllers\Admin\VideoCategoryController::class);
+    //    Route::get('session_videos/{id}', [VideoUploadController::class, 'session_videos'])->name('session_videos');
+    //
+    ////
+    //    Route::resource('tools', \App\Http\Controllers\Admin\ToolsController::class);
+    //    Route::get('assign_tools/{student_id}', [ToolsController::class, 'assign_tools_get'])->name('assign_tools_get');
+    //    Route::post('assign_tools', [ToolsController::class, 'assign_tools_post'])->name('assign_tools_post');
+    //    Route::delete('assign_tools_delete/{id}', [ToolsController::class, 'assign_tools_delete'])->name('assign_tools_delete');
+    //
+    //    Route::get('assign_certificate/{id}', [StudentFeeController::class, 'assign_certificate'])->name('assign_certificate');
+    //
 
     //    Marketing Banner AD
-//    Route::resource('marketing_banner_ad', \App\Http\Controllers\Admin\MarketingBannerAdController::class);
-//    Route::get('marketing_banner_ad/{id}', [\App\Http\Controllers\Admin\MarketingBannerAdController::class, 'getData'])->name('ad_getData');
+    //    Route::resource('marketing_banner_ad', \App\Http\Controllers\Admin\MarketingBannerAdController::class);
+    //    Route::get('marketing_banner_ad/{id}', [\App\Http\Controllers\Admin\MarketingBannerAdController::class, 'getData'])->name('ad_getData');
 
 
     Route::resource('marketing_banner_ad', \App\Http\Controllers\Admin\MarketingBannerAdController::class);
@@ -75,9 +75,9 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'admin', 'as' => 'admin.'], 
 
 
     //    Marketing Notifications
-//    Route::resource('marketing_notification', \App\Http\Controllers\Admin\MarketingNotificationController::class);
-////    Route::get('marketing_notification/{id}', [\App\Http\Controllers\Admin\MarketingNotificationController::class, 'session_videos'])->name('session_videos');
-//
+    //    Route::resource('marketing_notification', \App\Http\Controllers\Admin\MarketingNotificationController::class);
+    ////    Route::get('marketing_notification/{id}', [\App\Http\Controllers\Admin\MarketingNotificationController::class, 'session_videos'])->name('session_videos');
+    //
 
     Route::resource('marketing_notification', \App\Http\Controllers\Admin\MarketingNotificationController::class);
     Route::post('getdata/marketing_notification', [MarketingNotificationController::class, 'getdata'])->name('marketing_notification_getdata');
@@ -157,7 +157,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'admin', 'as' => 'admin.'], 
     Route::group(['prefix' => 'fee-management', 'as' => 'fee-management.'], function () {
         // Dashboard
         Route::get('/', [FeeManagementController::class, 'index'])->name('index');
-        
+
         // Categories
         Route::get('/categories', [FeeManagementController::class, 'categories'])->name('categories');
         Route::get('/categories/data', [FeeManagementController::class, 'getCategoriesData'])->name('categories.data');
@@ -166,7 +166,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'admin', 'as' => 'admin.'], 
         Route::get('/categories/{id}/edit', [FeeManagementController::class, 'editCategory'])->name('categories.edit');
         Route::put('/categories/{id}', [FeeManagementController::class, 'updateCategory'])->name('categories.update');
         Route::delete('/categories/{id}', [FeeManagementController::class, 'deleteCategory'])->name('categories.delete');
-        
+
         // Structures
         Route::get('/structures', [FeeManagementController::class, 'structures'])->name('structures');
         Route::get('/structures/data', [FeeManagementController::class, 'getStructuresData'])->name('structures.data');
@@ -175,7 +175,10 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'admin', 'as' => 'admin.'], 
         Route::get('/structures/{id}/edit', [FeeManagementController::class, 'editStructure'])->name('structures.edit');
         Route::put('/structures/{id}', [FeeManagementController::class, 'updateStructure'])->name('structures.update');
         Route::delete('/structures/{id}', [FeeManagementController::class, 'deleteStructure'])->name('structures.delete');
-        
+
+        Route::get('/structures/students/{class_id}', [FeeManagementController::class, 'getClassByStudent'])->name('class.students');
+
+
         // Collections
         Route::get('/collections', [FeeManagementController::class, 'collections'])->name('collections');
         Route::get('/collections/data', [FeeManagementController::class, 'getCollectionsData'])->name('collections.data');
@@ -192,7 +195,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'admin', 'as' => 'admin.'], 
         Route::get('/collections/{id}/edit', [FeeManagementController::class, 'editCollection'])->name('collections.edit');
         Route::put('/collections/{id}/update-challan', [FeeManagementController::class, 'updateChallanCollection'])->name('collections.update-challan');
         Route::put('/collections/{id}', [FeeManagementController::class, 'updateCollection'])->name('collections.update');
-        
+
         // Discounts
         Route::get('/discounts', [FeeManagementController::class, 'discounts'])->name('discounts');
         Route::get('/discounts/data', [FeeManagementController::class, 'getDiscountsData'])->name('discounts.data');
@@ -201,20 +204,20 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'admin', 'as' => 'admin.'], 
         Route::get('/discounts/{id}/edit', [FeeManagementController::class, 'editDiscount'])->name('discounts.edit');
         Route::put('/discounts/{id}', [FeeManagementController::class, 'updateDiscount'])->name('discounts.update');
         Route::delete('/discounts/{id}', [FeeManagementController::class, 'deleteDiscount'])->name('discounts.delete');
-        
+
         // Billing
         Route::get('/billing', [FeeManagementController::class, 'billing'])->name('billing');
         Route::get('/billing/data', [FeeManagementController::class, 'getBillingData'])->name('billing.data');
         Route::post('/billing/generate', [FeeManagementController::class, 'generateBilling'])->name('billing.generate');
         Route::get('/billing/{id}/print', [FeeManagementController::class, 'printBilling'])->name('billing.print');
-        
+
         // Reports
         Route::get('/reports', [FeeManagementController::class, 'reports'])->name('reports');
         Route::get('/reports/income', [FeeManagementController::class, 'incomeReport'])->name('reports.income');
         Route::get('/reports/outstanding', [FeeManagementController::class, 'outstandingReport'])->name('reports.outstanding');
         Route::get('/reports/student-ledger/{studentId}', [FeeManagementController::class, 'studentLedger'])->name('reports.student-ledger');
     });
-    
+
     // Dashboard Route
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 });
