@@ -19,6 +19,16 @@
                     <a href="{{ route('admin.fee-management.categories.create') }}" class="btn btn-primary">
                         <i class="fa fa-plus"></i> Add New Category
                     </a>
+
+                     <a href="{{ route('admin.fee-management.template.download.fee.category') }}" class="btn btn-danger">
+                        <i class="fa fa-download"></i> Download Category Template
+                    </a>
+
+                    <button type="button" class="btn btn-success" data-toggle="modal" data-target="#exampleModal">
+                       <i class="fa fa-upload"></i> Import Fee Category
+                    </button>
+
+                    
                 </div>
             </div>
         </div>
@@ -56,6 +66,35 @@
         </div>
     </div>
 </div>
+
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <form action="{{ route('admin.fee-management.fee.category.import') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="importModalLabel">Import Excel File</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="file" class="form-label">Select File</label>
+                            <input type="file" name="file" id="file" class="form-control" required>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-success">Upload</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+
+                
+            </div>
+        </div>
+    </div>
 @endsection
 
 @section('js')

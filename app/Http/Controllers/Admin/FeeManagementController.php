@@ -13,10 +13,16 @@ use App\Models\Student\Students;
 use App\Models\Fee\FeeAdjustment;
 use App\Models\Fee\FeeAllocation;
 use App\Models\Fee\FeeCollection;
+use App\Imports\FeeCategoryImport;
+use App\Imports\FeeDiscountImport;
 use Illuminate\Support\Facades\DB;
+use App\Imports\FeeStructureImport;
 use Illuminate\Support\Facades\Log;
+
 use App\Http\Controllers\Controller;
+use App\Imports\FeeCollectionImport;
 use Illuminate\Support\Facades\Gate;
+use Maatwebsite\Excel\Facades\Excel;
 use App\Models\Academic\AcademicClass;
 use App\Models\Academic\ActiveSession;
 use App\Models\Fee\FeeStructureDetail;
@@ -696,7 +702,7 @@ class FeeManagementController extends Controller
                 if ($billing->outstanding_amount <= 0) {
                     $billing->status = 'paid';
                 } else {
-                    $billing->status = 'partial';
+                    $billing->status = 'partially_paid';
                 }
                 $billing->save();
             }
@@ -1616,4 +1622,124 @@ class FeeManagementController extends Controller
 
         return view('admin.fee-management.reports.student-ledger', compact('student', 'collections', 'adjustments'));
     }
+
+    // Export and Import
+
+    public function downloadTemplateByFeeCategory(){
+
+         $file = public_path('templates/fee_category.xlsx');
+
+        if (file_exists($file)) {
+            return response()->download($file, 'fee_category.xlsx');
+        } else {
+            return redirect()->back()->with('error', 'Template file not found!');
+        }
+    }
+
+     public function importByFeeCategory(Request $request)
+    {
+
+        // dd($request->all());
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv'
+        ]);
+        try {
+            $file = $request->file('file');
+            Excel::import(new FeeCategoryImport, $file);
+        } catch (\Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
+
+        return back()->with('success', 'Fee Category Imported Successfully!');
+    }
+
+    // Export And Import By Structure
+
+     public function downloadTemplateByStructure(){
+       
+        $file = public_path('templates/fee-structures.xlsx');
+        if (file_exists($file)) {
+            return response()->download($file, 'fee-structures.xlsx');
+        } else {
+            return redirect()->back()->with('error', 'Template file not found!');
+        }
+    }
+
+    
+     public function importByStructure(Request $request)
+    {
+
+     
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv'
+        ]);
+        try {
+            $file = $request->file('file');
+            Excel::import(new FeeStructureImport, $file);
+        } catch (\Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
+
+        return back()->with('success', 'Structure Imported Successfully!');
+    }
+
+      // Export And Import By Discount
+
+     public function downloadTemplateByDiscount(){
+       
+        $file = public_path('templates/fee-discounts.xlsx');
+      
+        if (file_exists($file)) {
+            return response()->download($file, 'fee-discounts.xlsx');
+        } else {
+            return redirect()->back()->with('error', 'Template file not found!');
+        }
+    }
+
+    
+     public function importByDiscount(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv'
+        ]);
+        try {
+            $file = $request->file('file');
+            Excel::import(new FeeDiscountImport, $file);
+        } catch (\Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
+
+        return back()->with('success', 'Fee Discount Imported Successfully!');
+    }
+
+       // Export And Import By Fee Collection
+
+     public function downloadTemplateByCollection(){
+       
+        $file = public_path('templates/fee_collection.xlsx');
+      
+        if (file_exists($file)) {
+            return response()->download($file, 'fee_collection.xlsx');
+        } else {
+            return redirect()->back()->with('error', 'Template file not found!');
+        }
+    }
+
+    
+     public function importByCollection(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv'
+        ]);
+        try {
+            $file = $request->file('file');
+            Excel::import(new FeeCollectionImport, $file);
+        } catch (\Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
+
+        return back()->with('success', 'Fee Collection Imported Successfully!');
+    }
+
+
 }

@@ -167,6 +167,12 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'admin', 'as' => 'admin.'], 
         Route::put('/categories/{id}', [FeeManagementController::class, 'updateCategory'])->name('categories.update');
         Route::delete('/categories/{id}', [FeeManagementController::class, 'deleteCategory'])->name('categories.delete');
 
+        // Export And Import By Categories
+        Route::get('/download-fee-category-template', [FeeManagementController::class, 'downloadTemplateByFeeCategory'])->name('template.download.fee.category');
+        Route::post('/fee-category/import', [FeeManagementController::class, 'importByFeeCategory'])->name('fee.category.import');
+
+
+
         // Structures
         Route::get('/structures', [FeeManagementController::class, 'structures'])->name('structures');
         Route::get('/structures/data', [FeeManagementController::class, 'getStructuresData'])->name('structures.data');
@@ -175,9 +181,10 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'admin', 'as' => 'admin.'], 
         Route::get('/structures/{id}/edit', [FeeManagementController::class, 'editStructure'])->name('structures.edit');
         Route::put('/structures/{id}', [FeeManagementController::class, 'updateStructure'])->name('structures.update');
         Route::delete('/structures/{id}', [FeeManagementController::class, 'deleteStructure'])->name('structures.delete');
-
         Route::get('/structures/students/{class_id}', [FeeManagementController::class, 'getClassByStudent'])->name('class.students');
-
+        // Export And Import Structures
+        Route::get('/download-structures-template', [FeeManagementController::class, 'downloadTemplateByStructure'])->name('template.download.structure');
+        Route::post('/structure/import', [FeeManagementController::class, 'importByStructure'])->name('structure.import');
 
         // Collections
         Route::get('/collections', [FeeManagementController::class, 'collections'])->name('collections');
@@ -195,6 +202,10 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'admin', 'as' => 'admin.'], 
         Route::get('/collections/{id}/edit', [FeeManagementController::class, 'editCollection'])->name('collections.edit');
         Route::put('/collections/{id}/update-challan', [FeeManagementController::class, 'updateChallanCollection'])->name('collections.update-challan');
         Route::put('/collections/{id}', [FeeManagementController::class, 'updateCollection'])->name('collections.update');
+        // Export And Import Collections
+        Route::get('/download-collection-template', [FeeManagementController::class, 'downloadTemplateByCollection'])->name('template.download.fee.collection');
+        Route::post('/collection/import', [FeeManagementController::class, 'importByCollection'])->name('fee.collection.import');
+
 
         // Discounts
         Route::get('/discounts', [FeeManagementController::class, 'discounts'])->name('discounts');
@@ -204,6 +215,9 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'admin', 'as' => 'admin.'], 
         Route::get('/discounts/{id}/edit', [FeeManagementController::class, 'editDiscount'])->name('discounts.edit');
         Route::put('/discounts/{id}', [FeeManagementController::class, 'updateDiscount'])->name('discounts.update');
         Route::delete('/discounts/{id}', [FeeManagementController::class, 'deleteDiscount'])->name('discounts.delete');
+        // Export And Import Discounts
+        Route::get('/download-discount-template', [FeeManagementController::class, 'downloadTemplateByDiscount'])->name('template.download.discount');
+        Route::post('/discount/import', [FeeManagementController::class, 'importByDiscount'])->name('discount.import');
 
         // Billing
         Route::get('/billing', [FeeManagementController::class, 'billing'])->name('billing');
