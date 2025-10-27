@@ -14,6 +14,8 @@ use Maatwebsite\Excel\Concerns\Importable;
 use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use Carbon\Carbon;
+use PhpOffice\PhpSpreadsheet\Shared\Date as XlsDate;
 
 
 class FeeCollectionImport implements ToModel, WithHeadingRow, SkipsEmptyRows
@@ -30,18 +32,19 @@ class FeeCollectionImport implements ToModel, WithHeadingRow, SkipsEmptyRows
 
     public function model(array $row)
     {
-
+        
+       
          $row = collect($row)->map(function ($v) {
             return is_string($v) ? trim($v) : $v;
         })->toArray();
 
 
-    //    dd($row);
+    
 
         if (!$this->headersChecked) {
             $this->headersChecked = true;
-            if (count($row) > 10) {
-                throw new \Exception("Excel file headers should not be more than 10 columns!");
+            if (count($row) > 14) {
+                throw new \Exception("Excel file headers should not be more than 14 columns!");
             }
         }
 
@@ -91,28 +94,61 @@ class FeeCollectionImport implements ToModel, WithHeadingRow, SkipsEmptyRows
         $student = Students::where('student_id', $row['student_id'])->first();
         if (!$student) {
             throw new \Exception("Student record not found: {$row['student_id']}");
-        } else {
-            $studentNmae = Students::whereRaw("CONCAT(TRIM(first_name),' ',TRIM(last_name)) = ?", [trim($row['student_name'])])
-                ->where('student_id', $student->student_id)
-                ->first();
-            if (!$studentNmae) {
-                throw new \Exception("Student record not found: {$row['student_id']} {$row['student_name']}");
-            } else {
-                $studentWithClass = Students::where('student_id', $row['student_id'])
-                    ->where('class_id', $class_id)
-                    ->first();
-                if (!$studentWithClass) {
-                    throw new \Exception("Student record not found with the given class: {$row['student_id']} {$row['student_name']} {$class_id} ");
-                }
-            }
-        }
+        } 
+        // else {
+        //     $studentNmae = Students::whereRaw("CONCAT(TRIM(first_name),' ',TRIM(last_name)) = ?", [trim($row['student_name'])])
+        //         ->where('student_id', $student->student_id)
+        //         ->first();
+        //     if (!$studentNmae) {
+        //         throw new \Exception("Student record not found: {$row['student_id']} {$row['student_name']}");
+        //     } else {
+        //         $studentWithClass = Students::where('student_id', $row['student_id'])
+        //             ->where('class_id', $class_id)
+        //             ->first();
+        //         if (!$studentWithClass) {
+        //             throw new \Exception("Student record not found with the given class: {$row['student_id']} {$row['student_name']} {$class_id} ");
+        //         }
+        //     }
+        // }
         $student_id = $student->id;
 
-        $collection = $row['collection_date'];
-        $collection_date = $this->excelDateToCarbon($collection);
-        $valid_collection_Date = $collection_date->format('Y-m-d');
+        // $collection = $row['collection_date'];
+        // $collection_date = $this->excelDateToCarbon($collection);
+        // $valid_collection_Date = $collection_date->format('Y-m-d');
 
-        
+        $raw = $row['collection_date'] ?? null;
+
+            if ($raw instanceof \DateTimeInterface) {
+                $dt = Carbon::instance($raw);
+            } elseif (is_numeric($raw)) {
+                // Excel serial
+                if (class_exists(\PhpOffice\PhpSpreadsheet\Shared\Date::class)) {
+                    $dt = Carbon::instance(XlsDate::excelToDateTimeObject((float)$raw));
+                } else {
+                    // Fallback if PhpSpreadsheet helper not available
+                    $dt = Carbon::createFromTimestampUTC((int)(((float)$raw - 25569) * 86400));
+                }
+            } else {
+                // String dates: handle m/d/Y and d/m/Y
+                $s = trim((string)$raw);
+                $s = str_replace(['.', '-'], '/', $s); // normalise separators
+                $dt = null;
+
+                foreach (['m/d/Y','d/m/Y','Y/m/d','Y/m/d H:i:s','Y-m-d'] as $fmt) {
+                    try { $dt = Carbon::createFromFormat($fmt, $s); break; } catch (\Throwable $e) {}
+                }
+                if (!$dt) { // last resort
+                    try { $dt = Carbon::parse($s); } catch (\Throwable $e) { $dt = null; }
+                }
+            }
+
+            if (!$dt) {
+                throw new \Exception('Invalid collection_date: '.json_encode($raw));
+            }
+
+$valid_collection_Date = $dt->format('Y-m-d');
+      
+      
         // --- parse "A | B" + "100 | 200" ---
         [$cats, $amts] = $this->parsePipePair($row['category'], $row['amount']);
         if (count($cats) !== count($amts)) {
@@ -217,16 +253,54 @@ class FeeCollectionImport implements ToModel, WithHeadingRow, SkipsEmptyRows
 
        protected function excelDateToCarbon($serial)
         {
+            // dd($serial ,\Carbon\Carbon::createFromTimestamp(($serial - 25569) * 86400));
             return \Carbon\Carbon::createFromTimestamp(($serial - 25569) * 86400);
         }
 
 
-      protected function parsePipePair(string $categories, string $amounts): array
-    {
-        $split = function ($v) {
-            if ($v === null || trim($v) === '') return [];
-            return array_values(array_filter(array_map('trim', preg_split('/\s*\|\s*/', $v))));
-        };
-        return [$split($categories), $split($amounts)];
+    protected function parsePipePair(?string $categories, ?string $amounts): array
+{
+    // Normalize wrong pipe characters
+    $normalize = function (?string $v): string {
+        $v = trim((string) $v);
+        return str_replace(
+            ["\xE2\x94\x82", "¦", "｜"], // similar to |
+            "|",
+            $v
+        );
+    };
+
+    // Split by pipe and sanitize
+    $split = function (?string $v, bool $asNumeric = false) use ($normalize) {
+        $v = $normalize($v); // ✅ Now it works
+        if ($v === '' || $v === null) {
+            return [];
+        }
+
+        $parts = preg_split('/\s*\|\s*/u', $v); // split by |
+        $parts = array_map('trim', $parts);
+        $parts = array_filter($parts, fn($x) => $x !== '');
+
+        if ($asNumeric) {
+            $parts = array_map(function ($x) {
+                $x = str_replace(',', '', $x);
+                return is_numeric($x) ? $x + 0 : 0;
+            }, $parts);
+        }
+
+        return array_values($parts);
+    };
+
+    $cats = $split($categories, false);
+    $amts = $split($amounts, true);
+
+    // Auto-fix mismatch count
+    if (count($cats) !== count($amts)) {
+        $amts = array_pad($amts, count($cats), 0);
     }
+
+    return [$cats, $amts];
+}
+
+
 }

@@ -1731,12 +1731,12 @@ class FeeManagementController extends Controller
         $request->validate([
             'file' => 'required|mimes:xlsx,xls,csv'
         ]);
-        try {
+        // try {
             $file = $request->file('file');
             Excel::import(new FeeCollectionImport, $file);
-        } catch (\Exception $e) {
-            return back()->with('error', $e->getMessage());
-        }
+        // } catch (\Exception $e) {
+        //     return back()->with('error', $e->getMessage());
+        // }
 
         return back()->with('success', 'Fee Collection Imported Successfully!');
     }
