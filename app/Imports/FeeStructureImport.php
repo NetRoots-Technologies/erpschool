@@ -24,6 +24,7 @@ class FeeStructureImport implements ToModel, WithHeadingRow, SkipsEmptyRows
     public function model(array $row)
     {
 
+        
         $row = collect($row)->map(function ($v) {
             return is_string($v) ? trim($v) : $v;
         })->toArray();
@@ -95,36 +96,36 @@ class FeeStructureImport implements ToModel, WithHeadingRow, SkipsEmptyRows
         $student = Students::where('student_id', $row['student_id'])->first();
         if (!$student) {
             throw new \Exception("Student record not found: {$row['student_id']}");
-        }else{
-            $studentNmae = Students::whereRaw("CONCAT(TRIM(first_name),' ',TRIM(last_name)) = ?", [trim($row['student_name'])])
-                                ->where('student_id' , $student->student_id)
-                                ->first();
-            if(!$studentNmae){
-            throw new \Exception("Student record not found: {$row['student_id']} {$row['student_name']}");
-            }else{
-                $studentWithClass = Students::where('student_id', $row['student_id'])
-                            ->where('class_id' , $class_id)
-                            ->first();
-                if(!$studentWithClass){
-                    throw new \Exception("Student record not found with the given class: {$row['student_id']} {$row['student_name']} {$class_id} ");
-                }
-            }
         }
+        
+        // else{
+        //     $studentNmae = Students::whereRaw("CONCAT(TRIM(first_name),' ',TRIM(last_name)) = ?", [trim($row['student_name'])])
+        //                         ->where('student_id' , $student->student_id)
+        //                         ->first();
+        //     if(!$studentNmae){
+        //     throw new \Exception("Student record not found: {$row['student_id']} {$row['student_name']}");
+        //     }else{
+        //         $studentWithClass = Students::where('student_id', $row['student_id'])
+        //                     ->where('class_id' , $class_id)
+        //                     ->first();
+        //         if(!$studentWithClass){
+        //             throw new \Exception("Student record not found with the given class: {$row['student_id']} {$row['student_name']} {$class_id} ");
+        //         }
+        //     }
+        // }
         
       
         $student_id = $student->id;
 
 
-        [$cats, $amts, $notes] = $this->parsePipeTriplet(
+        [$cats, $amts] = $this->parsePipeTriplet(
             $row['category'],
-            $row['amount'],
-            $row['notes'] ?? null
+            $row['amount']
         );
 
         if (count($cats) !== count($amts)) {
             throw new \Exception("Categories count (" . count($cats) . ") does not match Amounts count (" . count($amts) . ").");
         }
-
 
         $detailItems = [];
         $total = 0;
@@ -146,7 +147,6 @@ class FeeStructureImport implements ToModel, WithHeadingRow, SkipsEmptyRows
             $detailItems[] = [
                 'fee_category_id' => $cat->id,
                 'amount'          => $amount,
-                'notes'           => $notes[$idx] ?? null,
             ];
         }
 
@@ -174,7 +174,7 @@ class FeeStructureImport implements ToModel, WithHeadingRow, SkipsEmptyRows
                     'fee_structure_id' => $structure->id,
                     'fee_category_id'  => $item['fee_category_id'],
                     'amount'           => $item['amount'],
-                    'notes'            => $item['notes'],
+                    'notes'            => "Bills for Oct 2025",
                     'company_id'          => auth()->user()->company_id ?? null,
                     'branch_id'           => auth()->user()->branch_id ?? null,
                     'created_by'          => auth()->id(),
@@ -185,30 +185,70 @@ class FeeStructureImport implements ToModel, WithHeadingRow, SkipsEmptyRows
         });
     }
 
-    /**
-     * Parse "A | B | C" style triplet columns.
-     *
-     * @param string $categories
-     * @param string $amounts
-     * @param string|null $notes
-     * @return array{0: array<int,string>, 1: array<int,string>, 2: array<int,string|null>}
-     */
-    protected function parsePipeTriplet(string $categories, string $amounts, ?string $notes): array
-    {
-        $split = function (?string $val): array {
-            if ($val === null || trim($val) === '') return [];
-            $parts = preg_split('/\s*\|\s*/', $val);
-            return array_values(array_filter(array_map('trim', $parts), fn($v) => $v !== ''));
-        };
 
-        $cats  = $split($categories);
-        $amts  = $split($amounts);
-        $nts   = $split($notes ?? '');
-        
-        if (count($nts) < count($cats)) {
-            $nts = array_pad($nts, count($cats), null);
+
+    protected function parsePipeTriplet(?string $categories, ?string $amounts): array
+{
+    // Normalize lookalike pipes to ASCII '|'
+    $normalize = function (?string $v): string {
+        $v = trim((string) $v);
+        return str_replace(
+            ["\xE2\x94\x82", "¦", "｜"], // │, ¦, fullwidth |
+            "|",
+            $v
+        );
+    };
+
+    /**
+     * Split by pipe with an option to keep empty tokens for strict alignment.
+     */
+    $split = function (?string $v, bool $asNumeric = false, bool $keepEmpty = true) use ($normalize) {
+        $v = $normalize($v);
+        if ($v === '' || $v === null) return [];
+
+        // split on pipes with optional spaces around them
+        $parts = preg_split('/\s*\|\s*/u', $v) ?: [];
+        $parts = array_map('trim', $parts);
+
+        if (!$keepEmpty) {
+            $parts = array_values(array_filter($parts, fn($x) => $x !== ''));
+        }
+        // when keeping empties, do NOT filter them out
+
+        if ($asNumeric) {
+            $parts = array_map(function ($x) {
+                // empty -> 0; remove commas; non-numeric -> 0
+                if ($x === '') return 0;
+                $x = str_replace(',', '', $x);
+                return is_numeric($x) ? $x + 0 : 0;
+            }, $parts);
         }
 
-        return [$cats, $amts, $nts];
+        return $parts;
+    };
+
+    // Keep empties to retain positions (STRICT alignment)
+    $cats = $split($categories, false, true);
+    $amts = $split($amounts,   true,  true);
+
+    $catCount = count($cats);
+    $amtCount = count($amts);
+
+    // Align lengths:
+    if ($amtCount < $catCount) {
+        // pad missing amounts with 0
+        $amts = array_pad($amts, $catCount, 0);
+    } elseif ($amtCount > $catCount) {
+        // truncate extra amounts (safer than throwing)
+        $amts = array_slice($amts, 0, $catCount);
+        // If you prefer to hard fail instead, replace the slice with an Exception.
+        // throw new \Exception("Amounts has extra values: got {$amtCount}, expected {$catCount}.");
     }
+
+    // Optional: normalize category names (collapse internal spaces)
+    $cats = array_map(fn($c) => preg_replace('/\s+/u', ' ', $c), $cats);
+
+    return [$cats, $amts];
+}
+
 }
