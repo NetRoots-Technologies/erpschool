@@ -44,7 +44,7 @@
                         <table class="table table-bordered table-striped" id="discountsTable">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
+                                    <th>Student ID</th>
                                     <th>Student</th>
                                     <th>Category</th>
                                     <th>Discount Type</th>
@@ -109,8 +109,8 @@
                 type: 'GET'
             },
             columns: [
-                { data: 'id', name: 'id' },
-                { data: 'student_name', name: 'student_name' },
+                { data: 'studentId', name: 'studentId' , searchable: true},
+                { data: 'student_name', name: 'student_name', searchable: true},
                 { data: 'category_name', name: 'category_name' },
                 { 
                     data: 'discount_type', 

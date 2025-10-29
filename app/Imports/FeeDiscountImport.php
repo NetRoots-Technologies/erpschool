@@ -29,9 +29,9 @@ class FeeDiscountImport implements ToModel, WithHeadingRow, SkipsEmptyRows
         if (!$this->headersChecked) {
             $this->headersChecked = true;
 
-            if (count($row) > 9) {
-                throw new \Exception("Excel file headers should not be more than 9 columns!");
-            }
+            // if (count($row) > 9) {
+            //     throw new \Exception("Excel file headers should not be more than 9 columns!");
+            // }
         }
 
         if (empty($row['student_id'])) {
@@ -50,9 +50,7 @@ class FeeDiscountImport implements ToModel, WithHeadingRow, SkipsEmptyRows
             throw new \Exception("discount_type row is empty");
         }
 
-        if (empty($row['discount_value'])) {
-            throw new \Exception("discount_value row is missing");
-        }
+       
         if (empty($row['reason_of_discount'])) {
             throw new \Exception("reason_of_discount row is missing");
         }
@@ -66,11 +64,11 @@ class FeeDiscountImport implements ToModel, WithHeadingRow, SkipsEmptyRows
         $percentage = $row['discount_value'];
         $finalPercentage = is_numeric($percentage) ? $percentage * 100 : floatval($percentage);
 
-        $class = AcademicClass::where('name', $row['class'])->first();
-        if (!$class) {
-            throw new \Exception("Class not found: {$row['class']}");
-        }
-        $class_id = $class->id;
+        // $class = AcademicClass::where('name', $row['class'])->first();
+        // if (!$class) {
+        //     throw new \Exception("Class not found: {$row['class']}");
+        // }
+        // $class_id = $class->id;
 
 
         $cat = FeeCategory::where('name', $row['fee_category'])->first();
@@ -82,21 +80,22 @@ class FeeDiscountImport implements ToModel, WithHeadingRow, SkipsEmptyRows
         $student = Students::where('student_id', $row['student_id'])->first();
         if (!$student) {
             throw new \Exception("Student record not found: {$row['student_id']}");
-        } else {
-            $studentNmae = Students::whereRaw("CONCAT(TRIM(first_name),' ',TRIM(last_name)) = ?", [trim($row['student_name'])])
-                ->where('student_id', $student->student_id)
-                ->first();
-            if (!$studentNmae) {
-                throw new \Exception("Student record not found: {$row['student_id']} {$row['student_name']}");
-            } else {
-                $studentWithClass = Students::where('student_id', $row['student_id'])
-                    ->where('class_id', $class_id)
-                    ->first();
-                if (!$studentWithClass) {
-                    throw new \Exception("Student record not found with the given class: {$row['student_id']} {$row['student_name']} {$class_id} ");
-                }
-            }
-        }
+        } 
+        // else {
+        //     $studentNmae = Students::whereRaw("CONCAT(TRIM(first_name),' ',TRIM(last_name)) = ?", [trim($row['student_name'])])
+        //         ->where('student_id', $student->student_id)
+        //         ->first();
+        //     if (!$studentNmae) {
+        //         throw new \Exception("Student record not found: {$row['student_id']} {$row['student_name']}");
+        //     } else {
+        //         $studentWithClass = Students::where('student_id', $row['student_id'])
+        //             ->where('class_id', $class_id)
+        //             ->first();
+        //         if (!$studentWithClass) {
+        //             throw new \Exception("Student record not found with the given class: {$row['student_id']} {$row['student_name']} {$class_id} ");
+        //         }
+        //     }
+        // }
         $student_id = $student->id;
 
         $valid_from_serial = $row['valid_form_month'];

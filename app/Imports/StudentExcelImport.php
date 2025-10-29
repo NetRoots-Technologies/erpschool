@@ -67,7 +67,7 @@ class StudentExcelImport implements ToCollection, WithHeadingRow
             // dd($row['is_guardian']);
             // dd($row['is_guardian']);
             // dd(trim($row['branch_name']));
-            $branchId = Branch::where('name', trim($row['branch_name']))->value('id');
+            $branchId = 1;
             // dd($branchId);
             $classId = AcademicClass::where('name', $row['class_name'])
                 ->whereHas('branch', function ($query) use ($branchId) {

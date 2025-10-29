@@ -126,6 +126,14 @@ class MissingPermissionsSeeder extends Seeder
                 'fee-report-income',
             ],
 
+
+            'FinancialYears' => [
+                'FinancialYears-list',
+                'FinancialYears-create',
+                'FinancialYears-edit',
+                'FinancialYears-delete',
+                'FinancialYears-view',
+            ],
            
 
 

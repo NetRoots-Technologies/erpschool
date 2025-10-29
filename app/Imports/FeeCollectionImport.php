@@ -71,11 +71,11 @@ class FeeCollectionImport implements ToModel, WithHeadingRow, SkipsEmptyRows
 
             
 
-         $class = AcademicClass::where('name', $row['class'])->first();
-            if (!$class) {
-                throw new \Exception("Class not found: {$row['class']}");
-            }
-        $class_id = $class->id;
+        //  $class = AcademicClass::where('name', $row['class'])->first();
+        //     if (!$class) {
+        //         throw new \Exception("Class not found: {$row['class']}");
+        //     }
+        // $class_id = $class->id;
 
 
         $sessions = AcademicSession::where('name', $row['session'])->first();
