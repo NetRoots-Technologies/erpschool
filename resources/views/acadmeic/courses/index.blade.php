@@ -23,16 +23,17 @@ Subjects
 
             {{-- Download Sample Bulk File --}}
             <div class="col-auto">
-                <a href="{{ config('google_sheet_links.subject_file_link') }}" target="_blank"
+                {{-- <a href="{{ config('google_sheet_links.subject_file_link') }}" target="_blank" --}}
+                <a href="{{ route('academic.subjects.export-file') }}"
                     class="btn btn-warning btn-md">
-                    <b>Download Sample Bulk File</b>
+                    <b>Export Bulk File</b>
                 </a>
             </div>
 
             {{-- Import Sample Bulk File --}}
             <div class="col-auto">
                 <a href="#" class="btn btn-success btn-md" data-bs-toggle="modal" data-bs-target="#importModal">
-                    <b>Import Data</b>
+                    <b>Import Bluk Data</b>
                 </a>
             </div>
 

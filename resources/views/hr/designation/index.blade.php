@@ -27,18 +27,18 @@ Designations
         </div>
 
         {{-- Download Sample Bulk File --}}
-        <div class="col-auto p-0">
+        {{-- <div class="col-auto p-0">
             <a href="{{ route('academic.designation.export-file') }}" class="btn btn-warning btn-md">
                 <b>Download Sample Bulk File</b>
             </a>
-        </div>
+        </div> --}}
 
         {{-- Import Sample Bulk File --}}
-        <div class="col-auto">
+        {{-- <div class="col-auto">
             <a href="#" class="btn btn-success btn-md" data-bs-toggle="modal" data-bs-target="#importModal">
                 <b>Import Data</b>
             </a>
-        </div>
+        </div> --}}
         <div class="col-auto p-0">
             <a href="{{route('print-preview', 'designations')}}" class="btn btn-info btn-md">
                 <b>Print Preview</b>

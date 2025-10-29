@@ -25,10 +25,10 @@ Academic
                 <a class="btn btn-primary btn-md mb-sm-0 mb-2 text-white" data-toggle="modal"
                     data-target="#createModal1">Add Session</a>
                 <a href="{{route('academic.session.export-file')}}"
-                    class="btn btn-success mb-2 mb-sm-0 btn-md text-white">Download
-                    Sample Bulk File</a>
+                    class="btn btn-success mb-2 mb-sm-0 btn-md text-white">
+                    Export Academic Session File</a>
                 <button class="btn btn-warning mb-sm-0 btn-md mb-2 text-white" data-toggle="modal"
-                    data-target="#importModal">Import Sample
+                    data-target="#importModal">Import 
                     Bulk File</button>
             </div>
         </div>

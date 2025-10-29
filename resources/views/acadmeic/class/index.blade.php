@@ -52,16 +52,17 @@ Classes
 
         {{-- View Sample File --}}
         <div class="col-auto">
-            <a href="https://docs.google.com/spreadsheets/d/1nrcmC1t3I0qWtDOgJLs4h7fzDm89bxsg0U42Sv4-G3Y/edit?gid=0#gid=0"
+            {{-- <a href="https://docs.google.com/spreadsheets/d/1nrcmC1t3I0qWtDOgJLs4h7fzDm89bxsg0U42Sv4-G3Y/edit?gid=0#gid=0" --}}
+            <a href="{{ route('academic.class.export-file') }}"
                 class="btn btn-success btn-md">
-                <b>View Sample File</b>
+                <b>Export Class File</b>
             </a>
         </div>
 
         {{-- Import Sample Bulk File --}}
         <div class="col-auto">
             <a href="#" class="btn btn-warning btn-md" data-bs-toggle="modal" data-bs-target="#importModal">
-                <b>Import Sample Bulk File</b>
+                <b>Import  Bulk File</b>
             </a>
         </div>
     </div>

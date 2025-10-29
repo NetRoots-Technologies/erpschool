@@ -3,8 +3,10 @@
 namespace App\Models\Fee;
 
 use App\Models\User;
-use App\Models\Admin\Company;
 use App\Models\Admin\Branch;
+use App\Models\Admin\Company;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Fee\FeeDiscountHistory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -39,6 +41,38 @@ class FeeDiscount extends Model
         'deleted_at' => 'datetime',
         'show_on_voucher' => 'boolean',
     ];
+
+
+    // Auto create and upade the histories
+ protected static function boot()
+{
+    parent::boot();
+
+    // ✅ Correct event: created (fires after record is saved)
+    static::created(function ($discount) {
+        \App\Models\Fee\FeeDiscountHistory::create([
+            'fee_discount_id' => $discount->id,
+            'updated_by' => Auth::id(),
+            'old_data' => null,
+            'new_data' => $discount->toArray(),
+        ]);
+    });
+
+    // ✅ updating (fires before update)
+    static::updating(function ($discount) {
+        $oldData = $discount->getOriginal();
+        $newData = $discount->getDirty();
+
+        \App\Models\Fee\FeeDiscountHistory::create([
+            'fee_discount_id' => $discount->id,
+            'updated_by' => Auth::id(),
+            'old_data' => $oldData,
+            'new_data' => $newData,
+        ]);
+    });
+}
+
+
 
     // Relationships
     public function student()

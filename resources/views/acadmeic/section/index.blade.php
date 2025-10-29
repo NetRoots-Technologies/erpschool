@@ -43,15 +43,16 @@
 
               {{-- Download Sample Bulk File --}}
             <div class="col-auto">
-                <a href="{{ config('google_sheet_links.section_file_link') }}" class="btn btn-warning btn-md" target="_blank">
-                    <b>Download Sample Bulk File</b>
+                {{-- <a href="{{ config('google_sheet_links.section_file_link') }}" class="btn btn-warning btn-md" target="_blank"> --}}
+                <a href="{{ route('academic.section.export-file') }}" class="btn btn-warning btn-md">
+                    <b>Export Section File</b>
                 </a>
             </div>
 
             {{-- Import Sample Bulk File --}}
             <div class="col-auto">
                 <a href="#" class="btn btn-success btn-md" data-bs-toggle="modal" data-bs-target="#importModal">
-                    <b>Import Data</b>
+                    <b>Import Bluk Data</b>
                 </a>
             </div>
             @endif

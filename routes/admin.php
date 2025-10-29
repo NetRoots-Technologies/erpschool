@@ -215,6 +215,9 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'admin', 'as' => 'admin.'], 
         Route::get('/discounts/{id}/edit', [FeeManagementController::class, 'editDiscount'])->name('discounts.edit');
         Route::put('/discounts/{id}', [FeeManagementController::class, 'updateDiscount'])->name('discounts.update');
         Route::delete('/discounts/{id}', [FeeManagementController::class, 'deleteDiscount'])->name('discounts.delete');
+
+        Route::get('/discounts/history/{id}', [FeeManagementController::class, 'history'])->name('discounts.history');
+
         // Export And Import Discounts
         Route::get('/download-discount-template', [FeeManagementController::class, 'downloadTemplateByDiscount'])->name('template.download.discount');
         Route::post('/discount/import', [FeeManagementController::class, 'importByDiscount'])->name('discount.import');

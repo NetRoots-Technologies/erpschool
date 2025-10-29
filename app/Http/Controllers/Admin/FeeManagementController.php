@@ -25,6 +25,7 @@ use Illuminate\Support\Facades\Gate;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\Academic\AcademicClass;
 use App\Models\Academic\ActiveSession;
+use App\Models\Fee\FeeDiscountHistory;
 use App\Models\Fee\FeeStructureDetail;
 use App\Models\Fee\FeeCollectionDetail;
 use App\Models\Student\AcademicSession;
@@ -932,36 +933,79 @@ class FeeManagementController extends Controller
         return view('admin.fee-management.discounts.index');
     }
 
+    // public function getDiscountsData()
+    // {
+    //     $discounts = FeeDiscount::with(['student', 'category', 'createdBy'])
+    //         ->select(['id', 'student_id', 'category_id', 'discount_type', 'discount_value', 'reason', 'show_on_voucher', 'valid_from', 'valid_to', 'created_at']);
+    //     return DataTables::of($discounts)
+    //         ->addColumn('action', function ($discount) {
+
+    //             $deleteBtn = '';
+    //             $editBtn = '';
+
+    //             if (Gate::allows('fee-discount-edit')) {
+    //                 $editBtn = '<a href="' . route('admin.fee-management.discounts.edit', $discount->id) . '" class="btn btn-sm btn-primary">Edit</a>';
+    //             }
+
+    //             if (Gate::allows('fee-discount-delete')) {
+    //                 $deleteBtn = '<button class="btn btn-sm btn-danger" onclick="deleteDiscount(' . $discount->id . ')">Delete</button>';
+    //             }
+
+
+    //             return $editBtn . ' ' . $deleteBtn;
+    //         })
+    //         ->addColumn('student_name', function ($discount) {
+    //             return $discount->student->fullname ?? 'N/A';
+    //         })
+    //         ->addColumn('category_name', function ($discount) {
+    //             return $discount->category->name ?? 'N/A';
+    //         })
+    //         ->rawColumns(['action'])
+    //         ->make(true);
+    // }
+
     public function getDiscountsData()
-    {
-        $discounts = FeeDiscount::with(['student', 'category', 'createdBy'])
-            ->select(['id', 'student_id', 'category_id', 'discount_type', 'discount_value', 'reason', 'show_on_voucher', 'valid_from', 'valid_to', 'created_at']);
-        return DataTables::of($discounts)
-            ->addColumn('action', function ($discount) {
+{
+    $discounts = FeeDiscount::with(['student', 'category', 'createdBy'])
+        ->select(['id', 'student_id', 'category_id', 'discount_type', 'discount_value', 'reason', 'show_on_voucher', 'valid_from', 'valid_to', 'created_at']);
 
-                $deleteBtn = '';
-                $editBtn = '';
+    return DataTables::of($discounts)
+        ->addColumn('action', function ($discount) {
 
-                if (Gate::allows('fee-discount-edit')) {
-                    $editBtn = '<a href="' . route('admin.fee-management.discounts.edit', $discount->id) . '" class="btn btn-sm btn-primary">Edit</a>';
-                }
+            $deleteBtn = '';
+            $editBtn = '';
+            $historyBtn = '';
 
-                if (Gate::allows('fee-discount-delete')) {
-                    $deleteBtn = '<button class="btn btn-sm btn-danger" onclick="deleteDiscount(' . $discount->id . ')">Delete</button>';
-                }
+            if (Gate::allows('fee-discount-edit')) {
+                $editBtn = '<a href="' . route('admin.fee-management.discounts.edit', $discount->id) . '" class="btn btn-sm btn-primary">
+                                <i class="fa fa-edit"></i> Edit
+                            </a>';
+            }
 
+            if (Gate::allows('fee-discount-delete')) {
+                $deleteBtn = '<button class="btn btn-sm btn-danger" onclick="deleteDiscount(' . $discount->id . ')">
+                                <i class="fa fa-trash"></i> Delete
+                              </button>';
+            }
 
-                return $editBtn . ' ' . $deleteBtn;
-            })
-            ->addColumn('student_name', function ($discount) {
-                return $discount->student->fullname ?? 'N/A';
-            })
-            ->addColumn('category_name', function ($discount) {
-                return $discount->category->name ?? 'N/A';
-            })
-            ->rawColumns(['action'])
-            ->make(true);
-    }
+            // 🟡 Add History Button
+            $historyBtn = '<a href="' . route('admin.fee-management.discounts.history', $discount->id) . '" 
+                            class="btn btn-sm btn-warning">
+                            <i class="fa fa-history"></i> History
+                          </a>';
+
+            return $editBtn . ' ' . $deleteBtn . ' ' . $historyBtn;
+        })
+        ->addColumn('student_name', function ($discount) {
+            return $discount->student->fullname ?? 'N/A';
+        })
+        ->addColumn('category_name', function ($discount) {
+            return $discount->category->name ?? 'N/A';
+        })
+        ->rawColumns(['action'])
+        ->make(true);
+}
+
 
     public function createDiscount()
     {
@@ -1740,6 +1784,17 @@ class FeeManagementController extends Controller
 
         return back()->with('success', 'Fee Collection Imported Successfully!');
     }
+
+    
+        public function history($id)
+        {
+
+            $histories = FeeDiscountHistory::with('histories')
+               ->where('fee_discount_id', $id)
+                ->get();
+
+            return view('admin.fee-management.discounts.history', compact('histories'));
+        }
 
 
 }

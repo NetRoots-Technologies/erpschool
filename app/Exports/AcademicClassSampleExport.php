@@ -1,4 +1,5 @@
-<?php 
+<?php
+
 namespace App\Exports;
 
 use Maatwebsite\Excel\Concerns\FromArray;
@@ -9,19 +10,19 @@ class AcademicClassSampleExport implements FromArray, WithHeadings
     public function headings(): array
     {
         return [
-            'Company ID',
-            'Session ID',
-            'Branch ID',
-            'Class Name',
-            'School Type ID',
+            'Company',
+            'Academic Session',
+            'Branch',
+            'Name',
+            'School Type',
         ];
     }
 
     public function array(): array
     {
         return [
-            ['1', '2025', '10', 'Class One', '2'],
-            ['1', '2025', '11', 'Class Two', '3'],
+            ['CSS', '2025-26 Academic Session', 'Global Campus', 'Grade 1', 'Pre school'],
+            ['CSS', '2025-26 Academic Session', 'Global Campus', 'Grade 2', 'Primary'],
         ];
     }
 }

@@ -112,12 +112,22 @@
                             </div>
                         </div>
 
-                        <div class="form-group mt-2">
+                        {{-- <div class="form-group mt-2">
                             <div class="form-check">
                                 <input type="checkbox" class="form-check-input" id="show_on_voucher" name="show_on_voucher" value="1" {{ old('show_on_voucher') ? 'checked' : '' }}>
                                 <label class="form-check-label" for="show_on_voucher">Show on Student Voucher</label>
                             </div>
+                        </div> --}}
+
+                        <div class="form-group mt-2">
+                        <div class="form-check">
+                            <!-- Always send a 0 even if unchecked -->
+                            <input type="hidden" name="show_on_voucher" value="0">
+                            <input type="checkbox" class="form-check-input" id="show_on_voucher" name="show_on_voucher" value="1" {{ old('show_on_voucher') ? 'checked' : '' }}>
+                            <label class="form-check-label" for="show_on_voucher">Show on Student Voucher</label>
                         </div>
+                    </div>
+
 
 
                         <div class="row">
