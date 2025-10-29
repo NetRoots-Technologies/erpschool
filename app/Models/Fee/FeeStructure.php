@@ -111,4 +111,10 @@ class FeeStructure extends Model
     {
         return $query->where('branch_id', $branchId);
     }
+
+    public function student()
+    {
+        return $this->belongsTo(\App\Models\Student\Students::class);
+    }
+    
 }

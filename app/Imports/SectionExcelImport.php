@@ -26,33 +26,20 @@ class SectionExcelImport implements ToCollection, WithHeadingRow
                 $activeSession  = AcademicSession::where('name', $row['active_session'])->first();
                 $academicClass  = AcademicClass::where('name', $row['class'])->first();
 
-                echo"<pre>";
-                print_r($company);
-                die;
+                Section::firstOrCreate(
+                    [
+                        'class_id' => $academicClass->id,
+                        'name'     => $row['name'],
+                    ],
+                    [
+                        'company_id'        => 1,
+                        'branch_id'         => 1,
+                        'session_id'        => 1,
+                        'active_session_id' => 1,
+                        'status'            => 1,
+                    ]
+                );
 
-
-                $missing = [];
-                if (!$company)        $missing[] = 'company';
-                if (!$branch)         $missing[] = 'branch';
-                if (!$session)        $missing[] = 'academic_session';
-                if (!$academicClass)  $missing[] = 'class';
-                if (!$activeSession)  $missing[] = 'active_session';
-                if (empty($row['name'])) $missing[] = 'name';
-
-                if (!empty($missing)) {
-                    Log::warning('Skipping row. Missing: ' . implode(', ', $missing), $row->toArray());
-                    continue;
-                }
-
-                Section::create([
-                    'company_id'        => $company->id,
-                    'branch_id'         => $branch->id,
-                    'session_id'        => $session->id,
-                    'active_session_id' => $activeSession->id,
-                    'class_id'          => $academicClass->id,
-                    'name'              => trim($row['name']),
-                    'status'            => 1,
-                ]);
             } catch (\Throwable $e) {
                 Log::error('Import Error', [
                     'message' => $e->getMessage(),

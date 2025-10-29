@@ -45,8 +45,9 @@
                         <table class="table table-bordered table-striped" id="structuresTable">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
-                                    <th>Name</th>
+                                    <th>Student ID</th>
+                                    <th>Student Name</th>
+                                    <th>Sturcture Name</th>
                                     <th>Class</th>
                                     <th>Session</th>
                                     <th>Total Amount</th>
@@ -108,7 +109,8 @@
                 type: 'GET'
             },
             columns: [
-                { data: 'id', name: 'id' },
+                { data: 'student_id', name: 'student_id' , searchable: true},
+                { data: 'student_name', name: 'student_name' , searchable: true },
                 { data: 'name', name: 'name' },
                 { data: 'class_name', name: 'class_name' },
                 { data: 'session_name', name: 'session_name' },

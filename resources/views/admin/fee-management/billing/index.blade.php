@@ -78,7 +78,7 @@
                 @csrf
                 <div class="modal-body">
                     <div class="row">
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <div class="form-group">
                                 <label for="billing_class_id" class="form-label">Class <span class="text-danger">*</span></label>
                                 <select class="form-control select2" id="billing_class_id" name="academic_class_id" required>
@@ -90,7 +90,7 @@
                             </div>
                         </div>
 
-                        <div class="col-md-4">
+                        {{-- <div class="col-md-4">
                             <div class="form-group">
                                         <label for="student_id">Student <span class="text-danger">*</span></label>
                                         <select class="form-control" id="student_id" name="student_id" required>
@@ -100,10 +100,10 @@
                                             <span class="text-danger">{{ $message }}</span>
                                         @enderror
                                     </div>
-                        </div>
+                        </div> --}}
 
 
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <div class="form-group">
                                 <label for="billing_session_id" class="form-label">Session <span class="text-danger">*</span></label>
                                 <select class="form-control" id="billing_session_id" name="academic_session_id" required>

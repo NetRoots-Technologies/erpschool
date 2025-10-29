@@ -242,8 +242,8 @@ class FeeManagementController extends Controller
 
     public function getStructuresData()
     {
-        $structures = FeeStructure::with(['academicClass', 'academicSession', 'createdBy', 'feeStructureDetails'])
-            ->select(['id', 'name', 'academic_class_id', 'academic_session_id', 'fee_factor_id', 'is_active', 'created_at']);
+        $structures = FeeStructure::with(['student', 'academicClass', 'academicSession', 'createdBy', 'feeStructureDetails'])
+            ->select(['id', 'name', 'academic_class_id', 'academic_session_id', 'fee_factor_id', 'is_active', 'created_at', 'student_id']);
 
         return DataTables::of($structures)
             ->addColumn('action', function ($structure) {
@@ -273,7 +273,23 @@ class FeeManagementController extends Controller
             ->addColumn('status', function ($structure) {
                 return $structure->is_active ? '<span class="badge badge-success">Active</span>' : '<span class="badge badge-danger">Inactive</span>';
             })
-            ->rawColumns(['action', 'status'])
+            ->addColumn('student_name', function ($structure) {
+                return $structure->student->first_name . ' ' . $structure->student->last_name;
+            })
+            ->addColumn('student_id', function ($structure) {
+                return $structure->student->student_id;
+            })
+            ->filterColumn('student_id', function ($query, $keyword) {
+                $query->whereHas('student', function ($q) use ($keyword) {
+                    $q->where('student_id', 'like', "%{$keyword}%");
+                });
+            })
+            ->filterColumn('student_name', function ($query, $keyword) {
+                $query->whereHas('student', function ($q) use ($keyword) {
+                    $q->whereRaw("TRIM(CONCAT(COALESCE(first_name,''),' ',COALESCE(last_name,''))) LIKE ?", ["%{$keyword}%"]);
+                });
+            })
+            ->rawColumns(['action', 'status', 'student_name', 'student_id'])
             ->make(true);
     }
 
@@ -525,6 +541,10 @@ class FeeManagementController extends Controller
             ->addColumn('student_name', function ($collection) {
                 return $collection->student->fullname ?? 'N/A';
             })
+
+            ->addColumn('student_id', function ($collection) {
+                return $collection->student->student_id ?? 'N/A';
+            })
             ->addColumn('class_name', function ($collection) {
                 return $collection->student->AcademicClass->name ?? 'N/A';
             })
@@ -534,7 +554,18 @@ class FeeManagementController extends Controller
             ->addColumn('total_amount', function ($collection) {
                 return $collection->details->sum('amount') ?? 0;
             })
-            ->rawColumns(['action'])
+
+            ->filterColumn('student_id', function ($query, $keyword) {
+                $query->whereHas('student', function ($q) use ($keyword) {
+                    $q->where('student_id', 'like', "%{$keyword}%");
+                });
+            })
+            ->filterColumn('student_name', function ($query, $keyword) {
+                $query->whereHas('student', function ($q) use ($keyword) {
+                    $q->whereRaw("TRIM(CONCAT(COALESCE(first_name,''),' ',COALESCE(last_name,''))) LIKE ?", ["%{$keyword}%"]);
+                });
+            })
+            ->rawColumns(['action' , 'student_name' , 'student_id'])
             ->make(true);
     }
 
@@ -1204,104 +1235,219 @@ class FeeManagementController extends Controller
             ->make(true);
     }
 
+    // public function generateBilling(Request $request)
+    // {
+
+    //     if (!Gate::allows('fee-billing-create')) {
+    //         abort(403, 'Unauthorized access');
+    //     }
+
+    //     $request->validate([
+    //         'academic_class_id' => 'required|exists:classes,id',
+    //         'academic_session_id' => 'required|exists:acadmeic_sessions,id',
+    //         'billing_month' => 'required|date_format:Y-m',
+    //         'exclude_arrears' => 'boolean',
+    //     ]);
+
+    //     DB::beginTransaction();
+    //     try {
+
+    //         $activeSession = ActiveSession::where('class_id', $request->academic_class_id)
+    //             ->where('session_id', $request->academic_session_id)
+    //             ->where('status', 1)
+    //             ->first();
+
+    //         if (!$activeSession) {
+    //             return redirect()->route('admin.fee-management.billing')
+    //                 ->with('error', 'No active session found for the selected class and session combination.');
+    //         }
+
+    //         // Get students in the specified class (session relationship is managed through ActiveSession)
+    //         $student = Students::where('class_id', $request->academic_class_id)
+    //             ->where('id', $request->student_id)
+    //             ->where('is_active', 1)
+    //             ->first();
+
+    //         if (!$student) {
+
+    //             return redirect()->route('admin.fee-management.billing')
+    //                 ->with('error', 'No students found for the selected class and session.');
+    //         }
+
+    //         // Get fee structure for the class and session
+    //         $feeStructure = FeeStructure::where('academic_class_id', $request->academic_class_id)
+    //             ->where('academic_session_id', $request->academic_session_id)
+    //             ->where('student_id', $request->student_id)
+    //             ->where('is_active', 1)
+    //             ->first();
+
+    //         if (!$feeStructure) {
+    //             return redirect()->route('admin.fee-management.billing')->with('error', 'No fee structure found for the selected student , class and session.');
+    //         }
+
+
+    //         $existingBilling = FeeBilling::where('student_id', $student->id)
+    //             ->where('academic_session_id', $request->academic_session_id)
+    //             ->where('billing_month', $request->billing_month)
+    //             ->first();
+
+    //         if ($existingBilling) {
+
+    //             return redirect()->route('admin.fee-management.billing')
+    //                 ->with('error', 'Billing already exists for student: ' . $student->first_name . ' ' . $student->last_name);
+    //         }
+    //         $totalAmount = $feeStructure->final_amount;
+
+    //         $challanNumber = $this->generateUniqueChallanNumber($request->billing_month);
+
+    //         // Create billing record
+    //         $billing = FeeBilling::create([
+    //             'student_id' => $student->id,
+    //             'academic_session_id' => $request->academic_session_id,
+    //             'challan_number' => $challanNumber,
+    //             'billing_month' => $request->billing_month,
+    //             'total_amount' => $totalAmount,
+    //             'bill_date' => now(),
+    //             'due_date' => now()->addDays(30), // 30 days from now
+    //             'outstanding_amount' => $totalAmount, // Initially outstanding amount equals total amount
+    //             'status' => 'generated',
+    //             'company_id' => auth()->user()->company_id ?? null,
+    //             'branch_id' => auth()->user()->branch_id ?? null,
+    //             'created_by' => auth()->id(),
+    //         ]);
+
+    //         // Apply discounts automatically
+    //         $billing->applyDiscounts();
+
+
+
+    //         DB::commit();
+
+
+    //         return redirect()->route('admin.fee-management.billing')
+    //             ->with('success', "Billing generated successfully");
+    //     } catch (\Exception $e) {
+    //         DB::rollback();
+    //         \Log::error('Billing generation error: ' . $e->getMessage());
+    //         return redirect()->route('admin.fee-management.billing')
+    //             ->with('error', 'Error generating billing: ' . $e->getMessage());
+    //     }
+    // }
+
+
     public function generateBilling(Request $request)
-    {
+{
+    if (!Gate::allows('Dashboard-list')) {
+        abort(403, 'Unauthorized access');
+    }
 
-        if (!Gate::allows('fee-billing-create')) {
-            abort(403, 'Unauthorized access');
-        }
-
-        $request->validate([
+  $request->validate([
             'academic_class_id' => 'required|exists:classes,id',
             'academic_session_id' => 'required|exists:acadmeic_sessions,id',
             'billing_month' => 'required|date_format:Y-m',
             'exclude_arrears' => 'boolean',
         ]);
 
-        DB::beginTransaction();
-        try {
+    DB::beginTransaction();
+    try {
+        \Log::info('Billing generation started', [
+            'class_id'      => $request->academic_class_id,
+            'session_id'    => $request->academic_session_id,
+            'billing_month' => $request->billing_month
+        ]);
 
-            $activeSession = ActiveSession::where('class_id', $request->academic_class_id)
-                ->where('session_id', $request->academic_session_id)
-                ->where('status', 1)
-                ->first();
+        // Get students in the specified class and session
+        $students = Students::where('class_id', $request->academic_class_id)
+            ->where('session_id', $request->academic_session_id)
+            ->get();
 
-            if (!$activeSession) {
-                return redirect()->route('admin.fee-management.billing')
-                    ->with('error', 'No active session found for the selected class and session combination.');
-            }
+        \Log::info('Students found: ' . $students->count());
 
-            // Get students in the specified class (session relationship is managed through ActiveSession)
-            $student = Students::where('class_id', $request->academic_class_id)
-                ->where('id', $request->student_id)
-                ->where('is_active', 1)
-                ->first();
+        if ($students->isEmpty()) {
+            \Log::info('No students found for class: ' . $request->academic_class_id . ' and session: ' . $request->academic_session_id);
+            DB::rollBack();
+            return redirect()->route('admin.fee-management.billing')
+                ->with('error', 'No students found for the selected class and session.');
+        }
 
-            if (!$student) {
+        $billingCount = 0;
+        \Log::info('Processing ' . $students->count() . ' students for billing');
 
-                return redirect()->route('admin.fee-management.billing')
-                    ->with('error', 'No students found for the selected class and session.');
-            }
+        // Anchor bill and due dates to the target month (optional but cleaner)
+        $billDate = \Carbon\Carbon::now();
+        $dueDate  = \Carbon\Carbon::now()->addDays(30);
 
-            // Get fee structure for the class and session
+        foreach ($students as $student) {
+            \Log::info('Processing student: ' . $student->id . ' - ' . ($student->fullname ?? 'N/A'));
+
+            // Skip if fee structure not found for this student
             $feeStructure = FeeStructure::where('academic_class_id', $request->academic_class_id)
                 ->where('academic_session_id', $request->academic_session_id)
-                ->where('student_id', $request->student_id)
+                ->where('student_id', $student->id)
                 ->where('is_active', 1)
                 ->first();
 
             if (!$feeStructure) {
-                return redirect()->route('admin.fee-management.billing')->with('error', 'No fee structure found for the selected student , class and session.');
+                \Log::info("Skipping student {$student->id}: no active fee structure for the selected class/session.");
+                continue; // <- skip just this student
             }
 
-
+            // Skip if billing already exists for this student, session and billing month
             $existingBilling = FeeBilling::where('student_id', $student->id)
                 ->where('academic_session_id', $request->academic_session_id)
                 ->where('billing_month', $request->billing_month)
-                ->first();
+                ->exists();
 
             if ($existingBilling) {
-
-                return redirect()->route('admin.fee-management.billing')
-                    ->with('error', 'Billing already exists for student: ' . $student->first_name . ' ' . $student->last_name);
+                \Log::info("Skipping student {$student->id}: billing already exists for {$request->billing_month}.");
+                continue; // <- skip just this student
             }
-            $totalAmount = $feeStructure->final_amount;
-            
-            $challanNumber = $this->generateUniqueChallanNumber($request->billing_month);
+
+            // Calculate total amount from fee structure (using final_amount as in your code)
+            $totalAmount = (float) $feeStructure->final_amount;
+            \Log::info("Total amount calculated for student {$student->id}: {$totalAmount}");
+
+            // Generate challan number (kept your format; ensure uniqueness if needed)
+            $challanNumber = 'CHL-' . date('Y') . '-' . str_pad($student->id, 6, '0', STR_PAD_LEFT);
 
             // Create billing record
             $billing = FeeBilling::create([
-                'student_id' => $student->id,
-                'academic_session_id' => $request->academic_session_id,
-                'challan_number' => $challanNumber,
-                'billing_month' => $request->billing_month,
-                'total_amount' => $totalAmount,
-                'bill_date' => now(),
-                'due_date' => now()->addDays(30), // 30 days from now
-                'outstanding_amount' => $totalAmount, // Initially outstanding amount equals total amount
-                'status' => 'generated',
-                'company_id' => auth()->user()->company_id ?? null,
-                'branch_id' => auth()->user()->branch_id ?? null,
-                'created_by' => auth()->id(),
+                'student_id'         => $student->id,
+                'academic_session_id'=> $request->academic_session_id,
+                'challan_number'     => $challanNumber,
+                'billing_month'      => $request->billing_month,
+                'total_amount'       => $totalAmount,
+                'bill_date'          => $billDate,
+                'due_date'           => $dueDate,
+                'outstanding_amount' => $totalAmount,
+                'status'             => 'generated',
+                'company_id'         => auth()->user()->company_id ?? null,
+                'branch_id'          => auth()->user()->branch_id ?? null,
+                'created_by'         => auth()->id(),
             ]);
 
-            // Apply discounts automatically
-            $billing->applyDiscounts();
-
-
-
-            DB::commit();
-
-
-            return redirect()->route('admin.fee-management.billing')
-                ->with('success', "Billing generated successfully");
-        } catch (\Exception $e) {
-            DB::rollback();
-            \Log::error('Billing generation error: ' . $e->getMessage());
-            return redirect()->route('admin.fee-management.billing')
-                ->with('error', 'Error generating billing: ' . $e->getMessage());
+            \Log::info("Billing created for student {$student->id} with ID: {$billing->id}");
+            $billingCount++;
         }
+
+        DB::commit();
+
+        if ($billingCount > 0) {
+            return redirect()->route('admin.fee-management.billing')
+                ->with('success', "Billing generated successfully for {$billingCount} students!");
+        }
+
+        return redirect()->route('admin.fee-management.billing')
+            ->with('warning', 'No new billing records were created. All eligible students were skipped (missing fee structure or already billed).');
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+        \Log::error('Billing generation error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+        return redirect()->route('admin.fee-management.billing')
+            ->with('error', 'Error generating billing: ' . $e->getMessage());
     }
+}
+
 
 
     public function printBilling($id)
@@ -1313,7 +1459,7 @@ class FeeManagementController extends Controller
         $billing = FeeBilling::with(['student.AcademicClass', 'student.branch', 'academicSession'])
             ->findOrFail($id);
 
-
+        
         $applicableDiscounts = $billing->getApplicableDiscounts()->load('category');
         if ($applicableDiscounts) {
 
@@ -1333,12 +1479,12 @@ class FeeManagementController extends Controller
 
         // ---------- Previous Unpaid Amount ----------
         $previousUnpaidBills = FeeBilling::where('student_id', $billing->student_id)
-            ->where('id', '!=',  $id)
-            ->where('outstanding_amount', '>', 0)->get();
+                                            ->where('id', '!=',  $id)
+                                            ->where('outstanding_amount', '>', 0)->get();
         $previousArrears = $previousUnpaidBills->sum('outstanding_amount');
         $unpaidMonthsList = $previousUnpaidBills->pluck('billing_month')->filter()->unique()->values();
 
-
+        
         // dd($previousUnpaidBills , $previousArrears , $unpaidMonthsList);
         return view('admin.fee-management.billing.print', compact('billing', 'applicableDiscounts', 'showDiscount', 'transportFees', 'totalTransportFee', 'previousArrears', 'unpaidMonthsList', 'previousUnpaidBills'));
     }
@@ -1669,9 +1815,10 @@ class FeeManagementController extends Controller
 
     // Export and Import
 
-    public function downloadTemplateByFeeCategory(){
+    public function downloadTemplateByFeeCategory()
+    {
 
-         $file = public_path('templates/fee_category.xlsx');
+        $file = public_path('templates/fee_category.xlsx');
 
         if (file_exists($file)) {
             return response()->download($file, 'fee_category.xlsx');
@@ -1680,7 +1827,7 @@ class FeeManagementController extends Controller
         }
     }
 
-     public function importByFeeCategory(Request $request)
+    public function importByFeeCategory(Request $request)
     {
 
         // dd($request->all());
@@ -1699,8 +1846,9 @@ class FeeManagementController extends Controller
 
     // Export And Import By Structure
 
-     public function downloadTemplateByStructure(){
-       
+    public function downloadTemplateByStructure()
+    {
+
         $file = public_path('templates/fee-structures.xlsx');
         if (file_exists($file)) {
             return response()->download($file, 'fee-structures.xlsx');
@@ -1709,11 +1857,11 @@ class FeeManagementController extends Controller
         }
     }
 
-    
-     public function importByStructure(Request $request)
+
+    public function importByStructure(Request $request)
     {
 
-     
+
         $request->validate([
             'file' => 'required|mimes:xlsx,xls,csv'
         ]);
@@ -1727,12 +1875,13 @@ class FeeManagementController extends Controller
         return back()->with('success', 'Structure Imported Successfully!');
     }
 
-      // Export And Import By Discount
+    // Export And Import By Discount
 
-     public function downloadTemplateByDiscount(){
-       
+    public function downloadTemplateByDiscount()
+    {
+
         $file = public_path('templates/fee-discounts.xlsx');
-      
+
         if (file_exists($file)) {
             return response()->download($file, 'fee-discounts.xlsx');
         } else {
@@ -1740,8 +1889,8 @@ class FeeManagementController extends Controller
         }
     }
 
-    
-     public function importByDiscount(Request $request)
+
+    public function importByDiscount(Request $request)
     {
         $request->validate([
             'file' => 'required|mimes:xlsx,xls,csv'
@@ -1756,12 +1905,13 @@ class FeeManagementController extends Controller
         return back()->with('success', 'Fee Discount Imported Successfully!');
     }
 
-       // Export And Import By Fee Collection
+    // Export And Import By Fee Collection
 
-     public function downloadTemplateByCollection(){
-       
+    public function downloadTemplateByCollection()
+    {
+
         $file = public_path('templates/fee_collection.xlsx');
-      
+
         if (file_exists($file)) {
             return response()->download($file, 'fee_collection.xlsx');
         } else {
@@ -1769,8 +1919,8 @@ class FeeManagementController extends Controller
         }
     }
 
-    
-     public function importByCollection(Request $request)
+
+    public function importByCollection(Request $request)
     {
         $request->validate([
             'file' => 'required|mimes:xlsx,xls,csv'

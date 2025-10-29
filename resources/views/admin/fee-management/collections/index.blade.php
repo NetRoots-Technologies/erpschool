@@ -46,7 +46,7 @@
                         <table class="table table-bordered table-striped" id="collectionsTable">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
+                                    <th>Student ID</th>
                                     <th>Student</th>
                                     <th>Class</th>
                                     <th>Challan No</th>
@@ -109,8 +109,8 @@
                 type: 'GET'
             },
             columns: [
-                { data: 'id', name: 'id' },
-                { data: 'student_name', name: 'student_name' },
+                { data: 'student_id', name: 'student_id' , searchable: true},
+                { data: 'student_name', name: 'student_name' , searchable: true},
                 { data: 'class_name', name: 'class_name' },
                 { 
                     data: 'challan_number', 

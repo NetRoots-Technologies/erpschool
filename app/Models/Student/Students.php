@@ -138,4 +138,9 @@ class Students extends Model
     {
         return $this->hasOne(ProgressReportRemark::class, 'student_id');
     }
+
+     public function fee_Structures()
+    {
+        return $this->belongsTo(\App\Models\Fee\FeeStructure::class, 'student_id');
+    }
 }
