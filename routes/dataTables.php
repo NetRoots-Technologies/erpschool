@@ -154,4 +154,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'datatable', 'as' => 'datata
 
     Route::post('get-overTime', [\App\Http\Controllers\HR\OvertimeController::class, 'getData'])->name('data.overtimeData');
 
+    Route::post('get-assetType', [\App\Http\Controllers\HR\AssetTypeController::class, 'getData'])->name('data.assetTypeData');
+    Route::post('get-asset', [\App\Http\Controllers\HR\AssetController::class, 'getData'])->name('data.assetData');
+
 });

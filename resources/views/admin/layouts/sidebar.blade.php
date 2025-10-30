@@ -707,13 +707,13 @@
                 @can("Accounts")
                 <li class="side-item side-item-category">Accounts & Finance</li>
                 <li class="slide">
-                    <a class="side-menu__item {{ request()->is('accounts*')|| request()->is('admin*') ? 'active' : '' }}"
+                    <a class="side-menu__item {{ request()->is('accounts*')|| request()->is('admin*') || request()->is('hr/asset_type*') || request()->is('hr/asset','hr/asset/*') || request()->is('asset','asset/bulk') ? 'active' : '' }}"
                         data-bs-toggle="slide" href="javascript:void(0);">
                         <i class="fa fa-calculator icons8 icon-style" aria-hidden="true"></i>
                         <span class="side-menu__label">Accounts & Finance</span>
                         <i class="angle fe fe-chevron-down"></i>
                     </a>
-                    <ul class="slide-menu" style="display: {{ request()->is('accounts*') || request()->is('admin*') ? 'block' : 'none' }}">
+                    <ul class="slide-menu" style="display: {{ request()->is('accounts*') || request()->is('admin*') || request()->is('hr/asset_type*') || request()->is('hr/asset','hr/asset/*') || request()->is('asset','asset/bulk')? 'block' : 'none' }}">
                         <li><a class="slide-item {{ request()->is('accounts/dashboard') ? 'active' : '' }}"
                                 href="{{ route('accounts.dashboard') }}">Dashboard</a></li>
                         
@@ -760,7 +760,24 @@
                                 href="{{ route('accounts.reports.aged_payables') }}">Aged Payables</a></li>
                         <li><a class="slide-item {{ request()->is('accounts/reports/aged-receivables*') ? 'active' : '' }}"
                                 href="{{ route('accounts.reports.aged_receivables') }}">Aged Receivables</a></li>
+                        
+                        {{-- Assets --}}
 
+                           
+                    <li>
+                        <a class="slide-item {{ request()->is('hr/asset_type*') ? 'active' : '' }}"
+                            href="{{route('hr.asset_type.index')}}">Assets Type</a>
+                    </li>
+                    <li>
+                        <a class="slide-item {{ request()->is('hr/asset','hr/asset/*') ? 'active' : '' }}"
+                            href="{{route('hr.asset.index')}}">Assets</a>
+                    </li>
+                    <li>
+                        <a class="slide-item {{ request()->is('asset','asset/bulk') ? 'active' : '' }}"
+                            href="{{route('asset-bulk')}}">Assets Bulk</a>
+                    </li>
+               
+                        {{-- End Assets --}}
                         <li><a class="slide-item {{ request()->is('admin/banks') || request()->is('admin/banks/*') ? 'active' : '' }}" 
                             href="{{ route('admin.banks.index') }}">Bank</a></li>
 
