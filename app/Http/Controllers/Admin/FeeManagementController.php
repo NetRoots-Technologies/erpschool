@@ -1446,7 +1446,9 @@ class FeeManagementController extends Controller
             \Log::info("Total amount calculated for student {$student->id}: {$totalAmount}");
 
             // Generate challan number (kept your format; ensure uniqueness if needed)
-            $challanNumber = 'CHL-' . date('Y') . '-' . str_pad($student->id, 6, '0', STR_PAD_LEFT);
+            // $challanNumber = 'CHL-' . date('Y') . '-' . str_pad($student->id, 6, '0', STR_PAD_LEFT);
+            $challanNumber = $this->generateUniqueChallanNumber($request->billing_month);
+
 
             // Create billing record
             $billing = FeeBilling::create([
