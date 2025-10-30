@@ -31,7 +31,7 @@ Asset
         {{-- Download Sample Bulk File --}}
         <div class="col-auto p-0">
             <a href="{{ route('academic.asset.export-file') }}" class="btn btn-warning btn-md">
-                <b>Download Sample Bulk File</b>
+                <b>Export  File</b>
             </a>
         </div>
 

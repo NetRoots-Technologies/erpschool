@@ -10,7 +10,6 @@ class AssetSampleExport implements FromArray, WithHeadings
     {
         return [
             'Credit Type',
-            'Credit Ledger',
             'Asset Type',
             'Name',
             'Is Working?',
@@ -35,7 +34,6 @@ class AssetSampleExport implements FromArray, WithHeadings
         return [
             [
                 'Cash',               // Credit Type
-                'Main Ledger',        // Credit Ledger
                 'Electronics',        // Asset Type
                 'Laptop HP ProBook',  // Name
                 'Yes',                // Is Working?
