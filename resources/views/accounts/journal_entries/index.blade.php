@@ -85,7 +85,8 @@
                     </table>
                 </div>
                 <div class="mt-3">
-                    {{ $entries->links() }}
+                    {{ $entries->links('pagination::bootstrap-4') }}
+
                 </div>
             </div>
         </div>
