@@ -436,7 +436,7 @@
                             </span>
                         </div> --}}
                     @else
-                        <div style="padding:6px 0; color:#999;">No previous dues</div>
+                        <div style="display:flex; border-bottom:1px solid #ddd; padding:6px 0; margin-left: 10px;">No previous dues</div>
                     @endif
                 </div>
 
@@ -488,23 +488,50 @@
 
 
 
-                @php
-                   
+                  @php
+                
+                $baseCurrentMonth = $billing->total_amount - $billing->paid_amount;
 
-                    // Previous unpaid total
-                    $prevTotal = 0;
-                    if (!empty($previousUnpaidBills)) {
-                        foreach ($previousUnpaidBills as $pb) {
-                            $prevTotal += $pb->outstanding_amount;
+            
+                $applyDiscount = [];
+                $totalDiscount = 0.0;
+
+                if (!empty($applicableDiscounts)) {
+                    foreach ($applicableDiscounts as $discount) {
+                        $line = 0.0;
+
+                        if ($discount->discount_type === 'percentage') {
+                            $line = round($baseCurrentMonth * ((float) $discount->discount_value / 100), 2);
+                        } else {
+                            $line = round((float) $discount->discount_value, 2);
                         }
+
+                        $line = min($line, max(0, $baseCurrentMonth - $totalDiscount));
+
+                        $applyDiscount[] = [
+                            'name'    => ($discount->category->name ?? 'General') . ' (' . ucfirst($discount->discount_type) . ')',
+                            'display' => $discount->discount_type === 'percentage'
+                                            ? number_format($discount->discount_value, 2) . '%'
+                                            : 'Rs. ' . number_format($discount->discount_value, 2),
+                            'amount'  => $line,
+                        ];
+
+                        $totalDiscount += $line;
                     }
+                }
 
-                    // Current Month Net Total
-                    $currentMonthNet = $billing->outstanding_amount;
+                
+                $prevTotal = 0.0;
+                if (!empty($previousUnpaidBills)) {
+                    foreach ($previousUnpaidBills as $pb) {
+                        $prevTotal += (float) $pb->outstanding_amount;
+                    }
+                }
 
-                    // Final Grand Total
-                    $grandTotal = $currentMonthNet + $prevTotal;
-                @endphp
+                
+                $currentMonthNet = max(0, $baseCurrentMonth - $totalDiscount);
+                $grandTotal = $currentMonthNet + $prevTotal;
+            @endphp
 
 
                 <div class="section-9-9" style="justify-content: space-between; margin-top: 7px">
@@ -689,7 +716,7 @@
                             </span>
                         </div> --}}
                     @else
-                        <div style="padding:6px 0; color:#999;">No previous dues</div>
+                        <div style="display:flex; border-bottom:1px solid #ddd; padding:6px 0; margin-left: 10px;">No previous dues</div>
                     @endif
                 </div>
 
@@ -741,23 +768,54 @@
 
 
 
-                @php
-                   
+                  @php
+                // Base (use total_amount if you store gross; else outstanding_amount)
+                $baseCurrentMonth = $billing->total_amount - $billing->paid_amount;
 
-                    // Previous unpaid total
-                    $prevTotal = 0;
-                    if (!empty($previousUnpaidBills)) {
-                        foreach ($previousUnpaidBills as $pb) {
-                            $prevTotal += $pb->outstanding_amount;
+                // Build applied discounts (no rendering here)
+                $applyDiscount = [];
+                $totalDiscount = 0.0;
+
+                if (!empty($applicableDiscounts)) {
+                    foreach ($applicableDiscounts as $discount) {
+                        $line = 0.0;
+
+                        if ($discount->discount_type === 'percentage') {
+                            // non-compounding on same base
+                            $line = round($baseCurrentMonth * ((float) $discount->discount_value / 100), 2);
+                        } else {
+                            $line = round((float) $discount->discount_value, 2);
                         }
+
+                        // Cap so we never go below zero overall
+                        $line = min($line, max(0, $baseCurrentMonth - $totalDiscount));
+
+                        $applyDiscount[] = [
+                            'name'    => ($discount->category->name ?? 'General') . ' (' . ucfirst($discount->discount_type) . ')',
+                            'display' => $discount->discount_type === 'percentage'
+                                            ? number_format($discount->discount_value, 2) . '%'
+                                            : 'Rs. ' . number_format($discount->discount_value, 2),
+                            'amount'  => $line,
+                        ];
+
+                        $totalDiscount += $line;
                     }
+                }
 
-                    // Current Month Net Total
-                    $currentMonthNet = $billing->outstanding_amount;
+                // Previous unpaid total (unchanged)
+                $prevTotal = 0.0;
+                if (!empty($previousUnpaidBills)) {
+                    foreach ($previousUnpaidBills as $pb) {
+                        $prevTotal += (float) $pb->outstanding_amount;
+                    }
+                }
 
-                    // Final Grand Total
-                    $grandTotal = $currentMonthNet + $prevTotal;
-                @endphp
+                // Apply discounts to current month only
+                $currentMonthNet = max(0, $baseCurrentMonth - $totalDiscount);
+
+                // Final Grand Total (arrears not discounted)
+                $grandTotal = $currentMonthNet + $prevTotal;
+            @endphp
 
 
                 <div class="section-9-9" style="justify-content: space-between; margin-top: 7px">
@@ -945,7 +1003,7 @@
                             </span>
                         </div> --}}
                     @else
-                        <div style="padding:6px 0; color:#999;">No previous dues</div>
+                        <div style="display:flex; border-bottom:1px solid #ddd; padding:6px 0; margin-left: 10px;">No previous dues</div>
                     @endif
                 </div>
 
@@ -998,22 +1056,53 @@
 
 
                 @php
-                   
+                // Base (use total_amount if you store gross; else outstanding_amount)
+                $baseCurrentMonth = $billing->total_amount - $billing->paid_amount;
 
-                    // Previous unpaid total
-                    $prevTotal = 0;
-                    if (!empty($previousUnpaidBills)) {
-                        foreach ($previousUnpaidBills as $pb) {
-                            $prevTotal += $pb->outstanding_amount;
+                // Build applied discounts (no rendering here)
+                $applyDiscount = [];
+                $totalDiscount = 0.0;
+
+                if (!empty($applicableDiscounts)) {
+                    foreach ($applicableDiscounts as $discount) {
+                        $line = 0.0;
+
+                        if ($discount->discount_type === 'percentage') {
+                            // non-compounding on same base
+                            $line = round($baseCurrentMonth * ((float) $discount->discount_value / 100), 2);
+                        } else {
+                            $line = round((float) $discount->discount_value, 2);
                         }
+
+                        // Cap so we never go below zero overall
+                        $line = min($line, max(0, $baseCurrentMonth - $totalDiscount));
+
+                        $applyDiscount[] = [
+                            'name'    => ($discount->category->name ?? 'General') . ' (' . ucfirst($discount->discount_type) . ')',
+                            'display' => $discount->discount_type === 'percentage'
+                                            ? number_format($discount->discount_value, 2) . '%'
+                                            : 'Rs. ' . number_format($discount->discount_value, 2),
+                            'amount'  => $line,
+                        ];
+
+                        $totalDiscount += $line;
                     }
+                }
 
-                    // Current Month Net Total
-                    $currentMonthNet = $billing->outstanding_amount;
+                // Previous unpaid total (unchanged)
+                $prevTotal = 0.0;
+                if (!empty($previousUnpaidBills)) {
+                    foreach ($previousUnpaidBills as $pb) {
+                        $prevTotal += (float) $pb->outstanding_amount;
+                    }
+                }
 
-                    // Final Grand Total
-                    $grandTotal = $currentMonthNet + $prevTotal;
-                @endphp
+                // Apply discounts to current month only
+                $currentMonthNet = max(0, $baseCurrentMonth - $totalDiscount);
+
+                // Final Grand Total (arrears not discounted)
+                $grandTotal = $currentMonthNet + $prevTotal;
+            @endphp
 
 
                 <div class="section-9-9" style="justify-content: space-between; margin-top: 7px">

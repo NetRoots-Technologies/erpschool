@@ -1499,8 +1499,8 @@ class FeeManagementController extends Controller
 
         
         $applicableDiscounts = $billing->getApplicableDiscounts()->load('category');
+        
         if ($applicableDiscounts) {
-
             $showDiscount = DB::table('fee_discounts')->where('student_id', $billing->student_id)->select('show_on_voucher')->first();
         }
 
@@ -1523,7 +1523,7 @@ class FeeManagementController extends Controller
         $unpaidMonthsList = $previousUnpaidBills->pluck('billing_month')->filter()->unique()->values();
 
         
-        // dd($previousUnpaidBills , $previousArrears , $unpaidMonthsList);
+        // dd($previousUnpaidBills , $previousArrears , $unpaidMonthsList , $applicableDiscounts);
         return view('admin.fee-management.billing.print', compact('billing', 'applicableDiscounts', 'showDiscount', 'transportFees', 'totalTransportFee', 'previousArrears', 'unpaidMonthsList', 'previousUnpaidBills'));
     }
 
