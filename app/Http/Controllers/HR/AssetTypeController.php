@@ -36,7 +36,7 @@ class AssetTypeController extends Controller
      */
     public function index()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('AssetType-list')) {
             return abort(503);
         }
         return view('hr.asset_type.index');
@@ -49,7 +49,7 @@ class AssetTypeController extends Controller
      */
     public function create()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('AssetType-create')) {
             return abort(503);
         }
         return view('hr.asset_type.create');
@@ -64,7 +64,7 @@ class AssetTypeController extends Controller
      */
     public function store(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('AssetType-create')) {
             return abort(503);
         }
         DB::beginTransaction();
@@ -77,7 +77,7 @@ class AssetTypeController extends Controller
                 $data['name'] = $request->name;
                 $data['parent_type_id'] = $asetType->id;
                 $data['parent_type'] = AssetType::class;
-                $this->coreAccounts->createGroup($data);
+                // $this->coreAccounts->createGroup($data);
 
             }
             DB::commit();
@@ -97,7 +97,7 @@ class AssetTypeController extends Controller
      */
     public function show($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('AssetType-list')) {
             return abort(503);
         }
     }
@@ -110,7 +110,7 @@ class AssetTypeController extends Controller
      */
     public function edit($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('AssetType-edit')) {
             return abort(503);
         }
         $asset_type = AssetType::find($id);
@@ -126,7 +126,7 @@ class AssetTypeController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('AssetType-edit')) {
             return abort(503);
         }
         try {
@@ -146,7 +146,7 @@ class AssetTypeController extends Controller
     public function destroy($id)
     {
 
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('AssetType-delete')) {
             return abort(503);
         }
         $this->AssetTypeService->destroy($id);

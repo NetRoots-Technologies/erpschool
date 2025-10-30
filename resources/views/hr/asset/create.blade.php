@@ -50,7 +50,7 @@ Asset Create
                                             <option value="1">Bank</option>
                                         </select>
                                     </div>
-                                    <div class="col-lg-6">
+                                    {{-- <div class="col-lg-6">
                                         <label for="credit_ledger"><b>Credit Ledger *</b></label>
                                         <select name="credit_ledger" id="credit_ledger" class="form-control" required>
                                             <option value="" disabled selected>Select A Ledger</option>
@@ -59,7 +59,7 @@ Asset Create
                                                 {{$ledger->name}}</option>
                                             @endforeach
                                         </select>
-                                    </div>
+                                    </div> --}}
                                 </div>
                                 <div class="row">
                                     <div class="col-lg-4">

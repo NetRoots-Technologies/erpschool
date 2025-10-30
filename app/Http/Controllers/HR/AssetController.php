@@ -56,7 +56,7 @@ class AssetController extends Controller
      */
     public function index()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Assets-list')) {
             return abort(503);
         }
         return view('hr.asset.index');
@@ -69,15 +69,15 @@ class AssetController extends Controller
      */
     public function create()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Assets-create')) {
             return abort(503);
         }
         $asserts = AssetType::get();
         $companies = Company::get();
         $branches = Branch::get();
-        $ledgers = Ledger::where("code", "cash")->orWhere("parent_type", BankAccount::class)->get();
+        // $ledgers = Ledger::where("code", "cash")->orWhere("parent_type", BankAccount::class)->get();
 
-        return view('hr.asset.create', compact('asserts', 'companies', 'branches', 'ledgers'));
+        return view('hr.asset.create', compact('asserts', 'companies', 'branches'));
 
     }
 
@@ -89,7 +89,7 @@ class AssetController extends Controller
      */
     public function store(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Assets-create')) {
             return abort(503);
         }
         // dd($request->all());
@@ -103,23 +103,23 @@ class AssetController extends Controller
             $data['branch_id'] = (int) $request->get('branch_id');
             $data['entry_type_id'] = 1;
 
-            $entry = $this->ledgerService->createEntry($data);
+            // $entry = $this->ledgerService->createEntry($data);
 
-            $data['entry_id'] = $entry->id;
-            $data['ledger_id'] = $request->get("credit_ledger");
-            $data['balanceType'] = "c";
-            $data['parent_id'] = $asset->id;
-            $data['parent_type'] = Asset::class;
+            // $data['entry_id'] = $entry->id;
+            // $data['ledger_id'] = $request->get("credit_ledger");
+            // $data['balanceType'] = "c";
+            // $data['parent_id'] = $asset->id;
+            // $data['parent_type'] = Asset::class;
 
-            $entry = $this->ledgerService->createEntryItems($data);
+            // $entry = $this->ledgerService->createEntryItems($data);
 
-            $group = Groups::where("parent_type", AssetType::class)
-                ->where("parent_type_id", $request->get('asset_type_id'))
-                ->first();
+            // $group = Groups::where("parent_type", AssetType::class)
+            //     ->where("parent_type_id", $request->get('asset_type_id'))
+            //     ->first();
 
-            if ($group) {
-                $this->ledgerService->createAutoLedgers([$group->id], $request->name . "Ledger", (int) $request->get('branch_id'), Asset::class, $asset->id);
-            }
+            // if ($group) {
+            //     $this->ledgerService->createAutoLedgers([$group->id], $request->name . "Ledger", (int) $request->get('branch_id'), Asset::class, $asset->id);
+            // }
 
             DB::commit();
             //die;
@@ -141,7 +141,7 @@ class AssetController extends Controller
      */
     public function show($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Assets-list')) {
             return abort(503);
         }
     }
@@ -154,7 +154,7 @@ class AssetController extends Controller
      */
     public function edit($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Assets-edit')) {
             return abort(503);
         }
         $asset_type = AssetType::get();
@@ -175,7 +175,7 @@ class AssetController extends Controller
      */
     public function update(Request $request, $id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Assets-edit')) {
             return abort(503);
         }
         try {
@@ -194,7 +194,7 @@ class AssetController extends Controller
      */
     public function destroy($id)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Assets-delete')) {
             return abort(503);
         }
         $this->AssetService->destroy($id);
@@ -203,7 +203,7 @@ class AssetController extends Controller
 
     public function getdata()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Assets-list')) {
             return abort(503);
         }
         return $this->AssetService->getdata();
@@ -211,7 +211,7 @@ class AssetController extends Controller
 
     public function bulkShow()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Assets-list')) {
             return abort(503);
         }
         return view('hr.asset.bulk');
@@ -219,7 +219,7 @@ class AssetController extends Controller
 
     public function bulkSave(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Assets-list')) {
             return abort(503);
         }
         try {
@@ -347,7 +347,7 @@ class AssetController extends Controller
 
     public function exportbulkfile()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Assets-list')) {
             return abort(503);
         }
         return Excel::download(new AssetSampleExport, 'class_bulk_sample.xlsx');
@@ -355,7 +355,7 @@ class AssetController extends Controller
 
     public function importBulkFile(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('Assets-list')) {
             return abort(503);
         }
         $request->validate([

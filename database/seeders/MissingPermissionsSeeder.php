@@ -134,9 +134,13 @@ class MissingPermissionsSeeder extends Seeder
                 'FinancialYears-delete',
                 'FinancialYears-view',
             ],
+
+              'Assets' => [
+                'AssetType-list', 'AssetType-create', 'AssetType-edit', 'AssetType-delete',
+                'Assets-list', 'Assets-create', 'Assets-edit', 'Assets-delete',
+                'AssetsBulk-list', 'AssetsBulk-create', 'AssetsBulk-edit', 'AssetsBulk-delete',
+            ],
            
-
-
 
 
         ];
