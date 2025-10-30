@@ -347,7 +347,7 @@
                     <div class="section-3" style="border-bottom: 1px solid black;">
                         <span style="margin-right: 10px;">Student Name:</span>
                         <span style=" margin-left: auto;font-weight: bold;">{!! $billing->student->first_name . ' ' . $billing->student->last_name ?? '' !!}</span>
-                        <span style="margin-left: 122px;">Student ID: {!! $billing->student->id ?? '' !!} </span>
+                        <span style="margin-left: 122px;">Student ID: {!! $billing->student->student_id?? '' !!} </span>
                     </div>
                 </div>
 
@@ -363,7 +363,7 @@
                     <div class="section-3" style="border-bottom: 1px solid black;">
                         <span style="margin-right: 10px;">Class:</span>
                         <span style=" margin-left: auto; font-weight: bold;">{!! $billing->student->AcademicClass->name ?? '' !!}</span>
-                        <span style="margin-left: 190px">Fee Term: 02240551 </span>
+                        <span style="margin-left: 190px"> </span>
                     </div>
                 </div>
 
@@ -627,7 +627,7 @@
                     <div class="section-3" style="border-bottom: 1px solid black;">
                         <span style="margin-right: 10px;">Student Name:</span>
                         <span style=" margin-left: auto;font-weight: bold;">{!! $billing->student->first_name . ' ' . $billing->student->last_name ?? '' !!}</span>
-                        <span style="margin-left: 122px;">Student ID: {!! $billing->student->id ?? '' !!} </span>
+                        <span style="margin-left: 122px;">Student ID: {!! $billing->student->student_id?? '' !!} </span>
                     </div>
                 </div>
 
@@ -643,7 +643,7 @@
                     <div class="section-3" style="border-bottom: 1px solid black;">
                         <span style="margin-right: 10px;">Class:</span>
                         <span style=" margin-left: auto; font-weight: bold;">{!! $billing->student->AcademicClass->name ?? '' !!}</span>
-                        <span style="margin-left: 190px">Fee Term: 02240551 </span>
+                        <span style="margin-left: 190px"> </span>
                     </div>
                 </div>
 
@@ -914,7 +914,7 @@
                     <div class="section-3" style="border-bottom: 1px solid black;">
                         <span style="margin-right: 10px;">Student Name:</span>
                         <span style=" margin-left: auto;font-weight: bold;">{!! $billing->student->first_name . ' ' . $billing->student->last_name ?? '' !!}</span>
-                        <span style="margin-left: 122px;">Student ID: {!! $billing->student->id ?? '' !!} </span>
+                        <span style="margin-left: 122px;">Student ID: {!! $billing->student->student_id?? '' !!} </span>
                     </div>
                 </div>
 
@@ -930,7 +930,7 @@
                     <div class="section-3" style="border-bottom: 1px solid black;">
                         <span style="margin-right: 10px;">Class:</span>
                         <span style=" margin-left: auto; font-weight: bold;">{!! $billing->student->AcademicClass->name ?? '' !!}</span>
-                        <span style="margin-left: 190px">Fee Term: 02240551 </span>
+                        <span style="margin-left: 190px"> </span>
                     </div>
                 </div>
 
