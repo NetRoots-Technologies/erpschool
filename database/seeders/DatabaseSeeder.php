@@ -19,7 +19,7 @@ class DatabaseSeeder extends Seeder
         $this->call(CatSeeder::class);
         $this->call(DepartmentSeeder::class);
         $this->call(DesignationSeeder::class);
-        // $this->call(StateSeeder::class);
+        $this->call(AccountGroupSeeder::class);
         // $this->call(CitySeeder::class);
         // Add other essential seeders here as needed
     }
