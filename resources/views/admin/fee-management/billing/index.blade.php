@@ -46,7 +46,7 @@
                         <table class="table table-bordered table-striped" id="billingTable">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
+                                    <th>Student ID</th>
                                     <th>Challan No</th>
                                     <th>Student</th>
                                     <th>Class</th>
@@ -166,7 +166,7 @@
                 }
             },
             columns: [
-                { data: 'id', name: 'id' },
+                { data: 'student_id', name: 'student_id' },
                 { data: 'challan_number', name: 'challan_number' },
                 { data: 'student_name', name: 'student_name' },
                 { data: 'class_name', name: 'class_name' },

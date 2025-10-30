@@ -95,7 +95,15 @@
             <div>
 
                 <div class="thumb gallery">
-                                    <img src="{{ asset($student->studentPictures->passport_photos) }}" alt="">
+                                   @php
+                        $photo = optional($student->studentPictures)->passport_photos;
+                    @endphp
+
+                    @if($photo)
+                        <img src="{{ Str::startsWith($photo, ['http://','https://']) ? $photo : asset($photo) }}" alt="Passport photo">
+                    @else
+                        <img src="{{ asset('images/placeholders/student.png') }}" alt="">
+             @endif
                 </div>
                
             </div>

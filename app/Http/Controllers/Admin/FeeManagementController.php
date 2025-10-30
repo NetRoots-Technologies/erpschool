@@ -995,47 +995,65 @@ class FeeManagementController extends Controller
     //         ->make(true);
     // }
 
-    public function getDiscountsData()
-{
-    $discounts = FeeDiscount::with(['student', 'category', 'createdBy'])
-        ->select(['id', 'student_id', 'category_id', 'discount_type', 'discount_value', 'reason', 'show_on_voucher', 'valid_from', 'valid_to', 'created_at']);
+            public function getDiscountsData()
+        {
+            $discounts = FeeDiscount::with(['student', 'category', 'createdBy'])
+                ->select(['id', 'student_id', 'category_id', 'discount_type', 'discount_value', 'reason', 'show_on_voucher', 'valid_from', 'valid_to', 'created_at']);
 
-    return DataTables::of($discounts)
-        ->addColumn('action', function ($discount) {
+            return DataTables::of($discounts)
+                ->addColumn('action', function ($discount) {
 
-            $deleteBtn = '';
-            $editBtn = '';
-            $historyBtn = '';
+                    $deleteBtn = '';
+                    $editBtn = '';
+                    $historyBtn = '';
 
-            if (Gate::allows('fee-discount-edit')) {
-                $editBtn = '<a href="' . route('admin.fee-management.discounts.edit', $discount->id) . '" class="btn btn-sm btn-primary">
-                                <i class="fa fa-edit"></i> Edit
-                            </a>';
-            }
+                    if (Gate::allows('fee-discount-edit')) {
+                        $editBtn = '<a href="' . route('admin.fee-management.discounts.edit', $discount->id) . '" class="btn btn-sm btn-primary">
+                                        <i class="fa fa-edit"></i> Edit
+                                    </a>';
+                    }
 
-            if (Gate::allows('fee-discount-delete')) {
-                $deleteBtn = '<button class="btn btn-sm btn-danger" onclick="deleteDiscount(' . $discount->id . ')">
-                                <i class="fa fa-trash"></i> Delete
-                              </button>';
-            }
+                    if (Gate::allows('fee-discount-delete')) {
+                        $deleteBtn = '<button class="btn btn-sm btn-danger" onclick="deleteDiscount(' . $discount->id . ')">
+                                        <i class="fa fa-trash"></i> Delete
+                                    </button>';
+                    }
 
-            // 🟡 Add History Button
-            $historyBtn = '<a href="' . route('admin.fee-management.discounts.history', $discount->id) . '" 
-                            class="btn btn-sm btn-warning">
-                            <i class="fa fa-history"></i> History
-                          </a>';
+                    // 🟡 Add History Button
+                    $historyBtn = '<a href="' . route('admin.fee-management.discounts.history', $discount->id) . '" 
+                                    class="btn btn-sm btn-warning">
+                                    <i class="fa fa-history"></i> History
+                                </a>';
 
-            return $editBtn . ' ' . $deleteBtn . ' ' . $historyBtn;
-        })
-        ->addColumn('student_name', function ($discount) {
-            return $discount->student->fullname ?? 'N/A';
-        })
-        ->addColumn('category_name', function ($discount) {
-            return $discount->category->name ?? 'N/A';
-        })
-        ->rawColumns(['action'])
-        ->make(true);
-}
+                    return $editBtn . ' ' . $deleteBtn . ' ' . $historyBtn;
+                })
+                ->addColumn('student_name', function ($discount) {
+                    return $discount->student->fullname ?? 'N/A';
+                })
+
+                 ->addColumn('student_id', function ($discount) {
+                    return $discount->student->student_id ?? 'N/A';
+                })
+
+                ->addColumn('category_name', function ($discount) {
+                    return $discount->category->name ?? 'N/A';
+                })
+
+                ->filterColumn('student_id', function ($query, $keyword) {
+                $query->whereHas('student', function ($q) use ($keyword) {
+                    $q->where('student_id', 'like', "%{$keyword}%");
+                });
+            })
+            ->filterColumn('student_name', function ($query, $keyword) {
+                $query->whereHas('student', function ($q) use ($keyword) {
+                    $q->whereRaw("TRIM(CONCAT(COALESCE(first_name,''),' ',COALESCE(last_name,''))) LIKE ?", ["%{$keyword}%"]);
+                });
+            })
+
+
+                ->rawColumns(['action' , 'student_id' , 'student_name'])
+                ->make(true);
+        }
 
 
     public function createDiscount()
@@ -1209,15 +1227,32 @@ class FeeManagementController extends Controller
             ->addColumn('student_name', function ($bill) {
                 return $bill->student->fullname ?? 'N/A';
             })
+
+             ->addColumn('student_id', function ($bill) {
+                return $bill->student->student_id ?? 'N/A';
+            })
             ->addColumn('class_name', function ($bill) {
                 return $bill->student->AcademicClass->name ?? 'N/A';
             })
+
+            ->filterColumn('student_id', function ($query, $keyword) {
+                $query->whereHas('student', function ($q) use ($keyword) {
+                    $q->where('student_id', 'like', "%{$keyword}%");
+                });
+            })
+            ->filterColumn('student_name', function ($query, $keyword) {
+                $query->whereHas('student', function ($q) use ($keyword) {
+                    $q->whereRaw("TRIM(CONCAT(COALESCE(first_name,''),' ',COALESCE(last_name,''))) LIKE ?", ["%{$keyword}%"]);
+                });
+            })
+            
             ->addColumn('status', function ($bill) {
                 // Determine correct status based on paid amount
                 $paidAmount = $bill->paid_amount ?? 0;
                 $finalAmount = $bill->getFinalAmount();
                 $outstandingAmount = $finalAmount - $paidAmount;
 
+                // dd($paidAmount , $finalAmount, $outstandingAmount);
                 if ($outstandingAmount <= 0) {
                     $status = 'paid';
                     $badgeClass = 'success';
@@ -1231,7 +1266,10 @@ class FeeManagementController extends Controller
 
                 return '<span class="badge badge-' . $badgeClass . '">' . ucfirst($status) . '</span>';
             })
-            ->rawColumns(['action', 'status'])
+              
+
+
+                ->rawColumns(['action' , 'student_id' , 'student_name' , 'status'])
             ->make(true);
     }
 
@@ -1939,10 +1977,10 @@ class FeeManagementController extends Controller
         public function history($id)
         {
 
-            $histories = FeeDiscountHistory::with('histories')
+            $histories = FeeDiscountHistory::with('histories' , 'updateUser')
                ->where('fee_discount_id', $id)
                 ->get();
-
+            // dd($histories);
             return view('admin.fee-management.discounts.history', compact('histories'));
         }
 

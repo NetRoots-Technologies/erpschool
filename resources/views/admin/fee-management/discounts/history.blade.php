@@ -84,11 +84,14 @@
                                     </tr>
                                 </thead>
                                 <tbody>
+
+                                    {{-- @dd($histories); --}}
                                     @foreach($histories as $index => $history)
                                         @php
                                             $oldData = collect($history->old_data)->except([
-                                                'id','student_id','category_id','show_on_voucher',
-                                                'reason','created_by','updated_at','created_at'
+                                                "id","category_id","student_id" , "show_on_voucher",
+                                                "company_id","branch_id","created_by","updated_by",
+                                                "created_at","updated_at","deleted_at"
                                             ]);
 
                                             $newData = collect($history->new_data)->except([
@@ -99,7 +102,7 @@
 
                                         <tr>
                                             <td>{{ $index + 1 }}</td>
-                                            <td>{{ $history->updatedBy->name ?? 'System' }}</td>
+                                            <td>{{ $history->updateUser->name ?? 'System' }}</td>
 
                                             {{-- OLD DATA --}}
                                             <td>

@@ -2,6 +2,7 @@
 
 namespace App\Models\Fee;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 
 class FeeDiscountHistory extends Model
@@ -23,5 +24,11 @@ class FeeDiscountHistory extends Model
     {
         return $this->hasMany(FeeDiscount::class , 'id', 'fee_discount_id');
     }
+
+      public function updateUser()
+    {
+        return $this->belongsTo(User::class , 'updated_by');
+    }
+
 
 }

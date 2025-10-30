@@ -109,7 +109,7 @@
                 type: 'GET'
             },
             columns: [
-                { data: 'studentId', name: 'studentId' , searchable: true},
+                { data: 'student_id', name: 'student_id' , searchable: true},
                 { data: 'student_name', name: 'student_name', searchable: true},
                 { data: 'category_name', name: 'category_name' },
                 { 
