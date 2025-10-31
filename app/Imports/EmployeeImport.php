@@ -83,7 +83,7 @@ class EmployeeImport implements ToCollection
 
     public function collection(Collection $rows)
     {
-        // dd($rows);
+       
         $firstRow = true;
         $columnNames = [];
         $data = [];
@@ -147,7 +147,7 @@ class EmployeeImport implements ToCollection
                 'present_address' => $item['Present Address'],
                 'dob' => Helpers::transformDate($item['Date of Birth']),
                 'start_date' => Helpers::transformDate($item['Date of Joining']),
-                'gender' => match (strtolower(trim($item['Gender']))) {
+                'gendar' => match (strtolower(trim($item['Gender']))) {
                     'male' => 'M',
                     'female' => 'F',
                     default => '',
@@ -167,9 +167,8 @@ class EmployeeImport implements ToCollection
                 'emp_id'=>$item['Employee ID'],
                 'job_seeking' => $item['Job Type'],
                 'skills' => $item['Skills or training related to the position?'],
-                // 'martial_status' => $item['Martial Status'],
-                'martial_status' => $item['Marital Status'],
-
+                'marital_status' => $item['Marital Status'],
+                'salary' => $item['Salary'],
                 'specialization_subject' => $item['Specialization'],
                 'work_shift_id' => WorkShift::where('name', trim($item['Work Shift']))->first()->id
             ]);

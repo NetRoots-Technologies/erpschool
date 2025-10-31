@@ -359,7 +359,7 @@
 
                                         <div class="col-md-6">
                                             <label for="shiftSelect">Report To <b>*</b></label>
-                                            <select id="shiftSelect" required name="employee_id"
+                                            <select id="shiftSelect"  name="employee_id"
                                                     class="form-select select2 basic-single">
                                                 <option value="" select disabled>Report To</option>
                                                 @foreach($employees as $employee)

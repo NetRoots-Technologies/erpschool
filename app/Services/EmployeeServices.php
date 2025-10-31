@@ -131,7 +131,6 @@ class EmployeeServices
 
     public function store($request)
     {
-       
         $request->validate([
             'email_address' => 'required|email|unique:users,email',
         ]);
