@@ -137,33 +137,8 @@
                             </thead>
                             <tbody>
                             </tbody>
-                            <tfoot align="right">
-                            <tr>
-                                <th></th>
-                                <th></th>
-                                                                <th></th>
-                                {{--                                <th></th>--}}
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-
-                            </tr>
-                            </tfoot>
-                            <tr class="bg-info">
-                                <th></th>
-                                <th>No</th>
-                                <th class="heading_style">Emp Id</th>
-                                <th>Name</th>
-                                {{--                                <th>Department</th>--}}
-                                {{--                                <th>Email</th>--}}
-                                <th>Mobile</th>
-                                <th>Company</th>
-                                <th>Branch</th>
-                                <th>Department</th>
-                                <th>Status</th>
-                                <th>Action</th>
-                            </tr>
+                            
+                            
 
                         </table>
                     </div>
