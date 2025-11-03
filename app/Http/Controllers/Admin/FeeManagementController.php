@@ -617,19 +617,19 @@ class FeeManagementController extends Controller
         return view('admin.fee-management.collections.create', compact('students', 'classes', 'sessions', 'categories'));
     }
 
-    public function getStudentsByClass($classId)
+    public function getStudentsByClass($student_roll_id)
     {
+
+       
         if (!Gate::allows('fee-collections-create')) {
             abort(403, 'Unauthorized access');
         }
 
-        $students = Students::with(['AcademicClass', 'academicSession'])
-            ->where('class_id', $classId)
-            ->get();
+        $student = Students::with(['AcademicClass', 'academicSession'])
+            ->where('id', $student_roll_id)
+            ->first();
 
-        return response()->json([
-            'students' => $students->map(function ($student) {
-                return [
+        $data = [
                     'id' => $student->id,
                     'name' => $student->fullname,
                     'class_name' => $student->AcademicClass->name ?? 'N/A',
@@ -637,8 +637,8 @@ class FeeManagementController extends Controller
                     'class_id' => $student->AcademicClass->id ?? null,
                     'session_id' => $student->academicSession->id ?? null
                 ];
-            })
-        ]);
+
+        return response()->json($data);
     }
 
     public function getSessionsByClass($classId)
@@ -833,6 +833,8 @@ class FeeManagementController extends Controller
      */
     public function updateChallanCollection(Request $request, $id)
     {
+
+       
         if (!Gate::allows('fee-collections-edit')) {
             abort(403, 'Unauthorized access');
         }
@@ -871,7 +873,7 @@ class FeeManagementController extends Controller
             $currentPaidAmount = $challan->paid_amount ?? 0;
             $newPaidAmount = $currentPaidAmount + $difference;
             $finalAmount = $challan->getFinalAmount();
-            $newOutstandingAmount = $finalAmount - $newPaidAmount;
+            $newOutstandingAmount = $finalAmount + $challan->fine_amount  - $newPaidAmount;
 
             $challan->paid_amount = $newPaidAmount;
             $challan->outstanding_amount = $newOutstandingAmount;
@@ -1383,6 +1385,7 @@ class FeeManagementController extends Controller
             'academic_class_id' => 'required|exists:classes,id',
             'academic_session_id' => 'required|exists:acadmeic_sessions,id',
             'billing_month' => 'required|date_format:Y-m',
+            'due_date' => 'required',
             'exclude_arrears' => 'boolean',
         ]);
 
@@ -1413,7 +1416,9 @@ class FeeManagementController extends Controller
 
         // Anchor bill and due dates to the target month (optional but cleaner)
         $billDate = \Carbon\Carbon::now();
-        $dueDate  = \Carbon\Carbon::now()->addDays(30);
+
+        $dueDate = $request->input('due_date');
+        // $dueDate  = \Carbon\Carbon::now()->addDays(30);
 
         foreach ($students as $student) {
             \Log::info('Processing student: ' . $student->id . ' - ' . ($student->fullname ?? 'N/A'));
@@ -1506,16 +1511,33 @@ class FeeManagementController extends Controller
             $showDiscount = DB::table('fee_discounts')->where('student_id', $billing->student_id)->select('show_on_voucher')->first();
         }
 
-        $transportFees = [];
-        $totalTransportFee = 0;
-        if ($billing->student) {
-            $transportFees = $billing->student->transportations()
-                ->where('status', 'active')
-                ->with(['vehicle', 'route'])
-                ->get();
-
-            $totalTransportFee = $transportFees->sum('monthly_charges');
+        $baseAmount     = (float) ($billing->total_amount ?? 0);
+        $totalDiscount  = 0.0;
+        if ($applicableDiscounts && $applicableDiscounts->count() > 0) {
+            foreach ($applicableDiscounts as $disc) {
+                $type  = strtolower($disc->discount_type ?? 'fixed'); // 'percentage' or 'fixed'
+                $value = (float) ($disc->discount_value ?? 0);
+                if ($type === 'percentage' && $value > 0) {
+                    $totalDiscount += round(($baseAmount * ($value / 100)), 2);
+                   
+                } else {
+                    $totalDiscount += $baseAmount;
+                }
+            }
         }
+
+    
+
+            $transportFees = [];
+            $totalTransportFee = 0;
+            if ($billing->student) {
+                $transportFees = $billing->student->transportations()
+                    ->where('status', 'active')
+                    ->with(['vehicle', 'route'])
+                    ->get();
+
+                $totalTransportFee = $transportFees->sum('monthly_charges');
+            }
 
         // ---------- Previous Unpaid Amount ----------
         $previousUnpaidBills = FeeBilling::where('student_id', $billing->student_id)
@@ -1524,9 +1546,16 @@ class FeeManagementController extends Controller
         $previousArrears = $previousUnpaidBills->sum('outstanding_amount');
         $unpaidMonthsList = $previousUnpaidBills->pluck('billing_month')->filter()->unique()->values();
 
+        $fineAmount = 0.0;
+            if (!empty($billing->due_date) && now()->gt($billing->due_date)) {
+                $fineAmount = 1500.0;
+            }
+
+
+        $sumForAllData = $totalDiscount + $fineAmount + $totalTransportFee +  $previousArrears;
         
-        // dd($previousUnpaidBills , $previousArrears , $unpaidMonthsList , $applicableDiscounts);
-        return view('admin.fee-management.billing.print', compact('billing', 'applicableDiscounts', 'showDiscount', 'transportFees', 'totalTransportFee', 'previousArrears', 'unpaidMonthsList', 'previousUnpaidBills'));
+        // dd( $totalDiscount , $fineAmount , $totalTransportFee ,  $previousArrears);
+        return view('admin.fee-management.billing.print', compact('billing', 'applicableDiscounts', 'showDiscount', 'transportFees', 'totalTransportFee', 'previousArrears', 'unpaidMonthsList', 'previousUnpaidBills' , 'fineAmount' , 'sumForAllData'));
     }
 
     /**
@@ -1537,10 +1566,10 @@ class FeeManagementController extends Controller
         if (!Gate::allows('pay-challan')) {
             abort(403, 'Unauthorized access');
         }
-
+        $students = Students::where('status', 1)->where('is_active', 1)->get();
         $classes = AcademicClass::where('status', 1)->get();
 
-        return view('admin.fee-management.collections.pay-challan', compact('classes'));
+        return view('admin.fee-management.collections.pay-challan', compact('classes' , 'students'));
     }
 
     /**
@@ -1560,7 +1589,14 @@ class FeeManagementController extends Controller
                 // Determine correct status based on paid amount
                 $paidAmount = $challan->paid_amount ?? 0;
                 $finalAmount = $challan->getFinalAmount();
-                $outstandingAmount = $finalAmount - $paidAmount;
+
+                $fine_amount = 0;
+                if (now()->gt($challan->due_date)) {
+                        $fine_amount += 1500;
+                    }
+
+                    
+                $outstandingAmount = $finalAmount + $fine_amount - $paidAmount;
 
                 if ($outstandingAmount <= 0) {
                     $status = 'paid';
@@ -1569,6 +1605,7 @@ class FeeManagementController extends Controller
                 } else {
                     $status = 'pending';
                 }
+                
 
                 return [
                     'id' => $challan->id,
@@ -1579,7 +1616,8 @@ class FeeManagementController extends Controller
                     'outstanding_amount' => $outstandingAmount,
                     'due_date' => $challan->due_date,
                     'status' => $status,
-                    'created_at' => $challan->created_at
+                    'created_at' => $challan->created_at,
+                    'fine_amount' => $fine_amount,
                 ];
             });
 
@@ -1614,12 +1652,18 @@ class FeeManagementController extends Controller
                 ];
             }
 
-            $finalAmount = $challan->total_amount - $totalDiscount;
+            // $fineAmount = 0;
+            // if (now()->gt($challan->due_date)) {
+            //     $fineAmount += 1500;
+            // }
+
+            $finalAmount = $challan->total_amount  - $totalDiscount ;
 
             return response()->json([
                 'discounts' => $discounts,
                 'totalDiscount' => $totalDiscount,
-                'finalAmount' => $finalAmount
+                'finalAmount' => $finalAmount,
+             
             ]);
         } catch (\Exception $e) {
             \Log::error('Error loading challan discounts: ' . $e->getMessage());
@@ -1671,6 +1715,7 @@ class FeeManagementController extends Controller
      */
     public function storeChallanPayment(Request $request)
     {
+        
         if (!Gate::allows('Dashboard-list')) {
             abort(403, 'Unauthorized access');
         }
@@ -1694,12 +1739,12 @@ class FeeManagementController extends Controller
             // Validate payment amount
             $finalAmount = $challan->getFinalAmount();
             $currentPaidAmount = $challan->paid_amount ?? 0;
-            $maxPayableAmount = $finalAmount - $currentPaidAmount;
+            $maxPayableAmount = $finalAmount + $request->fine_amount - $currentPaidAmount;
 
             if ($request->paid_amount > $maxPayableAmount) {
                 return back()->withErrors(['paid_amount' => 'Payment amount cannot exceed maximum payable amount (Rs. ' . number_format($maxPayableAmount, 2) . ')'])->withInput();
             }
-
+            
             // Create fee collection record
             $collection = FeeCollection::create([
                 'student_id' => $request->student_id,
@@ -1716,7 +1761,7 @@ class FeeManagementController extends Controller
 
             // Update challan status and outstanding amount
             $newPaidAmount = $currentPaidAmount + $request->paid_amount;
-            $newOutstandingAmount = $finalAmount - $newPaidAmount;
+            $newOutstandingAmount = $finalAmount + $request->fine_amount - $newPaidAmount;
 
             $challan->paid_amount = $newPaidAmount;
             $challan->outstanding_amount = $newOutstandingAmount;
@@ -1730,6 +1775,7 @@ class FeeManagementController extends Controller
                 $challan->status = 'pending';
             }
 
+            $challan->fine_amount = $request->fine_amount ?? 0;
             $challan->save();
 
             // ✅ ACCOUNTING INTEGRATION - Record fee collection in accounts
