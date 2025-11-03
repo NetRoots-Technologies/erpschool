@@ -137,7 +137,7 @@
                                     </small>
                                 </div>
                             </div>
-                            
+                                <input type="hidden" name="fine_amount" value="{{  $collection->billing->fine_amount }}">
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="remarks" class="form-label font-weight-bold">
@@ -167,6 +167,12 @@
                                             <td><strong>Challan Amount:</strong></td>
                                             <td class="text-right">Rs. {{ number_format($collection->billing->total_amount ?? 0, 2) }}</td>
                                         </tr>
+
+                                        <tr>
+                                            <td><strong>Fine Amount:</strong></td>
+                                            <td class="text-right">Rs. {{ number_format($collection->billing->fine_amount ?? 0, 2) }}</td>
+                                        </tr>
+
                                         @if(isset($totalTransportFee) && $totalTransportFee > 0)
                                         <tr>
                                             <td class="text-info"><strong>Transport Fee:</strong></td>
@@ -181,7 +187,7 @@
                                         @endif
                                         <tr class="border-top">
                                             <td><strong>Total Amount:</strong></td>
-                                            <td class="text-right"><strong>Rs. {{ number_format(($collection->billing->total_amount ?? 0) + (isset($totalTransportFee) ? $totalTransportFee : 0) - (isset($totalDiscount) ? $totalDiscount : 0), 2) }}</strong></td>
+                                            <td class="text-right"><strong>Rs. {{ number_format(($collection->billing->total_amount ?? 0) + ($collection->billing->fine_amount ?? 0) + (isset($totalTransportFee) ? $totalTransportFee : 0) - (isset($totalDiscount) ? $totalDiscount : 0), 2) }}</strong></td>
                                         </tr>
                                         <tr>
                                             <td><strong>Current Payment:</strong></td>
@@ -189,7 +195,7 @@
                                         </tr>
                                         <tr class="border-top">
                                             <td><strong>Outstanding:</strong></td>
-                                            <td class="text-right text-danger"><strong>Rs. {{ number_format((($collection->billing->total_amount ?? 0) + (isset($totalTransportFee) ? $totalTransportFee : 0) - (isset($totalDiscount) ? $totalDiscount : 0)) - $collection->paid_amount, 2) }}</strong></td>
+                                            <td class="text-right text-danger"><strong>Rs. {{ number_format((($collection->billing->total_amount ?? 0) +  ($collection->billing->fine_amount ?? 0) + (isset($totalTransportFee) ? $totalTransportFee : 0) - (isset($totalDiscount) ? $totalDiscount : 0)) - $collection->paid_amount, 2) }}</strong></td>
                                         </tr>
                                     </table>
                                 </div>
@@ -199,7 +205,7 @@
                                             $challan = $collection->billing;
                                             $paidAmount = $challan->paid_amount ?? 0;
                                             $finalAmount = $challan->getFinalAmount();
-                                            $outstandingAmount = $finalAmount - $paidAmount;
+                                            $outstandingAmount = $finalAmount + $challan->fine_amount - $paidAmount;
                                             
                                             if ($outstandingAmount <= 0) {
                                                 $status = 'Paid';
