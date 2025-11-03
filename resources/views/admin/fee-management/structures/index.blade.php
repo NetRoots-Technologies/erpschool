@@ -1,6 +1,6 @@
 @extends('admin.layouts.main')
 
-@section('title', 'Fee Structures')
+@section('title', 'Students Structures')
 
 @section('content')
 <div class="container-fluid">
@@ -8,7 +8,7 @@
         <div class="col-12">
             <div class="page-header">
                 <div class="page-leftheader">
-                    <h4 class="page-title mb-0">Fee Structures</h4>
+                    <h4 class="page-title mb-0">Students Structures</h4>
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Home</a></li>
                         <li class="breadcrumb-item"><a href="{{ route('admin.fee-management.index') }}">Fee Management</a></li>
@@ -38,7 +38,7 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">Fee Structures List</h3>
+                    <h3 class="card-title">Students Structures List</h3>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">

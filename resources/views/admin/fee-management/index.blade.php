@@ -43,7 +43,7 @@
                             <i class="fa fa-sitemap"></i>
                         </div>
                         <div>
-                            <h6 class="mb-1">Fee Structures</h6>
+                            <h6 class="mb-1">Students Structures</h6>
                             <h3 class="mb-0">{{ $data['total_structures'] }}</h3>
                         </div>
                     </div>
@@ -144,6 +144,44 @@
                 </div>
             </div>
         </div>
+
+            <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="icon-box icon-box-sm bg-secondary me-3" style="color: #212529 !important;">
+                            <i class="fa fa-cutlery"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-1">Students Food Gains</h6>
+                            <h3 class="mb-0">{{ $data['food_charge_structures'] }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+    <div class="card">
+        <div class="card-body">
+            <div class="d-flex align-items-center">
+                <div class="icon-box icon-box-sm bg-danger me-3" style="color: #212529 !important;">
+                    <i class="fa fa-cutlery"></i>
+                </div>
+                <div>
+                    <h6 class="mb-1">Total Food Charges</h6>
+                    <h3 class="mb-0">
+                        Rs. {{ fmod($data['total_food_charges'], 1) ? number_format($data['total_food_charges'], 2) : number_format($data['total_food_charges'], 0) }}
+                    </h3>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
     </div>
 
     <!-- Quick Actions -->

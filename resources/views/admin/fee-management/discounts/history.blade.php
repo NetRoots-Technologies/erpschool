@@ -150,8 +150,9 @@
                                                 @endif
                                             </td>
 
-                                            {{-- UPDATED DATE --}}
-                                            <td>{{ \Carbon\Carbon::parse($history->created_at)->format('d M, Y h:i A') }}</td>
+                                       {{-- UPDATED DATE --}}
+                                   <td>{{ \Carbon\Carbon::parse($history->updated_at)->timezone('Asia/Karachi')->format('d M, Y h:i A') }}</td>
+
                                         </tr>
                                     @endforeach
                                 </tbody>

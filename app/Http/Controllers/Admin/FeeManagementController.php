@@ -32,6 +32,7 @@ use App\Models\Student\AcademicSession;
 use App\Models\Fee\StudentFeeAssignment;
 use Yajra\DataTables\Facades\DataTables;
 
+
 class FeeManagementController extends Controller
 {
     public function __construct()
@@ -69,6 +70,30 @@ class FeeManagementController extends Controller
         $paidBillings = FeeBilling::where('status', 'paid')->count();
         $partialBillings = FeeBilling::where('status', 'partial')->count();
         $pendingBillings = FeeBilling::where('status', 'generated')->count();
+        // $feeStructures = FeeStructure::all();
+        
+
+        $studentsWithHighFoodCharges = FeeStructure::select('student_id', DB::raw('SUM(fee_structure_details.amount) as total_food'))
+            ->join('fee_structure_details', 'fee_structure_details.fee_structure_id', '=', 'fee_structures.id')
+            ->join('fee_categories', 'fee_categories.id', '=', 'fee_structure_details.fee_category_id')
+            ->where('fee_categories.name', 'Food Charges')
+            ->where('fee_categories.is_active', 1)
+            ->groupBy('student_id')
+            ->having('total_food', '>', 1)
+            ->get();
+
+        // Count of such students
+        $count = $studentsWithHighFoodCharges->count();
+
+        $studentsWithHighFoodCharges = FeeStructure::select('student_id', DB::raw('SUM(fee_structure_details.amount) as total_food'))
+        ->join('fee_structure_details', 'fee_structure_details.fee_structure_id', '=', 'fee_structures.id')
+        ->join('fee_categories', 'fee_categories.id', '=', 'fee_structure_details.fee_category_id')
+        ->where('fee_categories.name', 'Food Charges')
+        ->where('fee_categories.is_active', 1)
+        ->groupBy('student_id')
+        ->having('total_food', '>', 1)
+        ->get();
+        $totalFoodCharges = $studentsWithHighFoodCharges->sum('total_food');
 
         $data = [
             'title' => 'Fee Management Dashboard',
@@ -80,6 +105,10 @@ class FeeManagementController extends Controller
             'paid_billings' => $paidBillings,
             'partial_billings' => $partialBillings,
             'pending_billings' => $pendingBillings,
+            'food_charge_structures' => $count,
+                // 👇 Food Charges Stats
+            'food_charge_students' => $studentsWithHighFoodCharges->count(),
+            'total_food_charges' => $totalFoodCharges,
             'recent_collections' => FeeCollection::with(['student.AcademicClass', 'academicSession'])
                 ->orderBy('created_at', 'desc')
                 ->limit(5)
@@ -122,6 +151,12 @@ class FeeManagementController extends Controller
             })
             ->addColumn('status', function ($category) {
                 return $category->is_active ? '<span class="badge badge-success">Active</span>' : '<span class="badge badge-danger">Inactive</span>';
+            })
+                // ✅ Format created_at here
+            ->editColumn('created_at', function ($category) {
+                return $category->created_at
+                    ? $category->created_at->format('d-m-Y H:i')
+                    : '—'; // if null or invalid
             })
             ->rawColumns(['action', 'status'])
             ->make(true);

@@ -619,7 +619,7 @@
 
                             @can('fee-structures-list')
                                 <li><a class="slide-item {{ request()->is('admin/fee-management/structures*') ? 'active' : '' }}"
-                                    href="{{ route('admin.fee-management.structures') }}">Fee Structures</a></li>
+                                    href="{{ route('admin.fee-management.structures') }}">Students Structures</a></li>
                             @endcan
 
                             @can('fee-collections-list')
