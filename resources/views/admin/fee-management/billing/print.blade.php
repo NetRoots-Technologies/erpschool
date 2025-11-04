@@ -312,7 +312,7 @@
                     </div>
 
                     <div class="img" style="float: right;margin-top: 10px;margin-right: 30px;">
-                        <img src="{{ asset('logos/1759388635.png') }}" style="height: 50px;">
+                        <img src="{{ asset('logo/logo.png') }}" style="height: 50px;">
                     </div>
                 </div>
 
@@ -536,8 +536,12 @@
                         <h5 style="margin: 0;">After Due Date Add Fine:</h5>
                         <h5 style="margin: 0;">Rs. {{ __('1500') }}</h5>
                     </div>
-                </div>
 
+                    <div style="display: flex; justify-content: space-between;">
+                        <h5 style="margin: 0;">After Due Date Total Amount</h5>
+                        <h5 style="margin: 0;">Rs. {{ number_format($hardcodedAmount + 1500, 2) }}</h5>
+                    </div>
+                </div>
                 <div class="bank-stamp">
                     <div class="section-11 bank_stamp_style">
                         <span style="margin: 5px 0px;">BANK STAMP</span>
@@ -580,7 +584,7 @@
                     </div>
 
                     <div class="img" style="float: right;margin-top: 10px;margin-right: 30px;">
-                        <img src="{{ asset('logos/1759388635.png') }}" style="height: 50px;">
+                        <img src="{{ asset('logo/logo.png') }}" style="height: 50px;">
                     </div>
                 </div>
 
@@ -803,6 +807,10 @@
                     <div style="display: flex; justify-content: space-between;">
                         <h5 style="margin: 0;">After Due Date Add Fine:</h5>
                         <h5 style="margin: 0;">Rs. {{ __('1500') }}</h5>
+                    </div>
+                         <div style="display: flex; justify-content: space-between;">
+                        <h5 style="margin: 0;">After Due Date Total Amount</h5>
+                        <h5 style="margin: 0;">Rs. {{ number_format($hardcodedAmount + 1500, 2) }}</h5>
                     </div>
                 </div>
 
@@ -849,7 +857,7 @@
                     </div>
 
                     <div class="img" style="float: right;margin-top: 10px;margin-right: 30px;">
-                        <img src="{{ asset('logos/1759388635.png') }}" style="height: 50px;">
+                        <img src="{{ asset('logo/logo.png') }}" style="height: 50px;">
                     </div>
                 </div>
 
@@ -1072,6 +1080,10 @@
                     <div style="display: flex; justify-content: space-between;">
                         <h5 style="margin: 0;">After Due Date Add Fine:</h5>
                         <h5 style="margin: 0;">Rs. {{ __('1500') }}</h5>
+                    </div>
+                         <div style="display: flex; justify-content: space-between;">
+                        <h5 style="margin: 0;">After Due Date Total Amount</h5>
+                        <h5 style="margin: 0;">Rs. {{ number_format($hardcodedAmount + 1500, 2) }}</h5>
                     </div>
                 </div>
 
