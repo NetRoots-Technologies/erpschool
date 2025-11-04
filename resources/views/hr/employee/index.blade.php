@@ -66,15 +66,15 @@
 
         {{-- Download Sample Bulk File --}}
         <div class="col-auto p-0">
-            <a href="{{ config('google_sheet_links.employee_file_link') }}" target="_blank" class="btn btn-warning btn-md">
-                <b>Download Sample Bulk File</b>
+            <a href="{{ config('google_sheet_links.employee_file_link') }}" target="_blank" class="btn btn-danger btn-md">
+                <i class="fa fa-download"></i> <b>Download Sample Bulk File</b>
             </a>
         </div>
 
         {{-- Import Sample Bulk File --}}
           <div class="col-auto">
                 <a href="#" class="btn btn-success btn-md" data-bs-toggle="modal" data-bs-target="#importModal">
-                    <b>Import Datale</b>
+                   <i class="fa fa-upload"></i> <b>Import Emplyee Data</b>
                 </a>
             </div>
          @endif
