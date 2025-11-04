@@ -1555,13 +1555,21 @@ class FeeManagementController extends Controller
                 if ($type === 'percentage' && $value > 0) {
                     $totalDiscount += round(($baseAmount * ($value / 100)), 2);
                    
-                } else {
+                } 
+
+                elseif ($type === 'fixed' && $value > 0) {
+                    $totalDiscount += $value;
+                }
+                
+                else {
                     $totalDiscount += $baseAmount;
                 }
+
+                
             }
         }
 
-    
+    // dd($totalDiscount);
 
             $transportFees = [];
             $totalTransportFee = 0;
@@ -1587,10 +1595,11 @@ class FeeManagementController extends Controller
             }
 
 
-        $sumForAllData = $totalDiscount + $fineAmount + $totalTransportFee +  $previousArrears;
+        $sumForAllData =  $baseAmount -$totalDiscount + $fineAmount + $totalTransportFee +  $previousArrears;
         
-        // dd( $totalDiscount , $fineAmount , $totalTransportFee ,  $previousArrears);
-        return view('admin.fee-management.billing.print', compact('billing', 'applicableDiscounts', 'showDiscount', 'transportFees', 'totalTransportFee', 'previousArrears', 'unpaidMonthsList', 'previousUnpaidBills' , 'fineAmount' , 'sumForAllData'));
+        $hardcodedAmount =  $baseAmount -$totalDiscount + $totalTransportFee +  $previousArrears;
+        // dd( $baseAmount ,$totalDiscount , $fineAmount , $totalTransportFee ,  $previousArrears);
+        return view('admin.fee-management.billing.print', compact('billing', 'applicableDiscounts', 'showDiscount', 'transportFees', 'totalTransportFee', 'previousArrears', 'unpaidMonthsList', 'previousUnpaidBills' , 'fineAmount' , 'sumForAllData','hardcodedAmount'));
     }
 
     /**

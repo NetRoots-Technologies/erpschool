@@ -43,7 +43,7 @@
                             <i class="fa fa-sitemap"></i>
                         </div>
                         <div>
-                            <h6 class="mb-1">Students Structures</h6>
+                            <h6 class="mb-1">Number of Students</h6>
                             <h3 class="mb-0">{{ $data['total_structures'] }}</h3>
                         </div>
                     </div>
@@ -153,7 +153,7 @@
                             <i class="fa fa-cutlery"></i>
                         </div>
                         <div>
-                            <h6 class="mb-1">Students Food Gains</h6>
+                            <h6 class="mb-1">Students Food Allocated</h6>
                             <h3 class="mb-0">{{ $data['food_charge_structures'] }}</h3>
                         </div>
                     </div>
