@@ -322,9 +322,15 @@ return [
             // "PF" => [114, 115],
             // "SS" => [117, 119],
 
-            "EOBI" => [26, 27],
-            "PF" => [29, 30],
-            "SS" => [32, 33],
+            // local db
+            // "EOBI" => [26, 27],
+            // "PF" => [29, 30],
+            // "SS" => [32, 33],
+
+            // only live
+            "EOBI" => [25, 26],
+            "PF" => [28, 29],
+            "SS" => [31, 32],
             
             "EOBI_Contribution_Monthly_Payments" => 112,
             "EOBI_Payable_Monthly_Payments" => 113,
