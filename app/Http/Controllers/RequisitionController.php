@@ -23,6 +23,7 @@ class RequisitionController extends Controller
     {
         $this->type['food'] = 'F';
         $this->type['stationary'] = 'S';
+        $this->type['uniform'] = 'U';
     }
 
     public function index($type)
@@ -33,8 +34,17 @@ class RequisitionController extends Controller
         $branches = Branches::active()->get();
 
         $query = Item::active();
-        $query = $type == 'food' ? $query->food() : $query->stationary();
+        // $query = $type == 'food' ? $query->food() : $query->stationary();
+        if ($type == 'food') {
+            $query = $query->food();
+        } elseif ($type == 'stationary') {
+            $query = $query->stationary();
+        }elseif ($type == 'uniform') {
+            $query = $query->uniform();
+        }
+        
         $items = $query->get();
+        // dd($items);
 
         $statuses = config('constants.status');
         $priorities = config('constants.priority');
@@ -67,6 +77,7 @@ class RequisitionController extends Controller
         ]);
 
         try {
+            // dd($request->all());
             $data = Requisition::firstOrNew(['id' => $request->id]);
             $data->requester_id = auth()->id();
             $data->item_id = (int) $request->item_id;
@@ -79,7 +90,7 @@ class RequisitionController extends Controller
             $data->save();
 
             DB::commit();
-            return response()->json(["success" => true, "message" => 'Data stored successfully'], 200);
+            return response()->json(["success" => true, "message" => 'Data  successfully'], 200);
         } catch (Exception $ex) {
             DB::rollBack();
             return response()->json(["success" => false, "message" => $ex->getMessage()], 500);
@@ -111,7 +122,14 @@ class RequisitionController extends Controller
             ]);
 
        
-        $query = $request->type == 'food' ? $query->food() : $query->stationary();
+        // $query = $request->type == 'food' ? $query->food() : $query->stationary();
+        if ($request->type == 'food') {
+            $query = $query->food();
+        } elseif ($request->type == 'stationary') {
+            $query = $query->stationary();
+        }elseif ($request->type == 'uniform') {
+            $query = $query->uniform();
+        }
 
         $query = $query->get();
 

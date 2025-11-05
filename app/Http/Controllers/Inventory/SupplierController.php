@@ -22,6 +22,7 @@ class SupplierController extends Controller
     {
         $this->type['food'] = 'F';
         $this->type['stationary'] = 'S';
+        $this->type['uniform'] = 'U';
 
         $this->ledgerService = $ledgerService;
 
@@ -35,7 +36,14 @@ class SupplierController extends Controller
 
         $branches = Branches::active()->get();
         $query = Item::query()->active();
-        $query = $type == 'food' ? $query->food() : $query->stationary();
+        // $query = $type == 'food' ? $query->food() : $query->stationary();
+        if ($type == 'food') {
+            $query = $query->food();
+        } elseif ($type == 'stationary') {
+            $query = $query->stationary();
+        }elseif ($type == 'uniform') {
+            $query = $query->uniform();
+        }
         $items = $query->get();
 
         return view('admin.inventory_management.supplier.index', compact('branches', "items", 'type'));
@@ -65,6 +73,7 @@ class SupplierController extends Controller
 
         ]);
 
+
         try {
             $fixedGroup = config("constants.FixedGroups");
             $supplier = Supplier::firstOrNew(["id" => $request->id]);
@@ -75,17 +84,28 @@ class SupplierController extends Controller
             $supplier->email = $request->email;
             $supplier->ntn_number = $request->ntn_number;
             $supplier->type = $this->type[$request->type];
-            $supplier->type == 'F' ? $group_id = $fixedGroup['Food'] : $group_id = $fixedGroup['Stationary'];
+            // $supplier->type == 'F' ? $group_id = $fixedGroup['Food'] : $group_id = $fixedGroup['Stationary'];
+            if ($request->type == 'food') {
+                $group_id = $fixedGroup['Food'];
+            } elseif ($request->type == 'stationary') {
+                $group_id = $fixedGroup['Stationary'];
+            }else{
+                $group_id = $fixedGroup['Uniform'];
+            }
             $supplier->save();
             $supplier->branches()->sync($request->branches);
             $supplier->items()->sync($request->items);
+
+            // dd($group_id);
 
             foreach ($request->branches as $branch_id) {
                 $this->ledgerService->createAutoLedgers([$group_id], $supplier->name, $branch_id, Supplier::class, $supplier->id);
             }
 
             DB::commit();
-            return response()->json(["success" => true, "message" => 'Data stored successfully'], 200);
+
+            return redirect()->route('inventory.suppliers.index', ['type' => $request->type])->with('success', 'Supplier  Successfully');
+            // return response()->json(["success" => true, "message" => 'Data stored successfully'], 200);
         } catch (\Exception $ex) {
             DB::rollBack();
             return response()->json(["success" => false, "message" => $ex->getMessage()], 500);
@@ -115,13 +135,20 @@ class SupplierController extends Controller
         }
         $query = Supplier::query();
 
-        $query = $request->type == 'food' ? $query->food() : $query->stationary();
-
+        // $query = $request->type == 'food' ? $query->food() : $query->stationary();
+        if ($request->type == 'food') {
+            $query = $query->food();
+        } elseif ($request->type == 'stationary') {
+            $query = $query->stationary();
+        }elseif ($request->type == 'uniform') {
+            $query = $query->uniform();
+        }
+        
         $supplier = $query->latest()->with([
             'branches:id,name',
             'items:id,name'
-        ])->get();
-
+            ])->get();
+            
         return response()->json(["success" => true, 'message' => 'Item Listing', 'data' => $supplier], 200);
     }
     public function changeStatus(Supplier $supplier)

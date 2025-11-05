@@ -55,6 +55,11 @@ class Requisition extends Model
     {
         return $query->where('type', 'S');
     }
+    
+    public function scopeUniform($query)
+    {
+        return $query->where('type', 'U');
+    }
 
     public static function boot()
     {

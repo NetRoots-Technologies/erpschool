@@ -523,7 +523,7 @@
                         <span class="col-2 mb-3">
                             <label for="quantity" class="form-label">Quantity</label>
                             <input type="number" min='1' class="form-control quantity" name="quantity[${i}]"
-                                placeholder="Quantity" value="${0}" required>
+                                placeholder="Quantity" value="${v.quantity ?? 0}" required>
                         </span>
                         <span class="col-2 mb-3">
                             <label for="price" class="form-label">Price</label>

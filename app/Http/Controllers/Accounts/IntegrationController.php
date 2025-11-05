@@ -115,6 +115,8 @@ class IntegrationController extends Controller
      */
     public function recordInventoryPurchase(Request $request)
     {
+
+        // dd($request->all());
         $request->validate([
             'vendor_id' => 'required',
             'purchase_amount' => 'required|numeric',
@@ -122,8 +124,8 @@ class IntegrationController extends Controller
             'reference' => 'required|string',
         ]);
 
-        DB::beginTransaction();
-        try {
+        // DB::beginTransaction();
+        // try {
             // Get or create ledgers
             $inventoryLedger = AccountLedger::where('name', 'LIKE', '%Inventory%')
                 ->whereHas('accountGroup', function($q) {
@@ -211,12 +213,12 @@ class IntegrationController extends Controller
             $inventoryLedger->updateBalance($request->purchase_amount, 0);
             $payableLedger->updateBalance(0, $request->purchase_amount);
 
-            DB::commit();
+            // DB::commit();
             return response()->json(['success' => true, 'entry_id' => $entry->id]);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
-        }
+        // } catch (\Exception $e) {
+        //     DB::rollBack();
+        //     return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        // }
     }
 
     /**

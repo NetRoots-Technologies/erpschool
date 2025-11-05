@@ -57,10 +57,13 @@ Requisition
                     <div class="mb-3">
                         <label for="requisition_to" class="form-label">Requisition To</label>
                         <select class="form-control" id="requisition_to" name="requisition_to" required>
-                            <option value="supplier" selected>Supplier</option>
-                            @if($type == 'stationary')
+                         <option value="" selected disabled>Select</option>                          @if($type == 'stationary')
                             <option value="stationery_shop">Stationery Shop</option>
-                            @endif
+                             @elseif($type == 'food')
+                            <option value="food_cafe">Food Cafe</option>
+                            @elseif($type == 'uniform')
+                            <option value="uniform_shop">Uniform Shop</option>
+                        @endif
                         </select>
                     </div>
                 </div>
@@ -72,8 +75,6 @@ Requisition
         </div>
     </div>
 </div>
-
-
 
 <div class="container-fluid">
 
@@ -298,6 +299,8 @@ Requisition
                     $('#branch').val(sData.branch_id).trigger("change")
                     $('#priority').val(sData.priority).trigger("change")
                     $('#status').val(sData.status).trigger("change")
+                    $('#requisition_to').val(sData.requisition_to).trigger("change")
+                    
                 }
             })
 

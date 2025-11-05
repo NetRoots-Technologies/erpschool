@@ -336,7 +336,11 @@ return [
             "Stationery_Inventory" => 136,
             "Cafe_Inventory_Items" => 137,
             "Stationery_Inventory_Items" => 138,
-            "Student_Canteen_Receivables" => 141
+            "Student_Canteen_Receivables" => 141,
+            "Uniform" => 139,                  // <— NEW: supplier/customer group for Uniform
+            "Uniform_Inventory" => 140,        // <— NEW: parent inventory group for Uniform (optional but nice)
+            "Uniform_Inventory_Items" => 142,  // <— NEW: items ledger group used in ItemController@store
+ 
         ],
     "UNITS" => [
         "KG" => 1,
@@ -356,6 +360,7 @@ return [
         // "PK" => 18,
         // "CASE" => 19,
         // "BARREL" => 20,
+      "PCS" => 16,  // <— OPTIONAL: if you want PCS visible in dropdowns
     ],
     "UNIT_CONVERT" => [
         "KG" => "1000G",
@@ -378,6 +383,7 @@ return [
     "type" => [
         1 => "food",
         2 => "stationary",
+        3 => "uniform",   // <— NEW
     ],
     'delivery_status' => [
         1 => "PENDING",

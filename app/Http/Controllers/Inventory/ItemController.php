@@ -21,6 +21,7 @@ class ItemController extends Controller
         $this->ledgerService = $ledgerService;
         $this->type['food'] = 'F';
         $this->type['stationary'] = 'S';
+        $this->type['uniform'] = 'U'; // NEW
     }
     public function index($type)
     {
@@ -49,7 +50,7 @@ class ItemController extends Controller
         $request->validate([
             'name' => 'required|min:3',
         ]);
-
+// dd($request->all());
         try {
             $item = Item::firstOrNew(["id" => $request->id]);
             $item->name = $request->name;
@@ -59,8 +60,10 @@ class ItemController extends Controller
 
             if($request->type == "food"){
                 $group_id = config('constants.FixedGroups.Cafe_Inventory_Items');
-            }else {
+            }elseif($request->type == "stationary"){
                 $group_id = config('constants.FixedGroups.Stationery_Inventory_Items');
+            }else{
+                $group_id = config('constants.FixedGroups.Uniform_Inventory_Items');
             }
             $this->ledgerService->createAutoLedgers([$group_id], "$item->name"."[$item->measuring_unit]", 0 , Item::class, $item->id);
 
@@ -106,8 +109,16 @@ class ItemController extends Controller
             return abort(503);
         }
         $query = Item::query();
+        // $query = $request->type == 'food' ? $query->food() : $query->stationary();
+        if ($request->type == 'food') {
+            $query = $query->food();
+        } elseif ($request->type == 'stationary') {
+            $query = $query->stationary();
+        } elseif ($request->type == 'uniform') {
+            $query = $query->uniform();
+        }
 
-        $query = $request->type == 'food' ? $query->food() : $query->stationary();
+        
         $items = $query->latest()->get();
         return response()->json(["success" => true, 'message' => 'Item Listing', 'data' => $items], 200);
     }

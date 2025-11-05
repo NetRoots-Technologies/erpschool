@@ -20,6 +20,7 @@ class QuoteController extends Controller
     {
         $this->type['food'] = 'F';
         $this->type['stationary'] = 'S';
+        $this->type['uniform'] = 'U';
     }
 
     public function index($type)
@@ -36,8 +37,10 @@ class QuoteController extends Controller
 
                     if ($type == 'food') {
                         $query->food();
-                    } else {
+                    }elseif($type == 'stationary') {
                         $query->stationary();
+                    }else {
+                        $query->uniform();
                     }
 
                     $query->with([
@@ -104,7 +107,14 @@ class QuoteController extends Controller
             $data->quote_date = $request->quote_date;
             $data->due_date = $request->due_date;
             $data->comments = $request->comments;
-            $data->type = $this->type[$request->type];
+            // $data->type = $this->type[$request->type];
+            if ($request->type == 'food') {
+                $data->type = 'F';
+            } elseif ($request->type == 'stationary') {
+                $data->type = 'S';
+            } else {
+                $data->type = 'U';
+            }       
             $data->save();
 
             $data->quoteItems()->delete();
@@ -163,7 +173,17 @@ class QuoteController extends Controller
                 "quoteItems.item",
             ]);
 
-        $supplier = $request->type == 'food' ? $supplier->food() : $supplier->stationary();
+        // $supplier = $request->type == 'food' ? $supplier->food() : $supplier->stationary();
+
+        if ($request->type == 'food') {
+            $supplier = $supplier->food();
+        }
+        elseif ($request->type == 'stationary') {
+            $supplier = $supplier->stationary();
+        }
+        elseif ($request->type == 'uniform') {
+            $supplier = $supplier->uniform();
+        }
 
         $supplier = $supplier->get();
 
@@ -230,6 +250,7 @@ class QuoteController extends Controller
             'items.name',
             'items.measuring_unit',
             'qi.unit_price',
+            'qi.quantity',
             'qi.id as quote_item_id',
             'q.id as quote_id'
         )
@@ -258,7 +279,6 @@ class QuoteController extends Controller
                     ->where('q.branch_id', $request['branch_id']);
             })
             ->get();
-
         return response()->json(["success" => true, 'message' => "Items Found", 'data' => $items], 200);
     }
 }

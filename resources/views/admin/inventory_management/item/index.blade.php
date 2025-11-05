@@ -22,7 +22,7 @@ Item
                         <input type="text" class="form-control" id="nameInput" name="name" placeholder="Enter item name"
                             required aria-describedby="nameHelp">
                     </div>
-                    @if($type == "food")
+                    @if($type == "food" || $type == "uniform")
                     <div class="mb-3">
                         <label for="measuring_unit" class="form-label">Measuring Unit</label>
                         <select id="measuring_unit" name="measuring_unit" class="form-control" required>
@@ -95,7 +95,7 @@ Item
                 },
                 messages: {
                     name: {
-                        required: "Please enter item name",
+                        required: "Item Name is required",
                         minlength: "Item name should be at least 3 characters long"
                     }
                 },

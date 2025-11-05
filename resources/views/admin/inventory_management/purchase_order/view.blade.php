@@ -98,7 +98,8 @@
 
             <div class="row mt-4">
                 <div class="col-md-6">
-                    <div class="info-box">
+               <button id="backButton" class="btn btn-dark mt-2 ms-2">Back</button>                
+                   <div class="info-box">
                         <div><span class="label">Branch Name:</span> <span class="value"
                                 id="{{ $purchase_order->branch->branch_id }}">{{ $purchase_order->branch->name }}</span>
                         </div>
@@ -127,7 +128,7 @@
                             </select>
                         </div>
 
-                        @if ($currentStatus === 'SHIPPED')
+                        {{-- @if ($currentStatus === 'SHIPPED')
                             <div class="d-flex align-items-center">
                                 <span class="label">Select Ledger (optional):</span>
                                 <select name="paymentMethod" id="paymentMethod" class="form-select w-100">
@@ -137,7 +138,7 @@
                                     @endforeach
                                 </select>
                             </div>
-                        @endif
+                        @endif --}}
 
 
                         <div class="d-flex justify-content-center">
@@ -218,6 +219,7 @@
                 var $deliveryStatus = $('#deliveryStatus');
                 var $paymentMethod = $('#paymentMethod');
                 var $confirmOrder = $('#confirmOrder');
+                var $backButton = $('#backButton');
 
                 var currentStatus = @json($purchase_order->delivery_status);
                 var purchaseOrderId = @json($purchase_order->id);
@@ -229,6 +231,15 @@
 
                 $deliveryStatus.on('change', updateButtonState);
                 $paymentMethod.on('change', updateButtonState);
+
+               $backButton.on('click', function() {
+                    let type = "{{ strtolower($purchase_order->type) }}";
+                    if (type === 'f') type = 'food';
+                    if (type === 's') type = 'stationary';
+                    if (type === 'u') type = 'uniform';
+
+                    window.location.href = `/inventory/grn/${type}`;
+                });
 
                 $confirmOrder.on('click', function() {
                     var selectedStatus = $deliveryStatus.val();

@@ -155,20 +155,34 @@
                     error.insertAfter(element);
                 }
             },
-                rules: {
-                        name:        { required: true, minlength: 3 },
-                        ntn_number:  { required: true, maxlength: 50, ntnPattern: true } // ✅ added
-                    },
-                    messages: {
-                        name: {
-                        required: "Please enter supplier name",
+           rules: {
+                    name:        { required: true, minlength: 3 },
+                    contact:     { required: true },
+                    address:     { required: true },
+                    email:       { required: true, email: true },
+                    ntn_number:  { required: true, maxlength: 50, ntnPattern: true }
+                },
+                messages: {
+                    name: {
+                        required: "Supplier name is required",
                         minlength: "Supplier name should be at least 3 characters long"
-                        },
-                        ntn_number: {
-                        required:  "NTN Number is required",
-                        maxlength:  "Max 50 characters allowed"
-                        }
                     },
+                    contact: {
+                        required: "Contact is required"
+                    },
+                    address: {
+                        required: "Address is required"
+                    },
+                    email: {
+                        required: "Email is required",
+                        email: "Please enter a valid email address"
+                    },
+                    ntn_number: {
+                        required: "NTN Number is required",
+                        maxlength: "Maximum 50 characters allowed",
+                        ntnPattern: "Please enter a valid NTN (7–9 digits, e.g. 1234567-8)"
+                    }
+                },
 
                 submitHandler: function(form) {
                     console.log(form);
@@ -232,6 +246,8 @@
                         let token = $('meta[name="csrf-token"]').attr('content');
                         xhr.setRequestHeader('X-CSRF-TOKEN', token);
                     }
+
+                    
                 },
                 columns: [{
                         data: null,

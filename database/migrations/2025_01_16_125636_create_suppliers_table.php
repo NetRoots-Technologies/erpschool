@@ -25,7 +25,7 @@ class CreateSuppliersTable extends Migration
                 $table->string('email', 255)->nullable();
                 $table->integer('rating')->default(0);
                 $table->boolean('status')->default(1);
-                $table->enum('type', ['F', 'S'])->default('F');
+                $table->enum('type', ['F', 'S', 'U'])->default('F');
                 $table->timestamps();
                 $table->softDeletes();
             });

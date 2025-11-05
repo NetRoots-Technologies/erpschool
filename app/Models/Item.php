@@ -22,6 +22,11 @@ class Item extends Model
         return $query->where('type', 'F');
     }
 
+        public function scopeUniform($query)
+    {
+        return $query->where('type', 'U');
+    }
+
     public function scopeStationary($query)
     {
         return $query->where('type', 'S');
