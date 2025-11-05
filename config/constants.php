@@ -318,9 +318,14 @@ return [
             "Sales_Tax" => 111,
             "Income_Tax" => [106, 110],
             "Sales_Tax_groups" => [107, 111],
-            "EOBI" => [112, 113],
-            "PF" => [114, 115],
-            "SS" => [117, 119],
+            // "EOBI" => [112, 113],
+            // "PF" => [114, 115],
+            // "SS" => [117, 119],
+
+            "EOBI" => [26, 27],
+            "PF" => [29, 30],
+            "SS" => [32, 33],
+            
             "EOBI_Contribution_Monthly_Payments" => 112,
             "EOBI_Payable_Monthly_Payments" => 113,
             "Provident_Fund_Contribution_Monthly_Payments" => 114,

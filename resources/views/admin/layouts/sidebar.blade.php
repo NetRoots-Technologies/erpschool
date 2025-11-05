@@ -401,7 +401,7 @@
                             <i class="angle fe fe-chevron-down"></i></a>
                         <ul class="slide-menu"
                             style="display: {{ request()->is('hr/payroll*') ? 'block' : 'none' }}">
-                            @if (Gate::allows('Payroll-index'))
+                            @if (Gate::allows('Payroll'))
                                 <li><a class="slide-item {{ request()->is('hr/payroll') ? 'active' : '' }}"
                                         href="{{ route('hr.payroll.index') }}">PayRoll</a></li>
                             @endif

@@ -11,7 +11,7 @@ class Advance extends Model
     use HasFactory;
     protected $table = 'advances';
 
-    protected $fillable = ['employee_id', 'name', 'amount', 'duration', 'effective_from', 'installmentAmount', 'amount_to_pay', 'image', 'remaining_amount'];
+    protected $fillable = ['employee_id', 'name', 'amount', 'duration', 'effective_from', 'installmentAmount', 'amount_to_pay', 'image', 'remaining_amount' , 'status' , 'amount_status'];
 
     public function employee()
     {

@@ -6,6 +6,7 @@ use App\Models\Accounts\AccountLedger;
 use App\Models\Accounts\JournalEntry;
 use App\Models\Accounts\JournalEntryLine;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Collection;
 
 /**
  * LedgerService - Bridge to new Accounts system
@@ -223,15 +224,101 @@ class LedgerService
      * @param int $modelId - Model instance ID
      * @return AccountLedger|null
      */
-    public function getLedgers($groupId, $modelName, $modelId)
-    {
-        $moduleName = strtolower(class_basename($modelName));
+    // public function getLedgers($groupId, $modelName, $modelId)
+    // {
+    //     dd($groupId);
+    //     // foreach ($groupId as $key => $id) {
+    //     //    AccountGroup::where('id' , $id)->first();
+    //     // }
+       
+    //     return AccountLedger::whereIn('account_group_id', $groupId)
+    //         ->where('linked_module',  $modelName)
+    //         ->where('linked_id', $modelId)
+    //         ->get();
+    // }
 
-        return AccountLedger::where('account_group_id', $groupId)
-            ->where('linked_module', $moduleName)
-            ->where('linked_id', $modelId)
-            ->first();
+    public function getLedgers($groupIds, $modelName = null, $modelId = null): Collection
+{
+    
+    // 0) Normalize inputs
+    $groupIds = is_array($groupIds) ? $groupIds : [$groupIds];
+    $groupIds = array_values(array_filter($groupIds, fn ($v) => !is_null($v)));
+
+    // linked_module ko short name store karo (e.g. "Branches")
+    $module = null;
+    if (!empty($modelName)) {
+        $module = class_exists($modelName) ? class_basename($modelName) : (string) $modelName;
     }
+
+    // Agar module Branches hai, branchId = modelId assume (zarurat par 4th param bana sakte ho)
+    $branchId = ($module === 'Branches') ? $modelId : null;
+
+    // 1) Existing ledgers pick (same group + same link)
+    $existing = AccountLedger::query()
+        ->whereIn('account_group_id', $groupIds)
+        ->when($module, fn ($q) => $q->where('linked_module', $module))
+        ->when($modelId, fn ($q) => $q->where('linked_id', $modelId))
+        ->when(!is_null($branchId), fn ($q) => $q->where(function ($qq) use ($branchId) {
+            $qq->whereNull('branch_id')->orWhere('branch_id', $branchId);
+        }))
+        ->get()
+        ->keyBy('account_group_id');
+
+    $out = collect();
+
+    // 2) Har groupId ke liye ensure (firstOrCreate) + push to result
+    foreach ($groupIds as $gid) {
+        if ($existing->has($gid)) {
+            $out->push($existing->get($gid));
+            continue;
+        }
+
+        $group = \App\Models\Accounts\AccountGroup::find($gid);
+        if (!$group) {
+            // yahan chahe to throw new \Exception(...) bhi kar sakte ho
+            continue;
+        }
+
+        // assets/expenses => debit normal; otherwise credit
+        $gtype  = strtolower((string) $group->type);
+        $normal = in_array($gtype, ['asset','assets','expense','expenses'], true) ? 'debit' : 'credit';
+
+        // Simple sequential code
+        $nextId = (AccountLedger::max('id') ?? 0) + 1;
+        $code   = 'LED-' . str_pad((string) $nextId, 5, '0', STR_PAD_LEFT);
+
+        // Default name
+        $name = $group->name . ($module && $modelId ? " - {$module} #{$modelId}" : ' Ledger');
+
+        // Uniqueness key: same group + link + branch
+        $ledger = AccountLedger::firstOrCreate(
+            [
+                'name'             => $name,
+                'account_group_id' => $gid,
+                'linked_module'    => $module,
+                'linked_id'        => $modelId,
+                'branch_id'        => $branchId,
+            ],
+            [
+                'code'                  => $code,
+                'description'           => $name,
+                'opening_balance'       => 0,
+                'opening_balance_type'  => $normal,
+                'current_balance'       => 0,
+                'current_balance_type'  => $normal,
+                'currency_id'           => 1,
+                'is_active'             => 1,
+                'is_system'             => 0,
+                'created_by'            => auth()->id(),
+                'updated_by'            => auth()->id(),
+            ]
+        );
+
+        $out->push($ledger);
+    }
+
+    return $out->values(); // collection of AccountLedger models
+}
 
     /**
      * Create entry (for old system compatibility)
@@ -269,6 +356,7 @@ class LedgerService
      */
     public function createEntryItems($data)
     {
+        // dd($data , '2');
         try {
             $debit = 0;
             $credit = 0;

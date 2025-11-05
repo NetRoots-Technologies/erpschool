@@ -302,6 +302,7 @@ Payroll | Generate
                             'X-CSRF-TOKEN': '{{ csrf_token() }}'
                         },
                         success: function (data1) {
+                            console.log(data1);
                             loader.remove();
 
                             $('#loadData').html(data1);
