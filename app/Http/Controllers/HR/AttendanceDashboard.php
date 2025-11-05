@@ -22,9 +22,10 @@ class AttendanceDashboard extends Controller
 {
     public function index(Request $request)
     {
-if (!Gate::allows('AttendanceDashboard-list')) {
-            return abort(503);
-        }
+
+        // if (!Gate::allows('AttendanceDashboard-list')) {
+        //             return abort(503);
+        //         }
         //        try {
         if (isset($request['month_year']) && $request['month_year'] !== null) {
             $timestamp = strtotime($request['month_year']);
@@ -252,9 +253,9 @@ if (!Gate::allows('AttendanceDashboard-list')) {
 
     public function attendanceDetail(Request $request, $employeeId = 0)
     {
-        if (!Gate::allows('AttendanceReport-list')) {
-            return abort(503);
-        }
+        // if (!Gate::allows('AttendanceReport-list')) {
+        //     return abort(503);
+        // }
         try {
 
             if ($employeeId > 0 || $request->employee_id != null) {

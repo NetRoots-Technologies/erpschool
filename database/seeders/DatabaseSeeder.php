@@ -13,14 +13,14 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        // ONLY call the SuperAdminSeeder - it handles everything!
         $this->call(SuperAdminSeeder::class);
         $this->call(MissingPermissionsSeeder::class);
         $this->call(CatSeeder::class);
         $this->call(DepartmentSeeder::class);
         $this->call(DesignationSeeder::class);
         $this->call(AccountGroupSeeder::class);
-        // $this->call(CitySeeder::class);
-        // Add other essential seeders here as needed
+        $this->call(GeneralSettingSeeder::class);
+        $this->call(StatutoryGroupsSeeder::class);
+       
     }
 }

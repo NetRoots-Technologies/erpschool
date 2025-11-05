@@ -43,10 +43,11 @@ class PayrollController extends Controller
             return abort(503);
         }
 
-       $timestamp = time();
+        $timestamp = time();
         $branches = Branch::where('status', 1)->get();
         $bank_accounts = BankAccount::where('type', 'MOA')->pluck('id');
-        $ledgers = AccountLedger::where('linked_module', 'bank_account')->whereIn('linked_id', $bank_accounts)->get();
+        $ledgers = AccountLedger::where('linked_module', BankAccount::class)->whereIn('linked_id', $bank_accounts)->get();
+
         return view('hr.payroll.index', compact('branches', 'ledgers'));
 
     }
@@ -116,12 +117,11 @@ class PayrollController extends Controller
     {
 
 
-       
+      
 
         if (!Gate::allows('Payroll-list')) {
             return abort(503);
         }
-
 
         
         if (isset($request['month_year']) && $request['month_year'] !== null) {
@@ -163,14 +163,16 @@ class PayrollController extends Controller
             $dates_array[] = $day;
         }
 
+        
         $currentMonth = count($dates_array);
+        
         $totalHours = PayrollHelper::getTotalHoursInMonth($currentMonth);
-
-       
+        
+        
         $employees_data = [];
 
         $employees = Employees::where('status', 1)->where('salary', '>', 0)->with('workShifts.workdays');
-
+        
         if ((isset($request['department_id']) && $request['department_id'] != null)) {
             $employees->where('department_id', $request['department_id']);
         }
@@ -209,18 +211,18 @@ class PayrollController extends Controller
                 }
             } else {
                 $salaries[$employee->id] = $employee->salary;
-
                 foreach ($totalHours as $workShiftId => $totalHour) {
                     if ($employee->work_shift_id == $workShiftId) {
                         $committedTime[$employee->id] = $totalHour;
+                      
                         $perMinute = $totalHour;
                         $hourlyRatePerMinute = $employee->salary / $perMinute;
                         $total[$employee->id][$workShiftId] = $hourlyRatePerMinute;
                     }
                 }
             }
-
-            $employeeSalary = Employees::where('status', 1)->where('id', $employee->id)->pluck('grossSalary')->first();
+            
+            $employeeSalary = Employees::where('status', 1)->where('id', $employee->id)->pluck('salary')->first();
 
             $count_data['day_off'] = 0;
             $count_data['present'] = 0;
@@ -263,6 +265,7 @@ class PayrollController extends Controller
                         $attendance = Attendance::where('employee_id', $employee->id)
                         ->whereDate('attendance_date', $date)
                         ->first();
+                       
                         if ($attendance) {
                             if ($attendance->timeIn && $attendance->timeOut) {
                                 $checkin_time = $attendance->timeIn;
@@ -327,7 +330,7 @@ class PayrollController extends Controller
                         $leave = false;
                     }
                 }
-
+                
                 if ($present == true) {
                     $totalHoursWorked = $lateAndOvertime;
                     list($hours, $minutes) = sscanf($totalHoursWorked, "%d hrs : %dmins");
@@ -335,21 +338,22 @@ class PayrollController extends Controller
                     $count_data['present'] += $totalMinutesWorked;
                 }
                 if ($offDay == true && !($employee->job_seeking == 'visitingLecturer')) {
-                    $shift_start_time = Carbon::createFromFormat('H:i:s', $startTime);
-                    $shift_end_time = Carbon::createFromFormat('H:i:s', $endTime);
+                    $shift_start_time = Carbon::createFromFormat('H:i', $startTime);
+                    $shift_end_time = Carbon::createFromFormat('H:i', $endTime);
                     $totalTime = $shift_start_time->diffInMinutes($shift_end_time);
                     $totalMinutesWorked += $totalTime;
                     $count_data['day_off'] += $totalMinutesWorked;
                 }
 
+                // dd( $totalMinutesWorked ); // 0
                 if ($leave == true) {
-                    $shift_start_time = Carbon::createFromFormat('H:i:s', $startTime);
-                    $shift_end_time = Carbon::createFromFormat('H:i:s', $endTime);
+                    $shift_start_time = Carbon::createFromFormat('H:i', $startTime);
+                    $shift_end_time = Carbon::createFromFormat('H:i', $endTime);
                     $leave_total_time = $shift_start_time->diffInMinutes($shift_end_time);
                     $totalMinutesWorked += $leave_total_time;
                     $count_data['leave'] += $totalMinutesWorked;
                 }
-
+                
                 $employee_data['attendance'][$date] = [
                     'present' => $present,
                     'absent' => $absent,
@@ -369,7 +373,7 @@ class PayrollController extends Controller
                     $employee_data['totalWorked'] += $emp_Work['totalMinuteWorked'];
                 }
             }
-
+            
             $employee_data['data'] = $count_data;
 
             $eobi = Eobi::where('employee_id', $employee->id)->first();
@@ -505,6 +509,8 @@ class PayrollController extends Controller
 
     public function store(Request $request)
     {
+
+        // dd($request->all());
         if (!Gate::allows('Payroll-list')) {
             return abort(503);
         }
@@ -522,7 +528,7 @@ class PayrollController extends Controller
                         ->whereDate('end_date', $data['end_date']);
                 })
                 ->get();
-
+            // dd( $payrollApprovals , $data);
             if ($payrollApprovals->isNotEmpty()) {
                 $employeeNames = [];
 
@@ -540,7 +546,7 @@ class PayrollController extends Controller
                 $employeeNamesString = implode(', ', $employeeNames);
                 return response()->json(['error' => "Payroll for employee(s) $employeeNamesString already exists."], 422);
             }
-
+           
             $payrollApproval = PayrollApproval::create([
                 'hrm_employee_id' => $data['hrm_employee_id'],
                 'branch_id' => $data['branch_id'],

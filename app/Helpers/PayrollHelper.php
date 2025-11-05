@@ -10,19 +10,22 @@ class PayrollHelper
     public static function getTotalHoursInMonth($month)
     {
         $daysInMonth = $month;
-
+        
         //        $hoursInDay = 24;
 //        $totalWorkingHours = 0;
         $workShifts = WorkShift::with('workdays')->get();
         $workHours = [];
-
+        // dd($workShifts);
         foreach ($workShifts as $workShift) {
-            $startDateTime = Carbon::createFromFormat('H:i:s', $workShift->start_time);
-            $endDateTime = Carbon::createFromFormat('H:i:s', $workShift->end_time);
+            $startDateTime = Carbon::createFromFormat('H:i', $workShift->start_time);
+            // dd($startDateTime);
+            $endDateTime = Carbon::createFromFormat('H:i', $workShift->end_time);
             $workingHours = $endDateTime->diffInMinutes($startDateTime);
-
+            // dd($workingHours);
             $workHours[$workShift->id] = $workingHours;
         }
+
+        // dd($workHours);
         $totalHours = [];
         foreach ($workHours as $key => $workHour) {
             $totalHours[$key] = $daysInMonth * $workHour;
@@ -30,7 +33,7 @@ class PayrollHelper
 
         //        dd($startDateTime,$endDateTime,$workingHours,$totalHours,$workHours);
 
-        //dd($totalHours);
+        // dd($totalHours);
         return $totalHours;
     }
 

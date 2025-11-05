@@ -54,7 +54,7 @@ class AttendanceController extends Controller
 
     public function store(Request $request)
     {
-        if (!Gate::allows('EmployeeAttendance--createt')) {
+        if (!Gate::allows('EmployeeAttendance-create')) {
             return abort(503);
         }
         try {

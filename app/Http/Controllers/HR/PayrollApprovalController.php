@@ -95,25 +95,24 @@ class PayrollApprovalController extends Controller
 
     public function payrollStatus($id)
     {
-if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+        
         $payrollApproval = PayrollApproval::with('payroll')->findorfail($id);
-
+        
         $payrolls = $payrollApproval->payroll;
-
+        
         return view('hr.payroll.payroll_status_approve', compact('payrollApproval', 'payrolls'));
     }
 
     public function payroll_status_approve($id)
     {
+        
         if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         ini_set('max_execution_time', 120000);
         DB::beginTransaction();
 
-        try {
+        // try {
 
             $salary = PayrollApproval::with('payroll')->findorfail($id);
             $salary->approved = 1;
@@ -121,7 +120,7 @@ if (!Gate::allows('Dashboard-list')) {
 
             $Payroll_total = 0;
             $payrollEmployees = $salary->payroll;
-
+          
             foreach ($payrollEmployees as $payroll) {
                 $Payroll_total += $payroll->total_salary;
 
@@ -227,8 +226,12 @@ if (!Gate::allows('Dashboard-list')) {
                     $compnay_eobi = GeneralSettingsHelper::getSetting('eobi');
                     $socialSecurity = GeneralSettingsHelper::getSetting('socialSecurity');
 
+                    
+                   
                     foreach ($groups as $key => $group) {
+                        // dd($group);
                         $ledgers = $this->ledgerService->getLedgers($group, Branches::class, $payrollApprovals->branch_id);
+                        // dd($ledgers , $payroll->fund_values[$key] , 'e');
                         foreach ($ledgers as $ledger) {
                             $data['amount'] = $payroll->fund_values[$key];
                             $data['entry_id'] = $entry->id;
@@ -257,6 +260,7 @@ if (!Gate::allows('Dashboard-list')) {
                         $groups['Social_Security'] = config('constants.FixedGroups.SS');
 
                         $ledgers = $this->ledgerService->getLedgers($groups['Social_Security'], Branches::class, $payrollApprovals->branch_id);
+                        dd(  $ledgers , '3');
                         foreach ($ledgers as $ledger) {
                             $data['amount'] = $ss;
                             $data['entry_id'] = $entry->id;
@@ -300,10 +304,10 @@ if (!Gate::allows('Dashboard-list')) {
 
             DB::commit();
             return redirect()->route('hr.payroll.approve')->with('success', 'Payroll Approved');
-        } catch (Exception $e) {
-            DB::Rollback();
-            return redirect()->back()->with('error', $e->getMessage());
-        }
+        // } catch (Exception $e) {
+        //     DB::Rollback();
+        //     return redirect()->back()->with('error', $e->getMessage());
+        // }
     }
 
     public function payroll_status_reject($id)

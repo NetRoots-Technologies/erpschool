@@ -15,11 +15,11 @@ class GeneralSettingsHelper
         return $setting ? json_decode($setting->values, true) : null;
     }
 
-    public static function getGeneral($key)
-    {
-        $setting = DB::table('general_settings')->where('key', $key)->first();
-        return $setting ? $setting->values : null;
-    }
+        public static function getGeneral($key)
+        {
+            $setting = DB::table('general_settings')->where('key', $key)->first();
+            return $setting ? $setting->values : null;
+        }
 
     public static function calculateLateAndOvertime($startTime, $endTime, $checkinTime, $checkoutTime, $gracePeriod, $date)
     {
