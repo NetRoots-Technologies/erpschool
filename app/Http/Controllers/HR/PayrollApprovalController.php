@@ -112,7 +112,7 @@ class PayrollApprovalController extends Controller
         ini_set('max_execution_time', 120000);
         DB::beginTransaction();
 
-        // try {
+        try {
 
             $salary = PayrollApproval::with('payroll')->findorfail($id);
             $salary->approved = 1;
@@ -304,10 +304,10 @@ class PayrollApprovalController extends Controller
 
             DB::commit();
             return redirect()->route('hr.payroll.approve')->with('success', 'Payroll Approved');
-        // } catch (Exception $e) {
-        //     DB::Rollback();
-        //     return redirect()->back()->with('error', $e->getMessage());
-        // }
+        } catch (Exception $e) {
+            DB::Rollback();
+            return redirect()->back()->with('error', $e->getMessage());
+        }
     }
 
     public function payroll_status_reject($id)

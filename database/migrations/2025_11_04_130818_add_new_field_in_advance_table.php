@@ -16,6 +16,7 @@ class AddNewFieldInAdvanceTable extends Migration
         Schema::table('advances', function (Blueprint $table) {
             $table->integer('status')->default(0)->after('image');
             $table->string('amount_status')->nullable()->after('status');
+            $table->integer('remaining_amount')->default(0)->after('amount_to_pay');
         });
     }
 
@@ -29,6 +30,7 @@ class AddNewFieldInAdvanceTable extends Migration
         Schema::table('advances', function (Blueprint $table) {
             $table->dropColumn('status');
             $table->dropColumn('amount_status');
+            $table->dropColumn('remaining_amount');
             
         });
     }
