@@ -232,9 +232,9 @@ Roles
 
             var url = @json(route('roles.index'));
             $.ajax({
-                type: "put",
+                type: "post",
                 "url": url + '/' + id,
-                data: $('#editform').serialize(),
+                data: $('#editform').serialize() + '&_method=PUT',
                 success: function (response) {
                     loader.remove();
                     $('.modal').each(function () {

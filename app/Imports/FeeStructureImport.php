@@ -32,9 +32,9 @@ class FeeStructureImport implements ToModel, WithHeadingRow, SkipsEmptyRows
 
         if (!$this->headersChecked) {
             $this->headersChecked = true;
-            if (count($row) > 10) {
-                throw new \Exception("Excel file headers should not be more than 10 columns!");
-            }
+            // if (count($row) > 10) {
+            //     throw new \Exception("Excel file headers should not be more than 10 columns!");
+            // }
         }
 
         if (empty($row['structure_name'])) {

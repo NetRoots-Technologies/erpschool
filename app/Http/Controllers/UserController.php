@@ -29,7 +29,7 @@ class UserController extends Controller
     public function index()
     {
 
-        if (!Gate::allows('users-list')) {
+        if (!Gate::allows('Users-list')) {
             return abort(503);
         }
         $companies=Company::select('id','name')->where('status',1)->get();
@@ -49,7 +49,7 @@ class UserController extends Controller
     public function create()
     {
 
-        if (!Gate::allows('users-create')) {
+        if (!Gate::allows('Users-create')) {
             return abort(503);
         }
         $roles = Role::get();
@@ -59,7 +59,7 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
-         if (!Gate::allows('users-create')) {
+         if (!Gate::allows('Users-create')) {
             return abort(503);
         }
         $validator = Validator::make($request->all(), [
@@ -103,7 +103,7 @@ class UserController extends Controller
      */
     public function edit($id)
     {
-        if (!Gate::allows('users-edit')) {
+        if (!Gate::allows('Users-edit')) {
             return abort(503);
         }
         //$user = User::find($id);
@@ -121,7 +121,7 @@ class UserController extends Controller
      */
     public function update(Request $request,$id)
     {
-        if (!Gate::allows('users-edit')) {
+        if (!Gate::allows('Users-edit')) {
             return abort(503);
         }
         $this->validate($request, [
@@ -139,7 +139,7 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        if (!Gate::allows('users-delete')) {
+        if (!Gate::allows('Users-delete')) {
             return abort(503);
         }
         User::find($id)->delete();

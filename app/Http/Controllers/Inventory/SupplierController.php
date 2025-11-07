@@ -69,9 +69,8 @@ class SupplierController extends Controller
             'contact' => 'required',
             'address' => 'required',
             'email' => 'required|email',
-           'ntn_number' => 'required|string|max:50',
-
-        ]);
+            'ntn_number' => 'required|string|max:50',
+                ]);
 
 
         try {
@@ -96,10 +95,10 @@ class SupplierController extends Controller
             $supplier->branches()->sync($request->branches);
             $supplier->items()->sync($request->items);
 
-            // dd($group_id);
+           
 
             foreach ($request->branches as $branch_id) {
-                $this->ledgerService->createAutoLedgers([$group_id], $supplier->name, $branch_id, Supplier::class, $supplier->id);
+                $this->ledgerService->createAutoLedgersForSuppliers([$group_id], $supplier->name, $branch_id, Supplier::class, $supplier->id , $request->all());
             }
 
             DB::commit();

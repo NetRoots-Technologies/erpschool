@@ -246,8 +246,8 @@ class EmployeeServices
                 'branch_id' => $request->input('branchSelect')
             ]);
 
-
-            $roles = Role::where('name', 'General Employee')->pluck('id');
+            
+            $roles = Role::where('id', $request->role_id)->pluck('id');
             $user->syncRoles($roles);
         }
 
