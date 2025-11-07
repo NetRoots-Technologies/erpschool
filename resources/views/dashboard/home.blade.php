@@ -17,7 +17,7 @@ Dashboard
 </style>
 <!-- row -->
 
-@can(Gate::allows('Dashboard-list'))
+@can('Dashboard-list')
     
 
 <div class="row row-sm">
