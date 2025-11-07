@@ -7,6 +7,10 @@ use App\Models\Accounts\JournalEntry;
 use App\Models\Accounts\JournalEntryLine;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Collection;
+use App\Http\Controllers\Controller;
+use App\Models\Accounts\Vendor;
+use App\Models\Accounts\AccountGroup;
+use Illuminate\Http\Request;
 
 /**
  * LedgerService - Bridge to new Accounts system
@@ -168,6 +172,7 @@ class LedgerService
      */
     public function createAutoLedgers($groupIds, $ledgerName, $branchId, $modelName, $modelId)
     {
+        // dd($groupIds, $ledgerName, $branchId, $modelName, $modelId);
         try {
             // Get the first group ID (for backward compatibility)
             $groupId = is_array($groupIds) ? $groupIds[0] : $groupIds;
@@ -216,6 +221,71 @@ class LedgerService
         }
     }
 
+     public function createAutoLedgersForSuppliers($groupIds, $ledgerName, $branchId, $modelName, $modelId , $request)
+    {
+        
+        try {
+                $payablesGroup = AccountGroup::where('type', 'liability')
+                    ->where('name', 'LIKE', '%Payable%')
+                    ->first();
+                if (!$payablesGroup) {
+                    throw new \Exception('Accounts Payable group not found. Please setup chart of accounts first.');
+                }
+
+                  $lastCode = Vendor::orderBy('id', 'desc')->value('code');
+                if (!$lastCode) {
+                    $code = 'VEN-001';
+                }
+                preg_match('/(\d+)$/', $lastCode, $matches);
+                $number = isset($matches[1]) ? (int)$matches[1] + 1 : 1;
+
+                $code = 'VEN-' . str_pad($number, 3, '0', STR_PAD_LEFT);
+
+
+                $ledger = AccountLedger::create([
+                    'name' => 'Vendor - ' . $request['name'],
+                    'code' => $code,
+                    'account_group_id' => $payablesGroup->id,
+                    'opening_balance' => 0,
+                    'opening_balance_type' => 'credit',
+                    'current_balance' => 0,
+                    'current_balance_type' => 'credit',
+                    'linked_module' => 'vendor',
+                    'branch_id' => $branchId,
+                    'created_by' => auth()->id(),
+                ]);
+                
+            // Create vendor
+            $vendor = Vendor::create([
+                'name' => $request["name"],
+                'code' =>  $code,
+                'email' => $request["email"],
+                'phone' => "",
+                'contact_person' => $request["contact"],
+                'address' => $request["address"],
+                'city' => 'Lahore',
+                'state' => 'Punjab',
+                'country' => 'Pakistan',
+                'tax_number' => "",
+                'payment_terms' => "",
+                'account_ledger_id' => $ledger->id,
+                'branch_id' => $branchId,
+                'created_by' => auth()->id(),
+            ]);
+
+            // Update ledger link
+            $ledger->linked_id = $vendor->id;
+            $ledger->save();
+
+            return $ledger;
+
+        } catch (\Exception $e) {
+            \Log::error("LedgerService::createAutoLedgers failed: " . $e->getMessage());
+            return null;
+        }
+    }
+
+   
     /**
      * Get ledgers for a specific model/entity
      * 
