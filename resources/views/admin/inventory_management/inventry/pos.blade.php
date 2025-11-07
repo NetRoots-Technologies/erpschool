@@ -1,7 +1,7 @@
 @extends('admin.layouts.main')
 
 @section('title')
-POS Inventory System - Stationary Shop
+POS Inventory System
 @stop
 
 @section('content')
@@ -10,7 +10,7 @@ POS Inventory System - Stationary Shop
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">POS Inventory System - Canteen</h3>
+                    <h3 class="card-title">POS Inventory System - Uniform</h3>
                 </div>
                 <div class="card-body">
                     <div class="row mt-3">
