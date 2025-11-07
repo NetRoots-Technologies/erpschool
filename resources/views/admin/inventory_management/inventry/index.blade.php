@@ -126,73 +126,125 @@ Inventry
             })
 
 
-            let dt = $('#data_table').DataTable({
-                ajax: {
-                    url: uri,
-                    type: 'POST',
-                    dataSrc: function (json) {
-                        return json.data;
-                    },
-                    data: function (d) {
-                        d.type = type;
-                        // d.type = $('#type').val();
-                        // d.month = $('#month').val();
-                        // d.employee_id = $('#employees_list').val(); ;
+            // let dt = $('#data_table').DataTable({
+            //     ajax: {
+            //         url: uri,
+            //         type: 'POST',
+            //         dataSrc: function (json) {
+            //             return json.data;
+            //         },
+            //         data: function (d) {
+            //             d.type = type;
+            //             // d.type = $('#type').val();
+            //             // d.month = $('#month').val();
+            //             // d.employee_id = $('#employees_list').val(); ;
 
-                    },
-                    beforeSend: function (xhr) {
-                        var token = $('meta[name="csrf-token"]').attr('content');
-                        xhr.setRequestHeader('X-CSRF-TOKEN', token);
-                    }
+            //         },
+            //         beforeSend: function (xhr) {
+            //             var token = $('meta[name="csrf-token"]').attr('content');
+            //             xhr.setRequestHeader('X-CSRF-TOKEN', token);
+            //         }
+            //     },
+            //     columns: [
+            //         { data: null, title: 'Sr No', width: "7%", orderable: false,
+            //         render: function (data, type, row, meta) {
+            //             return meta.row + 1;
+            //         }
+            //     },
+            //     { data: 'name', title: 'Name' },
+            //     { data: 'branch.name', title: 'Branch Name'},
+            //     { data: 'measuring_unit', title: 'Measuring Unit', render: function(data, type, row) {
+            //             return data ?? 'None';
+            //     }},
+            //     { data: 'quantity', title: 'Quantity' },
+            //         { data: 'unit_price', title: 'Unit Price' },
+            //         { data: 'cost_price', title: 'Cost Price' },
+            //         { data: 'sale_price', title: 'Sale Price',
+            //         render: function (data, type, row, meta) {
+            //             return data;
+            //         }},
+            //         { data: null, title: 'Action', orderable: false,
+            //             render: function (data, type, row, meta) {
+            //                 html = '';
+            //                 if(editPermssion){
+            //                     html +=`<a class="btn btn-sm btn-warning edit-item" data-id="${row.id}" data-sale_price="${row.sale_price}" data-expiry_date="${row.expiry_date}"><i class="fa fa-pencil"></i></a>`;
+            //                 }
+            //                 return html;
+            //         }},
+            //     ],
+            //     paging: true,
+            //     searching: true,
+            //     processing: true,
+            //     ordering: true,
+            //     responsive: true,
+            //     language: {
+            //         emptyTable: 'No data available in the table.'
+            //     },
+            //     // dom: `<"row"<"col-md-6"l><"col-md-6 text-end"B>>tipr`,
+            //     // buttons: [
+            //     //     {
+            //     //         text: 'Add Item',
+            //     //         className: 'btn btn-primary',
+            //     //         action: function (e, dt, node, config) {
+            //     //             $('#iModal').modal('show');
+            //     //         }
+            //     //     }
+            //     // ],
+            //     drawCallback: function(settings) {
+            //     }
+            // });
+            let dt = $('#data_table').DataTable({
+            ajax: {
+                url: uri,
+                type: 'POST',
+                data: d => { d.type = type; },
+                dataSrc: json => json?.data ?? [],
+                beforeSend: function (xhr) {
+                const token = $('meta[name="csrf-token"]').attr('content');
+                xhr.setRequestHeader('X-CSRF-TOKEN', token);
                 },
-                columns: [
-                    { data: null, title: 'Sr No', width: "7%", orderable: false,
-                    render: function (data, type, row, meta) {
-                        return meta.row + 1;
-                    }
+                error: function(xhr){
+                console.error('DT Ajax error:', xhr.status, xhr.responseText);
+                toastr.error('Failed to load data ('+xhr.status+'). Check console.');
+                }
+            },
+            columns: [
+                { data: null, title: 'Sr No', width: "7%", orderable: false,
+                render: (d,t,r,m) => m.row + 1
                 },
                 { data: 'name', title: 'Name' },
-                { data: 'branch.name', title: 'Branch Name'},
-                { data: 'measuring_unit', title: 'Measuring Unit', render: function(data, type, row) {
-                        return data ?? 'None';
-                }},
-                { data: 'quantity', title: 'Quantity' },
-                    { data: 'unit_price', title: 'Unit Price' },
-                    { data: 'cost_price', title: 'Cost Price' },
-                    { data: 'sale_price', title: 'Sale Price',
-                    render: function (data, type, row, meta) {
-                        return data;
-                    }},
-                    { data: null, title: 'Action', orderable: false,
-                        render: function (data, type, row, meta) {
-                            html = '';
-                            if(editPermssion){
-                                html +=`<a class="btn btn-sm btn-warning edit-item" data-id="${row.id}" data-sale_price="${row.sale_price}" data-expiry_date="${row.expiry_date}"><i class="fa fa-pencil"></i></a>`;
-                            }
-                            return html;
-                    }},
-                ],
-                paging: true,
-                searching: true,
-                processing: true,
-                ordering: true,
-                responsive: true,
-                language: {
-                    emptyTable: 'No data available in the table.'
+                { data: 'branch.name', title: 'Branch Name',
+                render: (d, t, row) => row?.branch?.name ?? '—'
                 },
-                // dom: `<"row"<"col-md-6"l><"col-md-6 text-end"B>>tipr`,
-                // buttons: [
-                //     {
-                //         text: 'Add Item',
-                //         className: 'btn btn-primary',
-                //         action: function (e, dt, node, config) {
-                //             $('#iModal').modal('show');
-                //         }
-                //     }
-                // ],
-                drawCallback: function(settings) {
+                { data: 'measuring_unit', title: 'Measuring Unit',
+                render: d => d ?? 'None'
+                },
+                { data: 'quantity', title: 'Quantity' },
+                { data: 'unit_price', title: 'Unit Price' },
+                { data: 'cost_price', title: 'Cost Price' },
+                { data: 'sale_price', title: 'Sale Price' },
+                { data: null, title: 'Action', orderable: false,
+                render: (d,t,row) => {
+                    let html = '';
+                    if (editPermssion) {
+                    html += `<a class="btn btn-sm btn-warning edit-item"
+                                data-id="${row.id}"
+                                data-sale_price="${row.sale_price ?? ''}"
+                                data-expiry_date="${row.expiry_date ?? ''}">
+                                <i class="fa fa-pencil"></i></a>`;
+                    }
+                    return html;
                 }
+                }
+            ],
+            paging: true,
+            searching: true,
+            processing: true,
+            ordering: true,
+            responsive: true,
+            language: { emptyTable: 'No data available in the table.' }
             });
+
 
             $(`#data_table`).on('click','.edit-item', function(e){
                 $('#iForm').trigger("reset");

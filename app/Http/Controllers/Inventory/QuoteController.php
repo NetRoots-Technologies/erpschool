@@ -49,8 +49,10 @@ class QuoteController extends Controller
 
                             if ($type == 'food') {
                                 $query->food();
-                            } else {
+                            } elseif($type == 'stationary') {
                                 $query->stationary();
+                            } else {
+                                $query->uniform();
                             }
                         }
                     ]);
@@ -130,7 +132,7 @@ class QuoteController extends Controller
 
 
             DB::commit();
-            return response()->json(["success" => true, "message" => 'Data stored successfully'], 200);
+            return response()->json(["success" => true, "message" => 'Data successfully'], 200);
         } catch (\Exception $ex) {
             DB::rollBack();
             return response()->json(["success" => false, "message" => $ex->getMessage()], 500);

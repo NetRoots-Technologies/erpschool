@@ -52,4 +52,8 @@ class PurchaseOrder extends Model
     {
         return $query->where('type', 'S');
     }
+      public function scopeUniform($query)
+    {
+        return $query->where('type', 'U');
+    }
 }

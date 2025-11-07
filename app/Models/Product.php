@@ -38,6 +38,11 @@ class Product extends Model
         return $query->where('type', 'S');
     }
 
+    public function scopeUniform($query)
+    {
+        return $query->where('type', 'U');
+    }
+
     public function branch()
     {
         return $this->belongsTo(Branch::class, 'branch_id');

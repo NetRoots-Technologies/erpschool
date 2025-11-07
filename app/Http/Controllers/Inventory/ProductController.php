@@ -27,6 +27,7 @@ class ProductController extends Controller
         $this->ledgerService = $ledgerService;
         $this->type['food'] = 'F';
         $this->type['stationary'] = 'S';
+        $this->type['uniform'] = 'U';
     }
 
     public function index($type)
@@ -35,7 +36,14 @@ class ProductController extends Controller
             return abort(503);
         }
         $query = Inventry::query();
-        $query = $type == 'food' ? $query->food() : $query->stationary();
+        // $query = $type == 'food' ? $query->food() : $query->stationary();
+        if ($type == 'food') {
+            $query = $query->food();
+        } elseif ($type == 'stationary') {
+            $query = $query->stationary();
+        } elseif ($type == 'uniform') {
+            $query = $query->uniform();
+        }
         $ingredients = $query->get();
         $branches = Branch::all();
         return view('admin.inventory_management.product.index', compact('ingredients', 'type', 'branches'));
@@ -85,8 +93,11 @@ class ProductController extends Controller
             }
             if ($request->type == "food") {
                 $group_id = config('constants.FixedGroups.Cafe_Inventory_Items');
-            } else {
+            } elseif($request->type == "stationary") {
                 $group_id = config('constants.FixedGroups.Stationery_Inventory_Items');
+            } else {
+               $group_id =config('constants.FixedGroups.Uniform_Inventory_Items');
+
             }
 
             if (!$request->get('id')) {
@@ -108,7 +119,14 @@ class ProductController extends Controller
         }
         $query = Product::query()->with(['ProductItems', 'ProductItems.inventoryItems', 'branch']);
 
-        $query = $request->type == 'food' ? $query->food() : $query->stationary();
+        // $query = $request->type == 'food' ? $query->food() : $query->stationary();
+        if ($request->type == 'food') {
+            $query = $query->food();
+        } elseif ($request->type == 'stationary') {
+            $query = $query->stationary();
+        } elseif ($request->type == 'uniform') {
+            $query = $query->uniform();
+        }
         $query = $query->latest()->get();
 
         return response()->json(["success" => true, 'data' => $query]);
