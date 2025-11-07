@@ -16,6 +16,10 @@ Dashboard
     }
 </style>
 <!-- row -->
+
+@can(Gate::allows('Dashboard-list'))
+    
+
 <div class="row row-sm">
     <div class="col-xl-3 col-lg-6 col-md-6 col-xm-12">
         <div class="card overflow-hidden sales-card bg-primary-gradient">
@@ -370,6 +374,8 @@ Dashboard
     </div>
     
 </div>
+
+@endcan
 @endsection
 @section('js')
 <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
