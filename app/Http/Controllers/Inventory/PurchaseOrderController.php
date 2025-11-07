@@ -40,18 +40,26 @@ class PurchaseOrderController extends Controller
 
     public function index($type)
     {
+        // dd($type);
         if (!Gate::allows('PurchaseOrders-list')) {
             return abort(503);
         }
-        $mappedType = $type == 'food' ? 'F' : 'S';
-
+           $mappedType = match ($type) {
+                                            'food' => 'F',
+                                            'stationary' => 'S',
+                                            'uniform' => 'U',
+                                            default => 'S',
+                                        };
         $branches = Branches::active()
             ->with([
-                'suppliers' => function ($query) use ($mappedType) {
-                    $query->where('type', $mappedType);
-                },
-                'suppliers.items:id,name'
-            ])
+                // 'suppliers' => function ($query) use ($mappedType) {
+            //         $query->where('type', $mappedType);
+            //     },
+            //     'suppliers.items:id,name'
+            // ])
+            'suppliers' => fn($q) => $q->where('type', $mappedType),
+            'suppliers.items:id,name'
+        ])
             ->select(['id', 'name'])
             ->get();
 
@@ -108,7 +116,14 @@ class PurchaseOrderController extends Controller
             "delivery_date" => 'required|date',
             "description" => 'nullable|string',
         ]);
-        $type = $request->type == 'food' ? 'F' : 'S';
+        // $type = $request->type == 'food' ? 'F' : 'S';
+       $type = match ($request->type) {
+            'food' => 'F',
+            'stationary' => 'S',
+            'uniform' => 'U',
+            default => 'S',
+        };
+
         try {
             $data = PurchaseOrder::firstOrNew(['id' => $request->id]);
             $data->supplier_id = $request->supplier_id;
@@ -211,11 +226,22 @@ class PurchaseOrderController extends Controller
                 "purchaseOrderItems:id,item_id,purchase_order_id,quantity,unit_price,total_price,quote_item_price,measuring_unit",
                 "purchaseOrderItems.item:id,name",
             ]);
-        $type = $request->get('type') == "food" ? 'F' : "S";
-        $supplier->where('type', $type);
+         //   $type = $request->get('type') == "food" ? 'F' : "S";
+         // normalize + map
+            $rawType = $request->get('type');
+            $type = in_array($rawType, ['food','stationary','uniform']) ? $rawType : 'stationary';
 
+            // map to DB code
+            $mappedType = match ($type) {
+                'food' => 'F',
+                'stationary' => 'S',
+                'uniform' => 'U',
+                default => 'S',
+            };
 
-        $supplier = $supplier->latest()->get();
+            $supplier->where('type', $mappedType);
+
+            $supplier = $supplier->latest()->get();
 
         return response()->json(["success" => true, 'message' => 'Listing', 'data' => $supplier], 200);
     }

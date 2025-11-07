@@ -42,7 +42,22 @@
                 </tbody>
             </table>
 
-            <a href="{{ route('inventory.quotes.index', $type ?? 'stationary') }}" class="btn btn-secondary mt-3">Back</a>
+           <a href="#" id="backBtn" class="btn btn-secondary mt-3">Back</a>
+
+            <script>
+                document.getElementById('backBtn').addEventListener('click', function (e) {
+                    e.preventDefault();
+
+                    // get current URL path (e.g., /inventory/quotes/food/12)
+                    const pathParts = window.location.pathname.split('/');
+
+                    // find type (food/stationary/uniform)
+                    const type = ['food', 'stationary', 'uniform'].find(t => pathParts.includes(t)) || 'stationary';
+
+                    // redirect accordingly
+                    window.location.href = `/inventory/quotes/${type}`;
+                });
+            </script>
         </div>
     </div>
 </div>

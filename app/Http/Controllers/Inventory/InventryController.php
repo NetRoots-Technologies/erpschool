@@ -64,7 +64,13 @@ class InventryController extends Controller
             return abort(503);
         }
         $query = Inventry::latest()->with('branch');
-        $query = $request->type == 'food' ? $query->food()->orWhere('type', 'p') : $query->stationary()->orWhere('type', 'SP');
+        // $query = $request->type == 'food' ? $query->food()->orWhere('type', 'p') : $query->stationary()->orWhere('type', 'SP');
+        $query = $request->type == 'food'
+        ? $query->food()->orWhereIn('type', ['F', 'P'])
+        : ($request->type == 'uniform'
+            ? $query->uniform()->orWhereIn('type', ['U'])
+            : $query->stationary()->orWhereIn('type', ['S', 'SP']));
+
         return response()->json(["success" => true, 'message' => 'Listing', 'data' => $query->get()], 200);
 
     }

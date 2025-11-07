@@ -378,6 +378,18 @@ class FeeManagementController extends Controller
             'student_id' => "required",
         ]);
 
+        // ✅ Step 1: Check if already created
+        $exists = FeeStructure::where('academic_class_id', $request->class_id)
+            ->where('academic_session_id', $request->session_id)
+            ->where('fee_factor_id', $request->factor_id)
+            ->where('student_id', $request->student_id)
+            ->whereYear('created_at', '=', now()->year) 
+            ->exists();
+            
+        if ($exists) {
+                       $year = now()->year;
+        return redirect()->back()->with('error', "Fee structure already created for this student in year {$year}. Please update the structure.");
+        }
         $finalAmount = 0;
         $total = collect($request->categories)->sum('amount');
         if ($total) {

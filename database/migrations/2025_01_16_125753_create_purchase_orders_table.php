@@ -26,7 +26,7 @@ class CreatePurchaseOrdersTable extends Migration
                 $table->enum('delivery_status', ['PENDING', 'SHIPPED', 'CANCELLED', 'COMPLETED'])->default('PENDING');
                 $table->enum('payment_status', ['PAID', 'PENDING', 'OVERDUE'])->default('PENDING');
                 $table->enum('payment_method', ['BANK', 'CASH', 'CHEQUE'])->default('BANK');
-                $table->enum('type', ['F', 'S'])->default('F');
+                $table->enum('type', ['F', 'S', 'U'])->default('F');
                 $table->timestamps();
                 $table->softDeletes();
             });

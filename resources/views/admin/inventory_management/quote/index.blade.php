@@ -115,12 +115,19 @@
                 })
             });
 
-            //for view  display
-            $('#data_table').on('click', '.view-item', function() {
-                const id = $(this).data('id');
-                // alert(id);
-                window.location.href = `/inventory/quotes/food/${id}`;
-            });
+        $('#data_table').on('click', '.view-item', function() {
+    const id = $(this).data('id');
+    // get type from hidden input (set in blade)
+    const type = $('#type').val();
+
+    // validate allowed types to prevent broken URLs
+    const allowedTypes = ['food', 'stationary', 'uniform'];
+    const itemType = allowedTypes.includes(type) ? type : 'stationary';
+
+    // redirect dynamically
+    window.location.href = `/inventory/quotes/${itemType}/${id}`;
+});
+
 
 
             $(`#item, #branch, #supplier`).select2().val('').trigger('change');
@@ -148,7 +155,6 @@
             })
 
             $('#supplier').on('change', function() {
-
                 let supplier_id = $(this).val();
                 let supplier = suppliers[supplier_id]
                 $(`#items`).empty();
