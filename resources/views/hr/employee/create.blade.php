@@ -113,6 +113,19 @@
                                                    id="tell_no">
                                         </div>
                                     </div>
+
+                                    <div class="row mt-2">
+                                        <div class="col-lg-4 mt-2">
+                                            <label for="role_id">Role<b>*</b></label>
+                                            <select class="form-control select2" name="role_id" id="role_id" required>
+                                                <option value="">Select Role</option>    
+                                                @foreach ($roles as $role)
+                                                    <option value="{{$role->id}}">{{$role->name}}</option>
+                                                @endforeach
+                                                </select>
+                                        </div>
+                                    </div>
+
                                     <div class="row mt-2">
                                         <div class="col-lg-4 mt-2">
                                             <label for="personal_email_address">Personal Email Address <b>*</b></label>
