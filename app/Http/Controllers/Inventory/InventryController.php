@@ -102,11 +102,13 @@ class InventryController extends Controller
             $inventory = $inventory->Canteen();
         }
         if ($request->type == "uniform") {
-            $inventory = $inventory->where('name', 'like', "%uniform%");
+            // $inventory = $inventory->where('name', 'like', "%uniform%");
+        $inventory = $inventory->where('type','sp')->latest()->get();
+
         }
 
         
-        $inventory = $inventory->where('type','p')->latest()->get();
+        // $inventory = $inventory->where('type','sp')->latest()->get();
       
         return response()->json(["success" => true, "message" => "Message", "data" => $inventory], 200);
 
