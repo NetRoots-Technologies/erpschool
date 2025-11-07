@@ -31,9 +31,9 @@ class DashboardController extends Controller
 
     public function index()
     {
-     if (!Gate::allows('Dashboard-list')) {
-            return abort(503);
-        }
+    //  if (!Gate::allows('Dashboard-list')) {
+    //         return abort(503);
+    //     }
         $employees_name = Employees::latest()->limit(6)->get();
       
         // Fee module removed - these values need to be updated for new fee structure
