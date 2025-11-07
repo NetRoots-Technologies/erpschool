@@ -27,16 +27,15 @@ Dashboard
                     <div class="pb-0 mt-0">
                         <div class="d-flex">
                             <div class="">
-                                @if (Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Super Admin') || Auth::user()->hasRole('main desk'))
+                                
                                 <h4 class="tx-20 fw-bold mb-1 text-white">
                                     <span>{{$helper->getEmployeeCount()}}</span>
                                 </h4>
-                                @endif
-                                @if (Auth::user()->hasRole('Agent'))
+                              
                                 <h4 class="tx-20 fw-bold mb-1 text-white">
                                     <span>{{$helper->agentsStudent()}}</span>
                                 </h4>
-                                @endif
+                              
                             </div>
                             <span class="float-end my-auto ms-auto">
                                 <i class="fas fa-arrow-circle-up text-white"></i>
@@ -49,7 +48,7 @@ Dashboard
             </a>
         </div>
     </div>
-    @if (Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Super Admin') || Auth::user()->hasRole('main desk'))
+    
     <div class="col-xl-3 col-lg-6 col-md-6 col-xm-12">
         <div class="card overflow-hidden sales-card bg-danger-gradient">
             <a href="{!! url('/academic/student_view') !!}">
@@ -75,8 +74,8 @@ Dashboard
             </a>
         </div>
     </div>
-    @endif
-    @if (Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Super Admin') || Auth::user()->hasRole('main desk') )
+    
+    
     <div class="col-xl-3 col-lg-6 col-md-6 col-xm-12">
         <div class="card overflow-hidden sales-card bg-success-gradient">
             <a href="">
@@ -102,8 +101,8 @@ Dashboard
             </a>
         </div>
     </div>
-    @endif
-    @if (Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Super Admin') || Auth::user()->hasRole('main desk'))
+    
+    
     <div class="col-xl-3 col-lg-6 col-md-6 col-xm-12">
         <div class="card overflow-hidden sales-card bg-warning-gradient">
             <a href="">
@@ -129,9 +128,9 @@ Dashboard
             </a>
         </div>
     </div>
-    @endif
-    @if (Auth::user()->hasRole('Agent') )
-    <div class="col-xl-3 col-lg-6 col-md-6 col-xm-12">
+    
+    
+    {{-- <div class="col-xl-3 col-lg-6 col-md-6 col-xm-12">
         <div class="card overflow-hidden sales-card bg-warning-gradient">
             <div class="px-3 pt-3  pb-2 pt-0">
                 <div class="">
@@ -153,13 +152,12 @@ Dashboard
             </div>
             <span id="compositeline4" class="pt-1"></span>
         </div>
-    </div>
-    @endif
+    </div> --}}
+    
 </div>
 <!-- row closed -->
-@if (Auth::user()->hasRole('Agent'))
 <div class="row row-sm">
-    <div class="col-md-12 col-lg-12 col-xl-7">
+    {{-- <div class="col-md-12 col-lg-12 col-xl-7">
         <div class="card">
             <div class="card-header bg-transparent pd-b-0 pd-t-20 bd-b-0">
                 <div class="d-flex justify-content-between">
@@ -186,10 +184,10 @@ Dashboard
                 <div id="bar" class="sales-bar mt-4"></div>
             </div>
         </div>
-    </div>
-    @endif
+    </div> --}}
+    
     <div class="row row-sm">
-        @if (Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Super Admin') || Auth::user()->hasRole('main desk'))
+        
         <div class="col-md-12 col-lg-12 col-xl-8">
             <div class="card">
                 <div id="chartHeading" class="chart-heading"><b>Employee Distribution by Department</b></div>
@@ -230,8 +228,8 @@ Dashboard
                 </div>
             </div>
         </div>
-        @endif
-        @if (Auth::user()->hasRole('Agent'))
+        
+      
         {{-- <div class="col-xl-4 col-md-12 col-lg-12">--}}
             {{-- <div class="card">--}}
                 {{-- <div class="card-header pb-1">--}}
@@ -266,9 +264,9 @@ Dashboard
                     {{-- </div>--}}
                 {{-- </div>--}}
             {{-- </div>--}}
-        @endif
+        
     </div>
-    @if (Auth::user()->hasRole('Admin') || Auth::user()->hasRole('Super Admin'))
+    
     <div class="row">
         <div class="col-lg-12">
             <div class="justify-center text-center text-capitalize bold">
@@ -370,7 +368,7 @@ Dashboard
             </div>
         </div>
     </div>
-    @endif
+    
 </div>
 @endsection
 @section('js')
