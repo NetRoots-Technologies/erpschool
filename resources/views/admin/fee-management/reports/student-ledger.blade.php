@@ -88,7 +88,7 @@
         <div class="col-md-4">
             <div class="card">
                 <div class="card-body text-center">
-                    <h3 class="text-danger">Rs. {{  $outstandingBalance  }}</h3>
+                    <h3 class="text-danger">Rs. {{  number_format($outstandingBalance)  }}</h3>
                     <p class="mb-0">Outstanding Balance</p>
                 </div>
             </div>

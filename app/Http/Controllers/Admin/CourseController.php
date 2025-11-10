@@ -175,9 +175,7 @@ class CourseController extends Controller
 
     public function fetchAcademicClass(Request $request)
     {
-        if (!Gate::allows('Subjects-list')) {
-            return abort(503);
-        }
+        
         $class = AcademicClass::where('branch_id', $request->branch_id)->get();
         return response()->json($class);
     }

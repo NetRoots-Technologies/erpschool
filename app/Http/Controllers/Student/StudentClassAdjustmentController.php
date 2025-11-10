@@ -13,7 +13,7 @@ class StudentClassAdjustmentController extends Controller
 
     public function create()
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('PreAdmissionForm-create')) {
             return abort(503);
         }
         $companies=Company::all();
@@ -22,7 +22,7 @@ class StudentClassAdjustmentController extends Controller
 
     public function store(Request $request)
     {
-        if (!Gate::allows('Dashboard-list')) {
+        if (!Gate::allows('PreAdmissionForm-create')) {
             return abort(503);
         }
         $request->validate([

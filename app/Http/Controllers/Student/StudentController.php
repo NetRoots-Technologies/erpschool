@@ -227,7 +227,7 @@ class StudentController extends Controller
 
     public function getStudentSiblingData()
     {
-        if (!Gate::allows('ViewStudents-create')) {
+        if (!Gate::allows('StudentSiblingsReport-list')) {
             return abort(503);
         }
         return $this->StudentServices->StudentSiblingData();
