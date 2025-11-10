@@ -8,7 +8,7 @@
         <div class="col-12">
             <div class="page-header">
                 <div class="page-leftheader">
-                    <h4 class="page-title mb-0">Student Ledger - {{ $student->name }}</h4>
+                    <h4 class="page-title mb-0">Student Ledger - {{ $student->fullname }}</h4>
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Home</a></li>
                         <li class="breadcrumb-item"><a href="{{ route('admin.fee-management.index') }}">Fee Management</a></li>
@@ -16,7 +16,7 @@
                         <li class="breadcrumb-item active" aria-current="page">Student Ledger</li>
                     </ol>
                 </div>
-                <div class="page-rightheader">
+                <div class="page-rightheader mb-2">
                     <button class="btn btn-success" onclick="printLedger()">
                         <i class="fa fa-print"></i> Print Ledger
                     </button>
@@ -34,17 +34,20 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-md-3">
-                            <strong>Name:</strong> {{ $student->name }}
+                        <div class="col-md-2">
+                            <strong>Name:</strong> {{ $student->fullname ?? 'N/A' }}
                         </div>
                         <div class="col-md-3">
+                            <strong>Father Name:</strong> {{ $student->father_name ?? 'N/A' }}
+                        </div>
+                        <div class="col-md-2">
                             <strong>Class:</strong> {{ $student->academicClass->name ?? 'N/A' }}
                         </div>
                         <div class="col-md-3">
                             <strong>Session:</strong> {{ $student->academicSession->name ?? 'N/A' }}
                         </div>
-                        <div class="col-md-3">
-                            <strong>Student ID:</strong> {{ $student->id }}
+                        <div class="col-md-2">
+                            <strong>Student ID:</strong> {{ $student->student_id ?? 'N/A' }}
                         </div>
                     </div>
                 </div>
@@ -54,7 +57,7 @@
 
     <!-- Summary Cards -->
     <div class="row">
-        <div class="col-md-3">
+        <div class="col-md-4">
             <div class="card">
                 <div class="card-body text-center">
                     <h3 class="text-success">Rs. {{ number_format($collections->sum('paid_amount')) }}</h3>
@@ -62,7 +65,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-4">
             <div class="card">
                 <div class="card-body text-center">
                     <h3 class="text-info">{{ $collections->count() }}</h3>
@@ -70,7 +73,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-4" style="display: none;">
             <div class="card">
                 <div class="card-body text-center">
                     <h3 class="text-warning">Rs. {{ number_format($adjustments->sum('amount')) }}</h3>
@@ -78,10 +81,14 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
+
+        @php
+            $outstandingBalance = $feeBilling->sum('outstanding_amount');
+        @endphp
+        <div class="col-md-4">
             <div class="card">
                 <div class="card-body text-center">
-                    <h3 class="text-danger">Rs. 0</h3>
+                    <h3 class="text-danger">Rs. {{  $outstandingBalance  }}</h3>
                     <p class="mb-0">Outstanding Balance</p>
                 </div>
             </div>
@@ -138,7 +145,7 @@
     </div>
 
     <!-- Adjustments -->
-    <div class="row">
+    <div class="row" style="display: none;">
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
@@ -195,7 +202,7 @@
                                 <li class="list-group-item d-flex justify-content-between">
                                     Cash Collections
                                     <span class="badge badge-primary">
-                                        Rs. {{ number_format($collections->where('payment_method', 'cash')->sum('paid_amount')) }}
+                                        Rs. {{ number_format($collections->where('status' , 'paid')->whereIn('payment_method', ['cash', 'Cash'])->sum('paid_amount')) }}
                                     </span>
                                 </li>
                                 <li class="list-group-item d-flex justify-content-between">
@@ -235,6 +242,33 @@
         </div>
     </div>
 </div>
+@endsection
+@section('css')
+<style>
+.badge {
+    color: #212529 !important;
+}
+.badge-success {
+    background-color: #28a745 !important;
+    color: #212529 !important;
+}
+.badge-danger {
+    background-color: #dc3545 !important;
+    color: #212529 !important;
+}
+.badge-warning {
+    background-color: #ffc107 !important;
+    color: #212529 !important;
+}
+.badge-info {
+    background-color: #17a2b8 !important;
+    color: #212529 !important;
+}
+.badge-secondary {
+    background-color: #6c757d !important;
+    color: #212529 !important;
+}
+</style>
 @endsection
 
 @section('js')

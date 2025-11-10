@@ -20,7 +20,7 @@
     </div>
 
     <div class="row">
-        <div class="col-md-4">
+        <div class="col-md-4" style="display: none;">
             <div class="card">
                 <div class="card-header">
                     <h3 class="card-title">Income Report</h3>
@@ -33,7 +33,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-4" style="display: none;">
             <div class="card">
                 <div class="card-header">
                     <h3 class="card-title">Outstanding Dues</h3>
@@ -53,12 +53,13 @@
                 </div>
                 <div class="card-body">
                     <p>View individual student fee transactions.</p>
-                    <form action="{{ route('admin.fee-management.reports.student-ledger', 0) }}" method="GET" class="d-inline">
+                    <form id ="studentLedgerForm" class="d-inline">
                         <div class="form-group">
-                            <select name="studentId" class="form-control" required>
+                            <select name="studentId" class="form-control select2"  required>
                                 <option value="">Select Student</option>
-                                <option value="1">Student 1</option>
-                                <option value="2">Student 2</option>
+                                @foreach ($students as $student)
+                                    <option value="{{ $student->id }}">{{ $student->student_id }} - ({{ $student->fullname }} - {{ $student->academicClass->name }})</option>
+                                @endforeach
                             </select>
                         </div>
                         <button type="submit" class="btn btn-info btn-block">
@@ -114,8 +115,14 @@
 @section('js')
 <script>
     $(document).ready(function() {
-        // Initialize any report-specific JavaScript here
         console.log('Fee Reports page loaded');
+
+        $('#studentLedgerForm').submit(function(e) {
+            e.preventDefault();
+            var studentId = $('select[name="studentId"]').val();
+            window.location.href = '/admin/fee-management/reports/student-ledger/' + studentId;
+            
+        });
     });
 </script>
 @endsection
