@@ -86,7 +86,7 @@
                 </svg>
             </div>
             <ul class="side-menu">
-                @can('Dashboard')
+                {{-- @can('Dashboard') --}}
                     <li class="side-item side-item-category">Main</li>
                     <li class="slide">
                         <a class="side-menu__item {{ request()->is('dashboard*') ? 'active' : '' }}"
@@ -95,7 +95,7 @@
                             <span class="side-menu__label">Dashboard</span>
                         </a>
                     </li>
-                @endcan
+                {{-- @endcan --}}
 
                 @canany(['Company', 'Branches', 'Category', 'Departments', 'FinancialYears', 'Designations',
                     'SignatoryAuthorities'])

@@ -405,6 +405,7 @@
                 $.ajax({
                     url: '{{ route("admin.fee-management.collections.students-by-class", ":classId") }}'.replace(':classId', classId),
                     type: 'GET',
+                    data : { 'class_id' : classId},
                     success: function(response) {
                         studentSelect.html('<option value="">Select Student</option>');
                         

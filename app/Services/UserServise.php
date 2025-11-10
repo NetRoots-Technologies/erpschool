@@ -114,7 +114,7 @@ class UserServise
 
                 $btn = ' <form class="delete_form" data-route="' . route("users.destroy", $row->id) . '"   id="User-' . $row->id . '"  method="POST"> ';
 
-                if (Gate::allows('users-edit')){
+                if (Gate::allows('Users-edit')){
 
                
                 // $btn = $btn . '<a  data-id="' . $row->id . '" class="btn btn-primary text-white  btn-sm user_edit"  data-user-edit=\'' . $row . '\'>Edit</a>';
@@ -129,7 +129,7 @@ class UserServise
                 ]) . '\'
                         >Edit</a>';
                 }
-                if (Gate::allows('users-delete')){
+                if (Gate::allows('Users-delete')){
                     $btn = $btn . ' <button data-id="User-' . $row->id . '" type="button" class="btn btn-danger delete btn-sm "" >Delete</button>';
 
                 $btn = $btn . method_field('DELETE') . '' . csrf_field();

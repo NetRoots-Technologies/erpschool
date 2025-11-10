@@ -2,34 +2,35 @@
 
 namespace App\Http\Controllers\Admin;
 
-use Carbon\Carbon;
-use Illuminate\Http\Request;
-use App\Models\Fee\FeeFactor;
-use App\Models\Fee\FeeBilling;
-use App\Models\Fee\FeeCategory;
-use App\Models\Fee\FeeDiscount;
-use App\Models\Fee\FeeStructure;
-use App\Models\Student\Students;
-use App\Models\Fee\FeeAdjustment;
-use App\Models\Fee\FeeAllocation;
-use App\Models\Fee\FeeCollection;
-use App\Imports\FeeCategoryImport;
-use App\Imports\FeeDiscountImport;
-use Illuminate\Support\Facades\DB;
-use App\Imports\FeeStructureImport;
-use Illuminate\Support\Facades\Log;
-
 use App\Http\Controllers\Controller;
+use App\Imports\FeeCategoryImport;
 use App\Imports\FeeCollectionImport;
-use Illuminate\Support\Facades\Gate;
-use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\FeeDiscountImport;
+use App\Imports\FeeStructureImport;
 use App\Models\Academic\AcademicClass;
 use App\Models\Academic\ActiveSession;
-use App\Models\Fee\FeeDiscountHistory;
-use App\Models\Fee\FeeStructureDetail;
+use App\Models\Fee\FeeAdjustment;
+use App\Models\Fee\FeeAllocation;
+use App\Models\Fee\FeeBilling;
+use App\Models\Fee\FeeCategory;
+use App\Models\Fee\FeeCollection;
 use App\Models\Fee\FeeCollectionDetail;
-use App\Models\Student\AcademicSession;
+use App\Models\Fee\FeeDiscount;
+use App\Models\Fee\FeeDiscountHistory;
+use App\Models\Fee\FeeFactor;
+
+use App\Models\Fee\FeeStructure;
+use App\Models\Fee\FeeStructureDetail;
 use App\Models\Fee\StudentFeeAssignment;
+use App\Models\Student\AcademicSession;
+use App\Models\Student\Students;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Route;
+use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\Facades\DataTables;
 
 
@@ -672,10 +673,35 @@ class FeeManagementController extends Controller
             abort(403, 'Unauthorized access');
         }
 
+       
+
+        if(isset(request()->class_id) && request()->class_id != null){
+
+            $classId = request()->class_id;
+
+             $students = Students::with(['AcademicClass', 'academicSession'])
+            ->where('class_id', $classId)
+            ->get();
+
+            return response()->json([
+            'students' => $students->map(function($student) {
+                return [
+                    'id' => $student->id,
+                    'name' => $student->fullname,
+                    'class_name' => $student->AcademicClass->name ?? 'N/A',
+                    'session_name' => $student->academicSession->name ?? 'N/A',
+                    'class_id' => $student->AcademicClass->id ?? null,
+                    'session_id' => $student->academicSession->id ?? null
+                ];
+            })
+        ]);
+
+        }else{
         $student = Students::with(['AcademicClass', 'academicSession'])
             ->where('id', $student_roll_id)
             ->first();
 
+    
         $data = [
                     'id' => $student->id,
                     'name' => $student->fullname,
@@ -685,7 +711,13 @@ class FeeManagementController extends Controller
                     'session_id' => $student->academicSession->id ?? null
                 ];
 
+
         return response()->json($data);
+
+        }
+        
+        
+
     }
 
     public function getSessionsByClass($classId)
@@ -1888,7 +1920,9 @@ class FeeManagementController extends Controller
             abort(403, 'Unauthorized access');
         }
 
-        return view('admin.fee-management.reports.index');
+        $students = Students::with(['academicClass', 'academicSession'])->get();
+        
+        return view('admin.fee-management.reports.index' , compact('students'));
     }
 
     public function incomeReport(Request $request)
@@ -1944,15 +1978,18 @@ class FeeManagementController extends Controller
         $student = Students::with(['academicClass', 'academicSession'])->findOrFail($studentId);
 
         $collections = FeeCollection::where('student_id', $studentId)
-            ->with(['feeCollectionDetails.category'])
+            ->with(['feeCollectionDetails.feeCategory' , 'billing'])
             ->orderBy('collection_date', 'desc')
             ->get();
 
         $adjustments = FeeAdjustment::where('student_id', $studentId)
-            ->orderBy('adjustment_date', 'desc')
-            ->get();
+            ->orderBy('created_at', 'desc')
+            ->get();    
 
-        return view('admin.fee-management.reports.student-ledger', compact('student', 'collections', 'adjustments'));
+         $feeBilling = FeeBilling::where('student_id', $studentId)->orderBy('created_at', 'desc')->get();
+
+
+        return view('admin.fee-management.reports.student-ledger', compact('student', 'collections', 'adjustments' , 'feeBilling'));
     }
 
     // Export and Import
