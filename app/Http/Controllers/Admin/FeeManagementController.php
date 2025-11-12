@@ -1312,6 +1312,7 @@ class FeeManagementController extends Controller
              ->addColumn('student_id', function ($bill) {
                 return $bill->student->student_id ?? 'N/A';
             })
+            
             ->addColumn('class_name', function ($bill) {
                 return $bill->student->AcademicClass->name ?? 'N/A';
             })
@@ -2117,12 +2118,77 @@ class FeeManagementController extends Controller
     
         public function history($id)
         {
-
             $histories = FeeDiscountHistory::with('histories' , 'updateUser')
                ->where('fee_discount_id', $id)
                 ->get();
             // dd($histories);
             return view('admin.fee-management.discounts.history', compact('histories'));
+        }
+
+        // Student Fee Billing Status 
+
+        public function feeBillsStatusReport(Request $request)
+        {
+            
+            if($request->ajax()){
+                $feeBilling = FeeBilling::with(['student.academicClass' , 'academicSession' , 'createdBy']); 
+
+                if ($request->has('filter_month') && !empty($request->filter_month)) {
+                    $feeBilling->where('billing_month', $request->filter_month);
+                }
+
+                if($request->has('status') && !empty($request->status) ){
+                        $feeBilling->where('status' , $request->status);
+                    }
+
+                return DataTables::of($feeBilling)
+
+                ->addColumn('student_name', function ($data) {
+                    return $data->student->fullname;
+                })
+
+                ->addColumn('student_id', function ($data) {
+                    return $data->student->student_id;
+                })
+
+                ->addColumn('father_name', function ($data) {
+                    return $data->student->father_name;
+                })
+
+                ->addColumn('class', function ($data) {
+                    return $data->student->academicClass->name;
+                })
+
+                ->addColumn('session', function ($data) {
+                    return $data->academicSession->name;
+                })
+                
+                ->addColumn('status', function ($data) {
+                    if($data->status == 'paid'){
+                        return '<span class="badge badge-success"> Paid </span>';
+                    }elseif($data->status == 'partially_paid'){
+                        return '<span class="badge badge-warning"> Partially Paid </span>';
+                    }else{
+                        return '<span class="badge badge-info"> Generated </span>';
+                    }
+                })
+                ->filter(function ($query) use ($request) {
+                    if ($request->has('class_id') && !empty($request->class_id)) {
+                        $query->whereHas('student', function ($q) use ($request) {
+                            $q->where('class_id', $request->class_id);
+                        });
+                    }
+                })
+
+                
+                
+                ->rawColumns(['father_name' , 'student_name' , 'class' , 'session' , 'student_id' , 'status'])
+                ->addIndexColumn()
+                ->make(true);
+            }
+
+            $classes = AcademicClass::where('status', 1)->get();
+            return view('admin.fee-management.reports.student-fee-status' , compact('classes'));
         }
 
 

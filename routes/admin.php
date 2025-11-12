@@ -233,6 +233,9 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'admin', 'as' => 'admin.'], 
         Route::get('/reports/income', [FeeManagementController::class, 'incomeReport'])->name('reports.income');
         Route::get('/reports/outstanding', [FeeManagementController::class, 'outstandingReport'])->name('reports.outstanding');
         Route::get('/reports/student-ledger/{studentId}', [FeeManagementController::class, 'studentLedger'])->name('reports.student-ledger');
+
+        // Fee Bills Status Reports 
+        Route::get('/reports/fee-bills', [FeeManagementController::class, 'feeBillsStatusReport'])->name('reports.fee-bills');
     });
 
     // Dashboard Route

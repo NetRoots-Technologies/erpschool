@@ -638,9 +638,14 @@
                             @endcan
 
                             @can('fee-report-list')
-                                <li><a class="slide-item {{ request()->is('admin/fee-management/reports*') ? 'active' : '' }}"
-                                    href="{{ route('admin.fee-management.reports') }}">Reports</a></li>
+                                <li><a class="slide-item {{ request()->is('admin/fee-management/reports') ? 'active' : '' }}"
+                                    href="{{ route('admin.fee-management.reports') }}">Student Ledger Reports</a></li>
                             @endcan
+
+                            {{-- @can('fee-report-list') --}}
+                                <li><a class="slide-item {{ request()->is('admin/fee-management/reports/fee-bills*') ? 'active' : '' }}"
+                                    href="{{ route('admin.fee-management.reports.fee-bills') }}">Fee Bills Status Report</a></li>
+                            {{-- @endcan --}}
                             
                         </ul>
                     </li>
