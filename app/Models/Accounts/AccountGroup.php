@@ -34,6 +34,11 @@ class AccountGroup extends Model
         return $this->belongsTo(AccountGroup::class, 'parent_id');
     }
 
+    public function childrenRecursive()
+    {
+        return $this->children()->with(['ledgers', 'childrenRecursive'])->orderBy('name');
+    }
+
     public function children()
     {
         return $this->hasMany(AccountGroup::class, 'parent_id');

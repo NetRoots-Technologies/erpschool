@@ -92,14 +92,15 @@
 @section('content')
     <div class="container mt-4">
         <div class="row w-100 mt-4">
-            <h3 class="text-22 text-center text-bold w-100 mb-4">Purchase Order</h3>
+            <h3 class="text-22 text-center text-bold w-100 mb-4">GRN</h3>
         </div>
         <div class="form-container p-4">
 
             <div class="row mt-4">
                 <div class="col-md-6">
-               <button id="backButton" class="btn btn-dark mt-2 ms-2">Back</button>                
-                   <div class="info-box">
+                    <button id="backButton" class="btn btn-dark mt-2 ms-2">Back</button>
+                    
+                    <div class="info-box">
                         <div><span class="label">Branch Name:</span> <span class="value"
                                 id="{{ $purchase_order->branch->branch_id }}">{{ $purchase_order->branch->name }}</span>
                         </div>
@@ -119,11 +120,12 @@
                                 @endif
 
                                 @foreach ($delivery_status as $key => $status)
-                                    @if ($currentStatus == 'PENDING' && ($status == 'SHIPPED' || $status == 'CANCELLED'))
+                                    {{-- @if ($currentStatus == 'PENDING' && ($status == 'SHIPPED' || $status == 'CANCELLED' || $status == 'PARTIALLY'))
                                         <option value="{{ $key }}">{{ $status }}</option>
-                                    @elseif ($currentStatus == 'SHIPPED' && ($status == 'COMPLETED' || $status == 'CANCELLED'))
+                                    @elseif ($currentStatus == 'SHIPPED' && ($status == 'COMPLETED' || $status == 'CANCELLED' || $status == 'PARTIALLY')) --}}
                                         <option value="{{ $key }}">{{ $status }}</option>
-                                    @endif
+                                    
+                                    {{-- @endif --}}
                                 @endforeach
                             </select>
                         </div>
@@ -188,29 +190,119 @@
                             <tr>
                                 <th>Item Name</th>
                                 <th>Quantity</th>
+                                <th>Received Quantity</th>
                                 <th>Price</th>
                                 <th>Total Price</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach ($purchase_order->purchaseOrderItems as $order)
+
+                            @php
+                                $check = $order->quantity - $order->received_quantity;
+                            @endphp
                                 <tr>
                                     <td>{{ $order->item->name }}</td>
-                                    <td>{{ $order->quantity }}</td>
+                                    <td>{{ $check }}</td>
+                                    <td><input type="text" name="received_qty" value="0" class="received-qty"></td>
                                     <td>{{ $order->unit_price }}</td>
-                                    <td>{{ $order->total_price }}</td>
+                                    <td><input type="text" name="total_price" value="0.00" class="total-price"
+                                            readonly></td>
                                 </tr>
                             @endforeach
-
                         </tbody>
                     </table>
                 </div>
             </div>
+
+            <p style="display: inline; margin-right: 20px;">
+                <strong>Prepared By:</strong> {{ auth()->user()->name ?? '-' }}
+            </p>
+
+            <p style="display: inline; margin-right: 20px;">
+                <strong>Approved By:</strong> ____________
+            </p>
+
+            <p style="display: inline;">
+                <strong>Checked By:</strong> ____________
+            </p>
         </div>
 
     @endsection
 
     @section('js')
+        <script>
+            $(document).ready(function() {
+                // selector for table - adjust if your table has different id/class
+                var $table = $('.item_info table');
+
+                // ensure a grand total row exists (create if not)
+                if ($table.find('tfoot').length === 0) {
+                    $table.append(
+                        '<tfoot><tr class="grand-total-row"><td colspan="4" style="text-align:right"><strong>Grand Total:</strong></td>' +
+                        '<td><input type="text" id="grand-total" value="0.00" readonly class="form-control" name="grand_total"></td></tr></tfoot>'
+                    );
+                }
+
+                // helper to parse number safely
+                function parseNum(v) {
+                    v = String(v).replace(/,/g, '').trim();
+                    var n = parseFloat(v);
+                    return isNaN(n) ? 0 : n;
+                }
+
+                // recalc a single row (row is a <tr>)
+                function recalcRow($row) {
+                    // column indices based on your table:
+                    // 0 = Item Name, 1 = Quantity (ordered), 2 = Received Qty (input), 3 = Price (text), 4 = Total (input)
+                    var $receivedInput = $row.find('td').eq(2).find('input');
+                    var $priceCell = $row.find('td').eq(3);
+                    var $totalInput = $row.find('td').eq(4).find('input');
+
+                    // if inputs not found by class, we try fallback to find any input in that td
+                    if ($receivedInput.length === 0) $receivedInput = $row.find('td').eq(2).find(
+                        'input, [name*=received]');
+                    if ($totalInput.length === 0) $totalInput = $row.find('td').eq(4).find('input, [name*=total]');
+
+                    var qty = parseNum($receivedInput.val());
+                    var unit = parseNum($priceCell.text() || $priceCell.find('input').val());
+
+                    var total = qty * unit;
+                    // set formatted value
+                    $totalInput.val(total.toFixed(2));
+
+                    return total;
+                }
+
+                // recalc all rows and update grand total
+                function recalcAll() {
+                    var grand = 0;
+                    $table.find('tbody tr').each(function() {
+                        grand += recalcRow($(this));
+                    });
+                    $('#grand-total').val(grand.toFixed(2));
+                }
+
+                // attach input event to received qty inputs (delegated)
+                $table.on('input', 'tbody tr td:nth-child(3) input, tbody tr td:nth-child(3) [name*=received]',
+                    function() {
+                        var $row = $(this).closest('tr');
+                        recalcRow($row);
+
+                        // update grand total
+                        var grand = 0;
+                        $table.find('tbody tr').each(function() {
+                            var v = parseNum($(this).find('td').eq(4).find('input').val());
+                            grand += v;
+                        });
+                        $('#grand-total').val(grand.toFixed(2));
+                    });
+
+                // initial calculation (in case defaults are non-zero)
+                recalcAll();
+            });
+        </script>
+
         <script type="text/javascript" defer>
             $(document).ready(function() {
                 'use strict';
@@ -232,7 +324,7 @@
                 $deliveryStatus.on('change', updateButtonState);
                 $paymentMethod.on('change', updateButtonState);
 
-               $backButton.on('click', function() {
+                $backButton.on('click', function() {
                     let type = "{{ strtolower($purchase_order->type) }}";
                     if (type === 'f') type = 'food';
                     if (type === 's') type = 'stationary';
@@ -242,19 +334,36 @@
                 });
 
                 $confirmOrder.on('click', function() {
+
+                    let items = [];
+
+                    $("table tbody tr").each(function () {
+
+                    let row = $(this);
+                    let itemId = row.data("item-id");
+                    let receivedQty = row.find(".received-qty").val();
+                    let totalPrice = row.find(".total-price").val();
+
+                    items.push({
+                        id: itemId,
+                        received_qty: receivedQty,
+                        total_price: totalPrice
+                    });
+                });
+                    console.log(items);
                     var selectedStatus = $deliveryStatus.val();
                     var requestUrl = deliveryStatusApi.replace(':purchase_order', purchaseOrderId).replace(
                         ':status', selectedStatus);
                     var selectedPaymentMethod = $paymentMethod.val();
 
-                    // if (selectedStatus === '4' && !selectedPaymentMethod) {
-                    //     toastr.warning("Please select a payment method before completing the order.");
-                    //     return;
-                    // }
-
                     $.ajax({
                         url: requestUrl,
                         type: 'POST',
+                        data: {
+                            items: items,
+                            'grn_amount': $('#grand-total').val(),
+                           
+                        },
                         beforeSend: function(xhr) {
                             let token = $('meta[name="csrf-token"]').attr('content');
                             xhr.setRequestHeader('X-CSRF-TOKEN', token);

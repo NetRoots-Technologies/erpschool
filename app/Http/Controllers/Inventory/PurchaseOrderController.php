@@ -11,17 +11,19 @@ use App\Models\Admin\Branch;
 use App\Models\SupplierItem;
 use Illuminate\Http\Request;
 use App\Models\PurchaseOrder;
-use App\Models\Accounts\AccountLedger;
 use App\Models\Admin\Branches;
 use App\Services\LedgerService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Admin\BankAccount;
 use App\Models\PurchaseOrderItem;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Imports\PurchaseOrderImport;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Http;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Models\Accounts\AccountLedger;
 
 class PurchaseOrderController extends Controller
 {
@@ -100,7 +102,7 @@ class PurchaseOrderController extends Controller
     public function store(Request $request)
     {
 
-        // dd($request);
+        // dd($request->all());
         if (!Gate::allows('PurchaseOrders-create')) {
             return abort(503);
         }
@@ -110,6 +112,7 @@ class PurchaseOrderController extends Controller
             "branch_id" => 'required|integer|exists:branches,id',
             "item_id" => 'required|array|exists:items,id',
             "quantity" => 'required|array',
+            'discount' => 'required|array',
             "price" => 'required|array',
             "total" => 'required|array',
             "order_date" => 'required|date',
@@ -142,6 +145,7 @@ class PurchaseOrderController extends Controller
                 $purchase_order_item->item_id = $item;
                 $purchase_order_item->purchase_order_id = $data->id;
                 $purchase_order_item->quantity = $request->get('quantity')[$key];
+                $purchase_order_item->discount_amount = $request->get('discount')[$key];
                 $purchase_order_item->unit_price = $request->get('price')[$key];
                 $purchase_order_item->total_price = $request->get('total')[$key];
                 $purchase_order_item->quote_item_price = $request->get('quoted_price')[$key];
@@ -290,9 +294,24 @@ class PurchaseOrderController extends Controller
     //     }
     // }
 
-    public function changeStatus(PurchaseOrder $purchaseOrder, $status)
+    public function changeStatus(PurchaseOrder $purchaseOrder, $status , Request $request)
 {
     
+
+//     array:3 [
+//   0 => array:2 [
+//     "received_qty" => "2"
+//     "total_price" => "60.00"
+//   ]
+//   1 => array:2 [
+//     "received_qty" => "3"
+//     "total_price" => "600.00"
+//   ]
+//   2 => array:2 [
+//     "received_qty" => "4"
+//     "total_price" => "640.00"
+//   ]
+// ]
     DB::beginTransaction();
 
     try {
@@ -300,6 +319,159 @@ class PurchaseOrderController extends Controller
 
         $purchaseOrder->delivery_status = $this->delivery_status[$status];
         $purchaseOrder->save();
+        
+        if ($this->delivery_status[$status] == 'PARTIALLY') {
+
+             $items = $request->items ?? [];
+
+            foreach ($purchaseOrder->purchaseOrderItems as $index => $p) {
+                $receivedQty = isset($items[$index]['received_qty']) ? floatval($items[$index]['received_qty']):  floatval($p->quantity);
+             if ($receivedQty <= 0) {
+                        continue;
+                    }
+
+              $lineTotal = isset($items[$index]['total_price']) ? floatval($items[$index]['total_price']) : $receivedQty * floatval($p->unit_price);
+
+
+                $inventry = Inventry::where('item_id', $p->item_id)
+                    ->where('branch_id', $purchaseOrder->branch_id)
+                    ->where('measuring_unit', $p->measuring_unit)
+                    ->first();
+
+                    if (!$inventry) {
+                        // 🔹 First time item aa raha hai → direct assign
+                    $inventry = new Inventry();
+                    $inventry->cost_price = $p->total_price;
+                    $inventry->unit_price = $receivedQty > 0 ? $lineTotal / $receivedQty : $p->unit_pric;
+                    $inventry->quantity = $receivedQty;
+                } else {
+                    // 🔹 Old values
+                    $oldQty  = floatval($inventry->quantity);
+                    $oldCost = floatval($inventry->cost_price);
+
+                    $newQty  = $oldQty + $receivedQty;
+                    $newCost = $oldCost + $lineTotal;
+
+                    $inventry->quantity   = $newQty;
+                    $inventry->cost_price = $newCost;
+                    $inventry->unit_price = $newQty > 0 ? $newCost / $newQty : $inventry->unit_price;
+                }
+
+                    // 🔹 Common fields update
+                    $inventry->name           = $p->item->name;
+                    $inventry->item_id        = $p->item_id;
+                    $inventry->branch_id      = $purchaseOrder->branch_id;
+                    $inventry->measuring_unit = $p->measuring_unit;
+                    $inventry->type           = $purchaseOrder->type;
+                    $inventry->save();
+
+                    // Update Purchase Order Item (history)
+                    $p->grn_amount  = floatval($p->grn_amount ?? 0)  + $lineTotal;
+                    $p->received_quantity  = floatval($p->received_quantity ?? 0)  + $receivedQty;
+                    $p->save();
+
+            }
+
+            // ✅ ACCOUNTING ENTRY - Create Journal Entry for Purchase
+            try {
+                // Get or create supplier ledger
+                $supplierLedger = AccountLedger::where('linked_module', 'vendor')
+                    ->where('linked_id', $purchaseOrder->supplier_id)
+                    ->first();
+                
+                if (!$supplierLedger) {
+                    $supplier = Supplier::find($purchaseOrder->supplier_id);
+                    $supplierLedger = AccountLedger::create([
+                        'name' => 'Supplier - ' . ($supplier->name ?? 'Unknown'),
+                        'code' => 'SUP-' . $purchaseOrder->supplier_id . '-' . time(),
+                        'description' => 'Supplier payable account',
+                        'account_group_id' => 7, // Accounts Payable
+                        'opening_balance' => 0,
+                        'opening_balance_type' => 'credit',
+                        'current_balance' => 0,
+                        'current_balance_type' => 'credit',
+                        'linked_module' => 'vendor',
+                        'linked_id' => $purchaseOrder->supplier_id,
+                        'is_active' => true,
+                        'created_by' => 1
+                    ]);
+                    \Log::info("Supplier ledger auto-created for Supplier ID: " . $purchaseOrder->supplier_id);
+                }
+
+                // Get or create inventory ledger
+                $inventoryLedger = AccountLedger::where('linked_module', 'inventory')->first();
+                
+                if (!$inventoryLedger) {
+                    $inventoryLedger = AccountLedger::where('name', 'LIKE', '%Inventory%')
+                        ->whereHas('accountGroup', function($q) {
+                            $q->where('type', 'asset');
+                        })
+                        ->first();
+                }
+                
+                if (!$inventoryLedger) {
+                    $inventoryLedger = AccountLedger::create([
+                        'name' => 'Inventory',
+                        'code' => 'AST-INV-' . time(),
+                        'description' => 'Inventory and stock items',
+                        'account_group_id' => 2, // Current Assets
+                        'opening_balance' => 0,
+                        'opening_balance_type' => 'debit',
+                        'current_balance' => 0,
+                        'current_balance_type' => 'debit',
+                        'linked_module' => 'inventory',
+                        'is_active' => true,
+                        'created_by' => 1
+                    ]);
+                    \Log::info("Inventory ledger auto-created with code: " . $inventoryLedger->code);
+                }
+
+                if ($supplierLedger && $inventoryLedger) {
+                    $supplier = Supplier::find($purchaseOrder->supplier_id);
+
+                   $grnAmount = $request->grn_amount;
+                    // Create journal entry
+                    $data = [
+                        "amount" => $grnAmount, // Total amount
+                        "narration" => "Purchase Order Partial - PO #" . $purchaseOrder->id . " from " . ($supplier->name ?? 'Supplier'),
+                        "branch_id" => $purchaseOrder->branch_id,
+                        "entry_type_id" => 1, // Journal Entry
+                    ];
+
+                    $entry = $this->ledgerService->createEntry($data);
+
+                    if ($entry) {
+                        // Debit: Inventory (Asset increases)
+                        $this->ledgerService->createEntryItems([
+                            "entry_type_id" => 1,
+                            "entry_id" => $entry->id,
+                            "ledger_id" => $inventoryLedger->id,
+                            "amount" => $grnAmount,
+                            "balanceType" => 'd', // Debit
+                            "narration" => $data["narration"],
+                        ]);
+
+                        // Credit: Supplier Payable (Liability increases)
+                        $this->ledgerService->createEntryItems([
+                            "entry_type_id" => 1,
+                            "entry_id" => $entry->id,
+                            "ledger_id" => $supplierLedger->id,
+                            "amount" => $grnAmount,
+                            "balanceType" => 'c', // Credit
+                            "narration" => $data["narration"],
+                        ]);
+
+                        \Log::info("Accounting entry created for Purchase Order #" . $purchaseOrder->id);
+                    } else {
+                        \Log::error("Failed to create journal entry for Purchase Order #" . $purchaseOrder->id);
+                    }
+                }
+            } catch (\Exception $e) {
+                \Log::error('Purchase order accounting entry failed: ' . $e->getMessage());
+                // Don't fail the whole transaction, just log the error
+            }
+        }
+
 
         if ($this->delivery_status[$status] == 'COMPLETED') {
             foreach ($purchaseOrder->purchaseOrderItems as $p) {
@@ -307,9 +479,8 @@ class PurchaseOrderController extends Controller
                     ->where('branch_id', $purchaseOrder->branch_id)
                     ->where('measuring_unit', $p->measuring_unit)
                     ->first();
-
-                if (!$inventry) {
-                    // 🔹 First time item aa raha hai → direct assign
+                    if (!$inventry) {
+                        // 🔹 First time item aa raha hai → direct assign
                     $inventry = new Inventry();
                     $inventry->cost_price = $p->total_price;
                     $inventry->unit_price = $p->unit_price;
@@ -318,11 +489,11 @@ class PurchaseOrderController extends Controller
                     // 🔹 Old values
                     $oldQuantity = $inventry->quantity;
                     $oldCost     = $inventry->cost_price;
-
+                    
                     // 🔹 New values
                     $newQuantity = $oldQuantity + $p->quantity;
                     $newCost     = $oldCost + $p->total_price;
-
+                    
                     // 🔹 Weighted Average
                     $inventry->quantity   = $newQuantity;
                     $inventry->cost_price = $newCost;
