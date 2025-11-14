@@ -70,6 +70,27 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'accounts', 'as' => 'account
         Route::post('/bills/store', [\App\Http\Controllers\Accounts\BillController::class, 'store'])->name('bills.store');
         Route::get('/bills/{id}', [\App\Http\Controllers\Accounts\BillController::class, 'show'])->name('bills.show');
         Route::post('/bills/{id}/pay', [\App\Http\Controllers\Accounts\BillController::class, 'pay'])->name('bills.pay');
+
+        Route::prefix('vendor-payments')->name('vendorPayments.')->group(function () {
+
+        Route::get('/', [\App\Http\Controllers\Accounts\VendorPaymentController::class, 'index'])->name('index');
+
+        Route::get('/create', [\App\Http\Controllers\Accounts\VendorPaymentController::class, 'create'])->name('create');
+
+        Route::post('/store', [\App\Http\Controllers\Accounts\VendorPaymentController::class, 'store'])->name('store');
+
+        Route::get('/{id}/edit', [\App\Http\Controllers\Accounts\VendorPaymentController::class, 'edit'])->name('edit');
+
+        Route::put('/{id}', [\App\Http\Controllers\Accounts\VendorPaymentController::class, 'update'])->name('update');
+
+        Route::delete('/{id}', [\App\Http\Controllers\Accounts\VendorPaymentController::class, 'destroy'])->name('delete');
+
+        Route::get('/{id}/print', [\App\Http\Controllers\Accounts\VendorPaymentController::class, 'print'])->name('print');
+
+        Route::get('/{vendor_id}/pending-invoices', [\App\Http\Controllers\Accounts\VendorPaymentController::class, 'getPendingInvoices'])->name('getPendingInvoices');
+
+    });
+
     });
     
     // M3: Accounts Receivables
@@ -127,4 +148,6 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'accounts', 'as' => 'account
         Route::post('/academic-fee', [\App\Http\Controllers\Accounts\IntegrationController::class, 'recordAcademicFee'])->name('academic_fee');
         Route::post('/fleet-expense', [\App\Http\Controllers\Accounts\IntegrationController::class, 'recordFleetExpense'])->name('fleet_expense');
     });
+    // Inside the main 'accounts' route group with middleware
+
 });

@@ -47,10 +47,16 @@
                             <div class="mb-3">
                                 <label class="form-label">Entry Type</label>
                                 <select name="entry_type" class="form-select">
-                                    <option value="journal">Journal</option>
+                       <option value="journal_voucher" selected>Journal Voucher</option>
+                                    <option value="cash_payment_voucher">Cash Payment Voucher</option>
+                                    <option value="bank_payment_voucher">Bank Payment Voucher</option>
+                                    <option value="bank_receipt_voucher">Bank Receipt Voucher</option>
+                                    <option value="cash_receipt_voucher">Cash Receipt Voucher</option>
+
+                                    {{-- <option value="journal">Journal</option>
                                     <option value="payment">Payment</option>
                                     <option value="receipt">Receipt</option>
-                                    <option value="transfer">Transfer</option>
+                                    <option value="transfer">Transfer</option> --}}
                                 </select>
                             </div>
                         </div>
