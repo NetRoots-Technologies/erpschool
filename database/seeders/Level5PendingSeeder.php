@@ -10,6 +10,7 @@ use App\Models\Accounts\AccountLedger;
 
 class Level5WithLedgersSeeder extends Seeder
 {
+
     public function run()
     {
         // wrap in transaction so partial failures rollback
