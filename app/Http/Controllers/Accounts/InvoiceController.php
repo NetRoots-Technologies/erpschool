@@ -15,7 +15,7 @@ class InvoiceController extends Controller
 {
     public function index()
     {
-        $invoices = CustomerInvoice::with(['customer', 'branch'])->latest()->paginate(20);
+        $invoices = CustomerInvoice::with(['customer', 'student', 'branch'])->latest()->paginate(20);
         return view('accounts.receivables.invoices.index', compact('invoices'));
     }
 
@@ -93,7 +93,7 @@ class InvoiceController extends Controller
 
     public function show($id)
     {
-        $invoice = CustomerInvoice::with(['customer', 'journalEntry'])->findOrFail($id);
+        $invoice = CustomerInvoice::with(['customer', 'student', 'journalEntry'])->findOrFail($id);
         return view('accounts.receivables.invoices.show', compact('invoice'));
     }
 

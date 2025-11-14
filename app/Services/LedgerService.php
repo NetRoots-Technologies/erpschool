@@ -11,6 +11,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Accounts\Vendor;
 use App\Models\Accounts\AccountGroup;
 use Illuminate\Http\Request;
+use App\Models\Student\Students;
+use App\Models\Accounts\CustomerInvoice;
+
 
 /**
  * LedgerService - Bridge to new Accounts system
@@ -41,7 +44,7 @@ class LedgerService
             return null;
         }
     }
-    
+
     /**
      * Update an existing ledger
      */
@@ -65,7 +68,7 @@ class LedgerService
             return null;
         }
     }
-    
+
     /**
      * Get a ledger by ID
      */
@@ -73,7 +76,7 @@ class LedgerService
     {
         return AccountLedger::find($id);
     }
-    
+
     /**
      * Get ledger by name
      */
@@ -81,7 +84,7 @@ class LedgerService
     {
         return AccountLedger::where('name', 'LIKE', "%{$name}%")->first();
     }
-    
+
     /**
      * Get all active ledgers
      */
@@ -89,17 +92,17 @@ class LedgerService
     {
         return AccountLedger::where('is_active', true)->get();
     }
-    
+
     /**
      * Get ledgers by type
      */
     public function getLedgersByType($type)
     {
-        return AccountLedger::whereHas('accountGroup', function($q) use ($type) {
+        return AccountLedger::whereHas('accountGroup', function ($q) use ($type) {
             $q->where('type', $type);
         })->where('is_active', true)->get();
     }
-    
+
     /**
      * Create journal entry (for backward compatibility)
      */
@@ -107,7 +110,7 @@ class LedgerService
     {
         try {
             DB::beginTransaction();
-            
+
             $entry = JournalEntry::create([
                 'entry_number' => JournalEntry::generateNumber(),
                 'entry_date' => $data['date'] ?? now(),
@@ -122,7 +125,7 @@ class LedgerService
                 'posted_by' => auth()->id(),
                 'created_by' => auth()->id(),
             ]);
-            
+
             // Create lines
             if (isset($data['lines']) && is_array($data['lines'])) {
                 foreach ($data['lines'] as $line) {
@@ -133,7 +136,7 @@ class LedgerService
                         'debit' => $line['debit'] ?? 0,
                         'credit' => $line['credit'] ?? 0,
                     ]);
-                    
+
                     // Update ledger balance
                     $ledger = AccountLedger::find($line['ledger_id'] ?? $line['account_ledger_id']);
                     if ($ledger) {
@@ -141,7 +144,7 @@ class LedgerService
                     }
                 }
             }
-            
+
             DB::commit();
             return $entry;
         } catch (\Exception $e) {
@@ -150,7 +153,7 @@ class LedgerService
             return null;
         }
     }
-    
+
     /**
      * Get ledger balance
      */
@@ -214,47 +217,46 @@ class LedgerService
             \Log::info("Auto ledger created: {$ledgerName} for {$moduleName} ID {$modelId}");
 
             return $ledger;
-
         } catch (\Exception $e) {
             \Log::error("LedgerService::createAutoLedgers failed: " . $e->getMessage());
             return null;
         }
     }
 
-     public function createAutoLedgersForSuppliers($groupIds, $ledgerName, $branchId, $modelName, $modelId , $request)
+    public function createAutoLedgersForSuppliers($groupIds, $ledgerName, $branchId, $modelName, $modelId, $request)
     {
-        
+
         try {
-                $payablesGroup = AccountGroup::where('type', 'liability')
-                    ->where('name', 'LIKE', '%Payable%')
-                    ->first();
-                if (!$payablesGroup) {
-                    throw new \Exception('Accounts Payable group not found. Please setup chart of accounts first.');
-                }
+            $payablesGroup = AccountGroup::where('type', 'liability')
+                ->where('name', 'LIKE', '%Payable%')
+                ->first();
+            if (!$payablesGroup) {
+                throw new \Exception('Accounts Payable group not found. Please setup chart of accounts first.');
+            }
 
-                  $lastCode = Vendor::orderBy('id', 'desc')->value('code');
-                if (!$lastCode) {
-                    $code = 'VEN-001';
-                }
-                preg_match('/(\d+)$/', $lastCode, $matches);
-                $number = isset($matches[1]) ? (int)$matches[1] + 1 : 1;
+            $lastCode = Vendor::orderBy('id', 'desc')->value('code');
+            if (!$lastCode) {
+                $code = 'VEN-001';
+            }
+            preg_match('/(\d+)$/', $lastCode, $matches);
+            $number = isset($matches[1]) ? (int)$matches[1] + 1 : 1;
 
-                $code = 'VEN-' . str_pad($number, 3, '0', STR_PAD_LEFT);
+            $code = 'VEN-' . str_pad($number, 3, '0', STR_PAD_LEFT);
 
 
-                $ledger = AccountLedger::create([
-                    'name' => 'Vendor - ' . $request['name'],
-                    'code' => $code,
-                    'account_group_id' => $payablesGroup->id,
-                    'opening_balance' => 0,
-                    'opening_balance_type' => 'credit',
-                    'current_balance' => 0,
-                    'current_balance_type' => 'credit',
-                    'linked_module' => 'vendor',
-                    'branch_id' => $branchId,
-                    'created_by' => auth()->id(),
-                ]);
-                
+            $ledger = AccountLedger::create([
+                'name' => 'Vendor - ' . $request['name'],
+                'code' => $code,
+                'account_group_id' => $payablesGroup->id,
+                'opening_balance' => 0,
+                'opening_balance_type' => 'credit',
+                'current_balance' => 0,
+                'current_balance_type' => 'credit',
+                'linked_module' => 'vendor',
+                'branch_id' => $branchId,
+                'created_by' => auth()->id(),
+            ]);
+
             // Create vendor
             $vendor = Vendor::create([
                 'name' => $request["name"],
@@ -278,14 +280,13 @@ class LedgerService
             $ledger->save();
 
             return $ledger;
-
         } catch (\Exception $e) {
             \Log::error("LedgerService::createAutoLedgers failed: " . $e->getMessage());
             return null;
         }
     }
 
-   
+
     /**
      * Get ledgers for a specific model/entity
      * 
@@ -300,7 +301,7 @@ class LedgerService
     //     // foreach ($groupId as $key => $id) {
     //     //    AccountGroup::where('id' , $id)->first();
     //     // }
-       
+
     //     return AccountLedger::whereIn('account_group_id', $groupId)
     //         ->where('linked_module',  $modelName)
     //         ->where('linked_id', $modelId)
@@ -308,87 +309,87 @@ class LedgerService
     // }
 
     public function getLedgers($groupIds, $modelName = null, $modelId = null): Collection
-{
-    
-    // 0) Normalize inputs
-    $groupIds = is_array($groupIds) ? $groupIds : [$groupIds];
-    $groupIds = array_values(array_filter($groupIds, fn ($v) => !is_null($v)));
+    {
 
-    // linked_module ko short name store karo (e.g. "Branches")
-    $module = null;
-    if (!empty($modelName)) {
-        $module = class_exists($modelName) ? class_basename($modelName) : (string) $modelName;
-    }
+        // 0) Normalize inputs
+        $groupIds = is_array($groupIds) ? $groupIds : [$groupIds];
+        $groupIds = array_values(array_filter($groupIds, fn($v) => !is_null($v)));
 
-    // Agar module Branches hai, branchId = modelId assume (zarurat par 4th param bana sakte ho)
-    $branchId = ($module === 'Branches') ? $modelId : null;
-
-    // 1) Existing ledgers pick (same group + same link)
-    $existing = AccountLedger::query()
-        ->whereIn('account_group_id', $groupIds)
-        ->when($module, fn ($q) => $q->where('linked_module', $module))
-        ->when($modelId, fn ($q) => $q->where('linked_id', $modelId))
-        ->when(!is_null($branchId), fn ($q) => $q->where(function ($qq) use ($branchId) {
-            $qq->whereNull('branch_id')->orWhere('branch_id', $branchId);
-        }))
-        ->get()
-        ->keyBy('account_group_id');
-
-    $out = collect();
-
-    // 2) Har groupId ke liye ensure (firstOrCreate) + push to result
-    foreach ($groupIds as $gid) {
-        if ($existing->has($gid)) {
-            $out->push($existing->get($gid));
-            continue;
+        // linked_module ko short name store karo (e.g. "Branches")
+        $module = null;
+        if (!empty($modelName)) {
+            $module = class_exists($modelName) ? class_basename($modelName) : (string) $modelName;
         }
 
-        $group = \App\Models\Accounts\AccountGroup::find($gid);
-        if (!$group) {
-            // yahan chahe to throw new \Exception(...) bhi kar sakte ho
-            continue;
+        // Agar module Branches hai, branchId = modelId assume (zarurat par 4th param bana sakte ho)
+        $branchId = ($module === 'Branches') ? $modelId : null;
+
+        // 1) Existing ledgers pick (same group + same link)
+        $existing = AccountLedger::query()
+            ->whereIn('account_group_id', $groupIds)
+            ->when($module, fn($q) => $q->where('linked_module', $module))
+            ->when($modelId, fn($q) => $q->where('linked_id', $modelId))
+            ->when(!is_null($branchId), fn($q) => $q->where(function ($qq) use ($branchId) {
+                $qq->whereNull('branch_id')->orWhere('branch_id', $branchId);
+            }))
+            ->get()
+            ->keyBy('account_group_id');
+
+        $out = collect();
+
+        // 2) Har groupId ke liye ensure (firstOrCreate) + push to result
+        foreach ($groupIds as $gid) {
+            if ($existing->has($gid)) {
+                $out->push($existing->get($gid));
+                continue;
+            }
+
+            $group = \App\Models\Accounts\AccountGroup::find($gid);
+            if (!$group) {
+                // yahan chahe to throw new \Exception(...) bhi kar sakte ho
+                continue;
+            }
+
+            // assets/expenses => debit normal; otherwise credit
+            $gtype  = strtolower((string) $group->type);
+            $normal = in_array($gtype, ['asset', 'assets', 'expense', 'expenses'], true) ? 'debit' : 'credit';
+
+            // Simple sequential code
+            $nextId = (AccountLedger::max('id') ?? 0) + 1;
+            $code   = 'LED-' . str_pad((string) $nextId, 5, '0', STR_PAD_LEFT);
+
+            // Default name
+            $name = $group->name . ($module && $modelId ? " - {$module} #{$modelId}" : ' Ledger');
+
+            // Uniqueness key: same group + link + branch
+            $ledger = AccountLedger::firstOrCreate(
+                [
+                    'name'             => $name,
+                    'account_group_id' => $gid,
+                    'linked_module'    => $module,
+                    'linked_id'        => $modelId,
+                    'branch_id'        => $branchId,
+                ],
+                [
+                    'code'                  => $code,
+                    'description'           => $name,
+                    'opening_balance'       => 0,
+                    'opening_balance_type'  => $normal,
+                    'current_balance'       => 0,
+                    'current_balance_type'  => $normal,
+                    'currency_id'           => 1,
+                    'is_active'             => 1,
+                    'is_system'             => 0,
+                    'created_by'            => auth()->id(),
+                    'updated_by'            => auth()->id(),
+                ]
+            );
+
+            $out->push($ledger);
         }
 
-        // assets/expenses => debit normal; otherwise credit
-        $gtype  = strtolower((string) $group->type);
-        $normal = in_array($gtype, ['asset','assets','expense','expenses'], true) ? 'debit' : 'credit';
-
-        // Simple sequential code
-        $nextId = (AccountLedger::max('id') ?? 0) + 1;
-        $code   = 'LED-' . str_pad((string) $nextId, 5, '0', STR_PAD_LEFT);
-
-        // Default name
-        $name = $group->name . ($module && $modelId ? " - {$module} #{$modelId}" : ' Ledger');
-
-        // Uniqueness key: same group + link + branch
-        $ledger = AccountLedger::firstOrCreate(
-            [
-                'name'             => $name,
-                'account_group_id' => $gid,
-                'linked_module'    => $module,
-                'linked_id'        => $modelId,
-                'branch_id'        => $branchId,
-            ],
-            [
-                'code'                  => $code,
-                'description'           => $name,
-                'opening_balance'       => 0,
-                'opening_balance_type'  => $normal,
-                'current_balance'       => 0,
-                'current_balance_type'  => $normal,
-                'currency_id'           => 1,
-                'is_active'             => 1,
-                'is_system'             => 0,
-                'created_by'            => auth()->id(),
-                'updated_by'            => auth()->id(),
-            ]
-        );
-
-        $out->push($ledger);
+        return $out->values(); // collection of AccountLedger models
     }
-
-    return $out->values(); // collection of AccountLedger models
-}
 
     /**
      * Create entry (for old system compatibility)
@@ -411,7 +412,7 @@ class LedgerService
                 'posted_by' => auth()->id() ?? 1,
                 'created_by' => auth()->id() ?? 1,
             ]);
-            
+
             \Log::info("Legacy journal entry created: ID {$entry->id}");
             return $entry;
         } catch (\Exception $e) {
@@ -430,13 +431,13 @@ class LedgerService
         try {
             $debit = 0;
             $credit = 0;
-            
+
             if ($data['balanceType'] == 'd') {
                 $debit = $data['amount'];
             } else {
                 $credit = $data['amount'];
             }
-            
+
             $line = JournalEntryLine::create([
                 'journal_entry_id' => $data['entry_id'],
                 'account_ledger_id' => $data['ledger_id'],
@@ -444,13 +445,13 @@ class LedgerService
                 'debit' => $debit,
                 'credit' => $credit,
             ]);
-            
+
             // Update ledger balance
             $ledger = AccountLedger::find($data['ledger_id']);
             if ($ledger) {
                 $ledger->updateBalance($debit, $credit);
             }
-            
+
             \Log::info("Legacy journal entry line created: ID {$line->id}, Ledger: {$data['ledger_id']}, Debit: {$debit}, Credit: {$credit}");
             return $line;
         } catch (\Exception $e) {
@@ -458,5 +459,106 @@ class LedgerService
             return null;
         }
     }
-}
 
+    // new work by zaheer
+
+    public function generateMonthlyForStudents($student, $billingMonth, $due_date, $challanNumber, $billing, $totalAmount)
+    {
+        try {
+
+
+            $group = AccountGroup::where('name', 'Accounts Receivable')->where('is_active', 1)->first();
+
+            $ledger = AccountLedger::firstOrCreate(
+                ['linked_module' => Students::class, 'linked_id' => $student->id],
+                [
+                    'account_group_id' => $group->id,
+                    'name' => $student->fullname,
+                    'code' => 'STD-' . $student->id,
+                    'description' => 'Receivable ledger for student ID ' . $student->id,
+                    'opening_balance' => 0,
+                    'opening_balance_type' => 'debit',
+                    'current_balance' => 0,
+                    'current_balance_type' => 'debit',
+                    'currency_id' => Null,
+                    'is_active' => 1,
+                    'is_system' => 0,
+                    'created_by' => auth()->id(),
+                    'updated_by' => auth()->id(),
+                ]
+            );
+
+            \Log::info("Ledger created for student {$student->id} with ID: {$ledger->id}");
+            $existingJE = JournalEntry::where('source_module', 'fee_billing')
+                ->where('source_id', $billing->id)
+                ->exists();
+
+            if (!$existingJE) {
+
+
+                $je = JournalEntry::create([
+                    'entry_number'   => 'JV' . str_pad($ledger->id, 6, '0', STR_PAD_LEFT),
+                    'entry_date'     => $billingMonth,
+                    'reference'      => $challanNumber,
+                    'description'    => 'Fee billing from student ID:' . $student->id,
+                    'status'         => 'posted',
+                    'entry_type'     => 'journal',
+                    'branch_id'      => auth()->user()->branch_id ?? null,
+                    'source_module'  => 'fee_billing',
+                    'source_id'      => $billing->id,
+                    'posted_at'      => now(),
+                    'posted_by'      => auth()->id(),
+                    'created_by'     => auth()->id(),
+                ]);
+
+                \Log::info("Journal entry created for student {$student->id} with ID: {$je->id}");
+
+                // Dr Student
+                JournalEntryLine::create([
+                    'journal_entry_id' => $je->id,
+                    'account_ledger_id' => $ledger->id,
+                    'description'      => 'Receivable raised ' . $billingMonth,
+                    'debit'            => $totalAmount,
+                    'credit'           => 0,
+                    'reference'        => $challanNumber,
+                ]);
+
+                $feeIncomeLedger = AccountLedger::where('name', 'Fee Revenue')->where('is_active', 1)->first(); //Fee Revenue
+                // Cr Fee Income
+                JournalEntryLine::create([
+                    'journal_entry_id' => $je->id,
+                    'account_ledger_id' => $feeIncomeLedger->id,
+                    'description'      => 'Fee income ' . $billingMonth,
+                    'debit'            => 0,
+                    'credit'           => $totalAmount,
+                    'reference'        => $challanNumber,
+                ]);
+
+                // Student Invoice entry Account Receivable
+
+                $invoice = CustomerInvoice::create([
+                'invoice_number' => CustomerInvoice::generateNumber(),
+                'student_id' => $student->id,
+                'invoice_date' => $billingMonth,
+                'due_date' => $due_date,
+                'subtotal' => $totalAmount,
+                'tax_amount' => 0,
+                'discount' => 0,
+                'total_amount' => $totalAmount,
+                'balance' => $totalAmount,
+                'status' => 'sent',
+                'branch_id' => auth()->user()->branch_id ?? null,
+                'created_by' => auth()->id(),
+                'journal_entry_id'=> $je->id
+            ]);
+
+              $billing->update(['customer_invoice_id' => $invoice->id]);
+            }
+            
+            return $ledger;
+        } catch (\Exception $e) {
+            \Log::error('LedgerService::createLedger failed: ' . $e->getMessage());
+            return null;
+        }
+    }
+}

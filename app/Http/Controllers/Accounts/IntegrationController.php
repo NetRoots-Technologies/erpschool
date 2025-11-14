@@ -234,6 +234,7 @@ class IntegrationController extends Controller
             'reference' => 'required|string',
         ]);
 
+            
         \Log::info("=== INTEGRATION: recordAcademicFee START ===");
         \Log::info("Request data: " . json_encode($request->all()));
         
@@ -260,13 +261,13 @@ class IntegrationController extends Controller
             } else {
                 \Log::info("✅ Cash ledger found with ID: {$cashLedger->id}, Name: {$cashLedger->name}");
             }
-
+            
             \Log::info("Searching for Fee Revenue ledger...");
             $feeRevenueLedger = AccountLedger::where('name', 'LIKE', '%revenue%')
-                ->whereHas('accountGroup', function($q) {
-                    $q->where('type', 'revenue');
-                })
-                ->first();
+            ->whereHas('accountGroup', function($q) {
+                $q->where('type', 'revenue');
+            })
+            ->first();
             
             if (!$feeRevenueLedger) {
                 \Log::info("Fee Revenue ledger not found, creating new one...");
@@ -288,6 +289,8 @@ class IntegrationController extends Controller
                 \Log::info("✅ Fee Revenue ledger found with ID: {$feeRevenueLedger->id}, Name: {$feeRevenueLedger->name}");
             }
 
+
+            
             // Create journal entry
             \Log::info("Creating journal entry...");
             $entry = JournalEntry::create([
@@ -304,7 +307,8 @@ class IntegrationController extends Controller
                 'posted_by' => auth()->id(),
                 'created_by' => auth()->id(),
             ]);
-
+            
+           
             // Debit: Cash
             JournalEntryLine::create([
                 'journal_entry_id' => $entry->id,
@@ -320,7 +324,7 @@ class IntegrationController extends Controller
                 'debit' => 0,
                 'credit' => $request->fee_amount,
             ]);
-
+            
             \Log::info("✅ Journal entry created with ID: {$entry->id}, Number: {$entry->entry_number}");
             
             // Update balances
@@ -328,6 +332,10 @@ class IntegrationController extends Controller
             $cashLedger->updateBalance($request->fee_amount, 0);
             $feeRevenueLedger->updateBalance(0, $request->fee_amount);
             \Log::info("✅ Ledger balances updated successfully");
+
+            
+             
+              
 
             DB::commit();
             \Log::info("✅ Transaction committed successfully");

@@ -20,6 +20,7 @@ class FeeBilling extends Model
     protected $table = 'fee_billing';
 
     protected $fillable = [
+        'customer_invoice_id',
         'student_id',
         'academic_session_id',
         'bill_date',

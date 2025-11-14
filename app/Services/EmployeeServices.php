@@ -424,9 +424,9 @@ class EmployeeServices
 
 
 
-                if ($row->machine_status == 0) {
-                    $btn .= '<button type="button" class="btn btn-success btn-sm employee_attendance" data-id="' . $row->id . '" data-status="inactive">Add</button>';
-                }
+                // if ($row->machine_status == 0) {
+                //     $btn .= '<button type="button" class="btn btn-success btn-sm employee_attendance" data-id="' . $row->id . '" data-status="inactive">Add</button>';
+                // }
 
                 $btn .= '</div>';
 

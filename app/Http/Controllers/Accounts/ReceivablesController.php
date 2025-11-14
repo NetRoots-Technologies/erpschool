@@ -21,7 +21,9 @@ class ReceivablesController extends Controller
             'due_this_month' => CustomerInvoice::where('status', 'sent')
                 ->whereBetween('due_date', [now()->startOfMonth(), now()->endOfMonth()])
                 ->sum('balance'),
-        ];
+        ]; 
+
+        
 
         return view('accounts.receivables.index', compact('invoices', 'summary'));
     }

@@ -191,7 +191,7 @@ class EmployeeController extends Controller
         if ($user) {
             $validated = $request->validate([
                 'applicant_name' => 'required',
-                'email_address' => "required|email|unique:users,email,$user->id",
+                // 'email_address' => "required|email|unique:users,email,".$user->id,
             ]);
         }
         // try {
