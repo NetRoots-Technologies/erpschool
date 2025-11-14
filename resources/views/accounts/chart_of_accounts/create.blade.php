@@ -33,34 +33,69 @@
                 <form action="{{ route('accounts.coa.store') }}" method="POST">
                     @csrf
                     
+                    {{-- Level 1 --}}
                     <div class="mb-3">
-                        <label class="form-label">Account Group <span class="text-danger">*</span></label>
-                        <select name="account_group_id" class="form-select" required>
-                            <option value="">Select Group</option>
-                            @foreach($groups as $group)
-                                <option value="{{ $group->id }}" {{ old('account_group_id') == $group->id ? 'selected' : '' }}>
-                                    {{ $group->name }} ({{ ucfirst($group->type) }})
-                                </option>
+                        <label>Main Group (Level 1)</label>
+                        <select id="level1" class="form-select" name="account_group_id">
+                            <option value="">Select</option>
+                            @foreach($groups->whereNull('parent_id') as $g)
+                                <option value="{{ $g->id }}">{{ $g->name }}</option>
                             @endforeach
                         </select>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label">Account Code <span class="text-danger">*</span></label>
-                        <input type="text" name="code" class="form-control" value="{{ old('code') }}" required>
-                        <small class="text-muted">Unique code for this account (e.g., 1001, CASH-01)</small>
+                    {{-- Level 2 --}}
+                    <div class="mb-3" id="level2_div" style="display:none;">
+                        <label>Child Group (Level 2)</label>
+                        <select id="level2_dropdown" class="form-select" name="parent_id_level2">
+                            <option value="">Select</option>
+                        </select>
                     </div>
 
+                    {{-- Level 3 --}}
                     <div class="mb-3">
-                        <label class="form-label">Account Name <span class="text-danger">*</span></label>
-                        <input type="text" name="name" class="form-control" value="{{ old('name') }}" required>
+                        <div id="level3_checkbox_div" style="display:none;">
+                            <input type="checkbox" id="level3_use_dropdown"> Select existing Level 3
+                        </div>
+                        <select id="level3_dropdown" class="form-select" style="display:none;" name="parent_id_level3">
+                            <option value="">Select</option>
+                        </select>
+                        <input type="text" id="level3_input" class="form-control" placeholder="Enter Level 3 name" style="display:none;">
                     </div>
 
+                    {{-- Level 4 --}}
+                    <div class="mb-3" id="level4_div" style="display:none;">
+                        <div id="level4_checkbox_div" style="display:none;">
+                            <input type="checkbox" id="level4_use_dropdown"> Select existing Level 4
+                        </div>
+                        <select id="level4_dropdown" class="form-select" style="display:none;" name="parent_id_level4">
+                            <option value="">Select</option>
+                        </select>
+                        <input type="text" id="level4_input" class="form-control" placeholder="Enter Level 4 name" style="display:none;">
+                    </div>
+
+                    {{-- Level 5 --}}
+                    <div class="mb-3" id="level5_div" style="display:none;">
+                        <label>Final Account Name (Level 5)</label>
+                        <input type="text" id="level5_name" class="form-control" placeholder="Enter Account Name" value="{{ old('name') }}"  name="name">
+                    </div>
+
+                    {{-- Hidden final name --}}
+                    <input type="hidden" name="name" id="final_name">
+
+                         {{-- account_code --}}
+                    <div class="mb-3">
+                        <label class="form-label">Account code</label>
+                        <input type="text" name="code" class="form-control" rows="3"{{ old('code') }}name="code">
+                    </div>
+
+                    {{-- Description --}}
                     <div class="mb-3">
                         <label class="form-label">Description</label>
                         <textarea name="description" class="form-control" rows="3">{{ old('description') }}</textarea>
                     </div>
 
+                    {{-- Opening Balance --}}
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
@@ -79,6 +114,7 @@
                         </div>
                     </div>
 
+                    {{-- Active --}}
                     <div class="mb-3">
                         <div class="form-check">
                             <input type="checkbox" name="is_active" class="form-check-input" id="is_active" value="1" {{ old('is_active', 1) ? 'checked' : '' }}>
@@ -96,4 +132,158 @@
         </div>
     </div>
 </div>
+
+{{-- jQuery --}}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+function resetLevel(level){
+    for (var i = level; i <= 5; i++) {
+        $('#level' + i + '_div, #level' + i + '_dropdown, #level' + i + '_input, #level' + i + '_checkbox_div').hide();
+        $('#level' + i + '_dropdown').html('<option value="">Select</option>');
+        $('#level' + i + '_input').val('');
+        $('#level' + i + '_checkbox_div input[type=checkbox]').prop('checked', false);
+    }
+}
+
+/* ======================
+   LEVEL HANDLING LOGIC
+====================== */
+
+// Level 1 → Level 2
+$('#level1').on('change', function(){
+    const parentId = $(this).val();
+    resetLevel(2);
+
+    if (parentId) {
+        $.get('{{ route("accounts.coa.getChildGroups") }}', { parent_id: parentId }, function(data){
+            $('#level2_div').show();
+            if (data.length > 0) {
+                $('#level2_dropdown').html('<option value="">Select</option>');
+                $.each(data, function(i, v){
+                    $('#level2_dropdown').append('<option value="'+v.id+'">'+v.name+'</option>');
+                });
+                $('#level2_dropdown').show();
+            }
+        });
+    }
+});
+
+// Level 2 → Level 3
+$('#level2_dropdown').on('change', function(){
+    const parentId = $(this).val();
+    resetLevel(3);
+
+    if (!parentId) return;
+
+    $.get('{{ route("accounts.coa.getChildGroups") }}', { parent_id: parentId }, function(data){
+        $('#level3_checkbox_div').show();
+        $('#level3_input').show();
+        if (data.length > 0) {
+            $('#level3_dropdown').html('<option value="">Select</option>');
+            $.each(data, function(i, v){
+                $('#level3_dropdown').append('<option value="'+v.id+'">'+v.name+'</option>');
+            });
+        }
+    });
+});
+
+// Level 3 checkbox toggle
+$('#level3_use_dropdown').on('change', function(){
+    const parentId = $('#level2_dropdown').val();
+    if ($(this).is(':checked')) {
+        $.get('{{ route("accounts.coa.getthirdchild") }}', { parent_id: parentId }, function(data){
+            $('#level3_dropdown').html('<option value="">Select</option>');
+            $.each(data, function(i, v){
+                $('#level3_dropdown').append('<option value="'+v.id+'">'+v.name+'</option>');
+            });
+            $('#level3_dropdown').show();
+            $('#level3_input').hide();
+        });
+    } else {
+        $('#level3_input').show();
+        $('#level3_dropdown').hide();
+    }
+});
+
+// Level 3 → Level 4
+$('#level3_dropdown').on('change', function(){
+    const parentId = $(this).val();
+    resetLevel(4);
+    if (!parentId) return;
+
+    $.get('{{ route("accounts.coa.getChildGroups") }}', { parent_id: parentId }, function(data){
+        $('#level4_div').show();
+        $('#level4_checkbox_div').show();
+        $('#level4_input').show();
+        if (data.length > 0) {
+            $('#level4_dropdown').html('<option value="">Select</option>');
+            $.each(data, function(i, v){
+                $('#level4_dropdown').append('<option value="'+v.id+'">'+v.name+'</option>');
+            });
+        }
+    });
+});
+
+// Level 4 checkbox toggle
+$('#level4_use_dropdown').on('change', function(){
+    const parentId = $('#level3_dropdown').val();
+    if ($(this).is(':checked')) {
+        $.get('{{ route("accounts.coa.getChildGroups") }}', { parent_id: parentId }, function(data){
+            $('#level4_dropdown').html('<option value="">Select</option>');
+            $.each(data, function(i, v){
+                $('#level4_dropdown').append('<option value="'+v.id+'">'+v.name+'</option>');
+            });
+            $('#level4_dropdown').show();
+            $('#level4_input').hide();
+        });
+    } else {
+        $('#level4_input').show();
+        $('#level4_dropdown').hide();
+    }
+});
+
+// Level 4 → Level 5
+$('#level4_dropdown').on('change', function(){
+    const parentId = $(this).val();
+    if (!parentId) {
+        $('#level5_div').hide();
+        return;
+    }
+
+    // Check if Level 5 children exist for selected Level 4
+    $.get('{{ route("accounts.coa.getChildGroups") }}', { parent_id: parentId }, function(data){
+        if (data.length > 0) {
+            $('#level5_div').show(); // Only show if there are children possible
+        } else {
+            $('#level5_div').hide();
+        }
+    });
+});
+
+// If you want to show level 5 only when user *explicitly chooses* to create it:
+$('#level4_input').on('keyup', function(){
+    $('#level5_div').hide(); // Hide by default while creating new Level 4
+});
+
+
+/* ======================
+   UPDATE FINAL NAME
+====================== */
+function updateFinalName() {
+    let nameVal = '';
+
+    if ($('#level5_name').is(':visible') && $('#level5_name').val()) {
+        nameVal = $('#level5_name').val();
+    } else if ($('#level4_input').is(':visible') && $('#level4_input').val()) {
+        nameVal = $('#level4_input').val();
+    } else if ($('#level3_input').is(':visible') && $('#level3_input').val()) {
+        nameVal = $('#level3_input').val();
+    }
+
+    $('#final_name').val(nameVal);
+}
+
+$('#level3_input, #level4_input, #level5_name').on('keyup change', updateFinalName);
+
+</script>
 @endsection

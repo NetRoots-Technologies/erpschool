@@ -36,6 +36,13 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'accounts', 'as' => 'account
         Route::put('/{id}', [\App\Http\Controllers\Accounts\ChartOfAccountsController::class, 'update'])->name('update');
         Route::delete('/{id}', [\App\Http\Controllers\Accounts\ChartOfAccountsController::class, 'destroy'])->name('destroy');
         Route::get('/tree', [\App\Http\Controllers\Accounts\ChartOfAccountsController::class, 'tree'])->name('tree');
+        Route::get('/get-child-groups', [\App\Http\Controllers\Accounts\ChartOfAccountsController::class, 'getChildGroups'])
+              ->name('getChildGroups');
+        Route::get('/generate-account-code', [\App\Http\Controllers\Accounts\ChartOfAccountsController::class, 'generateAccountCode'])
+             ->name('generateAccountCode');
+        Route::get('/getthirdchild', [\App\Http\Controllers\Accounts\ChartOfAccountsController::class, 'getthirdchild'])
+             ->name('getthirdchild');
+
     });
     
     Route::prefix('journal-entries')->name('journal.')->group(function () {
