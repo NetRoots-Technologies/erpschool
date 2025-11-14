@@ -11,6 +11,7 @@ class CustomerInvoice extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
+        'student_id',
         'invoice_number',
         'customer_id',
         'invoice_date',
@@ -45,6 +46,11 @@ class CustomerInvoice extends Model
     public function customer()
     {
         return $this->belongsTo(Customer::class, 'customer_id');
+    }
+
+    public function student()
+    {
+        return $this->belongsTo(\App\Models\Student\Students::class, 'student_id');
     }
 
     public function journalEntry()

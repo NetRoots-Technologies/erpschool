@@ -5,7 +5,7 @@
 @section('content')
 <div class="container-fluid mt-4">
     <div class="row mb-4">
-        @if (Gate::allows('students'))
+        @if (Gate::allows('SignatoryAuthorities-create'))
         <div class="col-12 text-right">
             <a href="{{ route('admin.signatory-authorities.add') }}" class="btn btn-success">Add Authority</a>
         </div>

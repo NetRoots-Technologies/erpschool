@@ -32,11 +32,21 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-6">
+                        @if (!empty($invoice->customer))
                         <h6>Customer Information</h6>
                         <p class="mb-1"><strong>{{ $invoice->customer->name }}</strong></p>
                         <p class="mb-1">{{ $invoice->customer->contact_person }}</p>
                         <p class="mb-1">{{ $invoice->customer->phone }}</p>
                         <p class="mb-1">{{ $invoice->customer->email }}</p>
+
+                        @else
+                        <h6>Student Information</h6>
+                        <p class="mb-1"><strong>{{ $invoice->student->full_name }}</strong></p>
+                        <p class="mb-1">{{ $invoice->student->phone }}</p>
+                        <p class="mb-1">{{ $invoice->student->email }}</p>
+
+                        @endif
+                        
                     </div>
                     <div class="col-md-6 text-end">
                         <h6>Invoice Information</h6>

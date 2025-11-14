@@ -99,6 +99,7 @@
                             <tr>
                                 <th>Invoice #</th>
                                 <th>Customer</th>
+                                <th>Student</th>
                                 <th>Invoice Date</th>
                                 <th>Due Date</th>
                                 <th>Total Amount</th>
@@ -111,7 +112,8 @@
                             @forelse($invoices as $invoice)
                             <tr>
                                 <td><a href="{{ route('accounts.receivables.invoices.show', $invoice->id) }}">{{ $invoice->invoice_number }}</a></td>
-                                <td>{{ $invoice->customer->name }}</td>
+                                <td>{{ $invoice->customer->name ?? 'N/A' }}</td>
+                                <td>{{ $invoice->student->full_name ?? 'N/A' }}</td>
                                 <td>{{ $invoice->invoice_date->format('d M Y') }}</td>
                                 <td>{{ $invoice->due_date->format('d M Y') }}</td>
                                 <td class="text-end">Rs. {{ number_format($invoice->total_amount, 2) }}</td>
