@@ -23,8 +23,7 @@
     <p><strong>Order Date:</strong> {{ $purchaseOrder->order_date }}</p>
     <p><strong>Delivery Date:</strong> {{ $purchaseOrder->delivery_date }}</p>
     <p><strong>Delivery Status:</strong> {{ $purchaseOrder->delivery_status }}</p>
-    <p><strong>Comments:</strong> {{ $purchaseOrder->description }}</p>
-
+    
     <table>
         <thead>
             <tr>
@@ -92,6 +91,12 @@
     </td>
   </tr>
 </table>
+
+<div>
+  <p><strong>Terms and Conditions:</strong> {{ $purchaseOrder->description }}</p>
+</div>
+
+
 
 
 </body>

@@ -32,17 +32,42 @@ class ChartOfAccountsController extends Controller
         return view('accounts.chart_of_accounts.index', compact('groups', 'stats'));
     }
 
-    public function tree()
-    {
-        $groups = AccountGroup::with(['ledgers' => function($query) {
-            $query->orderBy('code');
-        }])
-        ->orderBy('name')
-        ->get();
+    // public function tree()
+    // {
+    //     $groups = AccountGroup::with(['ledgers' => function($query) {
+    //         $query->orderBy('code');
+    //     }])
+    //     ->orderBy('name')
+    //     ->get();
         
-        $tree = $this->buildTree();
-        return view('accounts.chart_of_accounts.tree', compact('groups', 'tree'));
-    }
+    //     $tree = $this->buildTree();
+    //     return view('accounts.chart_of_accounts.tree', compact('groups', 'tree'));
+    // }
+
+
+    public function tree()
+        {
+            // $groups = AccountGroup::with('ledgers')->whereNull('parent_id')->orderBy('name')->get();
+             $groups = AccountGroup::with(['ledgers', 'childrenRecursive'])->whereNull('parent_id')->orderBy('name')->get();
+            // $tree = $this->buildTree($groups);
+            return view('accounts.chart_of_accounts.tree', compact('groups'));
+        }
+
+        private function buildTree($groups)
+        {
+            $tree = [];
+            foreach ($groups as $group) {
+                $children = $group->children()->with('ledgers')->orderBy('name')->get();
+                $tree[] = [
+                    'id' => $group->id,
+                    'name' => $group->name,
+                    'ledgers' => $group->ledgers,
+                    'children' => $children->count() ? $this->buildTree($children) : []
+                ];
+            }
+            return $tree;
+        }
+
 
     public function create()
     {
@@ -151,25 +176,25 @@ class ChartOfAccountsController extends Controller
         return redirect()->route('accounts.coa.index')->with('success', 'Account deleted successfully');
     }
 
-    private function buildTree($parentId = null)
-    {
-        $groups = AccountGroup::where('parent_id', $parentId)
-            ->where('is_active', true)
-            ->with(['ledgers' => function($q) {
-                $q->where('is_active', true);
-            }])
-            ->get();
+    // private function buildTree($parentId = null)
+    // {
+    //     $groups = AccountGroup::where('parent_id', $parentId)
+    //         ->where('is_active', true)
+    //         ->with(['ledgers' => function($q) {
+    //             $q->where('is_active', true);
+    //         }])
+    //         ->get();
 
-        $tree = [];
-        foreach ($groups as $group) {
-            $tree[] = [
-                'group' => $group,
-                'children' => $this->buildTree($group->id),
-            ];
-        }
+    //     $tree = [];
+    //     foreach ($groups as $group) {
+    //         $tree[] = [
+    //             'group' => $group,
+    //             'children' => $this->buildTree($group->id),
+    //         ];
+    //     }
 
-        return $tree;
-    }
+    //     return $tree;
+    // }
 
     public function getChildGroups(Request $request)
     {

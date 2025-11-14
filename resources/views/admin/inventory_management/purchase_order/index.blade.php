@@ -57,8 +57,8 @@
                             </div>
 
                             <div class="col-6 mb-3">
-                                <label for="description" class="form-label">Comments</label>
-                                <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
+                                <label for="description" class="form-label">Terms and Condition</label>
+                                <textarea class="form-control" id="description" name="description" rows="2" required></textarea>
                             </div>
 
 
@@ -257,19 +257,45 @@
                 window.open(url, '_blank');
             });
 
+            // Zaheer
+            // $(`#items`).on('keyup', '.quantity,.item_price', function() {
+            //     alert($(this).parent().parent().find('.quantity').val());
+            //     let closestQuantity = $(this).parent().parent().find('.quantity').val();
+            //     let closestPrice = $(this).parent().parent().find('.item_price').val();
+            //     $(this).parent().parent().find('.total').val(closestQuantity * closestPrice);
 
-            $(`#items`).on('keyup', '.quantity,.item_price', function() {
-                let closestQuantity = $(this).parent().parent().find('.quantity').val();
-                let closestPrice = $(this).parent().parent().find('.item_price').val();
-                $(this).parent().parent().find('.total').val(closestQuantity * closestPrice);
+            //     let total = 0;
+            //     $(".total").each(function() {
+            //         total += parseFloat($(this).val());
+            //     })
+            //     $(`#total_amount`).val(total)
+            //     $(`#total_amount`).val()
+            // })
 
-                let total = 0;
-                $(".total").each(function() {
-                    total += parseFloat($(this).val());
-                })
-                $(`#total_amount`).val(total)
-                $(`#total_amount`).val()
-            })
+            $("#items").on('keyup change', '.quantity, .item_price, .inline_discount', function () {
+
+                let row = $(this).closest('.row'); // row container (your parent)
+                let qty = parseFloat(row.find('.quantity').val()) || 0;
+                let price = parseFloat(row.find('.item_price').val()) || 0;
+                let discount = parseFloat(row.find('.inline_discount').val()) || 0;
+
+                // Row amount (without discount)
+                let amount = qty * price;
+
+                // Discounted amount
+                let finalAmount = amount - (amount * (discount / 100));
+
+                // Put final amount into .total field
+                row.find('.total').val(finalAmount.toFixed(2));
+
+                // === UPDATE TOTAL SUM ===
+                let grandTotal = 0;
+                $(".total").each(function () {
+                    grandTotal += parseFloat($(this).val()) || 0;
+                });
+
+                $("#total_amount").val(grandTotal.toFixed(2));
+            });
 
             $(`#iForm`).validate({
                 errorPlacement: function(error, element) {
@@ -530,6 +556,14 @@
                             <input type="number" min="1" class="form-control item_price" name="price[${i}]"
                                 placeholder="Price" value="${0}" required>
                         </span>
+
+                        <span class="col-2 mb-3">
+                            <label for="discount" class="form-label">Discount %</label>
+                            <input type="number" min="0" class="form-control inline_discount" name="discount[${i}]"
+                                placeholder="Price" value="${0}" required>
+                        </span>
+
+
                         <span class="col-2 mb-3">
                             <label for="quoted_price" class="form-label">Quoted Price</label>
                             <input type="number" class="form-control item_price" name="quoted_price[${i}]"

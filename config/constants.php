@@ -401,6 +401,7 @@ return [
         2 => "SHIPPED",
         3 => "CANCELLED",
         4 => "COMPLETED",
+        5 => "PARTIALLY",
     ],
     "payment_status" => [
         1 => "PAID",
