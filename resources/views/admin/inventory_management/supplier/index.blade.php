@@ -65,6 +65,12 @@
                                 placeholder="Enter NTN Number" maxlength="50">
                         </div>
 
+                         <div class="col-md-4 mb-3">
+                            <label for="tax_percentage" class="form-label">Tax Percentage</label>
+                            <input type="text" class="form-control" id="tax_percentage" name="tax_percentage"
+                                placeholder="Enter Tax Percentage">
+                        </div>
+
                         <div class="col-md-4 mb-3">
                             <label for="branches" class="form-label">Supplier Branch</label>
                             <select class="form-control select2" id="branches" name="branches[]" required multiple>
@@ -160,7 +166,8 @@
                     contact:     { required: true },
                     address:     { required: true },
                     email:       { required: true, email: true },
-                    ntn_number:  { required: true, maxlength: 50, ntnPattern: true }
+                    ntn_number:  { required: true, maxlength: 50, ntnPattern: true },
+                    tax_percentage: { required: false, number: true, min: 0, max: 100 }
                 },
                 messages: {
                     name: {
@@ -181,6 +188,11 @@
                         required: "NTN Number is required",
                         maxlength: "Maximum 50 characters allowed",
                         ntnPattern: "Please enter a valid NTN (7–9 digits, e.g. 1234567-8)"
+                    },
+                    tax_percentage: {
+                        number: "Please enter a valid number",
+                        min: "Tax Percentage cannot be less than 0",
+                        max: "Tax Percentage cannot be more than 100"
                     }
                 },
 
@@ -375,6 +387,7 @@
                     $(`#address`).val(sData.address)
                     $(`#email`).val(sData.email)
                      $('#ntn_number').val(sData.ntn_number || '');   // ✅ prefill NTN here
+                     $('#tax_percentage').val(sData.tax_percentage || ''); // ✅ prefill Tax Percentage here
                     $(`#branches`).val(sData.branches.map(x => x.id)).trigger('change')
                     $(`#items`).val(sData.items.map(x => x.id)).trigger('change')
                 }

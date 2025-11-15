@@ -242,7 +242,7 @@ $('#level4_use_dropdown').on('change', function(){
     }
 });
 
-// Level 4 → Level 5
+// Level 4 → Level 5 (fixed)
 $('#level4_dropdown').on('change', function(){
     const parentId = $(this).val();
     if (!parentId) {
@@ -250,20 +250,27 @@ $('#level4_dropdown').on('change', function(){
         return;
     }
 
-    // Check if Level 5 children exist for selected Level 4
+    // Always show Level 5 input when a Level 4 is selected
+    $('#level5_div').show();
+
+    // Optionally check if there are child groups under selected Level 4
     $.get('{{ route("accounts.coa.getChildGroups") }}', { parent_id: parentId }, function(data){
         if (data.length > 0) {
-            $('#level5_div').show(); // Only show if there are children possible
+            // If you want to show a hint that more sub-levels exist:
+            // console.log('This Level 4 has children — you may choose an existing Level 5 instead of creating a new one.');
+            // You could also display a dropdown for existing Level 5 items here if desired.
         } else {
-            $('#level5_div').hide();
+            // No deeper groups; user likely will create the final account (Level 5)
         }
     });
 });
 
-// If you want to show level 5 only when user *explicitly chooses* to create it:
+// If user is typing a NEW Level 4 name, show Level 5 so they can enter the final account name
 $('#level4_input').on('keyup', function(){
-    $('#level5_div').hide(); // Hide by default while creating new Level 4
+    // Show level5 so user can immediately enter final account name for the newly created Level 4
+    $('#level5_div').show();
 });
+
 
 
 /* ======================
