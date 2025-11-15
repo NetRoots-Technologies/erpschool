@@ -10057,3 +10057,4 @@
 #56 C:\\xampp\\htdocs\\updateSchool\\server.php(21): require_once('C:\\\\xampp\\\\htdocs...')
 #57 {main}
 "} 
+[2025-11-15 12:57:27] local.ERROR: VendorPayment store error: Undefined variable $taxAmount  

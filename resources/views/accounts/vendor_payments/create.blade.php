@@ -53,6 +53,9 @@
                         </div>
                     </div>
 
+                    
+                    
+
                     <!-- Invoice Info -->
                     <h5 class="mb-3 text-primary"></i>Invoice Details</h5>
                     <div class="row g-3 mb-3">
@@ -81,6 +84,23 @@
                                 class="form-control form-control-lg" value="{{ old('payment_amount') }}" required>
                         </div>
                     </div>
+
+                    {{-- Tax Amount Percentage --}}
+                   <div class="row g-3 mb-3">
+                    <div class="col-md-4">
+                        <label>Tax (%)</label>
+                        <input type="number" id="tax_percentage" class="form-control form-control-lg" value="0">
+                    </div>
+                    <div class="col-md-4">
+                        <label>Tax Amount</label>
+                        <input type="text" id="tax_amount" name="tax_amount" class="form-control form-control-lg" readonly>
+                    </div>
+                    <div class="col-md-4">
+                        <label>Final Amount</label>
+                        <input type="text" id="final_payment" name="final_payment" class="form-control form-control-lg" readonly>
+                    </div>
+                </div>
+
 
                     <!-- Bank / Cheque Info -->
                     <h5 class="mb-3 text-primary">Bank / Cheque Info</h5>
@@ -254,5 +274,20 @@
 
             $("#pending_amount").val((invoice - payment).toFixed(2));
         });
+
+
+       $("#payment_amount, #tax_percentage").on("keyup change", function() {
+    let payment = parseFloat($("#payment_amount").val()) || 0;
+    let taxPerc = parseFloat($("#tax_percentage").val()) || 0;
+
+    let taxAmount = (payment * taxPerc) / 100;
+    let finalAmount = payment - taxAmount;
+
+    $("#tax_amount").val(taxAmount.toFixed(2));
+    $("#final_payment").val(finalAmount.toFixed(2));
+});
     </script>
+
+
+
 @endsection

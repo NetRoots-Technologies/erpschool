@@ -73,6 +73,17 @@ class VendorPaymentController extends Controller
         DB::beginTransaction();
         try {
 
+
+            // Tax AMount Percentage
+            $originalPrice = $validated['payment_amount']; 
+            $discountPercentage = $request->input('tax_amount'); 
+            $discountAmount = ($originalPrice * $discountPercentage) / 100;
+            $finalPrice = $originalPrice - $discountAmount;
+            $finalPrice = $originalPrice * (1 - ($discountPercentage / 100));
+            $finalPrice = number_format($finalPrice, 2);
+
+            // dd( $finalPrice );
+
             // create vendor payment
             $vp = new VendorPayment();
             $vp->voucher_no = $this->generateVoucherNo();
@@ -89,6 +100,7 @@ class VendorPaymentController extends Controller
             $vp->remarks = $validated['remarks'] ?? null;
             $vp->prepared_by = auth()->id();
             $vp->approved_by = $validated['approved_by'] ?? null;
+            $vp->tax_amount = $request->input('tax_amount');
 
             if ($request->hasFile('attachment')) {
                 $path = $request->file('attachment')->store('vendor_payments', 'public');
@@ -121,7 +133,7 @@ class VendorPaymentController extends Controller
                         'branch_id' => $vp->branch_id ?? null,
                         'created_by' => auth()->id(),
                     ]);
-               }
+                }
             // 1) Journal entry
                 $entry = JournalEntry::create([
                 'entry_number' => JournalEntry::generateNumber(),
@@ -161,29 +173,78 @@ class VendorPaymentController extends Controller
                 }
 
             $bankAccount = AccountLedger::where('account_group_id', $bankGroup->id)->first();
-            
+                
+            $whtGroup = AccountGroup::where('code', '040020050006')->first()
+            ?? AccountGroup::where('name', 'LIKE', '%With Holding Tax%')->first()
+            ?? AccountGroup::where('name', 'LIKE', '%Withholding%')->first();
+
+        if (! $whtGroup) {
+            // fallback create group? better to throw so admin creates the group
+            // throw new \Exception('WHT AccountGroup not found. Create group with code 040020050006.');
+            $whtGroup = $vendorGroup; // fallback to vendor group to avoid crash (optional)
+        }
+
+        $whtLedger = AccountLedger::where('account_group_id', $whtGroup->id)
+            ->where(function($q){
+                $q->where('name', 'LIKE', '%WHT%')->orWhere('name', 'LIKE', '%With Holding%')->orWhere('code','LIKE','%040020050006%');
+            })->first();
+
+            if (! $whtLedger) {
+                $whtCode = ($whtGroup->code ?? '040020050006') . '0001';
+                if (AccountLedger::where('code', $whtCode)->exists()) $whtCode = ($whtGroup->code ?? '040020050006') . time();
+                $whtLedger = AccountLedger::create([
+                    'name' => 'With Holding Tax on Payable',
+                    'code' => $whtCode,
+                    'description' => 'WHT payable (2%) on vendor payments/fees',
+                    'account_group_id' => $whtGroup->id ?? ($vendorGroup->id ?? null),
+                    'opening_balance' => 0,
+                    'opening_balance_type' => 'credit',
+                    'current_balance' => 0,
+                    'current_balance_type' => 'credit',
+                    'currency_id' => 1,
+                    'is_active' => true,
+                    'is_system' => false,
+                    'linked_module' => 'tax',
+                    'linked_id' => null,
+                    'branch_id' => $vp->branch_id ?? null,
+                    'created_by' => auth()->id(),
+                ]);
+            }
 
                 
-    // 6) Journal lines - make sure Debits = Credits
-    // Debit Vendor ledger (reduces liability)
-                JournalEntryLine::create([
-                    'journal_entry_id' => $entry->id,
-                    'account_ledger_id' => $vendorLedger->id,
-                    'description' => 'Payment to supplier: ' . $supplier->name,
-                    'debit' => $validated['payment_amount'],
-                    'credit' => 0,
-                    'reference' => $vp->voucher_no,
-                ]);
+            // 6) Journal lines - make sure Debits = Credits
+            // Debit Vendor ledger (reduces liability)
+                        JournalEntryLine::create([
+                            'journal_entry_id' => $entry->id,
+                            'account_ledger_id' => $vendorLedger->id,
+                            'description' => 'Payment to supplier: ' . $supplier->name,
+                            'debit' => $validated['payment_amount'],
+                            'credit' => 0,
+                            'reference' => $vp->voucher_no,
+                        ]);
 
-                // Credit Bank ledger (reduces bank asset)
-                JournalEntryLine::create([
-                    'journal_entry_id' => $entry->id,
-                    'account_ledger_id' =>  $bankAccount->id,
-                    'description' => 'MCB - Payment made for voucher: ' . $vp->voucher_no,
-                    'debit' => 0,
-                    'credit' => $validated['payment_amount'],
-                    'reference' => $vp->voucher_no,
-                ]);
+                        // Credit Bank ledger (reduces bank asset)
+                        JournalEntryLine::create([
+                            'journal_entry_id' => $entry->id,
+                            'account_ledger_id' =>  $bankAccount->id,
+                            'description' => 'MCB - Payment made for voucher: ' . $vp->voucher_no,
+                            'debit' => 0,
+                            'credit' => $finalPrice,
+                            'reference' => $vp->voucher_no,
+                        ]);
+
+                        // with tax jJournal Entry Line
+                        if ($discountPercentage > 0) {
+                            JournalEntryLine::create([
+                                'journal_entry_id' => $entry->id,
+                                'account_ledger_id' => $whtLedger->id,
+                                'description' => 'WHT withheld on voucher: ' . $vp->voucher_no,
+                                'debit' => 0,
+                                'credit' =>  $discountPercentage,
+                                'reference' => $vp->voucher_no,
+                            ]);
+                        }
+
             DB::commit();
 
             return redirect()->route('accounts.payables.vendorPayments.index')
@@ -217,19 +278,21 @@ class VendorPaymentController extends Controller
      */
     public function update(Request $request, $id)
     {
+
+        // dd( $request->all(), $id);
         $vp = VendorPayment::findOrFail($id);
 
         $rules = [
             'payment_date' => 'required|date',
-            'vendor_id' => 'required|exists:vendors,id',
-            'invoice_id' => 'nullable|exists:purchase_invoices,id',
+            'vendor_id' => 'required|exists:suppliers,id',
+            'invoice_id' => 'nullable|exists:purchase_orders,id',
             'payment_amount' => 'required|numeric|min:0.01',
             'payment_mode' => ['required', Rule::in(['Cash','Cheque','Bank Transfer','Other'])],
-            'account_id' => 'nullable|exists:accounts,id',
+            // 'account_id' => 'nullable|exists:accounts,id',
             'cheque_no' => 'nullable|string|required_if:payment_mode,Cheque',
             'cheque_date' => 'nullable|date|required_if:payment_mode,Cheque',
             'attachment' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
-            'prepared_by' => 'nullable|exists:users,id',
+            // 'prepared_by' => 'nullable|exists:users,id',
             'approved_by' => 'nullable|exists:users,id',
         ];
 
@@ -238,47 +301,65 @@ class VendorPaymentController extends Controller
         DB::beginTransaction();
         try {
             // Reverse previous invoice effect if any
-            if ($vp->invoice_id) {
-                $oldInvoice = PurchaseInvoice::lockForUpdate()->find($vp->invoice_id);
-                if ($oldInvoice) {
-                    $oldInvoice->paid_amount = round($oldInvoice->paid_amount - $vp->payment_amount,2);
-                    if ($oldInvoice->paid_amount <= 0) {
-                        $oldInvoice->paid_amount = 0;
-                        $oldInvoice->status = 'pending';
-                    } elseif ($oldInvoice->paid_amount < $oldInvoice->total_amount) {
-                        $oldInvoice->status = 'partially_paid';
-                    }
-                    $oldInvoice->save();
-                }
-            }
+            // if ($vp->invoice_id) {
+            //     $oldInvoice = PurchaseInvoice::lockForUpdate()->find($vp->invoice_id);
+            //     if ($oldInvoice) {
+            //         $oldInvoice->paid_amount = round($oldInvoice->paid_amount - $vp->payment_amount,2);
+            //         if ($oldInvoice->paid_amount <= 0) {
+            //             $oldInvoice->paid_amount = 0;
+            //             $oldInvoice->status = 'pending';
+            //         } elseif ($oldInvoice->paid_amount < $oldInvoice->total_amount) {
+            //             $oldInvoice->status = 'partially_paid';
+            //         }
+            //         $oldInvoice->save();
+            //     }
+            // }
 
-            // If new invoice selected, validate vendor and pending
-            $newInvoice = null;
-            if (!empty($validated['invoice_id'])) {
-                $newInvoice = PurchaseInvoice::lockForUpdate()->findOrFail($validated['invoice_id']);
-                if ($newInvoice->vendor_id != $validated['vendor_id']) {
-                    return back()->withInput()->withErrors(['invoice_id' => 'Selected invoice does not belong to chosen vendor.']);
-                }
-                $pending = round($newInvoice->total_amount - $newInvoice->paid_amount, 2);
-                if ($validated['payment_amount'] > $pending) {
-                    return back()->withInput()->withErrors(['payment_amount' => 'Payment amount cannot be greater than pending amount ('.$pending.').']);
-                }
-            }
-
+            // // If new invoice selected, validate vendor and pending
+            // $newInvoice = null;
+            // if (!empty($validated['invoice_id'])) {
+            //     $newInvoice = PurchaseInvoice::lockForUpdate()->findOrFail($validated['invoice_id']);
+            //     if ($newInvoice->vendor_id != $validated['vendor_id']) {
+            //         return back()->withInput()->withErrors(['invoice_id' => 'Selected invoice does not belong to chosen vendor.']);
+            //     }
+            //     $pending = round($newInvoice->total_amount - $newInvoice->paid_amount, 2);
+            //     if ($validated['payment_amount'] > $pending) {
+            //         return back()->withInput()->withErrors(['payment_amount' => 'Payment amount cannot be greater than pending amount ('.$pending.').']);
+            //     }
+            // }
+            // $vp = PurchaseOrder::find($validated['invoice_id']);
             // update vendor payment
+
+            $originalPrice = $validated['payment_amount']; 
+            $discountPercentage = $request->input('tax_amount'); 
+            $discountAmount = ($originalPrice * $discountPercentage) / 100;
+            $finalPrice = $originalPrice - $discountAmount;
+            $finalPrice = $originalPrice * (1 - ($discountPercentage / 100));
+            $finalPrice = number_format($finalPrice, 2);
+
+
+            $vp->voucher_no = $this->generateVoucherNo();
             $vp->payment_date = $validated['payment_date'];
             $vp->vendor_id = $validated['vendor_id'];
             $vp->invoice_id = $validated['invoice_id'] ?? null;
-            $vp->invoice_amount = $validated['invoice_id'] ? $newInvoice->total_amount : null;
-            $vp->pending_amount = $validated['invoice_id'] ? round($newInvoice->total_amount - $newInvoice->paid_amount,2) : null;
-            $vp->payment_amount = $validated['payment_amount'];
-            $vp->payment_mode = $validated['payment_mode'];
+            $vp->invoice_amount = $request->invoice_amount ?? null;
+            $vp->pending_amount = $request->pending_amount ?? null;
+            $vp->payment_amount = $request->payment_amount;
+            $vp->payment_mode = $request->payment_mode;
             $vp->account_id = $validated['account_id'] ?? null;
             $vp->cheque_no = $validated['cheque_no'] ?? null;
             $vp->cheque_date = $validated['cheque_date'] ?? null;
-            $vp->remarks = $validated['remarks'] ?? $vp->remarks;
-            $vp->prepared_by = $validated['prepared_by'] ?? $vp->prepared_by;
-            $vp->approved_by = $validated['approved_by'] ?? $vp->approved_by;
+            $vp->remarks = $validated['remarks'] ?? null;
+            $vp->prepared_by = auth()->id();
+            $vp->approved_by = $validated['approved_by'] ?? null;
+            $vp->tax_amount = $request->tax_amount ?? null;
+
+            if ($request->hasFile('attachment')) {
+                $path = $request->file('attachment')->store('vendor_payments', 'public');
+                $vp->attachment = $path;
+            }
+
+            $vp->save();
 
             if ($request->hasFile('attachment')) {
                 // delete old file
@@ -292,20 +373,20 @@ class VendorPaymentController extends Controller
             $vp->save();
 
             // Apply to new invoice if exists
-            if ($newInvoice) {
-                $apply = round($validated['payment_amount'],2);
-                $newInvoice->paid_amount = round($newInvoice->paid_amount + $apply,2);
-                if ($newInvoice->paid_amount >= $newInvoice->total_amount - 0.0001) {
-                    $newInvoice->status = 'paid';
-                } else {
-                    $newInvoice->status = 'partially_paid';
-                }
-                $newInvoice->save();
-            }
+            // if ($newInvoice) {
+            //     $apply = round($validated['payment_amount'],2);
+            //     $newInvoice->paid_amount = round($newInvoice->paid_amount + $apply,2);
+            //     if ($newInvoice->paid_amount >= $newInvoice->total_amount - 0.0001) {
+            //         $newInvoice->status = 'paid';
+            //     } else {
+            //         $newInvoice->status = 'partially_paid';
+            //     }
+            //     $newInvoice->save();
+            // }
 
             DB::commit();
 
-            return redirect()->route('payables.vendorPayments.index')->with('success','Payment updated successfully.');
+            return redirect()->route('accounts.payables.vendorPayments.index')->with('success','Payment updated successfully.');
 
         } catch (\Exception $e) {
             DB::rollBack();
