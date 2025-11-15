@@ -741,8 +741,15 @@
                         {{-- Receivables --}}
                         <li><a class="slide-item {{ request()->is('accounts/receivables') ? 'active' : '' }}"
                                 href="{{ route('accounts.receivables.index') }}">Accounts Receivable</a></li>
+
                         <li><a class="slide-item {{ request()->is('accounts/receivables/customers*') ? 'active' : '' }}"
-                                href="{{ route('accounts.receivables.customers.index') }}">Customers</a></li>
+                                href="{{ route('accounts.receivables.customers.index') }}" style="display: none;">Customers</a></li>
+
+                                {{-- Vendor Payments--}}
+                        
+                        <li><a class="slide-item {{ request()->is('accounts/payables/vendor-payments*') ? 'active' : '' }}"
+                                href="{{ route('accounts.payables.vendorPayments.index') }}">Vendor Payments</a></li>
+
                         <li><a class="slide-item {{ request()->is('accounts/receivables/invoices*') ? 'active' : '' }}"
                                 href="{{ route('accounts.receivables.invoices.index') }}">Invoices</a></li>
                         

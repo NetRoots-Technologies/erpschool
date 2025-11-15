@@ -1,5 +1,6 @@
-@extends('layouts.app')
+@extends('admin.layouts.main')
 
+@section('title', 'Print Vendor Payment Voucher')
 @section('content')
 <div class="container">
     <div class="card p-4">
@@ -19,7 +20,7 @@
         <table class="table table-borderless">
             <tr>
                 <th style="width:200px">Invoice / GRN</th>
-                <td>{{ optional($vp->invoice)->invoice_no ?? '-' }}</td>
+                <td>{{ optional($vp->invoice)->delivery_status ?? '-' }}</td>
             </tr>
             <tr>
                 <th>Invoice Amount</th>

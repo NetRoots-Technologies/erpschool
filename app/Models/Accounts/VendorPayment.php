@@ -2,6 +2,9 @@
 
 namespace App\Models\Accounts;
 
+use App\Models\PurchaseOrder;
+use App\Models\Supplier;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -29,33 +32,33 @@ class VendorPayment extends Model
         'approved_by',
     ];
 
-    // // Vendor Relation
-    // public function vendor()
-    // {
-    //     return $this->belongsTo(Vendor::class, 'vendor_id');
-    // }
+    // Vendor Relation
+    public function vendor()
+    {
+        return $this->belongsTo(Supplier::class, 'vendor_id');
+    }
 
-    // // Invoice Relation
-    // public function invoice()
-    // {
-    //     return $this->belongsTo(PurchaseInvoice::class, 'invoice_id');
-    // }
+    // Invoice Relation
+    public function invoice()
+    {
+        return $this->belongsTo(PurchaseOrder::class, 'invoice_id');
+    }
 
-    // // Bank / Cash Account Relation
+    // Bank / Cash Account Relation
     // public function account()
     // {
     //     return $this->belongsTo(Account::class, 'account_id');
     // }
 
-    // // Prepared By User
-    // public function preparedByUser()
-    // {
-    //     return $this->belongsTo(User::class, 'prepared_by');
-    // }
+    // Prepared By User
+    public function preparedByUser()
+    {
+        return $this->belongsTo(User::class, 'prepared_by');
+    }
 
-    // // Approved By User
-    // public function approvedByUser()
-    // {
-    //     return $this->belongsTo(User::class, 'approved_by');
-    // }
+    // Approved By User
+    public function approvedByUser()
+    {
+        return $this->belongsTo(User::class, 'approved_by');
+    }
 }

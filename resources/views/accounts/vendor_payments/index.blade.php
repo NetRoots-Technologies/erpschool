@@ -18,7 +18,7 @@
                 <th>Voucher No</th>
                 <th>Date</th>
                 <th>Vendor</th>
-                <th>Invoice</th>
+                <th>Invoice Status</th>
                 <th>Invoice Amt</th>
                 <th>Pending</th>
                 <th>Paid</th>
@@ -28,7 +28,7 @@
             </tr>
         </thead>
         <tbody>
-            {{-- @forelse($payments as $p)
+            @forelse($payments as $p)
                 <tr>
                     <td>{{ $p->voucher_no }}</td>
                     <td>{{ \Carbon\Carbon::parse($p->payment_date)->format('Y-m-d') }}</td>
@@ -39,7 +39,7 @@
                         {{ optional($p->vendor)->type ? '->' . $p->vendor->type : '' }}
                     </td>
 
-                    <td>{{ optional($p->invoice)->invoice_no ?? '-' }}</td>
+                    <td>{{  $p->invoice->delivery_status ?? '-' }}</td>
                     <td>{{ number_format($p->invoice_amount ?? 0,2) }}</td>
                     <td>{{ number_format($p->pending_amount ?? 0,2) }}</td>
                     <td>{{ number_format($p->payment_amount,2) }}</td>
@@ -47,10 +47,10 @@
                     <td>{{ optional($p->preparedByUser)->name ?? '-' }}</td>
 
                     <td style="white-space:nowrap">
-                        <a href="{{ route('payables.vendorPayments.edit', $p->id) }}" class="btn btn-sm btn-warning">Edit</a>
-                        <a href="{{ route('payables.vendorPayments.print', $p->id) }}" class="btn btn-sm btn-info" target="_blank">Print</a>
+                        <a href="{{ route('accounts.payables.vendorPayments.edit', $p->id) }}" class="btn btn-sm btn-warning">Edit</a>
+                        <a href="{{ route('accounts.payables.vendorPayments.print', $p->id) }}" class="btn btn-sm btn-info" target="_blank">Print</a>
 
-                        <form action="{{ route('payables.vendorPayments.delete', $p->id) }}" method="POST" style="display:inline-block" onsubmit="return confirm('Delete this payment?');">
+                        <form action="{{ route('accounts.payables.vendorPayments.delete', $p->id) }}" method="POST" style="display:inline-block" onsubmit="return confirm('Delete this payment?');">
                             @csrf
                             @method('DELETE')
                             <button class="btn btn-sm btn-danger">Delete</button>
@@ -59,10 +59,10 @@
                 </tr>
             @empty
                 <tr><td colspan="10" class="text-center">No payments found.</td></tr>
-            @endforelse --}}
+            @endforelse
         </tbody>
     </table>
 
-    {{-- {{ $payments->links() }} --}}
+    {{ $payments->links() }}
 </div>
 @endsection

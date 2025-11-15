@@ -28,7 +28,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'accounts', 'as' => 'account
         Route::delete('/{id}', [\App\Http\Controllers\Accounts\AccountGroupController::class, 'destroy'])->name('destroy');
     });
     
-    Route::prefix('chart-of-accounts')->name('coa.')->group(function () {
+        Route::prefix('chart-of-accounts')->name('coa.')->group(function () {
         Route::get('/', [\App\Http\Controllers\Accounts\ChartOfAccountsController::class, 'index'])->name('index');
         Route::get('/create', [\App\Http\Controllers\Accounts\ChartOfAccountsController::class, 'create'])->name('create');
         Route::post('/store', [\App\Http\Controllers\Accounts\ChartOfAccountsController::class, 'store'])->name('store');

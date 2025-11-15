@@ -3,17 +3,22 @@
 namespace App\Http\Controllers\Accounts;
 
 use App\Http\Controllers\Controller;
+use App\Models\Account; // optional - bank/cash accounts
+use App\Models\Accounts\AccountGroup;
+use App\Models\Accounts\AccountLedger;
+use App\Models\Accounts\JournalEntry;
+use App\Models\Accounts\JournalEntryLine;
+use App\Models\Accounts\VendorPayment;
+use App\Models\PurchaseInvoice;
+use App\Models\PurchaseOrder;
+use App\Models\Supplier;
+use App\Models\User;
+use App\Models\Vendor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
-use App\Models\Accounts\VendorPayment;
-use App\Models\Vendor;
-use App\Models\PurchaseInvoice;
-use App\Models\Account; // optional - bank/cash accounts
-use App\Models\PurchaseOrder;
-use App\Models\User;
-use App\Models\Supplier;
 
 class VendorPaymentController extends Controller
 {
@@ -27,7 +32,7 @@ class VendorPaymentController extends Controller
                     ->paginate(25);
                     // dd($payments);
 
-        return view('accounts.vendor_payments.index');
+        return view('accounts.vendor_payments.index' , compact('payments'));
     }
 
     /**
@@ -49,45 +54,24 @@ class VendorPaymentController extends Controller
     {
         $rules = [
             'payment_date' => 'required|date',
-            'vendor_id' => 'required|exists:vendors,id',
-            'invoice_id' => 'nullable|exists:purchase_invoices,id',
+            'vendor_id' => 'required|exists:suppliers,id',
+            'invoice_id' => 'nullable|exists:purchase_orders,id',
             'invoice_amount' => 'nullable|numeric|min:0',
             'pending_amount' => 'nullable|numeric|min:0',
             'payment_amount' => 'required|numeric|min:0.01',
             'payment_mode' => ['required', Rule::in(['Cash','Cheque','Bank Transfer','Other'])],
-            'account_id' => 'nullable|exists:accounts,id',
+            // 'account_id' => 'nullable|exists:accounts,id',
             'cheque_no' => 'nullable|string|required_if:payment_mode,Cheque',
             'cheque_date' => 'nullable|date|required_if:payment_mode,Cheque',
             'remarks' => 'nullable|string',
             'attachment' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
-            'prepared_by' => 'nullable|exists:users,id',
-            'approved_by' => 'nullable|exists:users,id',
+            'approved_by' => 'nullable',
         ];
 
         $validated = $request->validate($rules);
 
         DB::beginTransaction();
         try {
-            // If invoice_id provided, verify it's for the vendor and has pending balance
-            $invoice = null;
-            if (!empty($validated['invoice_id'])) {
-                $invoice = PurchaseInvoice::lockForUpdate()->findOrFail($validated['invoice_id']);
-
-                if ($invoice->vendor_id != $validated['vendor_id']) {
-                    return back()->withInput()->withErrors(['invoice_id' => 'Selected invoice does not belong to chosen vendor.']);
-                }
-
-                $pending = round($invoice->total_amount - $invoice->paid_amount, 2);
-                // if pending_amount sent, validate
-                if (isset($validated['pending_amount']) && round($validated['pending_amount'],2) !== $pending) {
-                    // not fatal: just correct it
-                    $validated['pending_amount'] = $pending;
-                }
-
-                if ($validated['payment_amount'] > $pending) {
-                    return back()->withInput()->withErrors(['payment_amount' => 'Payment amount cannot be greater than pending amount of selected invoice ('.$pending.').']);
-                }
-            }
 
             // create vendor payment
             $vp = new VendorPayment();
@@ -95,15 +79,15 @@ class VendorPaymentController extends Controller
             $vp->payment_date = $validated['payment_date'];
             $vp->vendor_id = $validated['vendor_id'];
             $vp->invoice_id = $validated['invoice_id'] ?? null;
-            $vp->invoice_amount = $validated['invoice_amount'] ?? ($invoice ? $invoice->total_amount : null);
-            $vp->pending_amount = $validated['pending_amount'] ?? ($invoice ? round($invoice->total_amount - $invoice->paid_amount,2) : null);
+            $vp->invoice_amount = $validated['invoice_amount'] ?? null;
+            $vp->pending_amount = $validated['pending_amount'] ?? null;
             $vp->payment_amount = $validated['payment_amount'];
             $vp->payment_mode = $validated['payment_mode'];
             $vp->account_id = $validated['account_id'] ?? null;
             $vp->cheque_no = $validated['cheque_no'] ?? null;
             $vp->cheque_date = $validated['cheque_date'] ?? null;
             $vp->remarks = $validated['remarks'] ?? null;
-            $vp->prepared_by = $validated['prepared_by'] ?? auth()->id();
+            $vp->prepared_by = auth()->id();
             $vp->approved_by = $validated['approved_by'] ?? null;
 
             if ($request->hasFile('attachment')) {
@@ -113,23 +97,96 @@ class VendorPaymentController extends Controller
 
             $vp->save();
 
-            // If linked to invoice -> update invoice paid_amount and status
-            if ($invoice) {
-                $apply = round($validated['payment_amount'],2);
-                $invoice->paid_amount = round($invoice->paid_amount + $apply,2);
 
-                if ($invoice->paid_amount >= $invoice->total_amount - 0.0001) {
-                    $invoice->status = 'paid';
-                } else {
-                    $invoice->status = 'partially_paid';
+            // create ledger entries
+            $supplier = Supplier::findOrFail($vp->vendor_id);
+            $vendorLedger = AccountLedger::where('linked_module', 'vendor')->where('linked_id', $supplier->id)->first();
+            $vendorGroup = AccountGroup::where('type', 'liability')->where('name', 'LIKE', '%Payable%')->first();
+            if (! $vendorLedger) {
+                    $vendorLedgerCode = $vendorLedger->code . str_pad($supplier->id, 5, '0', STR_PAD_LEFT); // e.g. 04002001000100002
+                    $vendorLedger = AccountLedger::create([
+                        'name' => $supplier->name,
+                        'code' => $vendorLedgerCode,
+                        'description' => 'Supplier payable account',
+                        'account_group_id' => $vendorGroup->id,
+                        'opening_balance' => 0,
+                        'opening_balance_type' => 'credit',
+                        'current_balance' => 0,
+                        'current_balance_type' => 'credit',
+                        'currency_id' => 1,
+                        'is_active' => true,
+                        'is_system' => false,
+                        'linked_module' => 'vendor',
+                        'linked_id' => $supplier->id,
+                        'branch_id' => $vp->branch_id ?? null,
+                        'created_by' => auth()->id(),
+                    ]);
+               }
+            // 1) Journal entry
+                $entry = JournalEntry::create([
+                'entry_number' => JournalEntry::generateNumber(),
+                'entry_date' => $validated['payment_date'] ?? now(),
+                'reference' => $vp->voucher_no,
+                'description' => 'Payment to ' . $supplier->name,
+                'status' => 'posted',
+                'entry_type' => 'payment',
+                'source_module' => 'vendor_payment',
+                'source_id' => $vp->id ?? null,
+                'branch_id' => $data['branch_id'] ?? auth()->user()->branch_id ?? null,
+                'posted_at' => now(),
+                'posted_by' => auth()->id(),
+                'created_by' => auth()->id(),
+            ]);
+
+        //  Bank Check
+            $bankGroup = AccountGroup::where('type', 'asset')->where('name', 'LIKE', '%MCB%')->first();
+            if(AccountLedger::where('account_group_id', $bankGroup->id)->count() == 0){
+                $bankLedger = AccountLedger::create([
+                    'name' => $bankGroup->name . ' - Main Account', // e.g. "MCB - Bank - Main Account"
+                    'code' => 'AST-' . str_pad($bankGroup->id, 4, '0', STR_PAD_LEFT),
+                    'description' => 'Auto-created bank ledger for ' . $bankGroup->name,
+                    'account_group_id' => $bankGroup->id,
+                    'opening_balance' => 0,
+                    'opening_balance_type' => 'debit', // bank is an asset (debit normal)
+                    'current_balance' => 0,
+                    'current_balance_type' => 'debit',
+                    'currency_id' => 1,
+                    'is_active' => true,
+                    'is_system' => false,
+                    'linked_module' => 'bank',
+                    'linked_id' => null,
+                    'branch_id' => $vp->branch_id ?? null,
+                    'created_by' => auth()->id(),
+                ]);
                 }
 
-                $invoice->save();
-            }
+            $bankAccount = AccountLedger::where('account_group_id', $bankGroup->id)->first();
+            
 
+                
+    // 6) Journal lines - make sure Debits = Credits
+    // Debit Vendor ledger (reduces liability)
+                JournalEntryLine::create([
+                    'journal_entry_id' => $entry->id,
+                    'account_ledger_id' => $vendorLedger->id,
+                    'description' => 'Payment to supplier: ' . $supplier->name,
+                    'debit' => $validated['payment_amount'],
+                    'credit' => 0,
+                    'reference' => $vp->voucher_no,
+                ]);
+
+                // Credit Bank ledger (reduces bank asset)
+                JournalEntryLine::create([
+                    'journal_entry_id' => $entry->id,
+                    'account_ledger_id' =>  $bankAccount->id,
+                    'description' => 'MCB - Payment made for voucher: ' . $vp->voucher_no,
+                    'debit' => 0,
+                    'credit' => $validated['payment_amount'],
+                    'reference' => $vp->voucher_no,
+                ]);
             DB::commit();
 
-            return redirect()->route('payables.vendorPayments.index')
+            return redirect()->route('accounts.payables.vendorPayments.index')
                              ->with('success', 'Payment saved successfully. Voucher: '.$vp->voucher_no);
 
         } catch (\Exception $e) {
@@ -144,12 +201,12 @@ class VendorPaymentController extends Controller
      */
     public function edit($id)
     {
-        $vp = VendorPayment::findOrFail($id);
-        $vendors = Vendor::orderBy('name')->get();
-        $accounts = Account::orderBy('name')->get();
+         $vendors = Supplier::orderBy('name')->get();
+        // $accounts = Account::orderBy('name')->get(); // optional - if you have accounts table
         $users = User::orderBy('name')->get();
+        $vp = VendorPayment::with('vendor' , 'invoice', 'preparedByUser', 'approvedByUser')->findOrFail($id);
 
-        return view('accounts.vendor_payments.edit', compact('vp','vendors','accounts','users'));
+        return view('accounts.vendor_payments.edit', compact('vp','vendors','users'));
     }
 
     /**

@@ -163,6 +163,7 @@ class PurchaseOrderController extends Controller
                     'purchase_amount' => $data->total_amount,
                     'purchase_date' => $data->order_date,
                     'reference' => 'PO-' . $data->id . ' - ' . ($supplier->name ?? 'Supplier'),
+                    'type' => $type
                 ]);
             } catch (\Exception $e) {
                 \Log::warning('Purchase order accounts integration failed: ' . $e->getMessage());

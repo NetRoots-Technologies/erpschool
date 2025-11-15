@@ -1,4 +1,6 @@
-@extends('layouts.app')
+@extends('admin.layouts.main')
+
+@section('title', 'Edit Vendor Payment')
 
 @section('content')
 <div class="container">
@@ -10,7 +12,7 @@
       </div>
     @endif
 
-    <form action="{{ route('payables.vendorPayments.update', $vp->id) }}" method="POST" enctype="multipart/form-data" id="editPaymentForm">
+    <form action="{{ route('accounts.payables.vendorPayments.update', $vp->id) }}" method="POST" enctype="multipart/form-data" id="editPaymentForm">
       @csrf
       @method('PUT')
 
@@ -41,7 +43,7 @@
         </div>
       </div>
 
-      <div class="row g-2 mt-2">
+      {{-- <div class="row g-2 mt-2">
         <div class="col-md-4">
           <label class="form-label">Invoice / GRN (optional)</label>
           <select name="invoice_id" id="invoiceSelect" class="form-select">
@@ -52,7 +54,9 @@
                   "invoice_no"=>$vp->invoice->invoice_no,
                   "total_amount"=>$vp->invoice->total_amount,
                   "pending_amount"=>($vp->invoice->total_amount - $vp->invoice->paid_amount)
-              ])'>{{ $vp->invoice->invoice_no }} | Pending: {{ number_format($vp->invoice->total_amount - $vp->invoice->paid_amount,2) }}</option>
+              ])'>
+              
+              {{ $vp->invoice->invoice_no }} | Pending: {{ number_format($vp->invoice->total_amount - $vp->invoice->paid_amount,2) }}</option>
             @endif
           </select>
         </div>
@@ -73,18 +77,14 @@
           <label class="form-label">Payment Amount</label>
           <input type="number" name="payment_amount" step="0.01" id="payment_amount" class="form-control" value="{{ old('payment_amount', $vp->payment_amount) }}" required>
         </div>
-      </div>
+      </div> --}}
 
       <div class="row g-2 mt-2">
         <div class="col-md-4">
           <label class="form-label">Bank / Cash Account</label>
           <select name="account_id" class="form-select">
-            <option value="">-- Select Account (optional) --</option>
-            @if(isset($accounts))
-              @foreach($accounts as $acc)
-                <option value="{{ $acc->id }}" {{ (old('account_id', $vp->account_id) == $acc->id) ? 'selected' : '' }}>{{ $acc->name }}</option>
-              @endforeach
-            @endif
+            <option value="">-- Select Account--</option>
+            
           </select>
         </div>
 
@@ -140,7 +140,7 @@
 
       <div class="mt-3">
         <button class="btn btn-success">Update Payment</button>
-        <a href="{{ route('payables.vendorPayments.index') }}" class="btn btn-secondary">Cancel</a>
+        <a href="{{ route('accounts.payables.vendorPayments.index') }}" class="btn btn-secondary">Cancel</a>
       </div>
     </form>
 </div>

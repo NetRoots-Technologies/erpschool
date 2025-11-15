@@ -122,10 +122,11 @@ class IntegrationController extends Controller
             'purchase_amount' => 'required|numeric',
             'purchase_date' => 'required|date',
             'reference' => 'required|string',
+            'type' => 'required|string',
         ]);
 
-        // DB::beginTransaction();
-        // try {
+        DB::beginTransaction();
+        try {
             // Get or create ledgers
             $inventoryLedger = AccountLedger::where('name', 'LIKE', '%Inventory%')
                 ->whereHas('accountGroup', function($q) {
@@ -135,10 +136,10 @@ class IntegrationController extends Controller
             
             if (!$inventoryLedger) {
                 $inventoryLedger = AccountLedger::create([
-                    'name' => 'Inventory',
+                    'name' => 'Inventory' .  $request->type,
                     'code' => 'AST-INV-001',
                     'description' => 'Inventory and stock items',
-                    'account_group_id' => 2, // Current Assets
+                    'account_group_id' => 17, // Current Assets
                     'opening_balance' => 0,
                     'opening_balance_type' => 'debit',
                     'current_balance' => 0,
@@ -166,7 +167,7 @@ class IntegrationController extends Controller
                         'name' => 'Accounts Payable',
                         'code' => 'LIA-PAY-001',
                         'description' => 'Amounts owed to suppliers and vendors',
-                        'account_group_id' => 7, // Accounts Payable
+                        'account_group_id' => 647, // Accounts Payable
                         'opening_balance' => 0,
                         'opening_balance_type' => 'credit',
                         'current_balance' => 0,
@@ -213,12 +214,12 @@ class IntegrationController extends Controller
             $inventoryLedger->updateBalance($request->purchase_amount, 0);
             $payableLedger->updateBalance(0, $request->purchase_amount);
 
-            // DB::commit();
+            DB::commit();
             return response()->json(['success' => true, 'entry_id' => $entry->id]);
-        // } catch (\Exception $e) {
-        //     DB::rollBack();
-        //     return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
-        // }
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
     }
 
     /**

@@ -63,7 +63,7 @@ class BillController extends Controller
                     'name' => 'Vendor - ' . $bill->vendor->name,
                     'code' => 'VEN-' . $bill->vendor->id . '-' . time(),
                     'description' => 'Vendor payable account',
-                    'account_group_id' => 7, // Accounts Payable
+                    'account_group_id' => 647, // Accounts Payable
                     'opening_balance' => 0,
                     'opening_balance_type' => 'credit',
                     'current_balance' => 0,
