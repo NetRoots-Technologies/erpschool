@@ -70,6 +70,7 @@ class SupplierController extends Controller
             'address' => 'required',
             'email' => 'required|email',
             'ntn_number' => 'required|string|max:50',
+            'tax_percentage' => 'nullable|numeric|min:0|max:100',
                 ]);
 
 
@@ -82,6 +83,7 @@ class SupplierController extends Controller
             $supplier->address = $request->address;
             $supplier->email = $request->email;
             $supplier->ntn_number = $request->ntn_number;
+            $supplier->tax_percentage = $request->tax_percentage ?? 0;  
             $supplier->type = $this->type[$request->type];
             // $supplier->type == 'F' ? $group_id = $fixedGroup['Food'] : $group_id = $fixedGroup['Stationary'];
             if ($request->type == 'food') {
