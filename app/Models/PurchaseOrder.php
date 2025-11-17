@@ -19,6 +19,7 @@ class PurchaseOrder extends Model
         'order_date',
         'delivery_date',
         'total_amount',
+        'paid_amount',
         'delivery_status',
         'type',
         'id',

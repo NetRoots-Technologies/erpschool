@@ -89,7 +89,7 @@
                    <div class="row g-3 mb-3">
                     <div class="col-md-4">
                         <label>Tax (%)</label>
-                        <input type="number" id="tax_percentage" class="form-control form-control-lg" value="0">
+                        <input type="number" id="tax_percentage" name="tax_percentage" class="form-control form-control-lg" value="0">
                     </div>
                     <div class="col-md-4">
                         <label>Tax Amount</label>
@@ -224,9 +224,9 @@
                     .then(data => {
                         let html = '<option value="">-- Select Invoice --</option>';
                         data.forEach(inv => {
-                            html +=
-                                `<option value="${inv.id}" data-inv='${JSON.stringify(inv)}'>${inv.delivery_status} | Pending: ${parseFloat(inv.total_amount).toFixed(2)}</option>`;
-                        });
+                             const invJson = JSON.stringify(inv).replace(/'/g, "&apos;"); // safe single-quote escape
+                                html += `<option value="${inv.id}" data-inv='${invJson}'>${inv.delivery_status} | Pending: ${parseFloat(inv.pending_amount).toFixed(2)}</option>`;
+                            });
                         invoiceSelect.innerHTML = html;
                     })
                     .catch(err => invoiceSelect.innerHTML = '<option value="">Failed to load</option>');
