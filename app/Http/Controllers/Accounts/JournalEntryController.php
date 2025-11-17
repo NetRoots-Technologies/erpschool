@@ -57,7 +57,7 @@ class JournalEntryController extends Controller
                 'reference' => $request->reference,
                 'description' => $request->description,
                 'status' => 'draft',
-                'entry_type' => $request->entry_type ?? 'journal',
+                'entry_type' => $request->entry_type ?? 'journal_voucher',
                 'branch_id' => auth()->user()->branch_id,
                 'created_by' => auth()->id(),
             ]);

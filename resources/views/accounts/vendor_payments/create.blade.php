@@ -277,15 +277,15 @@
 
 
        $("#payment_amount, #tax_percentage").on("keyup change", function() {
-    let payment = parseFloat($("#payment_amount").val()) || 0;
-    let taxPerc = parseFloat($("#tax_percentage").val()) || 0;
+            let payment = parseFloat($("#payment_amount").val()) || 0;
+            let taxPerc = parseFloat($("#tax_percentage").val()) || 0;
 
-    let taxAmount = (payment * taxPerc) / 100;
-    let finalAmount = payment - taxAmount;
+            let taxAmount = (payment * taxPerc) / 100;
+            let finalAmount = payment - taxAmount;
 
-    $("#tax_amount").val(taxAmount.toFixed(2));
-    $("#final_payment").val(finalAmount.toFixed(2));
-});
+            $("#tax_amount").val(taxAmount.toFixed(2));
+            $("#final_payment").val(finalAmount.toFixed(2));
+        });
     </script>
 
 

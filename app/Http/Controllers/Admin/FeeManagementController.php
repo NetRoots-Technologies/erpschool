@@ -39,7 +39,7 @@ use Yajra\DataTables\Facades\DataTables;
 class FeeManagementController extends Controller
 {
     protected $ledgerservice;
-    public function __construct( LedgerService $ledgerservice)
+    public function __construct(LedgerService $ledgerservice)
     {
         $this->middleware('auth');
         $this->ledgerservice = $ledgerservice;
@@ -752,7 +752,7 @@ class FeeManagementController extends Controller
 
     public function storeCollection(Request $request)
     {
-        
+
         if (!Gate::allows('fee-collections-create')) {
             abort(403, 'Unauthorized access');
         }
@@ -1556,7 +1556,7 @@ class FeeManagementController extends Controller
 
                 // Create Students Ledger record using servies
 
-                  $this->ledgerservice->generateMonthlyForStudents($student, $billDate , $dueDate , $challanNumber , $billing , $totalAmount);
+                $this->ledgerservice->generateMonthlyForStudents($student, $billDate, $dueDate, $challanNumber, $billing, $totalAmount);
 
                 $billingCount++;
             }
@@ -1816,14 +1816,14 @@ class FeeManagementController extends Controller
             'paid_amount' => 'required|numeric|min:0.01',
             'remarks' => 'nullable|string|max:255'
         ]);
-        
+
         try {
             DB::beginTransaction();
 
             // Get the challan
             $challan = FeeBilling::findOrFail($request->challan_id);
-            
-            
+
+
             // Validate payment amount
             $finalAmount = $challan->getFinalAmount();
             $currentPaidAmount = $challan->paid_amount ?? 0;
@@ -1866,40 +1866,40 @@ class FeeManagementController extends Controller
             $challan->fine_amount = $request->fine_amount ?? 0;
             $challan->save();
 
-             // Create A collection
-                $invoice = CustomerInvoice::where('id', $challan->customer_invoice_id)
-                    ->where('student_id', $request->student_id)
-                    ->lockForUpdate()
-                    ->first();
+            // Create A collection
+            $invoice = CustomerInvoice::where('id', $challan->customer_invoice_id)
+                ->where('student_id', $request->student_id)
+                ->lockForUpdate()
+                ->first();
 
-                    if ($invoice) {
-                        $receivedOld = (float) ($invoice->received_amount ?? 0);
-                        $paidNow     = (float) ($request->paid_amount ?? 0);
-                        $receivedNew = $receivedOld + $paidNow;
+            if ($invoice) {
+                $receivedOld = (float) ($invoice->received_amount ?? 0);
+                $paidNow     = (float) ($request->paid_amount ?? 0);
+                $receivedNew = $receivedOld + $paidNow;
 
-                        // Recalculate balance
-                        $balance = (float) $invoice->total_amount - $receivedNew;
+                // Recalculate balance
+                $balance = (float) $invoice->total_amount - $receivedNew;
 
-                        // Select exact correct status
-                        if ($balance <= 0.00) {
-                            $status = 'paid';
-                            $balance = 0; // no negative
-                        } elseif ($receivedNew > 0 && $balance > 0) {
-                            $status = 'partially_paid';
-                        } else {
-                            $status = 'sent'; // agar pehle hi sent tha aur kuch pay nahi hua
-                        }
-                        $invoice->update([
-                            'received_amount' => $receivedNew,
-                            'balance'         => $balance,
-                            'status'          => $status,
-                        ]);
-                    }
-                
+                // Select exact correct status
+                if ($balance <= 0.00) {
+                    $status = 'paid';
+                    $balance = 0; // no negative
+                } elseif ($receivedNew > 0 && $balance > 0) {
+                    $status = 'partially_paid';
+                } else {
+                    $status = 'sent'; // agar pehle hi sent tha aur kuch pay nahi hua
+                }
+                $invoice->update([
+                    'received_amount' => $receivedNew,
+                    'balance'         => $balance,
+                    'status'          => $status,
+                ]);
+            }
+
             DB::table('payment_allocations')->insert([
                 'journal_entry_id' => null,
                 'customer_invoice_id' => $challan->customer_invoice_id ?? null,
-                'student_id' =>$collection->student_id,
+                'student_id' => $collection->student_id,
                 'amount' => $collection->paid_amount,
                 'created_at' => now(),
                 'updated_at' => now(),

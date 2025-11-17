@@ -70,7 +70,7 @@ class IntegrationController extends Controller
                 'reference' => $request->reference,
                 'description' => 'Salary payment for employee ID: ' . $request->employee_id,
                 'status' => 'posted',
-                'entry_type' => 'payment',
+                'entry_type' => 'bank_receipt_voucher',
                 'source_module' => 'hr_salary',
                 'source_id' => $request->employee_id,
                 'branch_id' => auth()->user()->branch_id ?? null,
@@ -185,7 +185,7 @@ class IntegrationController extends Controller
                 'reference' => $request->reference,
                 'description' => 'Inventory purchase from vendor ID: ' . $request->vendor_id,
                 'status' => 'posted',
-                'entry_type' => 'journal',
+                'entry_type' => 'journal_voucher',
                 'source_module' => 'inventory_purchase',
                 'source_id' => $request->vendor_id,
                 'branch_id' => auth()->user()->branch_id ?? null,
@@ -250,7 +250,7 @@ class IntegrationController extends Controller
                     'name' => 'Cash Account',
                     'code' => 'AST-CASH-001',
                     'description' => 'Cash in hand',
-                    'account_group_id' => 2, // Current Assets
+                    'account_group_id' => 17, // Current Assets
                     'opening_balance' => 0,
                     'opening_balance_type' => 'debit',
                     'current_balance' => 0,
@@ -276,7 +276,7 @@ class IntegrationController extends Controller
                     'name' => 'Fee Revenue',
                     'code' => 'REV-FEE-' . time(),
                     'description' => 'Student fees and tuition revenue',
-                    'account_group_id' => 12, // Revenue
+                    'account_group_id' => 85, // Revenue
                     'opening_balance' => 0,
                     'opening_balance_type' => 'credit',
                     'current_balance' => 0,
@@ -300,7 +300,7 @@ class IntegrationController extends Controller
                 'reference' => $request->reference,
                 'description' => 'Fee collection from student ID: ' . $request->student_id,
                 'status' => 'posted',
-                'entry_type' => 'receipt',
+                'entry_type' => 'bank_receipt_voucher',
                 'source_module' => 'academic_fee',
                 'source_id' => $request->student_id,
                 'branch_id' => auth()->user()->branch_id ?? null,
@@ -386,7 +386,7 @@ class IntegrationController extends Controller
                     'name' => 'Transport Expense',
                     'code' => 'EXP-TRAN-' . time(),
                     'description' => 'Vehicle fuel and maintenance expenses',
-                    'account_group_id' => 21, // Transport Expense
+                    'account_group_id' => 119, // Transport Expense
                     'opening_balance' => 0,
                     'opening_balance_type' => 'debit',
                     'current_balance' => 0,
@@ -407,7 +407,7 @@ class IntegrationController extends Controller
                     'name' => 'Cash Account',
                     'code' => 'AST-CASH-' . time(),
                     'description' => 'Cash in hand',
-                    'account_group_id' => 2, // Current Assets
+                    'account_group_id' => 17, // Current Assets
                     'opening_balance' => 0,
                     'opening_balance_type' => 'debit',
                     'current_balance' => 0,
@@ -428,7 +428,7 @@ class IntegrationController extends Controller
                 'reference' => $request->reference,
                 'description' => 'Fleet ' . $request->expense_type . ' for vehicle ID: ' . $request->vehicle_id,
                 'status' => 'posted',
-                'entry_type' => 'payment',
+                'entry_type' => 'bank_payment_voucher',
                 'source_module' => 'fleet_expense',
                 'source_id' => $request->vehicle_id,
                 'branch_id' => auth()->user()->branch_id ?? null,

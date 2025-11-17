@@ -381,7 +381,7 @@ class PurchaseOrderController extends Controller
                         'name' => 'Supplier - ' . ($supplier->name ?? 'Unknown'),
                         'code' => 'SUP-' . $purchaseOrder->supplier_id . '-' . time(),
                         'description' => 'Supplier payable account',
-                        'account_group_id' => 7, // Accounts Payable
+                        'account_group_id' => 647, // Accounts Payable
                         'opening_balance' => 0,
                         'opening_balance_type' => 'credit',
                         'current_balance' => 0,
@@ -410,7 +410,7 @@ class PurchaseOrderController extends Controller
                         'name' => 'Inventory',
                         'code' => 'AST-INV-' . time(),
                         'description' => 'Inventory and stock items',
-                        'account_group_id' => 2, // Current Assets
+                        'account_group_id' => 17, // Current Assets
                         'opening_balance' => 0,
                         'opening_balance_type' => 'debit',
                         'current_balance' => 0,
@@ -518,7 +518,7 @@ class PurchaseOrderController extends Controller
                         'name' => 'Supplier - ' . ($supplier->name ?? 'Unknown'),
                         'code' => 'SUP-' . $purchaseOrder->supplier_id . '-' . time(),
                         'description' => 'Supplier payable account',
-                        'account_group_id' => 7, // Accounts Payable
+                        'account_group_id' => 647, // Accounts Payable
                         'opening_balance' => 0,
                         'opening_balance_type' => 'credit',
                         'current_balance' => 0,
@@ -547,7 +547,7 @@ class PurchaseOrderController extends Controller
                         'name' => 'Inventory',
                         'code' => 'AST-INV-' . time(),
                         'description' => 'Inventory and stock items',
-                        'account_group_id' => 2, // Current Assets
+                        'account_group_id' => 17, // Current Assets
                         'opening_balance' => 0,
                         'opening_balance_type' => 'debit',
                         'current_balance' => 0,
