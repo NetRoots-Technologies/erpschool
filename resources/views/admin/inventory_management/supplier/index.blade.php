@@ -64,12 +64,12 @@
                             <input type="text" class="form-control" id="ntn_number" name="ntn_number"
                                 placeholder="Enter NTN Number" maxlength="50">
                         </div>
-
+{{-- 
                          <div class="col-md-4 mb-3">
                             <label for="tax_percentage" class="form-label">Tax Percentage</label>
                             <input type="text" class="form-control" id="tax_percentage" name="tax_percentage"
                                 placeholder="Enter Tax Percentage">
-                        </div>
+                        </div> --}}
 
                         <div class="col-md-4 mb-3">
                             <label for="branches" class="form-label">Supplier Branch</label>
