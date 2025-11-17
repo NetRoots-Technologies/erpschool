@@ -328,9 +328,9 @@ return [
             // "SS" => [32, 33],
 
             // only live
-            "EOBI" => [25, 26],
-            "PF" => [28, 29],
-            "SS" => [31, 32],
+            "EOBI" => [652, 653],
+            "PF" => [655, 656],
+            "SS" => [658, 679],
             
             "EOBI_Contribution_Monthly_Payments" => 112,
             "EOBI_Payable_Monthly_Payments" => 113,

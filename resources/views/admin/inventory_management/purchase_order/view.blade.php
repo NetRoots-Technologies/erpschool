@@ -201,6 +201,8 @@
                             @php
                                 $check = $order->quantity - $order->received_quantity;
                             @endphp
+
+                            @if ($check != 0)
                                 <tr>
                                     <td>{{ $order->item->name }}</td>
                                     <td>{{ $check }}</td>
@@ -209,6 +211,8 @@
                                     <td><input type="text" name="total_price" value="0.00" class="total-price"
                                             readonly></td>
                                 </tr>
+                            @endif
+                                
                             @endforeach
                         </tbody>
                     </table>

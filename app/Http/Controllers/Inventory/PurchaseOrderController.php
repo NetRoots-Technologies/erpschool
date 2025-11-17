@@ -52,14 +52,9 @@ class PurchaseOrderController extends Controller
                                             'uniform' => 'U',
                                             default => 'S',
                                         };
-        $branches = Branches::active()
-            ->with([
-                // 'suppliers' => function ($query) use ($mappedType) {
-            //         $query->where('type', $mappedType);
-            //     },
-            //     'suppliers.items:id,name'
-            // ])
-            'suppliers' => fn($q) => $q->where('type', $mappedType),
+        $branches = Branches::active()->with([
+            'suppliers' => fn($q) => 
+            $q->where('type', $mappedType),
             'suppliers.items:id,name'
         ])
             ->select(['id', 'name'])
@@ -85,7 +80,7 @@ class PurchaseOrderController extends Controller
         $cash_in_hand = config('constants.FixedGroups.cash_in_hands');
 
         $purchase_order = PurchaseOrder::with(['purchaseOrderItems', 'items', 'branch', 'supplier'])->find($id);
-
+        // dd($purchase_order);
         $currentStatus = $purchase_order->delivery_status;
 
         // Using new accounts system - get cash and bank ledgers

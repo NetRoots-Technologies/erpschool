@@ -494,7 +494,7 @@ class VendorPaymentController extends Controller
     {
 
         // dd( $request->all(), $id);
-        $vp = VendorPayment::findOrFail($id);
+       
 
         $rules = [
             'payment_date' => 'required|date',
@@ -545,13 +545,15 @@ class VendorPaymentController extends Controller
             // update vendor payment
 
             $originalPrice = $validated['payment_amount']; 
-            $discountPercentage = $request->input('tax_amount'); 
+            $discountPercentage = $request->input('tax_percentage'); 
             $discountAmount = ($originalPrice * $discountPercentage) / 100;
             $finalPrice = $originalPrice - $discountAmount;
-            $finalPrice = $originalPrice * (1 - ($discountPercentage / 100));
             $finalPrice = number_format($finalPrice, 2);
+            $finalPrice = str_replace(',', '', $finalPrice);
+            $finalPrice = (float) $finalPrice;
+            $finalPriceInt = (int) $finalPrice;
 
-
+             $vp = VendorPayment::findOrFail($id);
             $vp->voucher_no = $this->generateVoucherNo();
             $vp->payment_date = $validated['payment_date'];
             $vp->vendor_id = $validated['vendor_id'];
@@ -560,21 +562,15 @@ class VendorPaymentController extends Controller
             $vp->pending_amount = $request->pending_amount ?? null;
             $vp->payment_amount = $request->payment_amount;
             $vp->payment_mode = $request->payment_mode;
-            $vp->account_id = $validated['account_id'] ?? null;
+            // $vp->account_id = $validated['account_id'] ?? null;
             $vp->cheque_no = $validated['cheque_no'] ?? null;
             $vp->cheque_date = $validated['cheque_date'] ?? null;
             $vp->remarks = $validated['remarks'] ?? null;
             $vp->prepared_by = auth()->id();
             $vp->approved_by = $validated['approved_by'] ?? null;
-            $vp->tax_amount = $request->tax_amount ?? null;
+            $vp->tax_amount = $discountPercentage ?? null;
 
-            if ($request->hasFile('attachment')) {
-                $path = $request->file('attachment')->store('vendor_payments', 'public');
-                $vp->attachment = $path;
-            }
-
-            $vp->save();
-
+            
             if ($request->hasFile('attachment')) {
                 // delete old file
                 if ($vp->attachment && Storage::disk('public')->exists($vp->attachment)) {
@@ -587,16 +583,10 @@ class VendorPaymentController extends Controller
             $vp->save();
 
             // Apply to new invoice if exists
-            // if ($newInvoice) {
-            //     $apply = round($validated['payment_amount'],2);
-            //     $newInvoice->paid_amount = round($newInvoice->paid_amount + $apply,2);
-            //     if ($newInvoice->paid_amount >= $newInvoice->total_amount - 0.0001) {
-            //         $newInvoice->status = 'paid';
-            //     } else {
-            //         $newInvoice->status = 'partially_paid';
-            //     }
-            //     $newInvoice->save();
-            // }
+             // Update Paid Amount in Purchase Orders
+            $po = PurchaseOrder::where('id', $vp->invoice_id)->first();
+            $po->paid_amount += $vp->payment_amount;
+            $po->save();
 
             DB::commit();
 

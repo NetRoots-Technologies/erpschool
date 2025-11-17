@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
         $this->call(DepartmentSeeder::class);
         $this->call(DesignationSeeder::class);
         $this->call(AccountGroupSeeder::class);
+        $this->call(Level5WithLedgersSeeder::class);
         $this->call(GeneralSettingSeeder::class);
         $this->call(StatutoryGroupsSeeder::class);
        

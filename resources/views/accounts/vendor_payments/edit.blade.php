@@ -105,6 +105,21 @@
                                 required>
                         </div>
                     </div>
+                     {{-- Tax Amount Percentage --}}
+                   <div class="row g-3 mb-3">
+                    <div class="col-md-4">
+                        <label>Tax (%)</label>
+                        <input type="number" id="tax_percentage" name="tax_percentage" class="form-control form-control-lg" value="{{ $vp->tax_amount }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label>Tax Amount</label>
+                        <input type="text" id="tax_amount" name="tax_amount" class="form-control form-control-lg" readonly>
+                    </div>
+                    <div class="col-md-4">
+                        <label>Final Amount</label>
+                        <input type="text" id="final_payment" name="final_payment" class="form-control form-control-lg" readonly>
+                    </div>
+                </div>
 
                     <!-- Bank / Cheque Info -->
                     <h5 class="mb-3 text-primary">Bank / Cheque Info</h5>
@@ -112,21 +127,20 @@
                         <div class="col-md-4">
                             <label class="form-label fw-semibold">Bank / Cash Account</label>
                             <select name="account_id" id="bankSelect" class="form-select form-select-lg">
-                                <option value="">-- Select Bank --</option>
+                                {{-- <option value="">-- Select Bank --</option> --}}
 
                                 {{-- show current selected account as first option --}}
-                                @if($vp->account_id)
+                                {{-- @if($vp->account_id)
                                     @php
                                         $currentBank = \App\Models\AccountLedger::find($vp->account_id);
                                     @endphp
                                     @if($currentBank)
                                         <option value="{{ $currentBank->id }}" selected>{{ $currentBank->name }}</option>
                                     @endif
-                                @endif
+                                @endif --}}
 
                                 <!-- Static option fallback -->
-                                <option value="1" {{ (old('account_id', $vp->account_id) == 1) ? 'selected' : '' }}>MCB
-                                    Bank</option>
+                                <option value="1" {{ $vp->account_id == 1 ? 'selected' : '' }}>MCB Bank</option>
                             </select>
                         </div>
 
@@ -216,9 +230,9 @@
                     .then(data => {
                         let html = '<option value="">-- Select Invoice --</option>';
                         data.forEach(inv => {
-                            html +=
-                                `<option value="${inv.id}" data-inv='${JSON.stringify(inv)}'>${inv.delivery_status} | Pending: ${parseFloat(inv.pending_amount).toFixed(2)}</option>`;
-                        });
+                             const invJson = JSON.stringify(inv).replace(/'/g, "&apos;"); // safe single-quote escape
+                                html += `<option value="${inv.id}" data-inv='${invJson}'>${inv.delivery_status} | Pending: ${parseFloat(inv.pending_amount).toFixed(2)}</option>`;
+                            });
                         invoiceSelect.innerHTML = html;
                     })
                     .catch(err => invoiceSelect.innerHTML = '<option value="">Failed to load</option>');
@@ -239,14 +253,6 @@
                 }
             });
 
-            // initial trigger: if we have a selected invoice option, trigger change to set values
-            const preselectedOpt = invoiceSelect.options[invoiceSelect.selectedIndex];
-            if (preselectedOpt && preselectedOpt.dataset && preselectedOpt.dataset.inv) {
-                const inv = JSON.parse(preselectedOpt.dataset.inv);
-                invoiceAmount.value = parseFloat(inv.total_amount).toFixed(2);
-                pendingAmount.value = parseFloat(inv.pending_amount).toFixed(2);
-            }
-
             paymentMode?.addEventListener('change', function() {
                 if (this.value === 'Cheque') {
                     chequeNo.required = true;
@@ -259,6 +265,7 @@
         });
     </script>
 @endsection
+
 
 @section('js')
     <script>
@@ -273,5 +280,20 @@
 
             $("#pending_amount").val((invoice - payment).toFixed(2));
         });
+
+
+       $("#payment_amount, #tax_percentage").on("keyup change", function() {
+    let payment = parseFloat($("#payment_amount").val()) || 0;
+    let taxPerc = parseFloat($("#tax_percentage").val()) || 0;
+
+    let taxAmount = (payment * taxPerc) / 100;
+    let finalAmount = payment - taxAmount;
+
+    $("#tax_amount").val(taxAmount.toFixed(2));
+    $("#final_payment").val(finalAmount.toFixed(2));
+});
     </script>
+
+
+
 @endsection
