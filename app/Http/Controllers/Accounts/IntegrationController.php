@@ -243,14 +243,15 @@ class IntegrationController extends Controller
         try {
             // Get or create ledgers
             \Log::info("Searching for Cash ledger...");
-            $cashLedger = AccountLedger::where('name', 'LIKE', '%Cash%')->first();
+            $cashLedger = AccountLedger::where('name', 'LIKE', '%MCB%')->first();
+            
             if (!$cashLedger) {
                 \Log::info("Cash ledger not found, creating new one...");
                 $cashLedger = AccountLedger::create([
-                    'name' => 'Cash Account',
-                    'code' => 'AST-CASH-001',
-                    'description' => 'Cash in hand',
-                    'account_group_id' => 17, // Current Assets
+                    'name' => 'MCB - Bank - Main Account',
+                    'code' => 'AST-' . str_pad($cashLedger->id, 4, '0', STR_PAD_LEFT),
+                    'description' => 'Auto-created bank ledger for MCB - Bank',
+                    'account_group_id' => 22, // Bank MCB Assets
                     'opening_balance' => 0,
                     'opening_balance_type' => 'debit',
                     'current_balance' => 0,

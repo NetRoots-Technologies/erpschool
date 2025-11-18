@@ -34,7 +34,7 @@
 
                         <div class="col-md-4">
                             <label class="form-label fw-semibold">Vendor</label>
-                            <select name="vendor_id" id="vendorSelect" class="form-select form-select-lg" required>
+                            <select name="vendor_id" id="vendorSelect" class="form-select form-select-lg select2" required>
                                 <option value="" selected>-- Select Vendor --</option>
                                 @foreach ($vendors as $v)
                                     <option value="{{ $v->id }}">{{ $v->name }}</option>
@@ -151,6 +151,23 @@
                             <input type="file" name="attachment" class="form-control form-control-lg">
                         </div>
                     </div>
+                    {{-- Withholding Tax Payable --}}
+                    <h5 class="mb-3 text-primary"></i>Withholding Tax Payable</h5>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-12">
+                            <select name="wht_group_code" id="wht_group_code" class="form-select form-select-lg" required>
+                                <option value="" selected>-- Select Withholding Tax Payable --</option>
+                                <option value="040020050001">040020050001 - WHT Payable Supplies</option>
+                                <option value="040020050002">040020050002 - WHT Payable Services</option>
+                                <option value="040020050003">040020050003 - WHT Payable Rent</option>
+                                <option value="040020050004">040020050004 - WHT Payable Salaries</option>
+                                <option value="040020050005">040020050005 - WHT Payable Construction Contracts</option>
+                                <option value="040020050006">040020050006 - With Holding Tax on Fee</option>
+                                <option value="040020050007">040020050007 - SALES TAX - PRA</option>
+                            </select>
+                        </div>
+                    </div>
+
 
 
                     <!-- Remarks / Prepared & Approved By -->
@@ -197,6 +214,8 @@
     </div>
 
     <script>
+
+          
         document.addEventListener('DOMContentLoaded', function() {
             const vendorSelect = document.getElementById('vendorSelect');
             const invoiceSelect = document.getElementById('invoiceSelect');
@@ -207,7 +226,8 @@
             const chequeNo = document.getElementById('cheque_no');
             const chequeDate = document.getElementById('cheque_date');
 
-            vendorSelect?.addEventListener('change', function() {
+           
+            $('#vendorSelect').on('change', function() {
                 const vid = this.value;
                 invoiceSelect.innerHTML = '<option>Loading...</option>';
                 invoiceAmount.value = '';

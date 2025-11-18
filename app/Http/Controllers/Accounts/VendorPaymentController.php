@@ -269,7 +269,7 @@ class VendorPaymentController extends Controller
             'payment_amount' => 'required|numeric|min:0.01',
             'payment_mode' => ['required', Rule::in(['Cash','Cheque','Bank Transfer','Other'])],
             // 'account_id' => 'nullable|exists:accounts,id',
-            'cheque_no' => 'nullable|string|required_if:payment_mode,Cheque',
+            'cheque_no' => 'required|string|required_if:payment_mode,Cheque',
             'cheque_date' => 'nullable|date|required_if:payment_mode,Cheque',
             'remarks' => 'nullable|string',
             'attachment' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
@@ -281,7 +281,8 @@ class VendorPaymentController extends Controller
         DB::beginTransaction();
         try {
     
-    
+            
+           
             // Tax AMount Percentage
             $originalPrice = $validated['payment_amount']; 
             $discountPercentage = $request->input('tax_percentage'); 
@@ -385,45 +386,57 @@ class VendorPaymentController extends Controller
                 }
 
             $bankAccount = AccountLedger::where('account_group_id', $bankGroup->id)->first();
-                
-            $whtGroup = AccountGroup::where('code', '040020050006')->first()
-            ?? AccountGroup::where('name', 'LIKE', '%With Holding Tax%')->first()
-            ?? AccountGroup::where('name', 'LIKE', '%Withholding%')->first();
+            $code = $request->input('wht_group_code');  
+            $whtNames = [
+                '040020050001' => 'WHT Payable Supplies',
+                '040020050002' => 'WHT Payable Services',
+                '040020050003' => 'WHT Payable Rent',
+                '040020050004' => 'WHT Payable Salaries',
+                '040020050005' => 'WHT Payable Construction Contracts',
+                '040020050006' => 'Withholding Tax on Fee',
+                '040020050007' => 'Sales Tax - PRA',
+            ];
 
-        if (!$whtGroup) {
-            // fallback create group? better to throw so admin creates the group
-            // throw new \Exception('WHT AccountGroup not found. Create group with code 040020050006.');
-            $whtGroup = $vendorGroup; // fallback to vendor group to avoid crash (optional)
-        }
+            // 1: group find
+            $whtGroup = AccountGroup::where('code', $code)->first();
 
-        $whtLedger = AccountLedger::where('account_group_id', $whtGroup->id)
-            ->where(function($q){
-                $q->where('name', 'LIKE', '%WHT%')->orWhere('name', 'LIKE', '%With Holding%')->orWhere('code','LIKE','%040020050006%');
-            })->first();
-
-            if (! $whtLedger) {
-                $whtCode = ($whtGroup->code ?? '040020050006') . '0001';
-                if (AccountLedger::where('code', $whtCode)->exists()) $whtCode = ($whtGroup->code ?? '040020050006') . time();
-                $whtLedger = AccountLedger::create([
-                    'name' => 'With Holding Tax on Payable',
-                    'code' => $whtCode,
-                    'description' => 'WHT payable '.$discountPercentage.'%'  .' on vendor payments/fees',
-                    'account_group_id' => $whtGroup->id ?? ($vendorGroup->id ?? null),
-                    'opening_balance' => 0,
-                    'opening_balance_type' => 'credit',
-                    'current_balance' => 0,
-                    'current_balance_type' => 'credit',
-                    'currency_id' => 1,
-                    'is_active' => true,
-                    'is_system' => false,
-                    'linked_module' => 'tax',
-                    'linked_id' => null,
-                    'branch_id' => $vp->branch_id ?? null,
-                    'created_by' => auth()->id(),
-                ]);
+            if (! $whtGroup) {
+                return back()->with('error', 'Invalid WHT Group Code selected');
             }
 
+            // 2: ledger check
+            $whtLedger = AccountLedger::where('account_group_id', $whtGroup->id)->first();
+
+            if (! $whtLedger) {
+
+                // 3: ledger code generate (0400200500030001)
+                $ledgerCode = $code . '0001';
+                if (AccountLedger::where('code', $ledgerCode)->exists()) {
+                    $ledgerCode = $code . time();
+                }
+
+                // 4: readable name set
+                $ledgerName = $whtNames[$code] ?? 'Withholding Tax Payable';
                 
+                // 5: ledger create
+                $whtLedger = AccountLedger::create([
+                    'name'                => $ledgerName,
+                    'code'                => $ledgerCode,
+                    'description'         => 'Auto-created WHT Payable Ledger',
+                    'account_group_id'    => $whtGroup->id,
+                    'opening_balance'     => 0,
+                    'opening_balance_type'=> 'credit',
+                    'current_balance'     => 0,
+                    'current_balance_type'=> 'credit',
+                    'currency_id'         => 1,
+                    'is_active'           => true,
+                    'is_system'           => false,
+                    'linked_module'       => 'tax',
+                    'linked_id'           => null,
+                    'branch_id'           => $vp->branch_id ?? null,
+                    'created_by'          => auth()->id(),
+                ]);
+            }                
             // 6) Journal lines - make sure Debits = Credits
             // Debit Vendor ledger (reduces liability)
                         JournalEntryLine::create([
