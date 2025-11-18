@@ -15,9 +15,19 @@ return new class extends Migration
             $table->string('reference')->nullable();
             $table->text('description')->nullable();
             $table->enum('status', ['draft', 'posted', 'approved', 'cancelled'])->default('draft');
-            $table->enum('entry_type', ['journal', 'payment', 'receipt', 'transfer'])->default('journal');
+            $table->enum('entry_type', [
+            'journal',
+            'payment',
+            'receipt',
+            'transfer',
+            'journal_voucher',
+            'cash_payment_voucher',
+            'bank_payment_voucher',
+            'bank_receipt_voucher',
+            'cash_receipt_voucher'
+                  ])->default('journal');
             $table->unsignedBigInteger('currency_id')->nullable();
-            $table->decimal('exchange_rate', 15, 6)->default(1.000000);
+            $table->decimal('exchange_rate', 15, 6)->default(1.000000); 
             $table->unsignedBigInteger('branch_id')->nullable();
             $table->unsignedBigInteger('cost_center_id')->nullable();
             $table->unsignedBigInteger('profit_center_id')->nullable();
