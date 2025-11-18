@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Admin;
 
 use Carbon\Carbon;
+// use Barryvdh\DomPDF\PDF;
 use Illuminate\Http\Request;
 use App\Models\Fee\FeeFactor;
 use App\Models\Fee\FeeBilling;
 use App\Models\Fee\FeeCategory;
 use App\Models\Fee\FeeDiscount;
 use App\Services\LedgerService;
+use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Fee\FeeStructure;
 use App\Models\Student\Students;
 use App\Models\Fee\FeeAdjustment;
@@ -17,9 +19,10 @@ use App\Models\Fee\FeeCollection;
 use App\Imports\FeeCategoryImport;
 use App\Imports\FeeDiscountImport;
 use Illuminate\Support\Facades\DB;
-use App\Imports\FeeStructureImport;
 
+use App\Imports\FeeStructureImport;
 use Illuminate\Support\Facades\Log;
+use App\Exports\StudentLedgerExport;
 use App\Http\Controllers\Controller;
 use App\Imports\FeeCollectionImport;
 use Illuminate\Support\Facades\Gate;
@@ -34,6 +37,7 @@ use App\Models\Student\AcademicSession;
 use App\Models\Accounts\CustomerInvoice;
 use App\Models\Fee\StudentFeeAssignment;
 use Yajra\DataTables\Facades\DataTables;
+use App\Exports\StudentLedgerSingleSheetExport;
 
 
 class FeeManagementController extends Controller
@@ -2031,6 +2035,64 @@ class FeeManagementController extends Controller
 
         return view('admin.fee-management.reports.student-ledger', compact('student', 'collections', 'adjustments', 'feeBilling'));
     }
+    
+    public function exportStudentLedgerPdf($studentId)
+        {
+            $student = Students::with(['academicClass', 'academicSession'])->findOrFail($studentId);
+
+            $collections = FeeCollection::where('student_id', $studentId)
+                ->with(['feeCollectionDetails.feeCategory', 'billing'])
+                ->orderBy('collection_date', 'desc')
+                ->get();
+
+            $adjustments = FeeAdjustment::where('student_id', $studentId)
+                ->orderBy('created_at', 'desc')
+                ->get();
+            $pdf = Pdf::loadView ('admin.fee-management.reports.student-ledger-pdf', compact('student', 'collections', 'adjustments'));
+            return $pdf->download('student-ledger-'.$student->student_id.'.pdf');
+
+        }
+        
+        public function exportStudentLedgerExcel($studentId)
+        {
+            $student = Students::with(['academicClass', 'academicSession'])->findOrFail($studentId);
+
+            // optional reporting period from querystring (yyyy-mm-dd), fallback wide range
+            $from = request()->get('from'); // e.g. 2025-07-01
+            $to   = request()->get('to');   // e.g. 2025-10-29
+
+            // Bills / Charges (Debit) - FeeBilling model
+            $billsQuery = FeeBilling::where('student_id', $studentId);
+            if ($from) $billsQuery->whereDate('bill_date', '>=', $from);
+            if ($to)   $billsQuery->whereDate('bill_date', '<=', $to);
+            $bills = $billsQuery->orderBy('bill_date', 'asc')->get();
+
+            // Collections (Credit)
+            $collectionsQuery = FeeCollection::where('student_id', $studentId)
+                ->with(['feeCollectionDetails.feeCategory', 'billing']);
+            if ($from) $collectionsQuery->whereDate('collection_date', '>=', $from);
+            if ($to)   $collectionsQuery->whereDate('collection_date', '<=', $to);
+            $collections = $collectionsQuery->orderBy('collection_date', 'asc')->get();
+
+            // Adjustments
+            $adjustmentsQuery = FeeAdjustment::where('student_id', $studentId);
+            if ($from) $adjustmentsQuery->whereDate('created_at', '>=', $from);
+            if ($to)   $adjustmentsQuery->whereDate('created_at', '<=', $to);
+            $adjustments = $adjustmentsQuery->orderBy('created_at', 'asc')->get();
+
+            $export = new StudentLedgerSingleSheetExport(
+                $student,
+                $bills,
+                $collections,
+                $adjustments,
+                $from,
+                $to
+            );
+
+            $filename = 'student-ledger-'.$student->student_id.'-'.Carbon::now()->format('Ymd_His').'.xlsx';
+            return Excel::download($export, $filename);
+        }
+
 
     // Export and Import
 

@@ -16,11 +16,29 @@
                         <li class="breadcrumb-item active" aria-current="page">Student Ledger</li>
                     </ol>
                 </div>
-                <div class="page-rightheader mb-2">
-                    <button class="btn btn-success" onclick="printLedger()">
+                        <div class="page-rightheader mb-2 d-flex gap-2">
+
+                    <!-- Print Ledger Button -->
+                    <button class="btn btn-info" onclick="printLedger()">
                         <i class="fa fa-print"></i> Print Ledger
                     </button>
+
+                    <!-- PDF Button -->
+                    <a href="{{ route('admin.fee-management.reports.student-ledger.pdf', $student->id) }}" 
+                    class="btn btn-danger">
+                        <i class="fa fa-file-pdf-o"></i> Download PDF
+                    </a>
+
+                    <!-- Excel Button -->
+                    <a href="{{ route('admin.fee-management.reports.student-ledger.excel', $student->id) }}" 
+                    class="btn btn-success">
+                        <i class="fa fa-file-excel-o"></i> Download Excel
+                    </a>
+
                 </div>
+
+
+
             </div>
         </div>
     </div>

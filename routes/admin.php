@@ -233,6 +233,13 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'admin', 'as' => 'admin.'], 
         Route::get('/reports/income', [FeeManagementController::class, 'incomeReport'])->name('reports.income');
         Route::get('/reports/outstanding', [FeeManagementController::class, 'outstandingReport'])->name('reports.outstanding');
         Route::get('/reports/student-ledger/{studentId}', [FeeManagementController::class, 'studentLedger'])->name('reports.student-ledger');
+                // Student Ledger Exports
+        Route::get('/reports/student-ledger/{studentId}/pdf', 
+            [FeeManagementController::class, 'exportStudentLedgerPdf'])->name('reports.student-ledger.pdf');
+
+        Route::get('/reports/student-ledger/{studentId}/excel', 
+            [FeeManagementController::class, 'exportStudentLedgerExcel'])->name('reports.student-ledger.excel');
+
 
         // Fee Bills Status Reports 
         Route::get('/reports/fee-bills', [FeeManagementController::class, 'feeBillsStatusReport'])->name('reports.fee-bills');

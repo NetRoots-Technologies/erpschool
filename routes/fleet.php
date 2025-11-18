@@ -61,6 +61,8 @@ Route::middleware(['auth'])->prefix('fleet')->name('fleet.')->group(function () 
     Route::get('transportation/{transportation}/edit', [StudentTransportController::class, 'edit'])->name('transportation.edit');
     Route::put('transportation/{transportation}', [StudentTransportController::class, 'update'])->name('transportation.update');
     Route::delete('transportation/{transportation}', [StudentTransportController::class, 'destroy'])->name('transportation.destroy');
+    // 🔹 BULK IMPORT (FILE UPLOAD)
+    Route::post('transportation/import', [StudentTransportController::class, 'import'])->name('transportation.import');
     
     // AJAX Routes
     Route::get('api/vehicles', [VehicleController::class, 'apiVehicles'])->name('api.vehicles');

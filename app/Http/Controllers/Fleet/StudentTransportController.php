@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers\Fleet;
 
-use App\Http\Controllers\Controller;
 use App\Models\Fleet\Route;
-use App\Models\Fleet\Transportation;
+use Illuminate\Http\Request;
 use App\Models\Fleet\Vehicle;
 use App\Models\Student\Students;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
-
+use App\Http\Controllers\Controller;
+use App\Models\Fleet\Transportation;
+use Illuminate\Support\Facades\Gate;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\TransportExcelImport;
 class StudentTransportController extends Controller
 {
     /**
@@ -226,4 +227,25 @@ class StudentTransportController extends Controller
         return redirect()->route('fleet.transportation.index')
             ->with('success', 'Transportation assignment deleted successfully.');
     }
+     
+public function import(Request $request)
+{
+    $request->validate([
+        'import_file' => 'required|file|mimes:xlsx,xls,csv',
+    ]);
+
+    $import = new TransportExcelImport();
+
+    try {
+        Excel::import($import, $request->file('import_file'));
+
+        // Success
+        return redirect()->back()->with('success', 'Import completed successfully.');
+    } catch (\Exception $e) {
+        // The import class throws combined row errors, so show to user via toast
+        // Make sure message is safe — in this case it's fine because it's row error text.
+        return redirect()->back()->with('error', $e->getMessage());
+    }
+}
+
 }
