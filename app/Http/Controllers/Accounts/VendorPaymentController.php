@@ -269,7 +269,7 @@ class VendorPaymentController extends Controller
             'payment_amount' => 'required|numeric|min:0.01',
             'payment_mode' => ['required', Rule::in(['Cash','Cheque','Bank Transfer','Other'])],
             // 'account_id' => 'nullable|exists:accounts,id',
-            'cheque_no' => 'required|string|required_if:payment_mode,Cheque',
+            'cheque_no' => 'nullable|string|required_if:payment_mode,Cheque',
             'cheque_date' => 'nullable|date|required_if:payment_mode,Cheque',
             'remarks' => 'nullable|string',
             'attachment' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
@@ -347,6 +347,10 @@ class VendorPaymentController extends Controller
                         'created_by' => auth()->id(),
                     ]);
                 }
+
+                // Update Vendor Ledger Balance
+                $vendorLedger->current_balance += $vp->payment_amount;
+                $vendorLedger->save();
             // 1) Journal entry
                 $entry = JournalEntry::create([
                 'entry_number' => JournalEntry::generateNumber(),
@@ -383,10 +387,15 @@ class VendorPaymentController extends Controller
                     'branch_id' => $vp->branch_id ?? null,
                     'created_by' => auth()->id(),
                 ]);
-                }
-
+            }
+    
+            // 2) Update Bank Ledger Balance Credit
             $bankAccount = AccountLedger::where('account_group_id', $bankGroup->id)->first();
+            $bankAccount->current_balance -= $finalPrice;
+            $bankAccount->save();
+
             $code = $request->input('wht_group_code');  
+            
             $whtNames = [
                 '040020050001' => 'WHT Payable Supplies',
                 '040020050002' => 'WHT Payable Services',
@@ -436,7 +445,13 @@ class VendorPaymentController extends Controller
                     'branch_id'           => $vp->branch_id ?? null,
                     'created_by'          => auth()->id(),
                 ]);
-            }                
+            }      
+            
+                // Update WHT Ledger Balance credit 
+                $whtLedger->current_balance += $discountAmount;
+                $whtLedger->save();
+
+            
             // 6) Journal lines - make sure Debits = Credits
             // Debit Vendor ledger (reduces liability)
                         JournalEntryLine::create([
@@ -471,6 +486,8 @@ class VendorPaymentController extends Controller
                                 'reference' => $vp->voucher_no,
                             ]);
                         }
+
+
 
             DB::commit();
 

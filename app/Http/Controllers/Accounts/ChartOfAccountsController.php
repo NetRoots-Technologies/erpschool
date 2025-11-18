@@ -29,6 +29,7 @@ class ChartOfAccountsController extends Controller
             }),
         ];
 
+
         return view('accounts.chart_of_accounts.index', compact('groups', 'stats'));
     }
 

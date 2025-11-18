@@ -138,10 +138,10 @@ class BillController extends Controller
             // If still not found, create one
             if (!$expenseLedger) {
                 $expenseLedger = AccountLedger::create([
-                    'name' => 'General Expenses',
+                    'name' => 'Expense Payable Account', // Replace with your desired name General Expenses
                     'code' => 'EXP-GEN-' . time(),
                     'description' => 'General business expenses',
-                    'account_group_id' => 16, // Expenses
+                    'account_group_id' => 60, // Expense Payable Account
                     'opening_balance' => 0,
                     'opening_balance_type' => 'debit',
                     'current_balance' => 0,

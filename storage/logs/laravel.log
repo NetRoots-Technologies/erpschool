@@ -10101,3 +10101,359 @@
 [2025-11-17 12:33:03] local.INFO: Integration response: {"success":true,"entry_id":18}  
 [2025-11-17 12:33:03] local.INFO: ✅ Challan payment accounting entry created successfully, Entry ID: 18  
 [2025-11-17 12:33:03] local.INFO: === CHALLAN PAYMENT ACCOUNTING END ===  
+[2025-11-18 06:18:53] local.INFO: Applicable discounts for student 179 {"billing_month":"2025-11","discounts_count":1,"discounts":[{"id":58,"category_id":4,"student_id":179,"discount_type":"percentage","discount_value":"20.00","reason":"Decision by higher Management","show_on_voucher":false,"valid_from":"2024-07-25T00:00:00.000000Z","valid_to":"2050-08-22T00:00:00.000000Z","company_id":null,"branch_id":null,"created_by":1,"updated_by":1,"created_at":"2025-10-29T08:49:26.000000Z","updated_at":"2025-10-29T08:49:26.000000Z","deleted_at":null}]} 
+[2025-11-18 06:25:51] local.INFO: Applicable discounts for student 179 {"billing_month":"2025-11","discounts_count":1,"discounts":[{"id":58,"category_id":4,"student_id":179,"discount_type":"percentage","discount_value":"20.00","reason":"Decision by higher Management","show_on_voucher":false,"valid_from":"2024-07-25T00:00:00.000000Z","valid_to":"2050-08-22T00:00:00.000000Z","company_id":null,"branch_id":null,"created_by":1,"updated_by":1,"created_at":"2025-10-29T08:49:26.000000Z","updated_at":"2025-10-29T08:49:26.000000Z","deleted_at":null}]} 
+[2025-11-18 06:26:04] local.INFO: Billing generation started {"class_id":"1","session_id":"1","billing_month":"2025-12"} 
+[2025-11-18 06:26:04] local.INFO: Students found: 46  
+[2025-11-18 06:26:04] local.INFO: Processing 46 students for billing  
+[2025-11-18 06:26:04] local.INFO: Processing student: 1 - Zaira Nashal  
+[2025-11-18 06:26:04] local.INFO: Total amount calculated for student 1: 35748  
+[2025-11-18 06:26:04] local.INFO: Billing created for student 1 with ID: 322  
+[2025-11-18 06:26:20] local.INFO: Billing generation started {"class_id":"1","session_id":"1","billing_month":"2025-12"} 
+[2025-11-18 06:26:20] local.INFO: Students found: 46  
+[2025-11-18 06:26:20] local.INFO: Processing 46 students for billing  
+[2025-11-18 06:26:20] local.INFO: Processing student: 1 - Zaira Nashal  
+[2025-11-18 06:26:20] local.INFO: Total amount calculated for student 1: 35748  
+[2025-11-18 06:26:20] local.INFO: Billing created for student 1 with ID: 323  
+[2025-11-18 06:26:20] local.ERROR: LedgerService::createLedger failed: Attempt to read property "id" on null  
+[2025-11-18 06:26:20] local.INFO: Processing student: 10 - Hafsa Ali  
+[2025-11-18 06:26:20] local.INFO: Skipping student 10: no active fee structure for the selected class/session.  
+[2025-11-18 06:26:20] local.INFO: Processing student: 11 - Bareerah Furjam  
+[2025-11-18 06:26:20] local.INFO: Total amount calculated for student 11: 25487  
+[2025-11-18 06:26:20] local.INFO: Billing created for student 11 with ID: 324  
+[2025-11-18 06:26:20] local.ERROR: LedgerService::createLedger failed: Attempt to read property "id" on null  
+[2025-11-18 06:26:20] local.INFO: Processing student: 15 - Abdul Momin  
+[2025-11-18 06:26:20] local.INFO: Total amount calculated for student 15: 18684  
+[2025-11-18 06:26:20] local.INFO: Billing created for student 15 with ID: 325  
+[2025-11-18 06:26:20] local.ERROR: LedgerService::createLedger failed: Attempt to read property "id" on null  
+[2025-11-18 06:26:20] local.INFO: Processing student: 18 - Muhammad Ibrahim  
+[2025-11-18 06:26:20] local.INFO: Total amount calculated for student 18: 18684  
+[2025-11-18 06:26:20] local.INFO: Billing created for student 18 with ID: 326  
+[2025-11-18 06:26:20] local.ERROR: LedgerService::createLedger failed: Attempt to read property "id" on null  
+[2025-11-18 06:26:20] local.INFO: Processing student: 23 - Zoya Arslan  
+[2025-11-18 06:26:20] local.INFO: Total amount calculated for student 23: 18684  
+[2025-11-18 06:26:20] local.INFO: Billing created for student 23 with ID: 327  
+[2025-11-18 06:26:20] local.ERROR: LedgerService::createLedger failed: Attempt to read property "id" on null  
+[2025-11-18 06:26:20] local.INFO: Processing student: 24 - Ain Ul  
+[2025-11-18 06:26:20] local.INFO: Total amount calculated for student 24: 36829  
+[2025-11-18 06:26:20] local.INFO: Billing created for student 24 with ID: 328  
+[2025-11-18 06:26:20] local.ERROR: LedgerService::createLedger failed: Attempt to read property "id" on null  
+[2025-11-18 06:26:20] local.INFO: Processing student: 25 - Abdullah Usman  
+[2025-11-18 06:26:20] local.INFO: Total amount calculated for student 25: 35122  
+[2025-11-18 06:26:20] local.INFO: Billing created for student 25 with ID: 329  
+[2025-11-18 06:26:20] local.ERROR: LedgerService::createLedger failed: Attempt to read property "id" on null  
+[2025-11-18 06:26:20] local.INFO: Processing student: 27 - Zoeya Ibtisam  
+[2025-11-18 06:26:20] local.INFO: Total amount calculated for student 27: 32335  
+[2025-11-18 06:26:20] local.INFO: Billing created for student 27 with ID: 330  
+[2025-11-18 06:26:20] local.ERROR: LedgerService::createLedger failed: Attempt to read property "id" on null  
+[2025-11-18 06:26:20] local.INFO: Processing student: 29 - Muhammad Esa  
+[2025-11-18 06:26:20] local.INFO: Total amount calculated for student 29: 18684  
+[2025-11-18 06:26:20] local.INFO: Billing created for student 29 with ID: 331  
+[2025-11-18 06:26:20] local.ERROR: LedgerService::createLedger failed: Attempt to read property "id" on null  
+[2025-11-18 06:26:20] local.INFO: Processing student: 35 - Muhammad Mustafa  
+[2025-11-18 06:26:20] local.INFO: Total amount calculated for student 35: 10152  
+[2025-11-18 06:26:20] local.INFO: Billing created for student 35 with ID: 332  
+[2025-11-18 06:26:20] local.ERROR: LedgerService::createLedger failed: Attempt to read property "id" on null  
+[2025-11-18 06:26:20] local.INFO: Processing student: 39 - Ilyana Usama  
+[2025-11-18 06:26:20] local.INFO: Total amount calculated for student 39: 42600  
+[2025-11-18 06:26:20] local.INFO: Billing created for student 39 with ID: 333  
+[2025-11-18 06:26:20] local.ERROR: LedgerService::createLedger failed: Attempt to read property "id" on null  
+[2025-11-18 06:26:20] local.INFO: Processing student: 41 - Haider Abdul  
+[2025-11-18 06:26:20] local.INFO: Skipping student 41: no active fee structure for the selected class/session.  
+[2025-11-18 06:26:20] local.INFO: Processing student: 61 - Sabeen Haseeb  
+[2025-11-18 06:26:20] local.INFO: Total amount calculated for student 61: 41116  
+[2025-11-18 06:26:20] local.INFO: Billing created for student 61 with ID: 334  
+[2025-11-18 06:26:20] local.ERROR: LedgerService::createLedger failed: Attempt to read property "id" on null  
+[2025-11-18 06:26:20] local.INFO: Processing student: 65 - Muhammad Hashir  
+[2025-11-18 06:26:20] local.INFO: Total amount calculated for student 65: 25303  
+[2025-11-18 06:26:20] local.INFO: Billing created for student 65 with ID: 335  
+[2025-11-18 06:26:20] local.ERROR: LedgerService::createLedger failed: Attempt to read property "id" on null  
+[2025-11-18 06:26:20] local.INFO: Processing student: 75 - Zarmina Adnan  
+[2025-11-18 06:26:20] local.INFO: Skipping student 75: no active fee structure for the selected class/session.  
+[2025-11-18 06:26:20] local.INFO: Processing student: 86 - Eshal Shahid  
+[2025-11-18 06:26:20] local.INFO: Total amount calculated for student 86: 35748  
+[2025-11-18 06:26:20] local.INFO: Billing created for student 86 with ID: 336  
+[2025-11-18 06:26:20] local.ERROR: LedgerService::createLedger failed: Attempt to read property "id" on null  
+[2025-11-18 06:26:20] local.INFO: Processing student: 98 - Muhammad Umer  
+[2025-11-18 06:26:20] local.INFO: Total amount calculated for student 98: 27216  
+[2025-11-18 06:26:20] local.INFO: Billing created for student 98 with ID: 337  
+[2025-11-18 06:26:20] local.ERROR: LedgerService::createLedger failed: Attempt to read property "id" on null  
+[2025-11-18 06:26:20] local.INFO: Processing student: 107 - Abdul Hadi  
+[2025-11-18 06:26:20] local.INFO: Total amount calculated for student 107: 28922  
+[2025-11-18 06:26:20] local.INFO: Billing created for student 107 with ID: 338  
+[2025-11-18 06:26:20] local.ERROR: LedgerService::createLedger failed: Attempt to read property "id" on null  
+[2025-11-18 06:26:20] local.INFO: Processing student: 109 - Bilal Rehman  
+[2025-11-18 06:26:20] local.INFO: Total amount calculated for student 109: 36829  
+[2025-11-18 06:26:20] local.INFO: Billing created for student 109 with ID: 339  
+[2025-11-18 06:26:20] local.ERROR: LedgerService::createLedger failed: Attempt to read property "id" on null  
+[2025-11-18 06:26:20] local.INFO: Processing student: 111 - Zulkifal Bilal  
+[2025-11-18 06:26:20] local.INFO: Total amount calculated for student 111: 27216  
+[2025-11-18 06:26:20] local.INFO: Billing created for student 111 with ID: 340  
+[2025-11-18 06:26:20] local.ERROR: LedgerService::createLedger failed: Attempt to read property "id" on null  
+[2025-11-18 06:26:20] local.INFO: Processing student: 117 - Umamah Saif  
+[2025-11-18 06:26:20] local.INFO: Total amount calculated for student 117: 35748  
+[2025-11-18 06:26:20] local.INFO: Billing created for student 117 with ID: 341  
+[2025-11-18 06:26:20] local.ERROR: LedgerService::createLedger failed: Attempt to read property "id" on null  
+[2025-11-18 06:26:20] local.INFO: Processing student: 121 - Hashir Ahmad  
+[2025-11-18 06:26:20] local.INFO: Total amount calculated for student 121: 18684  
+[2025-11-18 06:26:20] local.INFO: Billing created for student 121 with ID: 342  
+[2025-11-18 06:26:20] local.ERROR: LedgerService::createLedger failed: Attempt to read property "id" on null  
+[2025-11-18 06:26:20] local.INFO: Processing student: 125 - Zainab Amir  
+[2025-11-18 06:26:20] local.INFO: Total amount calculated for student 125: 25510  
+[2025-11-18 06:26:20] local.INFO: Billing created for student 125 with ID: 343  
+[2025-11-18 06:26:20] local.ERROR: LedgerService::createLedger failed: Attempt to read property "id" on null  
+[2025-11-18 06:26:20] local.INFO: Processing student: 141 - Emaan Saad  
+[2025-11-18 06:26:20] local.INFO: Total amount calculated for student 141: 28922  
+[2025-11-18 06:26:20] local.INFO: Billing created for student 141 with ID: 344  
+[2025-11-18 06:26:20] local.ERROR: LedgerService::createLedger failed: Attempt to read property "id" on null  
+[2025-11-18 06:26:20] local.INFO: Processing student: 145 - Muhammad Ibrahim  
+[2025-11-18 06:26:20] local.INFO: Total amount calculated for student 145: 28922  
+[2025-11-18 06:26:20] local.INFO: Billing created for student 145 with ID: 345  
+[2025-11-18 06:26:20] local.ERROR: LedgerService::createLedger failed: Attempt to read property "id" on null  
+[2025-11-18 06:26:20] local.INFO: Processing student: 160 - Haider Ali  
+[2025-11-18 06:26:20] local.INFO: Total amount calculated for student 160: 31710  
+[2025-11-18 06:26:20] local.INFO: Billing created for student 160 with ID: 346  
+[2025-11-18 06:26:20] local.ERROR: LedgerService::createLedger failed: Attempt to read property "id" on null  
+[2025-11-18 06:26:20] local.INFO: Processing student: 164 - Fabiha Kashif  
+[2025-11-18 06:26:20] local.INFO: Total amount calculated for student 164: 35122  
+[2025-11-18 06:26:20] local.INFO: Billing created for student 164 with ID: 347  
+[2025-11-18 06:26:20] local.ERROR: LedgerService::createLedger failed: Attempt to read property "id" on null  
+[2025-11-18 06:26:20] local.INFO: Processing student: 181 - Rameen Fatima  
+[2025-11-18 06:26:20] local.INFO: Total amount calculated for student 181: 23803  
+[2025-11-18 06:26:20] local.INFO: Billing created for student 181 with ID: 348  
+[2025-11-18 06:26:20] local.ERROR: LedgerService::createLedger failed: Attempt to read property "id" on null  
+[2025-11-18 06:26:20] local.INFO: Processing student: 196 - Muhammad Arham  
+[2025-11-18 06:26:20] local.INFO: Total amount calculated for student 196: 31710  
+[2025-11-18 06:26:20] local.INFO: Billing created for student 196 with ID: 349  
+[2025-11-18 06:26:20] local.ERROR: LedgerService::createLedger failed: Attempt to read property "id" on null  
+[2025-11-18 06:26:20] local.INFO: Processing student: 197 - Hania Fatima  
+[2025-11-18 06:26:20] local.INFO: Total amount calculated for student 197: 30629  
+[2025-11-18 06:26:20] local.INFO: Billing created for student 197 with ID: 350  
+[2025-11-18 06:26:20] local.ERROR: LedgerService::createLedger failed: Attempt to read property "id" on null  
+[2025-11-18 06:26:20] local.INFO: Processing student: 200 - Arham Haroon  
+[2025-11-18 06:26:20] local.INFO: Total amount calculated for student 200: 30629  
+[2025-11-18 06:26:20] local.INFO: Billing created for student 200 with ID: 351  
+[2025-11-18 06:26:20] local.ERROR: LedgerService::createLedger failed: Attempt to read property "id" on null  
+[2025-11-18 06:26:20] local.INFO: Processing student: 232 - Ibrahim Mubashar  
+[2025-11-18 06:26:20] local.INFO: Total amount calculated for student 232: 36829  
+[2025-11-18 06:26:20] local.INFO: Billing created for student 232 with ID: 352  
+[2025-11-18 06:26:20] local.ERROR: LedgerService::createLedger failed: Attempt to read property "id" on null  
+[2025-11-18 06:26:20] local.INFO: Processing student: 247 - Hafsa Ahmed  
+[2025-11-18 06:26:20] local.INFO: Total amount calculated for student 247: 36829  
+[2025-11-18 06:26:20] local.INFO: Billing created for student 247 with ID: 353  
+[2025-11-18 06:26:20] local.ERROR: LedgerService::createLedger failed: Attempt to read property "id" on null  
+[2025-11-18 06:26:20] local.INFO: Processing student: 286 - Aayyat Rana  
+[2025-11-18 06:26:20] local.INFO: Total amount calculated for student 286: 7000  
+[2025-11-18 06:26:20] local.INFO: Billing created for student 286 with ID: 354  
+[2025-11-18 06:26:20] local.ERROR: LedgerService::createLedger failed: Attempt to read property "id" on null  
+[2025-11-18 06:26:20] local.INFO: Processing student: 290 - Muhammad Saim  
+[2025-11-18 06:26:20] local.INFO: Total amount calculated for student 290: 10152  
+[2025-11-18 06:26:20] local.INFO: Billing created for student 290 with ID: 355  
+[2025-11-18 06:26:20] local.ERROR: LedgerService::createLedger failed: Attempt to read property "id" on null  
+[2025-11-18 06:26:20] local.INFO: Processing student: 295 - Muhib -  
+[2025-11-18 06:26:20] local.INFO: Total amount calculated for student 295: 31710  
+[2025-11-18 06:26:20] local.INFO: Billing created for student 295 with ID: 356  
+[2025-11-18 06:26:20] local.ERROR: LedgerService::createLedger failed: Attempt to read property "id" on null  
+[2025-11-18 06:26:20] local.INFO: Processing student: 328 - Aira Nadeem  
+[2025-11-18 06:26:20] local.INFO: Total amount calculated for student 328: 25510  
+[2025-11-18 06:26:20] local.INFO: Billing created for student 328 with ID: 357  
+[2025-11-18 06:26:20] local.ERROR: LedgerService::createLedger failed: Attempt to read property "id" on null  
+[2025-11-18 06:26:20] local.INFO: Processing student: 332 - llyana Saad  
+[2025-11-18 06:26:20] local.INFO: Total amount calculated for student 332: 35748  
+[2025-11-18 06:26:20] local.INFO: Billing created for student 332 with ID: 358  
+[2025-11-18 06:26:20] local.ERROR: LedgerService::createLedger failed: Attempt to read property "id" on null  
+[2025-11-18 06:26:20] local.INFO: Processing student: 386 - Muhammad Rayyan  
+[2025-11-18 06:26:20] local.INFO: Total amount calculated for student 386: 10152  
+[2025-11-18 06:26:20] local.INFO: Billing created for student 386 with ID: 359  
+[2025-11-18 06:26:20] local.ERROR: LedgerService::createLedger failed: Attempt to read property "id" on null  
+[2025-11-18 06:26:20] local.INFO: Processing student: 388 - Noor Mehtab  
+[2025-11-18 06:26:20] local.INFO: Total amount calculated for student 388: 30629  
+[2025-11-18 06:26:20] local.INFO: Billing created for student 388 with ID: 360  
+[2025-11-18 06:26:20] local.ERROR: LedgerService::createLedger failed: Attempt to read property "id" on null  
+[2025-11-18 06:26:20] local.INFO: Processing student: 409 - Hayah Amir  
+[2025-11-18 06:26:20] local.INFO: Total amount calculated for student 409: 30629  
+[2025-11-18 06:26:20] local.INFO: Billing created for student 409 with ID: 361  
+[2025-11-18 06:26:20] local.ERROR: LedgerService::createLedger failed: Attempt to read property "id" on null  
+[2025-11-18 06:26:20] local.INFO: Processing student: 432 - Muhammad Ahmed  
+[2025-11-18 06:26:20] local.INFO: Total amount calculated for student 432: 30629  
+[2025-11-18 06:26:20] local.INFO: Billing created for student 432 with ID: 362  
+[2025-11-18 06:26:20] local.ERROR: LedgerService::createLedger failed: Attempt to read property "id" on null  
+[2025-11-18 06:26:20] local.INFO: Processing student: 433 - Areeba Butt  
+[2025-11-18 06:26:20] local.INFO: Total amount calculated for student 433: 30629  
+[2025-11-18 06:26:20] local.INFO: Billing created for student 433 with ID: 363  
+[2025-11-18 06:26:20] local.ERROR: LedgerService::createLedger failed: Attempt to read property "id" on null  
+[2025-11-18 06:26:20] local.INFO: Processing student: 443 - Nashra Fatima  
+[2025-11-18 06:26:20] local.INFO: Total amount calculated for student 443: 30629  
+[2025-11-18 06:26:20] local.INFO: Billing created for student 443 with ID: 364  
+[2025-11-18 06:26:20] local.ERROR: LedgerService::createLedger failed: Attempt to read property "id" on null  
+[2025-11-18 06:26:20] local.INFO: Processing student: 469 - Armish Khurram  
+[2025-11-18 06:26:20] local.INFO: Total amount calculated for student 469: 28922  
+[2025-11-18 06:26:20] local.INFO: Billing created for student 469 with ID: 365  
+[2025-11-18 06:26:20] local.ERROR: LedgerService::createLedger failed: Attempt to read property "id" on null  
+[2025-11-18 06:26:24] local.INFO: Applicable discounts for student 179 {"billing_month":"2025-11","discounts_count":1,"discounts":[{"id":58,"category_id":4,"student_id":179,"discount_type":"percentage","discount_value":"20.00","reason":"Decision by higher Management","show_on_voucher":false,"valid_from":"2024-07-25T00:00:00.000000Z","valid_to":"2050-08-22T00:00:00.000000Z","company_id":null,"branch_id":null,"created_by":1,"updated_by":1,"created_at":"2025-10-29T08:49:26.000000Z","updated_at":"2025-10-29T08:49:26.000000Z","deleted_at":null}]} 
+[2025-11-18 06:51:05] local.INFO: Applicable discounts for student 1 {"billing_month":"2025-12","discounts_count":1,"discounts":[{"id":1,"category_id":4,"student_id":1,"discount_type":"percentage","discount_value":"0.00","reason":"Full Fee","show_on_voucher":false,"valid_from":"2022-08-22T00:00:00.000000Z","valid_to":"2050-08-22T00:00:00.000000Z","company_id":null,"branch_id":null,"created_by":1,"updated_by":1,"created_at":"2025-10-29T08:49:25.000000Z","updated_at":"2025-10-29T08:49:25.000000Z","deleted_at":null}]} 
+[2025-11-18 06:51:05] local.INFO: Applicable discounts for student 11 {"billing_month":"2025-12","discounts_count":1,"discounts":[{"id":2,"category_id":4,"student_id":11,"discount_type":"percentage","discount_value":"30.00","reason":"Decision by higher Management","show_on_voucher":false,"valid_from":"2022-08-23T00:00:00.000000Z","valid_to":"2050-08-22T00:00:00.000000Z","company_id":null,"branch_id":null,"created_by":1,"updated_by":1,"created_at":"2025-10-29T08:49:25.000000Z","updated_at":"2025-10-29T08:49:25.000000Z","deleted_at":null}]} 
+[2025-11-18 06:51:05] local.INFO: Applicable discounts for student 15 {"billing_month":"2025-12","discounts_count":1,"discounts":[{"id":3,"category_id":4,"student_id":15,"discount_type":"percentage","discount_value":"50.00","reason":"Decision by higher Management","show_on_voucher":false,"valid_from":"2022-08-23T00:00:00.000000Z","valid_to":"2050-08-22T00:00:00.000000Z","company_id":null,"branch_id":null,"created_by":1,"updated_by":1,"created_at":"2025-10-29T08:49:25.000000Z","updated_at":"2025-10-29T08:49:25.000000Z","deleted_at":null}]} 
+[2025-11-18 06:51:05] local.INFO: Applicable discounts for student 18 {"billing_month":"2025-12","discounts_count":1,"discounts":[{"id":24,"category_id":4,"student_id":18,"discount_type":"percentage","discount_value":"50.00","reason":"Decision by higher Management","show_on_voucher":false,"valid_from":"2022-08-23T00:00:00.000000Z","valid_to":"2050-08-22T00:00:00.000000Z","company_id":null,"branch_id":null,"created_by":1,"updated_by":1,"created_at":"2025-10-29T08:49:25.000000Z","updated_at":"2025-10-29T08:49:25.000000Z","deleted_at":null}]} 
+[2025-11-18 06:51:05] local.INFO: Applicable discounts for student 23 {"billing_month":"2025-12","discounts_count":1,"discounts":[{"id":25,"category_id":4,"student_id":23,"discount_type":"percentage","discount_value":"50.00","reason":"Decision by higher Management","show_on_voucher":false,"valid_from":"2022-08-26T00:00:00.000000Z","valid_to":"2050-08-22T00:00:00.000000Z","company_id":null,"branch_id":null,"created_by":1,"updated_by":1,"created_at":"2025-10-29T08:49:25.000000Z","updated_at":"2025-10-29T08:49:25.000000Z","deleted_at":null}]} 
+[2025-11-18 06:51:05] local.INFO: Applicable discounts for student 24 {"billing_month":"2025-12","discounts_count":1,"discounts":[{"id":26,"category_id":4,"student_id":24,"discount_type":"percentage","discount_value":"15.00","reason":"Decision by higher Management","show_on_voucher":false,"valid_from":"2022-08-26T00:00:00.000000Z","valid_to":"2050-08-22T00:00:00.000000Z","company_id":null,"branch_id":null,"created_by":1,"updated_by":1,"created_at":"2025-10-29T08:49:25.000000Z","updated_at":"2025-10-29T08:49:25.000000Z","deleted_at":null}]} 
+[2025-11-18 06:51:05] local.INFO: Applicable discounts for student 25 {"billing_month":"2025-12","discounts_count":1,"discounts":[{"id":4,"category_id":4,"student_id":25,"discount_type":"percentage","discount_value":"20.00","reason":"Decision by higher Management","show_on_voucher":false,"valid_from":"2022-08-26T00:00:00.000000Z","valid_to":"2050-08-22T00:00:00.000000Z","company_id":null,"branch_id":null,"created_by":1,"updated_by":1,"created_at":"2025-10-29T08:49:25.000000Z","updated_at":"2025-10-29T08:49:25.000000Z","deleted_at":null}]} 
+[2025-11-18 06:51:05] local.INFO: Applicable discounts for student 27 {"billing_month":"2025-12","discounts_count":1,"discounts":[{"id":5,"category_id":4,"student_id":27,"discount_type":"percentage","discount_value":"10.00","reason":"Second Sibling","show_on_voucher":false,"valid_from":"2022-08-26T00:00:00.000000Z","valid_to":"2050-08-22T00:00:00.000000Z","company_id":null,"branch_id":null,"created_by":1,"updated_by":1,"created_at":"2025-10-29T08:49:25.000000Z","updated_at":"2025-10-29T08:49:25.000000Z","deleted_at":null}]} 
+[2025-11-18 06:51:05] local.INFO: Applicable discounts for student 29 {"billing_month":"2025-12","discounts_count":1,"discounts":[{"id":46,"category_id":4,"student_id":29,"discount_type":"percentage","discount_value":"50.00","reason":"Decision by higher Management","show_on_voucher":false,"valid_from":"2022-08-29T00:00:00.000000Z","valid_to":"2050-08-22T00:00:00.000000Z","company_id":null,"branch_id":null,"created_by":1,"updated_by":1,"created_at":"2025-10-29T08:49:26.000000Z","updated_at":"2025-10-29T08:49:26.000000Z","deleted_at":null}]} 
+[2025-11-18 06:51:05] local.INFO: Applicable discounts for student 35 {"billing_month":"2025-12","discounts_count":1,"discounts":[{"id":6,"category_id":4,"student_id":35,"discount_type":"percentage","discount_value":"75.00","reason":"Staff Child 1 ","show_on_voucher":false,"valid_from":"2022-09-05T00:00:00.000000Z","valid_to":"2050-08-22T00:00:00.000000Z","company_id":null,"branch_id":null,"created_by":1,"updated_by":1,"created_at":"2025-10-29T08:49:25.000000Z","updated_at":"2025-10-29T08:49:25.000000Z","deleted_at":null}]} 
+[2025-11-18 06:51:05] local.INFO: Applicable discounts for student 39 {"billing_month":"2025-12","discounts_count":1,"discounts":[{"id":7,"category_id":4,"student_id":39,"discount_type":"percentage","discount_value":"0.00","reason":"Full Fee","show_on_voucher":false,"valid_from":"2022-09-09T00:00:00.000000Z","valid_to":"2050-08-22T00:00:00.000000Z","company_id":null,"branch_id":null,"created_by":1,"updated_by":1,"created_at":"2025-10-29T08:49:25.000000Z","updated_at":"2025-10-29T08:49:25.000000Z","deleted_at":null}]} 
+[2025-11-18 06:51:05] local.INFO: Applicable discounts for student 61 {"billing_month":"2025-12","discounts_count":1,"discounts":[{"id":27,"category_id":4,"student_id":61,"discount_type":"percentage","discount_value":"25.00","reason":"Decision by higher Management","show_on_voucher":false,"valid_from":"2022-12-08T00:00:00.000000Z","valid_to":"2050-08-22T00:00:00.000000Z","company_id":null,"branch_id":null,"created_by":1,"updated_by":1,"created_at":"2025-10-29T08:49:25.000000Z","updated_at":"2025-10-29T08:49:25.000000Z","deleted_at":null}]} 
+[2025-11-18 06:51:05] local.INFO: Applicable discounts for student 65 {"billing_month":"2025-12","discounts_count":1,"discounts":[{"id":28,"category_id":4,"student_id":65,"discount_type":"percentage","discount_value":"35.00","reason":"Decision by higher Management","show_on_voucher":false,"valid_from":"2023-02-14T00:00:00.000000Z","valid_to":"2050-08-22T00:00:00.000000Z","company_id":null,"branch_id":null,"created_by":1,"updated_by":1,"created_at":"2025-10-29T08:49:25.000000Z","updated_at":"2025-10-29T08:49:25.000000Z","deleted_at":null}]} 
+[2025-11-18 06:51:05] local.INFO: Applicable discounts for student 86 {"billing_month":"2025-12","discounts_count":1,"discounts":[{"id":9,"category_id":4,"student_id":86,"discount_type":"percentage","discount_value":"0.00","reason":"Full Fee","show_on_voucher":false,"valid_from":"2023-04-28T00:00:00.000000Z","valid_to":"2050-08-22T00:00:00.000000Z","company_id":null,"branch_id":null,"created_by":1,"updated_by":1,"created_at":"2025-10-29T08:49:25.000000Z","updated_at":"2025-10-29T08:49:25.000000Z","deleted_at":null}]} 
+[2025-11-18 06:51:05] local.INFO: Applicable discounts for student 98 {"billing_month":"2025-12","discounts_count":1,"discounts":[{"id":10,"category_id":4,"student_id":98,"discount_type":"percentage","discount_value":"25.00","reason":"Decision by higher Management","show_on_voucher":false,"valid_from":"2023-08-10T00:00:00.000000Z","valid_to":"2050-08-22T00:00:00.000000Z","company_id":null,"branch_id":null,"created_by":1,"updated_by":1,"created_at":"2025-10-29T08:49:25.000000Z","updated_at":"2025-10-29T08:49:25.000000Z","deleted_at":null}]} 
+[2025-11-18 06:51:05] local.INFO: Applicable discounts for student 107 {"billing_month":"2025-12","discounts_count":1,"discounts":[{"id":30,"category_id":4,"student_id":107,"discount_type":"percentage","discount_value":"20.00","reason":"Decision by higher Management","show_on_voucher":false,"valid_from":"2023-08-22T00:00:00.000000Z","valid_to":"2050-08-22T00:00:00.000000Z","company_id":null,"branch_id":null,"created_by":1,"updated_by":1,"created_at":"2025-10-29T08:49:25.000000Z","updated_at":"2025-10-29T08:49:25.000000Z","deleted_at":null}]} 
+[2025-11-18 06:51:05] local.INFO: Applicable discounts for student 109 {"billing_month":"2025-12","discounts_count":1,"discounts":[{"id":31,"category_id":4,"student_id":109,"discount_type":"percentage","discount_value":"15.00","reason":"Decision by higher Management","show_on_voucher":false,"valid_from":"2023-08-22T00:00:00.000000Z","valid_to":"2050-08-22T00:00:00.000000Z","company_id":null,"branch_id":null,"created_by":1,"updated_by":1,"created_at":"2025-10-29T08:49:25.000000Z","updated_at":"2025-10-29T08:49:25.000000Z","deleted_at":null}]} 
+[2025-11-18 06:51:05] local.INFO: Applicable discounts for student 111 {"billing_month":"2025-12","discounts_count":1,"discounts":[{"id":11,"category_id":4,"student_id":111,"discount_type":"percentage","discount_value":"25.00","reason":"Decision by higher Management","show_on_voucher":false,"valid_from":"2023-08-23T00:00:00.000000Z","valid_to":"2050-08-22T00:00:00.000000Z","company_id":null,"branch_id":null,"created_by":1,"updated_by":1,"created_at":"2025-10-29T08:49:25.000000Z","updated_at":"2025-10-29T08:49:25.000000Z","deleted_at":null}]} 
+[2025-11-18 06:51:05] local.INFO: Applicable discounts for student 117 {"billing_month":"2025-12","discounts_count":1,"discounts":[{"id":32,"category_id":4,"student_id":117,"discount_type":"percentage","discount_value":"0.00","reason":"Full Fee","show_on_voucher":false,"valid_from":"2023-09-06T00:00:00.000000Z","valid_to":"2050-08-22T00:00:00.000000Z","company_id":null,"branch_id":null,"created_by":1,"updated_by":1,"created_at":"2025-10-29T08:49:25.000000Z","updated_at":"2025-10-29T08:49:25.000000Z","deleted_at":null}]} 
+[2025-11-18 06:51:05] local.INFO: Applicable discounts for student 121 {"billing_month":"2025-12","discounts_count":1,"discounts":[{"id":12,"category_id":4,"student_id":121,"discount_type":"percentage","discount_value":"50.00","reason":"Decision by higher Management","show_on_voucher":false,"valid_from":"2023-09-25T00:00:00.000000Z","valid_to":"2050-08-22T00:00:00.000000Z","company_id":null,"branch_id":null,"created_by":1,"updated_by":1,"created_at":"2025-10-29T08:49:25.000000Z","updated_at":"2025-10-29T08:49:25.000000Z","deleted_at":null}]} 
+[2025-11-18 06:51:05] local.INFO: Applicable discounts for student 125 {"billing_month":"2025-12","discounts_count":1,"discounts":[{"id":33,"category_id":4,"student_id":125,"discount_type":"percentage","discount_value":"30.00","reason":"Decision by higher Management","show_on_voucher":false,"valid_from":"2023-10-17T00:00:00.000000Z","valid_to":"2050-08-22T00:00:00.000000Z","company_id":null,"branch_id":null,"created_by":1,"updated_by":1,"created_at":"2025-10-29T08:49:25.000000Z","updated_at":"2025-10-29T08:49:25.000000Z","deleted_at":null}]} 
+[2025-11-18 06:51:05] local.INFO: Applicable discounts for student 141 {"billing_month":"2025-12","discounts_count":1,"discounts":[{"id":13,"category_id":4,"student_id":141,"discount_type":"percentage","discount_value":"20.00","reason":"Decision by higher Management","show_on_voucher":false,"valid_from":"2024-03-04T00:00:00.000000Z","valid_to":"2050-08-22T00:00:00.000000Z","company_id":null,"branch_id":null,"created_by":1,"updated_by":1,"created_at":"2025-10-29T08:49:25.000000Z","updated_at":"2025-10-29T08:49:25.000000Z","deleted_at":null}]} 
+[2025-11-18 06:51:05] local.INFO: Applicable discounts for student 145 {"billing_month":"2025-12","discounts_count":1,"discounts":[{"id":14,"category_id":4,"student_id":145,"discount_type":"percentage","discount_value":"20.00","reason":"Decision by higher Management","show_on_voucher":false,"valid_from":"2024-03-07T00:00:00.000000Z","valid_to":"2050-08-22T00:00:00.000000Z","company_id":null,"branch_id":null,"created_by":1,"updated_by":1,"created_at":"2025-10-29T08:49:25.000000Z","updated_at":"2025-10-29T08:49:25.000000Z","deleted_at":null}]} 
+[2025-11-18 06:51:05] local.INFO: Applicable discounts for student 160 {"billing_month":"2025-12","discounts_count":1,"discounts":[{"id":15,"category_id":4,"student_id":160,"discount_type":"percentage","discount_value":"30.00","reason":"Decision by higher Management","show_on_voucher":false,"valid_from":"2024-05-21T00:00:00.000000Z","valid_to":"2050-08-22T00:00:00.000000Z","company_id":null,"branch_id":null,"created_by":1,"updated_by":1,"created_at":"2025-10-29T08:49:25.000000Z","updated_at":"2025-10-29T08:49:25.000000Z","deleted_at":null}]} 
+[2025-11-18 06:51:05] local.INFO: Applicable discounts for student 164 {"billing_month":"2025-12","discounts_count":1,"discounts":[{"id":34,"category_id":4,"student_id":164,"discount_type":"percentage","discount_value":"20.00","reason":"Decision by higher Management","show_on_voucher":false,"valid_from":"2024-06-04T00:00:00.000000Z","valid_to":"2050-08-22T00:00:00.000000Z","company_id":null,"branch_id":null,"created_by":1,"updated_by":1,"created_at":"2025-10-29T08:49:25.000000Z","updated_at":"2025-10-29T08:49:25.000000Z","deleted_at":null}]} 
+[2025-11-18 06:51:23] local.INFO: Billing generation started {"class_id":"2","session_id":"1","billing_month":"2025-12"} 
+[2025-11-18 06:51:23] local.INFO: Students found: 24  
+[2025-11-18 06:51:23] local.INFO: Processing 24 students for billing  
+[2025-11-18 06:51:23] local.INFO: Processing student: 2 - Zayan Umer  
+[2025-11-18 06:51:23] local.INFO: Total amount calculated for student 2: 38372  
+[2025-11-18 06:51:23] local.INFO: Billing created for student 2 with ID: 366  
+[2025-11-18 06:51:23] local.INFO: Ledger created for student 2 with ID: 435  
+[2025-11-18 06:51:23] local.INFO: Journal entry created for student 2 with ID: 24  
+[2025-11-18 06:51:23] local.ERROR: LedgerService::createLedger failed: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`erp_school`.`customer_invoices`, CONSTRAINT `customer_invoices_customer_id_foreign` FOREIGN KEY (`customer_id`) REFERENCES `account_customers` (`id`)) (SQL: insert into `customer_invoices` (`invoice_number`, `student_id`, `invoice_date`, `due_date`, `subtotal`, `tax_amount`, `discount`, `total_amount`, `balance`, `status`, `branch_id`, `created_by`, `journal_entry_id`, `updated_at`, `created_at`) values (INV-000001, 2, 2025-11-18 06:51:23, 2025-11-19 00:00:00, 38372, 0, 0, 38372, 38372, sent, ?, 1, 24, 2025-11-18 06:51:23, 2025-11-18 06:51:23))  
+[2025-11-18 06:51:23] local.INFO: Processing student: 69 - Abdul Hadi  
+[2025-11-18 06:51:23] local.INFO: Total amount calculated for student 69: 22572  
+[2025-11-18 06:51:23] local.INFO: Billing created for student 69 with ID: 367  
+[2025-11-18 06:51:23] local.INFO: Ledger created for student 69 with ID: 436  
+[2025-11-18 06:51:23] local.INFO: Journal entry created for student 69 with ID: 25  
+[2025-11-18 06:51:23] local.ERROR: LedgerService::createLedger failed: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`erp_school`.`customer_invoices`, CONSTRAINT `customer_invoices_customer_id_foreign` FOREIGN KEY (`customer_id`) REFERENCES `account_customers` (`id`)) (SQL: insert into `customer_invoices` (`invoice_number`, `student_id`, `invoice_date`, `due_date`, `subtotal`, `tax_amount`, `discount`, `total_amount`, `balance`, `status`, `branch_id`, `created_by`, `journal_entry_id`, `updated_at`, `created_at`) values (INV-000001, 69, 2025-11-18 06:51:23, 2025-11-19 00:00:00, 22572, 0, 0, 22572, 22572, sent, ?, 1, 25, 2025-11-18 06:51:23, 2025-11-18 06:51:23))  
+[2025-11-18 06:51:23] local.INFO: Processing student: 74 - Zain Adnan  
+[2025-11-18 06:51:23] local.INFO: Skipping student 74: no active fee structure for the selected class/session.  
+[2025-11-18 06:51:23] local.INFO: Processing student: 95 - Adam Saad  
+[2025-11-18 06:51:23] local.INFO: Total amount calculated for student 95: 36115  
+[2025-11-18 06:51:23] local.INFO: Billing created for student 95 with ID: 368  
+[2025-11-18 06:51:23] local.INFO: Ledger created for student 95 with ID: 437  
+[2025-11-18 06:51:23] local.INFO: Journal entry created for student 95 with ID: 26  
+[2025-11-18 06:51:23] local.ERROR: LedgerService::createLedger failed: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`erp_school`.`customer_invoices`, CONSTRAINT `customer_invoices_customer_id_foreign` FOREIGN KEY (`customer_id`) REFERENCES `account_customers` (`id`)) (SQL: insert into `customer_invoices` (`invoice_number`, `student_id`, `invoice_date`, `due_date`, `subtotal`, `tax_amount`, `discount`, `total_amount`, `balance`, `status`, `branch_id`, `created_by`, `journal_entry_id`, `updated_at`, `created_at`) values (INV-000001, 95, 2025-11-18 06:51:23, 2025-11-19 00:00:00, 36115, 0, 0, 36115, 36115, sent, ?, 1, 26, 2025-11-18 06:51:23, 2025-11-18 06:51:23))  
+[2025-11-18 06:51:23] local.INFO: Processing student: 100 - Muhammad Zahid  
+[2025-11-18 06:51:23] local.INFO: Total amount calculated for student 100: 38372  
+[2025-11-18 06:51:23] local.INFO: Billing created for student 100 with ID: 369  
+[2025-11-18 06:51:23] local.INFO: Ledger created for student 100 with ID: 438  
+[2025-11-18 06:51:23] local.INFO: Journal entry created for student 100 with ID: 27  
+[2025-11-18 06:51:23] local.ERROR: LedgerService::createLedger failed: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`erp_school`.`customer_invoices`, CONSTRAINT `customer_invoices_customer_id_foreign` FOREIGN KEY (`customer_id`) REFERENCES `account_customers` (`id`)) (SQL: insert into `customer_invoices` (`invoice_number`, `student_id`, `invoice_date`, `due_date`, `subtotal`, `tax_amount`, `discount`, `total_amount`, `balance`, `status`, `branch_id`, `created_by`, `journal_entry_id`, `updated_at`, `created_at`) values (INV-000001, 100, 2025-11-18 06:51:23, 2025-11-19 00:00:00, 38372, 0, 0, 38372, 38372, sent, ?, 1, 27, 2025-11-18 06:51:23, 2025-11-18 06:51:23))  
+[2025-11-18 06:51:23] local.INFO: Processing student: 102 - Roheimann Malik  
+[2025-11-18 06:51:23] local.INFO: Total amount calculated for student 102: 38372  
+[2025-11-18 06:51:23] local.INFO: Billing created for student 102 with ID: 370  
+[2025-11-18 06:51:23] local.INFO: Ledger created for student 102 with ID: 439  
+[2025-11-18 06:51:23] local.INFO: Journal entry created for student 102 with ID: 28  
+[2025-11-18 06:51:23] local.ERROR: LedgerService::createLedger failed: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`erp_school`.`customer_invoices`, CONSTRAINT `customer_invoices_customer_id_foreign` FOREIGN KEY (`customer_id`) REFERENCES `account_customers` (`id`)) (SQL: insert into `customer_invoices` (`invoice_number`, `student_id`, `invoice_date`, `due_date`, `subtotal`, `tax_amount`, `discount`, `total_amount`, `balance`, `status`, `branch_id`, `created_by`, `journal_entry_id`, `updated_at`, `created_at`) values (INV-000001, 102, 2025-11-18 06:51:23, 2025-11-19 00:00:00, 38372, 0, 0, 38372, 38372, sent, ?, 1, 28, 2025-11-18 06:51:23, 2025-11-18 06:51:23))  
+[2025-11-18 06:51:23] local.INFO: Processing student: 134 - Harun Islah-Ud-Din  
+[2025-11-18 06:51:23] local.INFO: Total amount calculated for student 134: 38372  
+[2025-11-18 06:51:23] local.INFO: Billing created for student 134 with ID: 371  
+[2025-11-18 06:51:23] local.INFO: Ledger created for student 134 with ID: 440  
+[2025-11-18 06:51:23] local.INFO: Journal entry created for student 134 with ID: 29  
+[2025-11-18 06:51:23] local.ERROR: LedgerService::createLedger failed: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`erp_school`.`customer_invoices`, CONSTRAINT `customer_invoices_customer_id_foreign` FOREIGN KEY (`customer_id`) REFERENCES `account_customers` (`id`)) (SQL: insert into `customer_invoices` (`invoice_number`, `student_id`, `invoice_date`, `due_date`, `subtotal`, `tax_amount`, `discount`, `total_amount`, `balance`, `status`, `branch_id`, `created_by`, `journal_entry_id`, `updated_at`, `created_at`) values (INV-000001, 134, 2025-11-18 06:51:23, 2025-11-19 00:00:00, 38372, 0, 0, 38372, 38372, sent, ?, 1, 29, 2025-11-18 06:51:23, 2025-11-18 06:51:23))  
+[2025-11-18 06:51:23] local.INFO: Processing student: 140 - Muhammad Umer  
+[2025-11-18 06:51:23] local.INFO: Total amount calculated for student 140: 37615  
+[2025-11-18 06:51:23] local.INFO: Billing created for student 140 with ID: 372  
+[2025-11-18 06:51:23] local.INFO: Ledger created for student 140 with ID: 441  
+[2025-11-18 06:51:23] local.INFO: Journal entry created for student 140 with ID: 30  
+[2025-11-18 06:51:23] local.ERROR: LedgerService::createLedger failed: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`erp_school`.`customer_invoices`, CONSTRAINT `customer_invoices_customer_id_foreign` FOREIGN KEY (`customer_id`) REFERENCES `account_customers` (`id`)) (SQL: insert into `customer_invoices` (`invoice_number`, `student_id`, `invoice_date`, `due_date`, `subtotal`, `tax_amount`, `discount`, `total_amount`, `balance`, `status`, `branch_id`, `created_by`, `journal_entry_id`, `updated_at`, `created_at`) values (INV-000001, 140, 2025-11-18 06:51:23, 2025-11-19 00:00:00, 37615, 0, 0, 37615, 37615, sent, ?, 1, 30, 2025-11-18 06:51:23, 2025-11-18 06:51:23))  
+[2025-11-18 06:51:23] local.INFO: Processing student: 144 - Muhammad Azaan  
+[2025-11-18 06:51:23] local.INFO: Skipping student 144: no active fee structure for the selected class/session.  
+[2025-11-18 06:51:23] local.INFO: Processing student: 165 - Noor ul  
+[2025-11-18 06:51:23] local.INFO: Total amount calculated for student 165: 36115  
+[2025-11-18 06:51:23] local.INFO: Billing created for student 165 with ID: 373  
+[2025-11-18 06:51:23] local.INFO: Ledger created for student 165 with ID: 442  
+[2025-11-18 06:51:23] local.INFO: Journal entry created for student 165 with ID: 31  
+[2025-11-18 06:51:23] local.ERROR: LedgerService::createLedger failed: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`erp_school`.`customer_invoices`, CONSTRAINT `customer_invoices_customer_id_foreign` FOREIGN KEY (`customer_id`) REFERENCES `account_customers` (`id`)) (SQL: insert into `customer_invoices` (`invoice_number`, `student_id`, `invoice_date`, `due_date`, `subtotal`, `tax_amount`, `discount`, `total_amount`, `balance`, `status`, `branch_id`, `created_by`, `journal_entry_id`, `updated_at`, `created_at`) values (INV-000001, 165, 2025-11-18 06:51:23, 2025-11-19 00:00:00, 36115, 0, 0, 36115, 36115, sent, ?, 1, 31, 2025-11-18 06:51:23, 2025-11-18 06:51:23))  
+[2025-11-18 06:51:23] local.INFO: Processing student: 185 - Ayaan Usman  
+[2025-11-18 06:51:23] local.INFO: Total amount calculated for student 185: 45144  
+[2025-11-18 06:51:23] local.INFO: Billing created for student 185 with ID: 374  
+[2025-11-18 06:51:23] local.INFO: Ledger created for student 185 with ID: 443  
+[2025-11-18 06:51:23] local.INFO: Journal entry created for student 185 with ID: 32  
+[2025-11-18 06:51:23] local.ERROR: LedgerService::createLedger failed: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`erp_school`.`customer_invoices`, CONSTRAINT `customer_invoices_customer_id_foreign` FOREIGN KEY (`customer_id`) REFERENCES `account_customers` (`id`)) (SQL: insert into `customer_invoices` (`invoice_number`, `student_id`, `invoice_date`, `due_date`, `subtotal`, `tax_amount`, `discount`, `total_amount`, `balance`, `status`, `branch_id`, `created_by`, `journal_entry_id`, `updated_at`, `created_at`) values (INV-000001, 185, 2025-11-18 06:51:23, 2025-11-19 00:00:00, 45144, 0, 0, 45144, 45144, sent, ?, 1, 32, 2025-11-18 06:51:23, 2025-11-18 06:51:23))  
+[2025-11-18 06:51:23] local.INFO: Processing student: 194 - Daneen Aroosh  
+[2025-11-18 06:51:23] local.INFO: Total amount calculated for student 194: 33858  
+[2025-11-18 06:51:23] local.INFO: Billing created for student 194 with ID: 375  
+[2025-11-18 06:51:23] local.INFO: Ledger created for student 194 with ID: 444  
+[2025-11-18 06:51:23] local.INFO: Journal entry created for student 194 with ID: 33  
+[2025-11-18 06:51:23] local.ERROR: LedgerService::createLedger failed: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`erp_school`.`customer_invoices`, CONSTRAINT `customer_invoices_customer_id_foreign` FOREIGN KEY (`customer_id`) REFERENCES `account_customers` (`id`)) (SQL: insert into `customer_invoices` (`invoice_number`, `student_id`, `invoice_date`, `due_date`, `subtotal`, `tax_amount`, `discount`, `total_amount`, `balance`, `status`, `branch_id`, `created_by`, `journal_entry_id`, `updated_at`, `created_at`) values (INV-000001, 194, 2025-11-18 06:51:23, 2025-11-19 00:00:00, 33858, 0, 0, 33858, 33858, sent, ?, 1, 33, 2025-11-18 06:51:23, 2025-11-18 06:51:23))  
+[2025-11-18 06:51:23] local.INFO: Processing student: 199 - Wania Fatima  
+[2025-11-18 06:51:23] local.INFO: Total amount calculated for student 199: 38372  
+[2025-11-18 06:51:23] local.INFO: Billing created for student 199 with ID: 376  
+[2025-11-18 06:51:23] local.INFO: Ledger created for student 199 with ID: 445  
+[2025-11-18 06:51:23] local.INFO: Journal entry created for student 199 with ID: 34  
+[2025-11-18 06:51:23] local.ERROR: LedgerService::createLedger failed: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`erp_school`.`customer_invoices`, CONSTRAINT `customer_invoices_customer_id_foreign` FOREIGN KEY (`customer_id`) REFERENCES `account_customers` (`id`)) (SQL: insert into `customer_invoices` (`invoice_number`, `student_id`, `invoice_date`, `due_date`, `subtotal`, `tax_amount`, `discount`, `total_amount`, `balance`, `status`, `branch_id`, `created_by`, `journal_entry_id`, `updated_at`, `created_at`) values (INV-000001, 199, 2025-11-18 06:51:23, 2025-11-19 00:00:00, 38372, 0, 0, 38372, 38372, sent, ?, 1, 34, 2025-11-18 06:51:23, 2025-11-18 06:51:23))  
+[2025-11-18 06:51:23] local.INFO: Processing student: 209 - Ayaan Ahmed  
+[2025-11-18 06:51:23] local.INFO: Total amount calculated for student 209: 46872  
+[2025-11-18 06:51:23] local.INFO: Billing created for student 209 with ID: 377  
+[2025-11-18 06:51:23] local.INFO: Ledger created for student 209 with ID: 446  
+[2025-11-18 06:51:23] local.INFO: Journal entry created for student 209 with ID: 35  
+[2025-11-18 06:51:23] local.ERROR: LedgerService::createLedger failed: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`erp_school`.`customer_invoices`, CONSTRAINT `customer_invoices_customer_id_foreign` FOREIGN KEY (`customer_id`) REFERENCES `account_customers` (`id`)) (SQL: insert into `customer_invoices` (`invoice_number`, `student_id`, `invoice_date`, `due_date`, `subtotal`, `tax_amount`, `discount`, `total_amount`, `balance`, `status`, `branch_id`, `created_by`, `journal_entry_id`, `updated_at`, `created_at`) values (INV-000001, 209, 2025-11-18 06:51:23, 2025-11-19 00:00:00, 46872, 0, 0, 46872, 46872, sent, ?, 1, 35, 2025-11-18 06:51:23, 2025-11-18 06:51:23))  
+[2025-11-18 06:51:23] local.INFO: Processing student: 242 - M. AHMAD  
+[2025-11-18 06:51:23] local.INFO: Total amount calculated for student 242: 36115  
+[2025-11-18 06:51:23] local.INFO: Billing created for student 242 with ID: 378  
+[2025-11-18 06:51:23] local.INFO: Ledger created for student 242 with ID: 447  
+[2025-11-18 06:51:23] local.INFO: Journal entry created for student 242 with ID: 36  
+[2025-11-18 06:51:23] local.ERROR: LedgerService::createLedger failed: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`erp_school`.`customer_invoices`, CONSTRAINT `customer_invoices_customer_id_foreign` FOREIGN KEY (`customer_id`) REFERENCES `account_customers` (`id`)) (SQL: insert into `customer_invoices` (`invoice_number`, `student_id`, `invoice_date`, `due_date`, `subtotal`, `tax_amount`, `discount`, `total_amount`, `balance`, `status`, `branch_id`, `created_by`, `journal_entry_id`, `updated_at`, `created_at`) values (INV-000001, 242, 2025-11-18 06:51:23, 2025-11-19 00:00:00, 36115, 0, 0, 36115, 36115, sent, ?, 1, 36, 2025-11-18 06:51:23, 2025-11-18 06:51:23))  
+[2025-11-18 06:51:23] local.INFO: Processing student: 243 - Areeba Mateen  
+[2025-11-18 06:51:23] local.INFO: Total amount calculated for student 243: 9029  
+[2025-11-18 06:51:23] local.INFO: Billing created for student 243 with ID: 379  
+[2025-11-18 06:51:23] local.INFO: Ledger created for student 243 with ID: 448  
+[2025-11-18 06:51:23] local.INFO: Journal entry created for student 243 with ID: 37  
+[2025-11-18 06:51:23] local.ERROR: LedgerService::createLedger failed: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`erp_school`.`customer_invoices`, CONSTRAINT `customer_invoices_customer_id_foreign` FOREIGN KEY (`customer_id`) REFERENCES `account_customers` (`id`)) (SQL: insert into `customer_invoices` (`invoice_number`, `student_id`, `invoice_date`, `due_date`, `subtotal`, `tax_amount`, `discount`, `total_amount`, `balance`, `status`, `branch_id`, `created_by`, `journal_entry_id`, `updated_at`, `created_at`) values (INV-000001, 243, 2025-11-18 06:51:23, 2025-11-19 00:00:00, 9029, 0, 0, 9029, 9029, sent, ?, 1, 37, 2025-11-18 06:51:23, 2025-11-18 06:51:23))  
+[2025-11-18 06:51:23] local.INFO: Processing student: 245 - M. Rohan  
+[2025-11-18 06:51:23] local.INFO: Total amount calculated for student 245: 31601  
+[2025-11-18 06:51:23] local.INFO: Billing created for student 245 with ID: 380  
+[2025-11-18 06:51:24] local.INFO: Ledger created for student 245 with ID: 449  
+[2025-11-18 06:51:24] local.INFO: Journal entry created for student 245 with ID: 38  
+[2025-11-18 06:51:24] local.ERROR: LedgerService::createLedger failed: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`erp_school`.`customer_invoices`, CONSTRAINT `customer_invoices_customer_id_foreign` FOREIGN KEY (`customer_id`) REFERENCES `account_customers` (`id`)) (SQL: insert into `customer_invoices` (`invoice_number`, `student_id`, `invoice_date`, `due_date`, `subtotal`, `tax_amount`, `discount`, `total_amount`, `balance`, `status`, `branch_id`, `created_by`, `journal_entry_id`, `updated_at`, `created_at`) values (INV-000001, 245, 2025-11-18 06:51:23, 2025-11-19 00:00:00, 31601, 0, 0, 31601, 31601, sent, ?, 1, 38, 2025-11-18 06:51:24, 2025-11-18 06:51:24))  
+[2025-11-18 06:51:24] local.INFO: Processing student: 299 - Muhammad Abdullah  
+[2025-11-18 06:51:24] local.INFO: Total amount calculated for student 299: 38372  
+[2025-11-18 06:51:24] local.INFO: Billing created for student 299 with ID: 381  
+[2025-11-18 06:51:24] local.INFO: Ledger created for student 299 with ID: 450  
+[2025-11-18 06:51:24] local.INFO: Journal entry created for student 299 with ID: 39  
+[2025-11-18 06:51:24] local.ERROR: LedgerService::createLedger failed: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`erp_school`.`customer_invoices`, CONSTRAINT `customer_invoices_customer_id_foreign` FOREIGN KEY (`customer_id`) REFERENCES `account_customers` (`id`)) (SQL: insert into `customer_invoices` (`invoice_number`, `student_id`, `invoice_date`, `due_date`, `subtotal`, `tax_amount`, `discount`, `total_amount`, `balance`, `status`, `branch_id`, `created_by`, `journal_entry_id`, `updated_at`, `created_at`) values (INV-000001, 299, 2025-11-18 06:51:23, 2025-11-19 00:00:00, 38372, 0, 0, 38372, 38372, sent, ?, 1, 39, 2025-11-18 06:51:24, 2025-11-18 06:51:24))  
+[2025-11-18 06:51:24] local.INFO: Processing student: 303 - Abdul Hadi  
+[2025-11-18 06:51:24] local.INFO: Total amount calculated for student 303: 28586  
+[2025-11-18 06:51:24] local.INFO: Billing created for student 303 with ID: 382  
+[2025-11-18 06:51:24] local.INFO: Ledger created for student 303 with ID: 451  
+[2025-11-18 06:51:24] local.INFO: Journal entry created for student 303 with ID: 40  
+[2025-11-18 06:51:24] local.ERROR: LedgerService::createLedger failed: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`erp_school`.`customer_invoices`, CONSTRAINT `customer_invoices_customer_id_foreign` FOREIGN KEY (`customer_id`) REFERENCES `account_customers` (`id`)) (SQL: insert into `customer_invoices` (`invoice_number`, `student_id`, `invoice_date`, `due_date`, `subtotal`, `tax_amount`, `discount`, `total_amount`, `balance`, `status`, `branch_id`, `created_by`, `journal_entry_id`, `updated_at`, `created_at`) values (INV-000001, 303, 2025-11-18 06:51:23, 2025-11-19 00:00:00, 28586, 0, 0, 28586, 28586, sent, ?, 1, 40, 2025-11-18 06:51:24, 2025-11-18 06:51:24))  
+[2025-11-18 06:51:24] local.INFO: Processing student: 323 - Musaab Zahid  
+[2025-11-18 06:51:24] local.INFO: Total amount calculated for student 323: 46872  
+[2025-11-18 06:51:24] local.INFO: Billing created for student 323 with ID: 383  
+[2025-11-18 06:51:24] local.INFO: Ledger created for student 323 with ID: 452  
+[2025-11-18 06:51:24] local.INFO: Journal entry created for student 323 with ID: 41  
+[2025-11-18 06:51:24] local.ERROR: LedgerService::createLedger failed: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`erp_school`.`customer_invoices`, CONSTRAINT `customer_invoices_customer_id_foreign` FOREIGN KEY (`customer_id`) REFERENCES `account_customers` (`id`)) (SQL: insert into `customer_invoices` (`invoice_number`, `student_id`, `invoice_date`, `due_date`, `subtotal`, `tax_amount`, `discount`, `total_amount`, `balance`, `status`, `branch_id`, `created_by`, `journal_entry_id`, `updated_at`, `created_at`) values (INV-000001, 323, 2025-11-18 06:51:23, 2025-11-19 00:00:00, 46872, 0, 0, 46872, 46872, sent, ?, 1, 41, 2025-11-18 06:51:24, 2025-11-18 06:51:24))  
+[2025-11-18 06:51:24] local.INFO: Processing student: 374 - M Wamiq  
+[2025-11-18 06:51:24] local.INFO: Total amount calculated for student 374: 38372  
+[2025-11-18 06:51:24] local.INFO: Billing created for student 374 with ID: 384  
+[2025-11-18 06:51:24] local.INFO: Ledger created for student 374 with ID: 453  
+[2025-11-18 06:51:24] local.INFO: Journal entry created for student 374 with ID: 42  
+[2025-11-18 06:51:24] local.ERROR: LedgerService::createLedger failed: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`erp_school`.`customer_invoices`, CONSTRAINT `customer_invoices_customer_id_foreign` FOREIGN KEY (`customer_id`) REFERENCES `account_customers` (`id`)) (SQL: insert into `customer_invoices` (`invoice_number`, `student_id`, `invoice_date`, `due_date`, `subtotal`, `tax_amount`, `discount`, `total_amount`, `balance`, `status`, `branch_id`, `created_by`, `journal_entry_id`, `updated_at`, `created_at`) values (INV-000001, 374, 2025-11-18 06:51:23, 2025-11-19 00:00:00, 38372, 0, 0, 38372, 38372, sent, ?, 1, 42, 2025-11-18 06:51:24, 2025-11-18 06:51:24))  
+[2025-11-18 06:51:24] local.INFO: Processing student: 377 - Shaaf Bin  
+[2025-11-18 06:51:24] local.INFO: Total amount calculated for student 377: 36115  
+[2025-11-18 06:51:24] local.INFO: Billing created for student 377 with ID: 385  
+[2025-11-18 06:51:24] local.INFO: Ledger created for student 377 with ID: 454  
+[2025-11-18 06:51:24] local.INFO: Journal entry created for student 377 with ID: 43  
+[2025-11-18 06:51:24] local.ERROR: LedgerService::createLedger failed: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`erp_school`.`customer_invoices`, CONSTRAINT `customer_invoices_customer_id_foreign` FOREIGN KEY (`customer_id`) REFERENCES `account_customers` (`id`)) (SQL: insert into `customer_invoices` (`invoice_number`, `student_id`, `invoice_date`, `due_date`, `subtotal`, `tax_amount`, `discount`, `total_amount`, `balance`, `status`, `branch_id`, `created_by`, `journal_entry_id`, `updated_at`, `created_at`) values (INV-000001, 377, 2025-11-18 06:51:23, 2025-11-19 00:00:00, 36115, 0, 0, 36115, 36115, sent, ?, 1, 43, 2025-11-18 06:51:24, 2025-11-18 06:51:24))  
+[2025-11-18 06:51:24] local.INFO: Processing student: 481 - Muhammad Ayaan  
+[2025-11-18 06:51:24] local.INFO: Total amount calculated for student 481: 33858  
+[2025-11-18 06:51:24] local.INFO: Billing created for student 481 with ID: 386  
+[2025-11-18 06:51:24] local.INFO: Ledger created for student 481 with ID: 455  
+[2025-11-18 06:51:24] local.INFO: Journal entry created for student 481 with ID: 44  
+[2025-11-18 06:51:24] local.ERROR: LedgerService::createLedger failed: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`erp_school`.`customer_invoices`, CONSTRAINT `customer_invoices_customer_id_foreign` FOREIGN KEY (`customer_id`) REFERENCES `account_customers` (`id`)) (SQL: insert into `customer_invoices` (`invoice_number`, `student_id`, `invoice_date`, `due_date`, `subtotal`, `tax_amount`, `discount`, `total_amount`, `balance`, `status`, `branch_id`, `created_by`, `journal_entry_id`, `updated_at`, `created_at`) values (INV-000001, 481, 2025-11-18 06:51:23, 2025-11-19 00:00:00, 33858, 0, 0, 33858, 33858, sent, ?, 1, 44, 2025-11-18 06:51:24, 2025-11-18 06:51:24))  
+[2025-11-18 06:51:24] local.INFO: Processing student: 482 - Muhammad Eshaan  
+[2025-11-18 06:51:24] local.INFO: Total amount calculated for student 482: 33858  
+[2025-11-18 06:51:24] local.INFO: Billing created for student 482 with ID: 387  
+[2025-11-18 06:51:24] local.INFO: Ledger created for student 482 with ID: 456  
+[2025-11-18 06:51:24] local.INFO: Journal entry created for student 482 with ID: 45  
+[2025-11-18 06:51:24] local.ERROR: LedgerService::createLedger failed: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`erp_school`.`customer_invoices`, CONSTRAINT `customer_invoices_customer_id_foreign` FOREIGN KEY (`customer_id`) REFERENCES `account_customers` (`id`)) (SQL: insert into `customer_invoices` (`invoice_number`, `student_id`, `invoice_date`, `due_date`, `subtotal`, `tax_amount`, `discount`, `total_amount`, `balance`, `status`, `branch_id`, `created_by`, `journal_entry_id`, `updated_at`, `created_at`) values (INV-000001, 482, 2025-11-18 06:51:23, 2025-11-19 00:00:00, 33858, 0, 0, 33858, 33858, sent, ?, 1, 45, 2025-11-18 06:51:24, 2025-11-18 06:51:24))  
+[2025-11-18 06:51:29] local.INFO: Applicable discounts for student 179 {"billing_month":"2025-11","discounts_count":1,"discounts":[{"id":58,"category_id":4,"student_id":179,"discount_type":"percentage","discount_value":"20.00","reason":"Decision by higher Management","show_on_voucher":false,"valid_from":"2024-07-25T00:00:00.000000Z","valid_to":"2050-08-22T00:00:00.000000Z","company_id":null,"branch_id":null,"created_by":1,"updated_by":1,"created_at":"2025-10-29T08:49:26.000000Z","updated_at":"2025-10-29T08:49:26.000000Z","deleted_at":null}]} 
+[2025-11-18 12:45:14] local.INFO: Applicable discounts for student 179 {"billing_month":"2025-11","discounts_count":1,"discounts":[{"id":58,"category_id":4,"student_id":179,"discount_type":"percentage","discount_value":"20.00","reason":"Decision by higher Management","show_on_voucher":false,"valid_from":"2024-07-25T00:00:00.000000Z","valid_to":"2050-08-22T00:00:00.000000Z","company_id":null,"branch_id":null,"created_by":1,"updated_by":1,"created_at":"2025-10-29T08:49:26.000000Z","updated_at":"2025-10-29T08:49:26.000000Z","deleted_at":null}]} 
