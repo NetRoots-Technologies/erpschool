@@ -4,43 +4,50 @@
     <meta charset="utf-8">
     <title>Supplier Ledger PDF</title>
     <style>
-        body { 
-            font-family: DejaVu Sans, sans-serif; 
-            font-size: 12px; 
-            margin: 20px; 
-        }
-        table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            margin-bottom: 15px; 
-        }
-        th, td { 
-            border: 1px solid #555; 
-            padding: 6px; 
-            text-align: left;
-        }
-        th { 
-            background: #f2f2f2; 
-        }
-        .text-right { 
-            text-align: right; 
-        }
-        .header { 
-            text-align: center; 
-            margin-bottom: 20px; 
-        }
-        .header h2 { 
-            margin: 0; 
-        }
+        body { font-family: DejaVu Sans, sans-serif; font-size: 12px; margin: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+        th, td { border: 1px solid #555; padding: 6px; text-align: left; }
+        th { background: #f2f2f2; }
+        .text-right { text-align: right; }
+        .header { text-align: center; margin-bottom: 20px; }
+        .header h2 { margin: 0; }
+        .info-table td { padding: 6px; border: none; }
     </style>
 </head>
 <body>
 
 <div class="header">
     <h2>Supplier Ledger Report</h2>
-    <p><strong>{{ $supplier->name }}</strong></p>
-    <p>Phone: {{ $supplier->phone ?? '-' }} | Email: {{ $supplier->email ?? '-' }}</p>
 </div>
+
+<!-- SUPPLIER INFORMATION BLOCK -->
+<h3>Supplier Information</h3>
+<table class="info-table" style="border: 1px solid #555;">
+    <tr>
+        <td><strong>Name:</strong></td>
+        <td>{{ $supplier->name }}</td>
+
+        <td><strong>Contact:</strong></td>
+        <td>{{ $supplier->contact ?? '-' }}</td>
+    </tr>
+
+    <tr>
+        <td><strong>Address:</strong></td>
+        <td>{{ $supplier->address ?? '-' }}</td>
+
+        <td><strong>Email:</strong></td>
+        <td>{{ $supplier->email ?? '-' }}</td>
+    </tr>
+
+    <tr>
+        <td><strong>Type:</strong></td>
+        <td>{{ $supplier->type ?? '-' }}</td>
+
+        <td></td>
+        <td></td>
+    </tr>
+</table>
+<!-- END SUPPLIER INFO -->
 
 <h3>Purchase Orders ({{ $purchases->count() }})</h3>
 @if($purchases->count() > 0)
@@ -57,14 +64,14 @@
         @foreach($purchases as $p)
         <tr>
             <td>{{ \Carbon\Carbon::parse($p->order_date)->format('d M Y') }}</td>
-            @if ($p->type == 'F')
-                <td>{{ __('Food') }}</td>
-            @elseif ($p->type == 'S')
-                <td>{{ __('Stationary') }}</td>
-            @else
-                <td>{{ __('Uniform') }}</td>
-            @endif
-            
+
+            <td>
+                @if ($p->type == 'F') Food
+                @elseif ($p->type == 'S') Stationary
+                @else Uniform
+                @endif
+            </td>
+
             <td class="text-right">Rs. {{ number_format($p->total_amount, 2) }}</td>
             <td>{{ ucfirst($p->delivery_status ?? 'N/A') }}</td>
         </tr>
@@ -82,7 +89,6 @@
         <tr>
             <th>Date</th>
             <th>Voucher No</th>
-            {{-- <th>Invoice No</th> --}}
             <th class="text-right">Amount Paid</th>
             <th>Mode</th>
         </tr>
@@ -92,9 +98,8 @@
         <tr>
             <td>{{ \Carbon\Carbon::parse($pay->payment_date)->format('d M Y') }}</td>
             <td>{{ $pay->voucher_no ?? '-' }}</td>
-            {{-- <td>{{ optional($pay->invoice)->invoice_number ?? '-' }}</td> --}}
             <td class="text-right">Rs. {{ number_format($pay->payment_amount, 2) }}</td>
-            <td>{{ ucfirst(str_replace('_', ' ', $pay->payment_mode ?? '-')) }}</td>
+            <td>{{ ucfirst(str_replace('_', ' ', $pay->payment_mode)) }}</td>
         </tr>
         @endforeach
     </tbody>
