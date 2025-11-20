@@ -18,7 +18,6 @@ use App\Http\Controllers\Admin\DataBankController;
 use App\Http\Controllers\Student\StudentController;
 use App\Http\Controllers\Dashbboard\DashboardController;
 use App\Http\Controllers\Exam\SkillsController;
-use Illuminate\Support\Facades\Http;
 
 
 
@@ -74,77 +73,7 @@ Route::get('/sendsms', function () {
     $receiver = '923023373699';
     $sender = '8583';
     $textmessage = 'first message  from onezcommerce  ';
-});
-
-
-
-Route::get('/testsms-final3', function () {
-    $APIKey = '692bfd4fcf444774a93e511dfcf72058'; // bearer token
-    $receiver = '923234667972';
-    $sender = '923234667972';
-    $message = 'Test SMS from VT API';
-    $url = "https://api.veevotech.com/v3/sendsms?hash=692bfd4fcf444774a93e511dfcf72058&receivernum=+923234667972&receivernetwork=Receiver_Network&sendernum=Default&textmessage=HelloWorld";
-
-    // https://api.veevotech.com/v3/sendsms?hash=692bfd4fcf444774a93e511dfcf72058&receivernum=+923234667972&receivernet work=Receiver_Network&sendernum=Default&textmessage=HelloWorld
-
-    // One JSON payload containing many common aliases (best-effort)
-    $payload = [
-        // recipient aliases
-        'to' => $receiver,
-        'receivenum' => $receiver,
-        'receivenumber' => $receiver,
-        'msisdn' => $receiver,
-        'mobile' => $receiver,
-        'recipient' => $receiver,
-        'number' => $receiver,
-
-        // sender aliases
-        'from' => $sender,
-        'sender' => $sender,
-        'sendernum' => $sender,
-        'senderid' => $sender,
-        'orig' => $sender,
-
-        // message aliases
-        'text' => $message,
-        'message' => $message,
-        'msg' => $message,
-        'textmessage' => $message,
-        'body' => $message,
-        'content' => $message,
-
-        // other common meta (some providers expect these)
-        'type' => 'text',
-        'encoding' => 'utf-8',
-        'route' => 'default',
-        'flash' => 0,
-        'priority' => 'normal',
-    ];
-
-    try {
-        $resp = Http::withToken($APIKey)
-            ->timeout(30)
-            ->withOptions(['verify' => false]) // local dev; remove verify => false in production
-            ->post($url, $payload);
-
-        return response()->json([
-            'http_status' => $resp->status(),
-            'body' => $resp->body(),
-            'json' => json_decode($resp->body(), true),
-            'sent_payload' => $payload,
-        ]);
-    } catch (\Throwable $e) {
-        return response()->json([
-            'error' => true,
-            'message' => $e->getMessage(),
-        ]);
-    }
-});
-
-
-
-
-
+}); 
 Route::get('/testsms', function () {
     $APIKey = 'e8785e57ef6d6ebe153f093b0c527b86';
     $receiver = '923164225320';
