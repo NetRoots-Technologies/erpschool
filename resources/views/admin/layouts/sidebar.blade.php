@@ -1379,12 +1379,12 @@
             </a>
 
             <ul class="slide-menu" style="display: {{ $isPOSOpen ? 'block' : 'none' }}">
-                <li>
+                {{-- <li>
                     <a class="slide-item {{ request()->routeIs('inventory.pos.view') && $type === 'food' ? 'active' : '' }}"
                        href="{{ route('inventory.pos.view', ['type' => 'food']) }}">
                         POS (Food)
                     </a>
-                </li>
+                </li> --}}
                 <li>
                     <a class="slide-item {{ request()->routeIs('inventory.pos.view') && $type === 'uniform' ? 'active' : '' }}"
                        href="{{ route('inventory.pos.view', ['type' => 'uniform']) }}">
@@ -1394,6 +1394,30 @@
             </ul>
         </li>
     @endcanany
+
+    
+        {{-- ================= REPORTS (NEW MAIN MENU) ================= --}}
+        <li class="slide">
+        <a class="side-menu__item {{ request()->routeIs('inventory.reports.*') ? 'active' : '' }}"
+        data-bs-toggle="slide" href="javascript:void(0);">
+            <i class="fas fa-file-alt icons8 icon-style me-3"></i>
+            <span class="side-menu__label">Reports</span>
+            <i class="angle fe fe-chevron-down"></i>
+        </a>
+
+        <ul class="slide-menu"
+            style="display: {{ request()->routeIs('inventory.reports.*') ? 'block' : 'none' }}">
+
+            {{-- Supplier Ledger --}}
+            <li>
+                <a class="slide-item {{ request()->routeIs('inventory.reports.supplier.ledger') ? 'active' : '' }}"
+                href="{{ route('inventory.reports.supplier.ledger') }}">
+                    Supplier Ledger
+                </a>
+            </li>
+
+        </ul>
+    </li>
 @endcanany
 
 

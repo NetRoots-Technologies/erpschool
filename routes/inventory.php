@@ -20,6 +20,7 @@ use App\Http\Controllers\Admin\VendorCategoryController;
 use App\Http\Controllers\Inventory\StaffLunchController;
 use App\Http\Controllers\Admin\InventoryCategoryController;
 use App\Http\Controllers\Inventory\PurchaseOrderController;
+use App\Http\Controllers\Inventory\SupplierLedgerController;
 use App\Http\Controllers\Admin\SuppliementaryBudgetController;
 
 
@@ -168,5 +169,24 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'inventory', 'as' => 'invent
     Route::post('/vendor-management/{id}/toggle-status', [VendorController::class, 'toggleStatus'])
         ->name('inventory.vendor-management.toggleStatus');
 
+      // ===================== REPORTS ==========================
+        Route::prefix('reports')->name('reports.')->group(function () {
+
+            // Supplier Ledger Main Page (select supplier)
+            Route::get('/supplier-ledger', 
+                [SupplierLedgerController::class, 'index'])->name('supplier.ledger');
+
+            // Supplier Specific Ledger Detail
+            Route::get('/supplier-ledger/view/{id}', 
+                [SupplierLedgerController::class, 'showLedger'] )->name('supplier.ledger.view');
+
+             // supplier Ledger Exports
+             Route::get('/reports/supplier-ledger/{supplierId}/pdf', 
+               [SupplierLedgerController::class, 'exportSupplierLedgerPdf'])->name('supplier-ledger.pdf');
+
+            Route::get('/reports/supplier-ledger/{supplierId}/excel', 
+               [SupplierLedgerController::class, 'exportSupplierLedgerExcel'])->name('supplier-ledger.excel');
+
+        });
 
 });
