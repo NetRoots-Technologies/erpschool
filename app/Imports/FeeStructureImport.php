@@ -4,6 +4,7 @@ namespace App\Imports;
 
 use App\Models\Fee\FeeFactor;
 use App\Models\Fee\FeeCategory;
+use App\Models\Fee\FeeDiscount;
 use App\Models\Fee\FeeStructure;
 use App\Models\Student\Students;
 use Illuminate\Support\Facades\DB;
@@ -150,7 +151,82 @@ class FeeStructureImport implements ToModel, WithHeadingRow, SkipsEmptyRows
             ];
         }
 
-        $finalAmount = $months > 0 ? round($total / $months, 2) : $total;
+
+
+        // New Logic For Fee Structure with discount
+        
+        $discount = FeeDiscount::where('student_id',  $student_id)->first();
+       
+                $tuitionFeeCategoryWithDiscount = [];
+                $roboticsFeeCategoryWithAmount = [];
+                if ($discount) {
+                    foreach ($detailItems as $category) {
+                        $categories = FeeCategory::where('is_active', 1)->where('id', $category['fee_category_id'])->first();
+                       
+                        if ($categories['name'] == "Tuition Fee"  || $categories['name'] == "Tuition fee") {
+                            
+                            if ($discount->discount_type == "percentage") {
+                                $tuitionFeeCategoryWithDiscount = $category['amount'] - ($category['amount'] * $discount->discount_value / 100);
+                               
+                            } else {
+                                $tuitionFeeCategoryWithDiscount = $category['amount'] - $discount->discount_value;
+                            }
+                        }
+
+                        if ($categories['name'] == 'Robotics Charges' || $categories['name'] == "Robotics charges") {
+                            $roboticsFeeCategoryWithAmount = $category['amount'];
+                        }
+                    }
+                }else{
+                    foreach ($detailItems as $category) {
+                        $categories = FeeCategory::where('is_active', 1)->where('id', $category['fee_category_id'])->first();
+                        if ($categories->name == "Tuition Fee" || $categories->name == "Tuition fee") {
+                                $tuitionFeeCategoryWithDiscount = $category['amount'];
+                            }
+                        
+                        if ($categories->name == 'Robotics Charges' || $categories->name == "Robotics charges") {
+                            $roboticsFeeCategoryWithAmount = $category['amount'];
+                        }
+                    }
+                }
+
+                
+                    $tuitionFeeCategoryWithFeeFector = 0;
+                if ($tuitionFeeCategoryWithDiscount) {
+                    $factor = FeeFactor::whereRaw('LOWER(name) = ?', [$feeFactorNameKey])->first();
+                    if ($factor->factor_value == 1.0) {
+                        $tuitionFeeCategoryWithFeeFector = $tuitionFeeCategoryWithDiscount / 12;
+                    } elseif ($factor->factor_value == 1.2) {
+                        $tuitionFeeCategoryWithFeeFector = $tuitionFeeCategoryWithDiscount / 10;
+                    } elseif ($factor->factor_value == 2.0) {
+                        $tuitionFeeCategoryWithFeeFector = $tuitionFeeCategoryWithDiscount / 6;
+                    }
+                }
+                
+                $roboticsFeeCategoryWithFeeFector = 0;
+
+                if ($roboticsFeeCategoryWithAmount) {
+                    $factor = FeeFactor::whereRaw('LOWER(name) = ?', [$feeFactorNameKey])->first();;
+                    if ($factor->factor_value == 1.0) {
+                        $roboticsFeeCategoryWithFeeFector  = $roboticsFeeCategoryWithAmount / 12;
+                    } elseif ($factor->factor_value == 1.2) {
+                        $roboticsFeeCategoryWithFeeFector  = $roboticsFeeCategoryWithAmount / 10;
+                    } elseif ($factor->factor_value == 2.0) {
+                        $roboticsFeeCategoryWithFeeFector  = $roboticsFeeCategoryWithAmount / 6;
+                    }
+                }
+
+            $total = 0;
+            foreach ($detailItems as $category) {
+                $categories = FeeCategory::where('is_active', 1)->where('id', $category['fee_category_id'])->first();
+                if ($categories->name != "Tuition fee" && $categories->name != 'Robotics Charges') {
+                    $total += $category['amount'];
+                }
+                }
+   
+             $finalAmount = $tuitionFeeCategoryWithFeeFector + $roboticsFeeCategoryWithFeeFector + $total;
+            // dd($finalAmount);
+        // $finalAmount = $months > 0 ? round($total / $months, 2) : $total;
 
 
         return DB::transaction(function () use ($row, $class_id, $session_id, $feeFactor, $student_id, $finalAmount, $detailItems) {

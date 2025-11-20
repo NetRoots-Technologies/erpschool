@@ -399,22 +399,71 @@ class FeeManagementController extends Controller
             $year = now()->year;
             return redirect()->back()->with('error', "Fee structure already created for this student in year {$year}. Please update the structure.");
         }
-        $finalAmount = 0;
-        $total = collect($request->categories)->sum('amount');
-        if ($total) {
-            $factor = FeeFactor::findOrFail($request->factor_id);
 
-            if ($factor->factor_value == 1.0) {
-                $finalAmount = $total / 12;
-            } elseif ($factor->factor_value == 1.2) {
-                $finalAmount = $total / 10;
-            } elseif ($factor->factor_value == 2.0) {
-                $finalAmount = $total / 6;
-            } else {
-                $finalAmount = $total; // fallback
+        $discount = FeeDiscount::where('student_id', $request->student_id)->first();
+        $tuitionFeeCategoryWithDiscount = [];
+        $roboticsFeeCategoryWithAmount = [];
+        if ($discount) {
+            foreach ($request->categories as $category) {
+                $categories = FeeCategory::where('is_active', 1)->where('id', $category['category_id'])->first();
+                if ($categories->name == "Tuition fee") {
+                    if ($discount->discount_type == "percentage") {
+                        $tuitionFeeCategoryWithDiscount = $category['amount'] - ($category['amount'] * $discount->discount_value / 100);
+                    } else {
+                        $tuitionFeeCategoryWithDiscount = $category['amount'] - $discount->discount_value;
+                    }
+                }
+                if ($categories->name == 'Robotics Charges') {
+                    $roboticsFeeCategoryWithAmount = $category['amount'];
+                }
+            }
+        } else {
+            foreach ($request->categories as $category) {
+                $categories = FeeCategory::where('is_active', 1)->where('id', $category['category_id'])->first();
+                if ($categories->name == "Tuition Fee") {
+                    $tuitionFeeCategoryWithDiscount = $category['amount'];
+                }
+
+                if ($categories->name == 'Robotics Charges') {
+                    $roboticsFeeCategoryWithAmount = $category['amount'];
+                }
             }
         }
 
+        $tuitionFeeCategoryWithFeeFector = 0;
+        if ($tuitionFeeCategoryWithDiscount) {
+            $factor = FeeFactor::findOrFail($request->factor_id);
+            if ($factor->factor_value == 1.0) {
+                $tuitionFeeCategoryWithFeeFector = $tuitionFeeCategoryWithDiscount / 12;
+            } elseif ($factor->factor_value == 1.2) {
+                $tuitionFeeCategoryWithFeeFector = $tuitionFeeCategoryWithDiscount / 10;
+            } elseif ($factor->factor_value == 2.0) {
+                $tuitionFeeCategoryWithFeeFector = $tuitionFeeCategoryWithDiscount / 6;
+            }
+        }
+
+        $roboticsFeeCategoryWithFeeFector = 0;
+
+        if ($roboticsFeeCategoryWithAmount) {
+            $factor = FeeFactor::findOrFail($request->factor_id);
+            if ($factor->factor_value == 1.0) {
+                $roboticsFeeCategoryWithFeeFector  = $roboticsFeeCategoryWithAmount / 12;
+            } elseif ($factor->factor_value == 1.2) {
+                $roboticsFeeCategoryWithFeeFector  = $roboticsFeeCategoryWithAmount / 10;
+            } elseif ($factor->factor_value == 2.0) {
+                $roboticsFeeCategoryWithFeeFector  = $roboticsFeeCategoryWithAmount / 6;
+            }
+        }
+
+        $total = 0;
+        foreach ($request->categories as $category) {
+            $categories = FeeCategory::where('is_active', 1)->where('id', $category['category_id'])->first();
+            if ($categories->name != "Tuition fee" && $categories->name != 'Robotics Charges') {
+                $total += $category['amount'];
+            }
+        }
+
+        $finalAmount = $tuitionFeeCategoryWithFeeFector + $roboticsFeeCategoryWithFeeFector + $total;
 
         DB::beginTransaction();
         try {
@@ -480,6 +529,7 @@ class FeeManagementController extends Controller
             abort(403, 'Unauthorized access');
         }
 
+
         $request->validate([
             'name' => 'required|string|max:255',
             'academic_class_id' => 'required|exists:classes,id',
@@ -495,20 +545,71 @@ class FeeManagementController extends Controller
 
 
 
-        $finalAmount = 0;
-        $total = collect($request->categories)->sum('amount');
-        if ($total) {
-            $factor = FeeFactor::findOrFail($request->fee_factor_id);
-            if ($factor->factor_value == 1.0) {
-                $finalAmount = $total / 12;
-            } elseif ($factor->factor_value == 1.2) {
-                $finalAmount = $total / 10;
-            } elseif ($factor->factor_value == 2.0) {
-                $finalAmount = $total / 6;
-            } else {
-                $finalAmount = $total; // fallback
+        $discount = FeeDiscount::where('student_id', $request->student_id)->first();
+        $tuitionFeeCategoryWithDiscount = [];
+        $roboticsFeeCategoryWithAmount = [];
+        if ($discount) {
+            foreach ($request->categories as $category) {
+                $categories = FeeCategory::where('is_active', 1)->where('id', $category['category_id'])->first();
+                if ($categories->name == "Tuition fee") {
+                    if ($discount->discount_type == "percentage") {
+                        $tuitionFeeCategoryWithDiscount = $category['amount'] - ($category['amount'] * $discount->discount_value / 100);
+                    } else {
+                        $tuitionFeeCategoryWithDiscount = $category['amount'] - $discount->discount_value;
+                    }
+                }
+                if ($categories->name == 'Robotics Charges') {
+                    $roboticsFeeCategoryWithAmount = $category['amount'];
+                }
+            }
+        } else {
+            foreach ($request->categories as $category) {
+                $categories = FeeCategory::where('is_active', 1)->where('id', $category['category_id'])->first();
+                if ($categories->name == "Tuition Fee") {
+                    $tuitionFeeCategoryWithDiscount = $category['amount'];
+                }
+
+                if ($categories->name == 'Robotics Charges') {
+                    $roboticsFeeCategoryWithAmount = $category['amount'];
+                }
             }
         }
+
+        // dd($tuitionFeeCategoryWithDiscount , $request->fee_factor_id);
+
+        if ($tuitionFeeCategoryWithDiscount) {
+            $factor = FeeFactor::findOrFail($request->fee_factor_id);
+            if ($factor->factor_value == 1.0) {
+                $tuitionFeeCategoryWithFeeFector = $tuitionFeeCategoryWithDiscount / 12;
+            } elseif ($factor->factor_value == 1.2) {
+                $tuitionFeeCategoryWithFeeFector = $tuitionFeeCategoryWithDiscount / 10;
+            } elseif ($factor->factor_value == 2.0) {
+                $tuitionFeeCategoryWithFeeFector = $tuitionFeeCategoryWithDiscount / 6;
+            }
+        }
+
+        $roboticsFeeCategoryWithFeeFector = 0;
+
+        if ($roboticsFeeCategoryWithAmount) {
+            $factor = FeeFactor::findOrFail($request->fee_factor_id);
+            if ($factor->factor_value == 1.0) {
+                $roboticsFeeCategoryWithFeeFector  = $roboticsFeeCategoryWithAmount / 12;
+            } elseif ($factor->factor_value == 1.2) {
+                $roboticsFeeCategoryWithFeeFector  = $roboticsFeeCategoryWithAmount / 10;
+            } elseif ($factor->factor_value == 2.0) {
+                $roboticsFeeCategoryWithFeeFector  = $roboticsFeeCategoryWithAmount / 6;
+            }
+        }
+
+        $total = 0;
+        foreach ($request->categories as $category) {
+            $categories = FeeCategory::where('is_active', 1)->where('id', $category['category_id'])->first();
+            if ($categories->name != "Tuition fee" && $categories->name != 'Robotics Charges') {
+                $total += $category['amount'];
+            }
+        }
+
+        $finalAmount = $tuitionFeeCategoryWithFeeFector + $roboticsFeeCategoryWithFeeFector + $total;
 
 
         DB::beginTransaction();
@@ -540,6 +641,7 @@ class FeeManagementController extends Controller
                     'created_by' => auth()->id(),
                 ]);
             }
+
 
             DB::commit();
             return redirect()->route('admin.fee-management.structures')
@@ -1513,7 +1615,10 @@ class FeeManagementController extends Controller
                     ->where('academic_session_id', $request->academic_session_id)
                     ->where('student_id', $student->id)
                     ->where('is_active', 1)
+                    ->orderBy('id', 'desc')
                     ->first();
+
+                    // dd($feeStructure);
 
                 if (!$feeStructure) {
                     \Log::info("Skipping student {$student->id}: no active fee structure for the selected class/session.");
@@ -1600,6 +1705,7 @@ class FeeManagementController extends Controller
             $showDiscount = DB::table('fee_discounts')->where('student_id', $billing->student_id)->select('show_on_voucher')->first();
         }
 
+       
         $baseAmount     = (float) ($billing->total_amount ?? 0);
         $totalDiscount  = 0.0;
         if ($applicableDiscounts && $applicableDiscounts->count() > 0) {
@@ -1642,10 +1748,12 @@ class FeeManagementController extends Controller
         }
 
 
-        $sumForAllData =  $baseAmount - $totalDiscount + $fineAmount + $totalTransportFee +  $previousArrears;
+        // $sumForAllData =  $baseAmount - $totalDiscount + $fineAmount + $totalTransportFee +  $previousArrears;
+        $sumForAllData =  $baseAmount + $fineAmount + $totalTransportFee +  $previousArrears;
 
-        $hardcodedAmount =  $baseAmount - $totalDiscount + $totalTransportFee +  $previousArrears;
-        // dd( $baseAmount ,$totalDiscount , $fineAmount , $totalTransportFee ,  $previousArrears);
+        $hardcodedAmount =  $baseAmount + $totalTransportFee +  $previousArrears;
+        // $hardcodedAmount =  $baseAmount - $totalDiscount + $totalTransportFee +  $previousArrears;
+    
         return view('admin.fee-management.billing.print', compact('billing', 'applicableDiscounts', 'showDiscount', 'transportFees', 'totalTransportFee', 'previousArrears', 'unpaidMonthsList', 'previousUnpaidBills', 'fineAmount', 'sumForAllData', 'hardcodedAmount'));
     }
 
@@ -1748,11 +1856,14 @@ class FeeManagementController extends Controller
             //     $fineAmount += 1500;
             // }
 
-            $finalAmount = $challan->total_amount  - $totalDiscount;
+            // $finalAmount = $challan->total_amount  - $totalDiscount;
+            $finalAmount = $challan->total_amount;
 
             return response()->json([
-                'discounts' => $discounts,
-                'totalDiscount' => $totalDiscount,
+                'discounts' => 0,
+                'totalDiscount' => 0,
+                // 'discounts' => $discounts,
+                // 'totalDiscount' => $totalDiscount,
                 'finalAmount' => $finalAmount,
 
             ]);
@@ -2035,63 +2146,62 @@ class FeeManagementController extends Controller
 
         return view('admin.fee-management.reports.student-ledger', compact('student', 'collections', 'adjustments', 'feeBilling'));
     }
-    
+
     public function exportStudentLedgerPdf($studentId)
-        {
-            $student = Students::with(['academicClass', 'academicSession'])->findOrFail($studentId);
+    {
+        $student = Students::with(['academicClass', 'academicSession'])->findOrFail($studentId);
 
-            $collections = FeeCollection::where('student_id', $studentId)
-                ->with(['feeCollectionDetails.feeCategory', 'billing'])
-                ->orderBy('collection_date', 'desc')
-                ->get();
+        $collections = FeeCollection::where('student_id', $studentId)
+            ->with(['feeCollectionDetails.feeCategory', 'billing'])
+            ->orderBy('collection_date', 'desc')
+            ->get();
 
-            $adjustments = FeeAdjustment::where('student_id', $studentId)
-                ->orderBy('created_at', 'desc')
-                ->get();
-            $pdf = Pdf::loadView ('admin.fee-management.reports.student-ledger-pdf', compact('student', 'collections', 'adjustments'));
-            return $pdf->download('student-ledger-'.$student->student_id.'.pdf');
+        $adjustments = FeeAdjustment::where('student_id', $studentId)
+            ->orderBy('created_at', 'desc')
+            ->get();
+        $pdf = Pdf::loadView('admin.fee-management.reports.student-ledger-pdf', compact('student', 'collections', 'adjustments'));
+        return $pdf->download('student-ledger-' . $student->student_id . '.pdf');
+    }
 
-        }
-        
-        public function exportStudentLedgerExcel($studentId)
-        {
-            $student = Students::with(['academicClass', 'academicSession'])->findOrFail($studentId);
+    public function exportStudentLedgerExcel($studentId)
+    {
+        $student = Students::with(['academicClass', 'academicSession'])->findOrFail($studentId);
 
-            // optional reporting period from querystring (yyyy-mm-dd), fallback wide range
-            $from = request()->get('from'); // e.g. 2025-07-01
-            $to   = request()->get('to');   // e.g. 2025-10-29
+        // optional reporting period from querystring (yyyy-mm-dd), fallback wide range
+        $from = request()->get('from'); // e.g. 2025-07-01
+        $to   = request()->get('to');   // e.g. 2025-10-29
 
-            // Bills / Charges (Debit) - FeeBilling model
-            $billsQuery = FeeBilling::where('student_id', $studentId);
-            if ($from) $billsQuery->whereDate('bill_date', '>=', $from);
-            if ($to)   $billsQuery->whereDate('bill_date', '<=', $to);
-            $bills = $billsQuery->orderBy('bill_date', 'asc')->get();
+        // Bills / Charges (Debit) - FeeBilling model
+        $billsQuery = FeeBilling::where('student_id', $studentId);
+        if ($from) $billsQuery->whereDate('bill_date', '>=', $from);
+        if ($to)   $billsQuery->whereDate('bill_date', '<=', $to);
+        $bills = $billsQuery->orderBy('bill_date', 'asc')->get();
 
-            // Collections (Credit)
-            $collectionsQuery = FeeCollection::where('student_id', $studentId)
-                ->with(['feeCollectionDetails.feeCategory', 'billing']);
-            if ($from) $collectionsQuery->whereDate('collection_date', '>=', $from);
-            if ($to)   $collectionsQuery->whereDate('collection_date', '<=', $to);
-            $collections = $collectionsQuery->orderBy('collection_date', 'asc')->get();
+        // Collections (Credit)
+        $collectionsQuery = FeeCollection::where('student_id', $studentId)
+            ->with(['feeCollectionDetails.feeCategory', 'billing']);
+        if ($from) $collectionsQuery->whereDate('collection_date', '>=', $from);
+        if ($to)   $collectionsQuery->whereDate('collection_date', '<=', $to);
+        $collections = $collectionsQuery->orderBy('collection_date', 'asc')->get();
 
-            // Adjustments
-            $adjustmentsQuery = FeeAdjustment::where('student_id', $studentId);
-            if ($from) $adjustmentsQuery->whereDate('created_at', '>=', $from);
-            if ($to)   $adjustmentsQuery->whereDate('created_at', '<=', $to);
-            $adjustments = $adjustmentsQuery->orderBy('created_at', 'asc')->get();
+        // Adjustments
+        $adjustmentsQuery = FeeAdjustment::where('student_id', $studentId);
+        if ($from) $adjustmentsQuery->whereDate('created_at', '>=', $from);
+        if ($to)   $adjustmentsQuery->whereDate('created_at', '<=', $to);
+        $adjustments = $adjustmentsQuery->orderBy('created_at', 'asc')->get();
 
-            $export = new StudentLedgerSingleSheetExport(
-                $student,
-                $bills,
-                $collections,
-                $adjustments,
-                $from,
-                $to
-            );
+        $export = new StudentLedgerSingleSheetExport(
+            $student,
+            $bills,
+            $collections,
+            $adjustments,
+            $from,
+            $to
+        );
 
-            $filename = 'student-ledger-'.$student->student_id.'-'.Carbon::now()->format('Ymd_His').'.xlsx';
-            return Excel::download($export, $filename);
-        }
+        $filename = 'student-ledger-' . $student->student_id . '-' . Carbon::now()->format('Ymd_His') . '.xlsx';
+        return Excel::download($export, $filename);
+    }
 
 
     // Export and Import
