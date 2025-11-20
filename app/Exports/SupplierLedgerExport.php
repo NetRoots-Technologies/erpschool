@@ -22,7 +22,7 @@ class SupplierLedgerExport implements WithMultipleSheets
     protected $totalOrdered;
     protected $totalPaid;
     protected $outstanding;
-
+    
     public function __construct($supplier, $purchases, $payments, $totalOrdered, $totalPaid, $outstanding)
     {
         $this->supplier = $supplier;
@@ -32,7 +32,6 @@ class SupplierLedgerExport implements WithMultipleSheets
         $this->totalPaid = $totalPaid;
         $this->outstanding = $outstanding;
     }
-
     public function sheets(): array
     {
         return [
@@ -43,18 +42,20 @@ class SupplierLedgerExport implements WithMultipleSheets
     }
 }
 
+
 // Purchase Orders Sheet
 class PurchaseOrdersSheet implements FromCollection, WithHeadings, WithStyles, WithTitle, WithColumnWidths
 {
     protected $supplier;
     protected $purchases;
-
+    
     public function __construct($supplier, $purchases)
     {
         $this->supplier = $supplier;
         $this->purchases = $purchases;
     }
-
+    
+    
     public function collection()
     {
         return $this->purchases->map(function($purchase, $index) {
@@ -78,7 +79,7 @@ class PurchaseOrdersSheet implements FromCollection, WithHeadings, WithStyles, W
             ['Sr#', 'Date', 'Order No', 'Amount (Rs.)', 'Status'],
         ];
     }
-
+    
     public function columnWidths(): array
     {
         return [
@@ -89,14 +90,14 @@ class PurchaseOrdersSheet implements FromCollection, WithHeadings, WithStyles, W
             'E' => 15,  // Status
         ];
     }
-
+    
     public function styles(Worksheet $sheet)
     {
         // Merge cells for header
         $sheet->mergeCells('A1:E1');
         $sheet->mergeCells('A2:E2');
         $sheet->mergeCells('A3:E3');
-
+        
         // Main title styling
         $sheet->getStyle('A1')->applyFromArray([
             'font' => [
@@ -153,7 +154,7 @@ class PurchaseOrdersSheet implements FromCollection, WithHeadings, WithStyles, W
         // Set row height for headers
         $sheet->getRowDimension(1)->setRowHeight(25);
         $sheet->getRowDimension(5)->setRowHeight(20);
-
+        
         // Add borders and styling to data rows
         $lastRow = $sheet->getHighestRow();
         
@@ -167,15 +168,15 @@ class PurchaseOrdersSheet implements FromCollection, WithHeadings, WithStyles, W
                     ]
                 ],
             ]);
-
+            
             // Center align Sr#, Date, and Status
             $sheet->getStyle('A6:A' . $lastRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
             $sheet->getStyle('B6:B' . $lastRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
             $sheet->getStyle('E6:E' . $lastRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-
+            
             // Left align Order No
             $sheet->getStyle('C6:C' . $lastRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
-
+            
             // Right align and format Amount column
             $sheet->getStyle('D6:D' . $lastRow)->getNumberFormat()->setFormatCode('#,##0.00');
             $sheet->getStyle('D6:D' . $lastRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
@@ -207,13 +208,13 @@ class PaymentsSheet implements FromCollection, WithHeadings, WithStyles, WithTit
 {
     protected $supplier;
     protected $payments;
-
+    
     public function __construct($supplier, $payments)
     {
         $this->supplier = $supplier;
         $this->payments = $payments;
     }
-
+    
     public function collection()
     {
         return $this->payments->map(function($payment, $index) {
@@ -238,7 +239,7 @@ class PaymentsSheet implements FromCollection, WithHeadings, WithStyles, WithTit
             ['Sr#', 'Date', 'Voucher No', 'Invoice No', 'Amount Paid (Rs.)', 'Payment Mode'],
         ];
     }
-
+    
     public function columnWidths(): array
     {
         return [
@@ -274,7 +275,7 @@ class PaymentsSheet implements FromCollection, WithHeadings, WithStyles, WithTit
                 'startColor' => ['rgb' => '4472C4']
             ],
         ]);
-
+        
         // Supplier info styling
         $sheet->getStyle('A2:F3')->applyFromArray([
             'alignment' => [
@@ -332,10 +333,10 @@ class PaymentsSheet implements FromCollection, WithHeadings, WithStyles, WithTit
             $sheet->getStyle('A6:A' . $lastRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
             $sheet->getStyle('B6:B' . $lastRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
             $sheet->getStyle('F6:F' . $lastRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-
+            
             // Left align text columns
             $sheet->getStyle('C6:D' . $lastRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
-
+            
             // Right align and format Amount column
             $sheet->getStyle('E6:E' . $lastRow)->getNumberFormat()->setFormatCode('#,##0.00');
             $sheet->getStyle('E6:E' . $lastRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
@@ -369,7 +370,7 @@ class SummarySheet implements FromCollection, WithHeadings, WithStyles, WithTitl
     protected $totalOrdered;
     protected $totalPaid;
     protected $outstanding;
-
+    
     public function __construct($supplier, $totalOrdered, $totalPaid, $outstanding)
     {
         $this->supplier = $supplier;
@@ -386,7 +387,7 @@ class SummarySheet implements FromCollection, WithHeadings, WithStyles, WithTitl
             ['Outstanding Balance', $this->outstanding],
         ]);
     }
-
+    
     public function headings(): array
     {
         return [
@@ -429,7 +430,7 @@ class SummarySheet implements FromCollection, WithHeadings, WithStyles, WithTitl
                 'startColor' => ['rgb' => '4472C4']
             ],
         ]);
-
+        
         // Supplier info styling
         $sheet->getStyle('A2:B3')->applyFromArray([
             'alignment' => [
@@ -508,10 +509,11 @@ class SummarySheet implements FromCollection, WithHeadings, WithStyles, WithTitl
                 ]
             ],
         ]);
-
+        
+       
         return [];
     }
-
+    
     public function title(): string
     {
         return 'Summary';

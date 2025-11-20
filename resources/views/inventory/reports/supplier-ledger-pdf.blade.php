@@ -47,8 +47,8 @@
 <table>
     <thead>
         <tr>
-            <th>Date</th>
-            <th>Order No</th>
+            <th>Order Date</th>
+            <th>Type</th>
             <th class="text-right">Amount</th>
             <th>Status</th>
         </tr>
@@ -56,10 +56,17 @@
     <tbody>
         @foreach($purchases as $p)
         <tr>
-            <td>{{ \Carbon\Carbon::parse($p->created_at)->format('d M Y') }}</td>
-            <td>{{ $p->order_number ?? '-' }}</td>
+            <td>{{ \Carbon\Carbon::parse($p->order_date)->format('d M Y') }}</td>
+            @if ($p->type == 'F')
+                <td>{{ __('Food') }}</td>
+            @elseif ($p->type == 'S')
+                <td>{{ __('Stationary') }}</td>
+            @else
+                <td>{{ __('Uniform') }}</td>
+            @endif
+            
             <td class="text-right">Rs. {{ number_format($p->total_amount, 2) }}</td>
-            <td>{{ ucfirst($p->status ?? 'N/A') }}</td>
+            <td>{{ ucfirst($p->delivery_status ?? 'N/A') }}</td>
         </tr>
         @endforeach
     </tbody>
@@ -75,7 +82,7 @@
         <tr>
             <th>Date</th>
             <th>Voucher No</th>
-            <th>Invoice No</th>
+            {{-- <th>Invoice No</th> --}}
             <th class="text-right">Amount Paid</th>
             <th>Mode</th>
         </tr>
@@ -85,7 +92,7 @@
         <tr>
             <td>{{ \Carbon\Carbon::parse($pay->payment_date)->format('d M Y') }}</td>
             <td>{{ $pay->voucher_no ?? '-' }}</td>
-            <td>{{ optional($pay->invoice)->invoice_number ?? '-' }}</td>
+            {{-- <td>{{ optional($pay->invoice)->invoice_number ?? '-' }}</td> --}}
             <td class="text-right">Rs. {{ number_format($pay->payment_amount, 2) }}</td>
             <td>{{ ucfirst(str_replace('_', ' ', $pay->payment_mode ?? '-')) }}</td>
         </tr>

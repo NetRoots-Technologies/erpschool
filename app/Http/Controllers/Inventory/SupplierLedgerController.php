@@ -71,16 +71,15 @@ class SupplierLedgerController extends Controller
         {
             // Find supplier or 404
             $supplier = Supplier::findOrFail($supplierId);
-
             // Get purchases and payments
             $purchases = PurchaseOrder::where('supplier_id', $supplierId)
-                ->orderBy('created_at', 'asc')
+            ->orderBy('created_at', 'asc')
                 ->get();
 
             $payments = VendorPayment::where('vendor_id', $supplierId)
-                ->orderBy('payment_date', 'asc')
+            ->orderBy('payment_date', 'asc')
                 ->get();
-
+                
             // Totals
             $totalOrdered = $purchases->sum('total_amount') ?: 0;
             $totalPaid = $payments->sum('payment_amount') ?: 0;
@@ -96,24 +95,25 @@ class SupplierLedgerController extends Controller
             ]);
         return $pdf->download('supplier_ledger.pdf');
         }
-
+        
         public function exportSupplierLedgerExcel($supplierId)
         {
             $supplier = Supplier::findOrFail($supplierId);
-
+            
             $purchases = PurchaseOrder::where('supplier_id', $supplierId)
-                ->orderBy('created_at', 'asc')
-                ->get();
-
+            ->orderBy('created_at', 'asc')
+            ->get();
+            
             $payments = VendorPayment::where('vendor_id', $supplierId)
-                ->with('invoice')
-                ->orderBy('payment_date', 'asc')
-                ->get();
-
+            ->with('invoice')
+            ->orderBy('payment_date', 'asc')
+            ->get();
+            
             $totalOrdered = $purchases->sum('total_amount') ?: 0;
             $totalPaid = $payments->sum('payment_amount') ?: 0;
             $outstanding = $totalOrdered - $totalPaid;
-
+            
+            
             return Excel::download(
                 new SupplierLedgerExport($supplier, $purchases, $payments, $totalOrdered, $totalPaid, $outstanding),
                 'supplier_ledger_' . $supplier->name . '_' . now()->format('Y-m-d') . '.xlsx'
