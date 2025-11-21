@@ -647,10 +647,10 @@
                                     href="{{ route('admin.fee-management.reports.fee-bills') }}">Fee Bills Status Report</a></li>
 
                                     <li><a class="slide-item {{ request()->is('admin/fee-management/reports/fee-bills-by-class') ? 'active' : '' }}"
-                                    href="{{ route('admin.fee-management.reports.fee-bills-by-class') }}">Fee Bills By Class Report</a></li>
+                                    href="{{ route('admin.fee-management.reports.fee-bills-by-class') }}" style="display: none">Fee Bills By Class Report</a></li>
 
                                     <li><a class="slide-item {{ request()->is('admin/fee-management/reports/fee-bills-by-account') ? 'active' : '' }}"
-                                    href="{{ route('admin.fee-management.reports.fee-bills-by-account') }}">Fee Bills By Account</a></li>
+                                    href="{{ route('admin.fee-management.reports.fee-bills-by-account') }}" style="display: none">Fee Bills By Account</a></li>
                             {{-- @endcan --}}
 
 
