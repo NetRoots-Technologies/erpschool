@@ -225,7 +225,7 @@ class FeeStructureImport implements ToModel, WithHeadingRow, SkipsEmptyRows
             foreach ($details as $detail) {
                 $category = FeeCategory::find($detail->fee_category_id);
 
-                if ($category && strtolower($category->name) !== "tuition fee") {
+                if ($category->name !== "tuition fee" && $category->name !== "Tuition fee") {
                     $total += $detail->amount;
                 }
             }
