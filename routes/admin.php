@@ -243,6 +243,10 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'admin', 'as' => 'admin.'], 
 
         // Fee Bills Status Reports 
         Route::get('/reports/fee-bills', [FeeManagementController::class, 'feeBillsStatusReport'])->name('reports.fee-bills');
+        // Fee bills By Class
+        Route::get('/reports/fee-bills-by-class', [FeeManagementController::class, 'feeBillsByClass'])->name('reports.fee-bills-by-class');
+        // Fee Bills- By account
+        Route::get('/reports/fee-bills-by-account', [FeeManagementController::class, 'feeBillsByAccount'])->name('reports.fee-bills-by-account');
     });
 
     // Dashboard Route

@@ -413,9 +413,9 @@ class FeeManagementController extends Controller
                         $tuitionFeeCategoryWithDiscount = $category['amount'] - $discount->discount_value;
                     }
                 }
-                if ($categories->name == 'Robotics Charges') {
-                    $roboticsFeeCategoryWithAmount = $category['amount'];
-                }
+                // if ($categories->name == 'Robotics Charges') {
+                //     $roboticsFeeCategoryWithAmount = $category['amount'];
+                // }
             }
         } else {
             foreach ($request->categories as $category) {
@@ -424,9 +424,9 @@ class FeeManagementController extends Controller
                     $tuitionFeeCategoryWithDiscount = $category['amount'];
                 }
 
-                if ($categories->name == 'Robotics Charges') {
-                    $roboticsFeeCategoryWithAmount = $category['amount'];
-                }
+                // if ($categories->name == 'Robotics Charges') {
+                //     $roboticsFeeCategoryWithAmount = $category['amount'];
+                // }
             }
         }
 
@@ -442,28 +442,27 @@ class FeeManagementController extends Controller
             }
         }
 
-        $roboticsFeeCategoryWithFeeFector = 0;
-
-        if ($roboticsFeeCategoryWithAmount) {
-            $factor = FeeFactor::findOrFail($request->factor_id);
-            if ($factor->factor_value == 1.0) {
-                $roboticsFeeCategoryWithFeeFector  = $roboticsFeeCategoryWithAmount / 12;
-            } elseif ($factor->factor_value == 1.2) {
-                $roboticsFeeCategoryWithFeeFector  = $roboticsFeeCategoryWithAmount / 10;
-            } elseif ($factor->factor_value == 2.0) {
-                $roboticsFeeCategoryWithFeeFector  = $roboticsFeeCategoryWithAmount / 6;
-            }
-        }
+        // $roboticsFeeCategoryWithFeeFector = 0;
+        // if ($roboticsFeeCategoryWithAmount) {
+        //     $factor = FeeFactor::findOrFail($request->factor_id);
+        //     if ($factor->factor_value == 1.0) {
+        //         $roboticsFeeCategoryWithFeeFector  = $roboticsFeeCategoryWithAmount / 12;
+        //     } elseif ($factor->factor_value == 1.2) {
+        //         $roboticsFeeCategoryWithFeeFector  = $roboticsFeeCategoryWithAmount / 10;
+        //     } elseif ($factor->factor_value == 2.0) {
+        //         $roboticsFeeCategoryWithFeeFector  = $roboticsFeeCategoryWithAmount / 6;
+        //     }
+        // }
 
         $total = 0;
         foreach ($request->categories as $category) {
             $categories = FeeCategory::where('is_active', 1)->where('id', $category['category_id'])->first();
-            if ($categories->name != "Tuition fee" && $categories->name != 'Robotics Charges') {
+            if ($categories->name != "Tuition fee") {
                 $total += $category['amount'];
             }
         }
 
-        $finalAmount = $tuitionFeeCategoryWithFeeFector + $roboticsFeeCategoryWithFeeFector + $total;
+        $finalAmount = $tuitionFeeCategoryWithFeeFector + $total;
 
         DB::beginTransaction();
         try {
@@ -558,9 +557,9 @@ class FeeManagementController extends Controller
                         $tuitionFeeCategoryWithDiscount = $category['amount'] - $discount->discount_value;
                     }
                 }
-                if ($categories->name == 'Robotics Charges') {
-                    $roboticsFeeCategoryWithAmount = $category['amount'];
-                }
+                // if ($categories->name == 'Robotics Charges') {
+                //     $roboticsFeeCategoryWithAmount = $category['amount'];
+                // }
             }
         } else {
             foreach ($request->categories as $category) {
@@ -569,9 +568,9 @@ class FeeManagementController extends Controller
                     $tuitionFeeCategoryWithDiscount = $category['amount'];
                 }
 
-                if ($categories->name == 'Robotics Charges') {
-                    $roboticsFeeCategoryWithAmount = $category['amount'];
-                }
+                // if ($categories->name == 'Robotics Charges') {
+                //     $roboticsFeeCategoryWithAmount = $category['amount'];
+                // }
             }
         }
 
@@ -588,28 +587,28 @@ class FeeManagementController extends Controller
             }
         }
 
-        $roboticsFeeCategoryWithFeeFector = 0;
+        // $roboticsFeeCategoryWithFeeFector = 0;
 
-        if ($roboticsFeeCategoryWithAmount) {
-            $factor = FeeFactor::findOrFail($request->fee_factor_id);
-            if ($factor->factor_value == 1.0) {
-                $roboticsFeeCategoryWithFeeFector  = $roboticsFeeCategoryWithAmount / 12;
-            } elseif ($factor->factor_value == 1.2) {
-                $roboticsFeeCategoryWithFeeFector  = $roboticsFeeCategoryWithAmount / 10;
-            } elseif ($factor->factor_value == 2.0) {
-                $roboticsFeeCategoryWithFeeFector  = $roboticsFeeCategoryWithAmount / 6;
-            }
-        }
+        // if ($roboticsFeeCategoryWithAmount) {
+        //     $factor = FeeFactor::findOrFail($request->fee_factor_id);
+        //     if ($factor->factor_value == 1.0) {
+        //         $roboticsFeeCategoryWithFeeFector  = $roboticsFeeCategoryWithAmount / 12;
+        //     } elseif ($factor->factor_value == 1.2) {
+        //         $roboticsFeeCategoryWithFeeFector  = $roboticsFeeCategoryWithAmount / 10;
+        //     } elseif ($factor->factor_value == 2.0) {
+        //         $roboticsFeeCategoryWithFeeFector  = $roboticsFeeCategoryWithAmount / 6;
+        //     }
+        // }
 
         $total = 0;
         foreach ($request->categories as $category) {
             $categories = FeeCategory::where('is_active', 1)->where('id', $category['category_id'])->first();
-            if ($categories->name != "Tuition fee" && $categories->name != 'Robotics Charges') {
+            if ($categories->name != "Tuition fee") {
                 $total += $category['amount'];
             }
         }
 
-        $finalAmount = $tuitionFeeCategoryWithFeeFector + $roboticsFeeCategoryWithFeeFector + $total;
+        $finalAmount = $tuitionFeeCategoryWithFeeFector  + $total;
 
 
         DB::beginTransaction();
@@ -2402,4 +2401,146 @@ class FeeManagementController extends Controller
         $classes = AcademicClass::where('status', 1)->get();
         return view('admin.fee-management.reports.student-fee-status', compact('classes'));
     }
+
+    // feeBillsByClass
+  public function feeBillsByClass(Request $request)
+    {
+
+        if ($request->ajax()) {
+            $feeBilling = FeeBilling::with(['student.academicClass', 'academicSession', 'createdBy']);
+
+            if ($request->has('filter_month') && !empty($request->filter_month)) {
+                $feeBilling->where('billing_month', $request->filter_month);
+            }
+
+            if ($request->has('status') && !empty($request->status)) {
+                $feeBilling->where('status', $request->status);
+            }
+
+            return DataTables::of($feeBilling)
+
+                ->addColumn('student_name', function ($data) {
+                    return $data->student->fullname;
+                })
+
+                ->addColumn('student_id', function ($data) {
+                    return $data->student->student_id;
+                })
+
+                ->addColumn('father_name', function ($data) {
+                    return $data->student->father_name;
+                })
+
+                ->addColumn('class', function ($data) {
+                    return $data->student->academicClass->name;
+                })
+
+                ->addColumn('session', function ($data) {
+                    return $data->academicSession->name;
+                })
+
+                ->addColumn('outstanding_amount', function ($data) {
+                    return $data->outstanding_amount;
+                })
+
+
+                ->addColumn('status', function ($data) {
+                    if ($data->status == 'paid') {
+                        return '<span class="badge badge-success"> Paid </span>';
+                    } elseif ($data->status == 'partially_paid') {
+                        return '<span class="badge badge-warning"> Partially Paid </span>';
+                    } else {
+                        return '<span class="badge badge-info"> Generated </span>';
+                    }
+                })
+                ->filter(function ($query) use ($request) {
+                    if ($request->has('class_id') && !empty($request->class_id)) {
+                        $query->whereHas('student', function ($q) use ($request) {
+                            $q->where('class_id', $request->class_id);
+                        });
+                    }
+                })
+
+
+
+                ->rawColumns(['father_name', 'student_name', 'class', 'session', 'student_id', 'status' , 'outstanding_amount'])
+                ->addIndexColumn()
+                ->make(true);
+        }
+
+        $classes = AcademicClass::where('status', 1)->get();
+        return view('admin.fee-management.reports.fee-bills-by-class', compact('classes'));
+    }
+
+    // feeBillsByAccount
+
+     public function feeBillsByAccount(Request $request)
+    {
+
+        if ($request->ajax()) {
+            $feeBilling = FeeBilling::with(['student.academicClass', 'academicSession', 'createdBy']);
+
+            if ($request->has('filter_month') && !empty($request->filter_month)) {
+                $feeBilling->where('billing_month', $request->filter_month);
+            }
+
+            if ($request->has('status') && !empty($request->status)) {
+                $feeBilling->where('status', $request->status);
+            }
+
+            return DataTables::of($feeBilling)
+
+                ->addColumn('student_name', function ($data) {
+                    return $data->student->fullname;
+                })
+
+                ->addColumn('student_id', function ($data) {
+                    return $data->student->student_id;
+                })
+
+                ->addColumn('father_name', function ($data) {
+                    return $data->student->father_name;
+                })
+
+                ->addColumn('class', function ($data) {
+                    return $data->student->academicClass->name;
+                })
+
+                ->addColumn('session', function ($data) {
+                    return $data->academicSession->name;
+                })
+
+                ->addColumn('outstanding_amount', function ($data) {
+                    return $data->outstanding_amount;
+                })
+
+
+                ->addColumn('status', function ($data) {
+                    if ($data->status == 'paid') {
+                        return '<span class="badge badge-success"> Paid </span>';
+                    } elseif ($data->status == 'partially_paid') {
+                        return '<span class="badge badge-warning"> Partially Paid </span>';
+                    } else {
+                        return '<span class="badge badge-info"> Generated </span>';
+                    }
+                })
+                ->filter(function ($query) use ($request) {
+                    if ($request->has('class_id') && !empty($request->class_id)) {
+                        $query->whereHas('student', function ($q) use ($request) {
+                            $q->where('class_id', $request->class_id);
+                        });
+                    }
+                })
+
+
+
+                ->rawColumns(['father_name', 'student_name', 'class', 'session', 'student_id', 'status' , 'outstanding_amount'])
+                ->addIndexColumn()
+                ->make(true);
+        }
+
+        $classes = AcademicClass::where('status', 1)->get();
+        return view('admin.fee-management.reports.fee-bills-by-class', compact('classes'));
+    }
+
 }

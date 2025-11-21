@@ -173,9 +173,9 @@ class FeeStructureImport implements ToModel, WithHeadingRow, SkipsEmptyRows
                             }
                         }
 
-                        if ($categories['name'] == 'Robotics Charges' || $categories['name'] == "Robotics charges") {
-                            $roboticsFeeCategoryWithAmount = $category['amount'];
-                        }
+                        // if ($categories['name'] == 'Robotics Charges' || $categories['name'] == "Robotics charges") {
+                        //     $roboticsFeeCategoryWithAmount = $category['amount'];
+                        // }
                     }
                 }else{
                     foreach ($detailItems as $category) {
@@ -184,9 +184,9 @@ class FeeStructureImport implements ToModel, WithHeadingRow, SkipsEmptyRows
                                 $tuitionFeeCategoryWithDiscount = $category['amount'];
                             }
                         
-                        if ($categories->name == 'Robotics Charges' || $categories->name == "Robotics charges") {
-                            $roboticsFeeCategoryWithAmount = $category['amount'];
-                        }
+                        // if ($categories->name == 'Robotics Charges' || $categories->name == "Robotics charges") {
+                        //     $roboticsFeeCategoryWithAmount = $category['amount'];
+                        // }
                     }
                 }
 
@@ -203,28 +203,28 @@ class FeeStructureImport implements ToModel, WithHeadingRow, SkipsEmptyRows
                     }
                 }
                 
-                $roboticsFeeCategoryWithFeeFector = 0;
+                // $roboticsFeeCategoryWithFeeFector = 0;
 
-                if ($roboticsFeeCategoryWithAmount) {
-                    $factor = FeeFactor::whereRaw('LOWER(name) = ?', [$feeFactorNameKey])->first();;
-                    if ($factor->factor_value == 1.0) {
-                        $roboticsFeeCategoryWithFeeFector  = $roboticsFeeCategoryWithAmount / 12;
-                    } elseif ($factor->factor_value == 1.2) {
-                        $roboticsFeeCategoryWithFeeFector  = $roboticsFeeCategoryWithAmount / 10;
-                    } elseif ($factor->factor_value == 2.0) {
-                        $roboticsFeeCategoryWithFeeFector  = $roboticsFeeCategoryWithAmount / 6;
-                    }
-                }
+                // if ($roboticsFeeCategoryWithAmount) {
+                //     $factor = FeeFactor::whereRaw('LOWER(name) = ?', [$feeFactorNameKey])->first();;
+                //     if ($factor->factor_value == 1.0) {
+                //         $roboticsFeeCategoryWithFeeFector  = $roboticsFeeCategoryWithAmount / 12;
+                //     } elseif ($factor->factor_value == 1.2) {
+                //         $roboticsFeeCategoryWithFeeFector  = $roboticsFeeCategoryWithAmount / 10;
+                //     } elseif ($factor->factor_value == 2.0) {
+                //         $roboticsFeeCategoryWithFeeFector  = $roboticsFeeCategoryWithAmount / 6;
+                //     }
+                // }
 
             $total = 0;
             foreach ($detailItems as $category) {
                 $categories = FeeCategory::where('is_active', 1)->where('id', $category['fee_category_id'])->first();
-                if ($categories->name != "Tuition fee" && $categories->name != 'Robotics Charges') {
+                if ($categories->name != "Tuition fee" || $categories->name != "Tuition Fee") {
                     $total += $category['amount'];
                 }
                 }
    
-             $finalAmount = $tuitionFeeCategoryWithFeeFector + $roboticsFeeCategoryWithFeeFector + $total;
+             $finalAmount = $tuitionFeeCategoryWithFeeFector + $total;
             // dd($finalAmount);
         // $finalAmount = $months > 0 ? round($total / $months, 2) : $total;
 
