@@ -1782,6 +1782,7 @@ class FeeManagementController extends Controller
 
         $challans = FeeBilling::where('student_id', $studentId)
             ->where('status', '!=', 'draft')
+            ->where('outstanding_amount', '>', 0)
             ->orderBy('created_at', 'desc')
             ->get()
             ->map(function ($challan) {
@@ -1790,7 +1791,7 @@ class FeeManagementController extends Controller
                 $finalAmount = $challan->getFinalAmount();
 
                 $fine_amount = 0;
-                if (now()->gt($challan->due_date)) {
+                if (now()->gt($challan->due_date) ) {
                     $fine_amount += 1500;
                 }
 
