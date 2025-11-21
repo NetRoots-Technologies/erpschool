@@ -217,15 +217,23 @@ class FeeStructureImport implements ToModel, WithHeadingRow, SkipsEmptyRows
                 // }
 
             $total = 0;
-            foreach ($detailItems as $category) {
-                $categories = FeeCategory::where('is_active', 1)->where('id', $category['fee_category_id'])->first();
-                if ($categories->name != "Tuition fee" || $categories->name != "Tuition Fee") {
-                    $total += $category['amount'];
+            foreach ($detailItems as $item) {
+            $details = FeeStructureDetail::where('fee_structure_id', $factor->id)
+                ->where('fee_category_id', $item['fee_category_id'])
+                ->get();
+
+            foreach ($details as $detail) {
+                $category = FeeCategory::find($detail->fee_category_id);
+
+                if ($category && strtolower($category->name) !== "tuition fee") {
+                    $total += $detail->amount;
                 }
-                }
+            }
+        }
    
              $finalAmount = $tuitionFeeCategoryWithFeeFector + $total;
-            // dd($finalAmount);
+            //  dd($finalAmount , $tuitionFeeCategoryWithFeeFector  , $total , $discount , $factor);
+            
         // $finalAmount = $months > 0 ? round($total / $months, 2) : $total;
 
 
