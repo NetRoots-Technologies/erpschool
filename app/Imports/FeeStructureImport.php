@@ -215,7 +215,7 @@ class FeeStructureImport implements ToModel, WithHeadingRow, SkipsEmptyRows
                 //         $roboticsFeeCategoryWithFeeFector  = $roboticsFeeCategoryWithAmount / 6;
                 //     }
                 // }
-
+            $factor = FeeFactor::whereRaw('LOWER(name) = ?', [$feeFactorNameKey])->first();
             $total = 0;
             foreach ($detailItems as $item) {
             $details = FeeStructureDetail::where('fee_structure_id', $factor->id)

@@ -388,17 +388,17 @@ class FeeManagementController extends Controller
         ]);
 
         // ✅ Step 1: Check if already created
-        $exists = FeeStructure::where('academic_class_id', $request->class_id)
-            ->where('academic_session_id', $request->session_id)
-            ->where('fee_factor_id', $request->factor_id)
-            ->where('student_id', $request->student_id)
-            ->whereYear('created_at', '=', now()->year)
-            ->exists();
+        // $exists = FeeStructure::where('academic_class_id', $request->class_id)
+        //     ->where('academic_session_id', $request->session_id)
+        //     ->where('fee_factor_id', $request->factor_id)
+        //     ->where('student_id', $request->student_id)
+        //     ->whereYear('created_at', '=', now()->year)
+        //     ->exists();
 
-        if ($exists) {
-            $year = now()->year;
-            return redirect()->back()->with('error', "Fee structure already created for this student in year {$year}. Please update the structure.");
-        }
+        // if ($exists) {
+        //     $year = now()->year;
+        //     return redirect()->back()->with('error', "Fee structure already created for this student in year {$year}. Please update the structure.");
+        // }
 
         $discount = FeeDiscount::where('student_id', $request->student_id)->first();
         $tuitionFeeCategoryWithDiscount = [];
@@ -462,8 +462,10 @@ class FeeManagementController extends Controller
             }
         }
 
+
         $finalAmount = $tuitionFeeCategoryWithFeeFector + $total;
 
+        dd( $finalAmount );
         DB::beginTransaction();
         try {
             $structure = FeeStructure::create([
