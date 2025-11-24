@@ -61,7 +61,7 @@ class AccountLedger extends Model
     public function updateBalance($debit, $credit)
     {
         $balance = $this->current_balance;
-        dd( $balance , $debit , $credit);
+        
         if ($this->current_balance_type == 'debit') {
             $balance += $debit - $credit;
         } else {

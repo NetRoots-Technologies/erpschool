@@ -465,7 +465,7 @@ class FeeManagementController extends Controller
 
         $finalAmount = $tuitionFeeCategoryWithFeeFector + $total;
 
-        dd( $finalAmount );
+        
         DB::beginTransaction();
         try {
             $structure = FeeStructure::create([
@@ -1919,7 +1919,7 @@ class FeeManagementController extends Controller
      */
     public function storeChallanPayment(Request $request)
     {
-
+        
         if (!Gate::allows('Dashboard-list')) {
             abort(403, 'Unauthorized access');
         }
@@ -2028,7 +2028,7 @@ class FeeManagementController extends Controller
                 \Log::info("Collection ID: {$collection->id}, Challan: {$challan->challan_number}, Student ID: {$collection->student_id}, Amount: {$collection->paid_amount}");
 
                 $integrationController = new \App\Http\Controllers\Accounts\IntegrationController();
-
+               
                 $integrationRequest = new \Illuminate\Http\Request([
                     'student_id' => $collection->student_id,
                     'fee_amount' => $collection->paid_amount,
@@ -2040,8 +2040,8 @@ class FeeManagementController extends Controller
                 \Log::info("Calling recordAcademicFee with data: " . json_encode($integrationRequest->all()));
 
                 $response = $integrationController->recordAcademicFee($integrationRequest);
+                dd($response);
                 $responseData = $response->getData(true);
-
                 \Log::info("Integration response: " . json_encode($responseData));
 
                 if (isset($responseData['success']) && $responseData['success']) {
@@ -2542,7 +2542,8 @@ class FeeManagementController extends Controller
         }
 
         $classes = AcademicClass::where('status', 1)->get();
-        return view('admin.fee-management.reports.fee-bills-by-class', compact('classes'));
+        $categories = FeeCategory::where('is_active', 1)->get();
+        return view('admin.fee-management.reports.fee-bills-by-account', compact('classes'));
     }
 
 }
