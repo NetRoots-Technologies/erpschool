@@ -247,6 +247,9 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'admin', 'as' => 'admin.'], 
         Route::get('/reports/fee-bills-by-class', [FeeManagementController::class, 'feeBillsByClass'])->name('reports.fee-bills-by-class');
         // Fee Bills- By account
         Route::get('/reports/fee-bills-by-account', [FeeManagementController::class, 'feeBillsByAccount'])->name('reports.fee-bills-by-account');
+          // Fee Bills By Category Reports 
+        Route::get('/reports/category-bills', [FeeManagementController::class, 'feeBillsByCategoryReport'])->name('reports.category');
+
     });
 
     // Dashboard Route

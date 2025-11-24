@@ -651,6 +651,9 @@
 
                                     <li><a class="slide-item {{ request()->is('admin/fee-management/reports/fee-bills-by-account') ? 'active' : '' }}"
                                     href="{{ route('admin.fee-management.reports.fee-bills-by-account') }}" style="display: none">Fee Bills By Account</a></li>
+                                       <li><a class="slide-item {{ request()->is('admin/fee-management/reports/fee-bills*') ? 'active' : '' }}"
+                                    href="{{ route('admin.fee-management.reports.category') }}">Fee Bills By Category</a></li>
+
                             {{-- @endcan --}}
 
 

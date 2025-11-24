@@ -2544,5 +2544,70 @@ class FeeManagementController extends Controller
         $categories = FeeCategory::where('is_active', 1)->get();
         return view('admin.fee-management.reports.fee-bills-by-account', compact('classes'));
     }
+       
+  public function feeBillsByCategoryReport(Request $request)
+    {
+        if ($request->ajax()) {
 
+            $details = FeeCollectionDetail::with([
+                'feeCategory',
+                'feeCollection.student.academicClass',
+                'feeCollection.academicSession',
+                'feeCollection.createdBy',
+                'feeCollection.billing',
+            ]);
+
+            // Fee category filter (uncomment if needed)
+            if ($request->filled('category_id')) {
+                $details->where('fee_category_id', $request->category_id);
+            }
+
+            // Optional filter by student class
+            $details->when($request->filled('class_id'), function ($q) use ($request) {
+                $q->whereHas('feeCollection.student', function ($sq) use ($request) {
+                    $sq->where('class_id', $request->class_id);
+                });
+            });
+
+            return DataTables::of($details)
+                ->addColumn('student_name', function ($row) {
+                    return optional($row->feeCollection->student)->fullname ?? '-';
+                })
+                ->addColumn('student_id', function ($row) {
+                    return optional($row->feeCollection->student)->student_id ?? '-';
+                })
+                ->addColumn('father_name', function ($row) {
+                    return optional($row->feeCollection->student)->father_name ?? '-';
+    
+                }) ->addColumn('category_amount', function ($row) {
+                        // dd($row->feeCategory->amount);
+                        return optional($row)->amount ?? '-';
+                 })
+
+                ->addColumn('category_name', function ($row) {
+                    return optional($row->feeCategory)->name ?? '-';
+                })
+                ->addColumn('billing_month', function ($row) {
+                    return optional($row->feeCollection->billing)->billing_month ?? '-';
+                })
+                ->addColumn('challan_number', function ($row) {
+                    return optional($row->feeCollection->billing)->challan_number ?? '-';
+                })
+                ->rawColumns([
+                    'student_name','student_id','father_name',
+                    'category_name','category_amount',
+                    'billing_month','challan_number'
+                ])
+                ->addIndexColumn()
+                ->make(true);
+        }
+
+        // Load categories for filter dropdown
+        $categories = FeeCategory::where('is_active', 1)
+                            ->select('id','name')
+                            ->orderBy('name')
+                            ->get();
+
+        return view('admin.fee-management.reports.category-bills', compact('categories'));
+    }
 }
