@@ -2040,7 +2040,6 @@ class FeeManagementController extends Controller
                 \Log::info("Calling recordAcademicFee with data: " . json_encode($integrationRequest->all()));
 
                 $response = $integrationController->recordAcademicFee($integrationRequest);
-                dd($response);
                 $responseData = $response->getData(true);
                 \Log::info("Integration response: " . json_encode($responseData));
 
