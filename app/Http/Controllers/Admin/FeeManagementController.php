@@ -38,6 +38,7 @@ use App\Models\Accounts\CustomerInvoice;
 use App\Models\Fee\StudentFeeAssignment;
 use Yajra\DataTables\Facades\DataTables;
 use App\Exports\StudentLedgerSingleSheetExport;
+use Illuminate\Support\Facades\Storage;
 
 
 class FeeManagementController extends Controller
@@ -465,7 +466,7 @@ class FeeManagementController extends Controller
 
         $finalAmount = $tuitionFeeCategoryWithFeeFector + $total;
 
-        
+
         DB::beginTransaction();
         try {
             $structure = FeeStructure::create([
@@ -1619,7 +1620,7 @@ class FeeManagementController extends Controller
                     ->orderBy('id', 'desc')
                     ->first();
 
-                    // dd($feeStructure);
+                // dd($feeStructure);
 
                 if (!$feeStructure) {
                     \Log::info("Skipping student {$student->id}: no active fee structure for the selected class/session.");
@@ -1706,7 +1707,7 @@ class FeeManagementController extends Controller
             $showDiscount = DB::table('fee_discounts')->where('student_id', $billing->student_id)->select('show_on_voucher')->first();
         }
 
-       
+
         $baseAmount     = (float) ($billing->total_amount ?? 0);
         $totalDiscount  = 0.0;
         if ($applicableDiscounts && $applicableDiscounts->count() > 0) {
@@ -1754,7 +1755,7 @@ class FeeManagementController extends Controller
 
         $hardcodedAmount =  $baseAmount + $totalTransportFee +  $previousArrears;
         // $hardcodedAmount =  $baseAmount - $totalDiscount + $totalTransportFee +  $previousArrears;
-    
+
         return view('admin.fee-management.billing.print', compact('billing', 'applicableDiscounts', 'showDiscount', 'transportFees', 'totalTransportFee', 'previousArrears', 'unpaidMonthsList', 'previousUnpaidBills', 'fineAmount', 'sumForAllData', 'hardcodedAmount'));
     }
 
@@ -1792,7 +1793,7 @@ class FeeManagementController extends Controller
                 $finalAmount = $challan->getFinalAmount();
 
                 $fine_amount = 0;
-                if (now()->gt($challan->due_date) ) {
+                if (now()->gt($challan->due_date)) {
                     $fine_amount += 1500;
                 }
 
@@ -1919,7 +1920,7 @@ class FeeManagementController extends Controller
      */
     public function storeChallanPayment(Request $request)
     {
-        
+
         if (!Gate::allows('Dashboard-list')) {
             abort(403, 'Unauthorized access');
         }
@@ -2028,7 +2029,7 @@ class FeeManagementController extends Controller
                 \Log::info("Collection ID: {$collection->id}, Challan: {$challan->challan_number}, Student ID: {$collection->student_id}, Amount: {$collection->paid_amount}");
 
                 $integrationController = new \App\Http\Controllers\Accounts\IntegrationController();
-               
+
                 $integrationRequest = new \Illuminate\Http\Request([
                     'student_id' => $collection->student_id,
                     'fee_amount' => $collection->paid_amount,
@@ -2404,7 +2405,7 @@ class FeeManagementController extends Controller
     }
 
     // feeBillsByClass
-  public function feeBillsByClass(Request $request)
+    public function feeBillsByClass(Request $request)
     {
 
         if ($request->ajax()) {
@@ -2464,7 +2465,7 @@ class FeeManagementController extends Controller
 
 
 
-                ->rawColumns(['father_name', 'student_name', 'class', 'session', 'student_id', 'status' , 'outstanding_amount'])
+                ->rawColumns(['father_name', 'student_name', 'class', 'session', 'student_id', 'status', 'outstanding_amount'])
                 ->addIndexColumn()
                 ->make(true);
         }
@@ -2474,75 +2475,213 @@ class FeeManagementController extends Controller
     }
 
     // feeBillsByAccount
-
-     public function feeBillsByAccount(Request $request)
+    public function feeBillsByAccount(Request $request)
     {
-
         if ($request->ajax()) {
-            $feeBilling = FeeBilling::with(['student.academicClass', 'academicSession', 'createdBy']);
 
-            if ($request->has('filter_month') && !empty($request->filter_month)) {
-                $feeBilling->where('billing_month', $request->filter_month);
-            }
+            // Query: one row per fee collection detail
+            $details = FeeCollectionDetail::with([
+                'feeCategory',
+                'feeCollection.student.academicClass',
+                'feeCollection.academicSession',
+                'feeCollection.createdBy',
+                'feeCollection.billing',
+            ]);
 
-            if ($request->has('status') && !empty($request->status)) {
-                $feeBilling->where('status', $request->status);
-            }
+            // filter by billing month (billing is on feeCollection)
+            $details->when($request->filled('filter_month'), function ($q) use ($request) {
+                $q->whereHas('feeCollection.billing', function ($qb) use ($request) {
+                    $qb->where('billing_month', $request->filter_month);
+                });
+            });
 
-            return DataTables::of($feeBilling)
-
-                ->addColumn('student_name', function ($data) {
-                    return $data->student->fullname;
-                })
-
-                ->addColumn('student_id', function ($data) {
-                    return $data->student->student_id;
-                })
-
-                ->addColumn('father_name', function ($data) {
-                    return $data->student->father_name;
-                })
-
-                ->addColumn('class', function ($data) {
-                    return $data->student->academicClass->name;
-                })
-
-                ->addColumn('session', function ($data) {
-                    return $data->academicSession->name;
-                })
-
-                ->addColumn('outstanding_amount', function ($data) {
-                    return $data->outstanding_amount;
-                })
-
-
-                ->addColumn('status', function ($data) {
-                    if ($data->status == 'paid') {
-                        return '<span class="badge badge-success"> Paid </span>';
-                    } elseif ($data->status == 'partially_paid') {
-                        return '<span class="badge badge-warning"> Partially Paid </span>';
-                    } else {
-                        return '<span class="badge badge-info"> Generated </span>';
-                    }
-                })
-                ->filter(function ($query) use ($request) {
-                    if ($request->has('class_id') && !empty($request->class_id)) {
-                        $query->whereHas('student', function ($q) use ($request) {
-                            $q->where('class_id', $request->class_id);
+            // filter by category: either detail's fee_category_id or fee_collection.category_id
+            $details->when($request->filled('category_id'), function ($q) use ($request) {
+                $q->where(function ($qq) use ($request) {
+                    $qq->where('fee_category_id', $request->category_id)
+                        ->orWhereHas('feeCollection', function ($q2) use ($request) {
+                            $q2->where('fee_category_id', $request->category_id);
                         });
-                    }
+                });
+            });
+
+            return DataTables::of($details)
+                ->addColumn('challan_number', function ($d) {
+                    return optional($d->feeCollection->billing)->challan_number ?? '-';
                 })
+                ->addColumn('billing_month', function ($d) {
+                    return optional($d->feeCollection->billing)->billing_month ?? '-';
+                })
+                ->addColumn('student_id', function ($d) {
+                    return optional($d->feeCollection->student)->student_id ?? '-';
+                })
+                ->addColumn('student_name', function ($d) {
+                    return optional($d->feeCollection->student)->fullname ?? '-';
+                })
+                ->addColumn('father_name', function ($d) {
+                    return optional($d->feeCollection->student)->father_name ?? '-';
+                })
+                ->addColumn('previous_outstanding', function ($d) {
+                    // student id and current billing info
+                    $student = optional($d->feeCollection->student);
+                    // try multiple ways to get student id
+                    $studentId = $student->id ?? $d->feeCollection->student_id ?? null;
+
+                    $currentBilling = optional($d->feeCollection->billing);
+                    $currentBillingMonth = $currentBilling->billing_month ?? null; // could be '2025-11' or '2025-11-05' etc
+                    $currentBillingId = $currentBilling->id ?? null;
+
+                    if (! $studentId || ! $currentBillingMonth) {
+                        return 0;
+                    }
+
+                    $query = FeeBilling::where('student_id', $studentId)
+                        ->where('billing_month', '<', $currentBillingMonth)
+                        ->orderBy('billing_month', 'DESC')
+                        ->first();
+
+                    // dd($query ,  $currentBillingMonth , $studentId);
+                    // $currentDate = date('Y-m-d', strtotime($currentBillingMonth));
+                    // $previousBill = $query
+                    //     ->where('billing_month', '<', $currentDate)
+                    //     ->orderBy('billing_month', 'DESC')
+                    //     ->first();
 
 
-
-                ->rawColumns(['father_name', 'student_name', 'class', 'session', 'student_id', 'status' , 'outstanding_amount'])
+                    return optional($query)->outstanding_amount ?? 0;
+                })
+                ->addColumn('category', function ($d) {
+                    // show the single category for this detail (fallback to collection category)
+                    $catName = optional($d->feeCategory)->name;
+                    if ($catName) {
+                        return $catName;
+                    }
+                    // fallback: category on feeCollection
+                    return optional($d->feeCollection->category)->name
+                        ?? optional($d->feeCollection)->category_id
+                        ?? '-';
+                })
+                ->addColumn('fine_amount', function ($d) {
+                    return optional($d->feeCollection->billing)->fine_amount ?? 0;
+                })
                 ->addIndexColumn()
                 ->make(true);
         }
 
         $classes = AcademicClass::where('status', 1)->get();
         $categories = FeeCategory::where('is_active', 1)->get();
-        return view('admin.fee-management.reports.fee-bills-by-account', compact('classes'));
+        return view('admin.fee-management.reports.fee-bills-by-account', compact('classes', 'categories'));
     }
+
+
+
+    public function feeBillsByMonthPdf(Request $request)
+    {
+        return view('admin.fee-management.reports.fee-bills-by-month-pdf');
+    }
+    public function feeBillsByMonthPdfDownload(Request $request)
+    {
+
+        // Fetch bills with relationships
+        $feeBilling = FeeBilling::with(['student.academicClass', 'academicSession', 'createdBy']);
+
+        if ($request->filled('filter_month')) {
+            $feeBilling->where('billing_month', $request->filter_month);
+        }
+
+        $feeBillingData = $feeBilling->get();
+
+        if ($feeBillingData->isEmpty()) {
+            return redirect()->back()->with('error', 'No fee bills found for the selected month.');
+        }
+        // Calculate total outstanding per class
+        $classTotals = $feeBillingData->groupBy('student.academicClass.name')->map(function ($items) {
+            return $items->sum('outstanding_amount');
+        });
+
+        // return view('admin.fee-management.reports.pdf.fee_bills_by_pdf', [
+        //     'feeBillingData' => $feeBillingData,
+        //     'classTotals' => $classTotals,
+        //     'filterMonth' => $request->filter_month ?? null
+        // ]);
+
+        // Load PDF
+        $pdf = PDF::loadView('admin.fee-management.reports.pdf.fee_bills_by_pdf', [
+            'feeBillingData' => $feeBillingData,
+            'classTotals' => $classTotals,
+            'filterMonth' => $request->filter_month ?? null
+        ])->setPaper('A4', 'portrait');   // full page portrait;
+
+
+        return $pdf->download('fee_bills_' . ($request->filter_month ?? 'all') . '.pdf');
+    }
+
+
+
+    public function feeBillsByMonthAllStudents(Request $request){
+        return view('admin.fee-management.reports.fee-bills-by-month-all-students');
+    }
+    // Download downloadAllBillsByMonth
+    public function downloadAllBillsByMonth(Request $request)
+{
+
+    
+            $month = $request->filter_month; // YYYY-MM
+
+            if (!$month) {
+                return back()->with('error', 'Please select month');
+            }
+
+     
+            // Fetch all bills of month
+            $bills = FeeBilling::with('student')
+                ->where('billing_month', $month)
+                ->get();
+
+            if ($bills->isEmpty()) {
+                return back()->with('error', 'No bills found for selected month');
+            }
+
+            // Folder path
+            $folder = "fee_bills/$month";
+            
+            // Delete old folder if exists
+            if ( Storage::exists($folder)) {
+                Storage::deleteDirectory($folder);
+            }
+
+            Storage::makeDirectory($folder);
+
+            // Generate PDFs one by one
+            foreach ($bills as $bill) {
+
+                $pdf = PDF::loadView('admin.fee-management.reports.pdf.single_bill_pdf', compact('bill'));
+                        
+
+                $filename = $bill->student->full_name . "_bill.pdf";
+
+                Storage::put("$folder/$filename", $pdf->output());
+            }
+
+            // Create ZIP file
+            $zipPath = "fee_bills/$month.zip";
+
+            if (Storage::exists($zipPath)) {
+                Storage::delete($zipPath);
+            }
+
+            $zip = new \ZipArchive;
+            $zipFullPath = storage_path("app/$zipPath");
+
+            if ($zip->open($zipFullPath, \ZipArchive::CREATE) === TRUE) {
+                foreach (Storage::files($folder) as $file) {
+                    $zip->addFile(storage_path("app/$file"), basename($file));
+                }
+                $zip->close();
+            }
+
+           
+            return response()->download($zipFullPath)->deleteFileAfterSend(true);
+        }
 
 }

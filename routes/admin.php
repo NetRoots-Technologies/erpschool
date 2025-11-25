@@ -247,6 +247,15 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'admin', 'as' => 'admin.'], 
         Route::get('/reports/fee-bills-by-class', [FeeManagementController::class, 'feeBillsByClass'])->name('reports.fee-bills-by-class');
         // Fee Bills- By account
         Route::get('/reports/fee-bills-by-account', [FeeManagementController::class, 'feeBillsByAccount'])->name('reports.fee-bills-by-account');
+
+        // Fee Bills by fee Month Downloads in pdf 
+        Route::get('/reports/fee-bills-by-month/pdf', [FeeManagementController::class, 'feeBillsByMonthPdf'])->name('reports.fee-bills-by-month-pdf');
+        Route::get('/reports/pdf/download', [FeeManagementController::class, 'feeBillsByMonthPdfDownload'])->name('reports.fee-bills-by-month-pdf-download');
+
+        // Fee Bills BY Month for all students
+        Route::get('/reports/fee-bills-by-month-all-students', [FeeManagementController::class, 'feeBillsByMonthAllStudents'])->name('reports.fee-bills-by-month-all-students');
+        Route::get('/reports/fee-bills/month-download', [FeeManagementController::class, 'downloadAllBillsByMonth'])->name('reports.month-download');
+
     });
 
     // Dashboard Route

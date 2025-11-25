@@ -150,7 +150,7 @@
                     processing: true,
                     serverSide: true,
                     ajax: {
-                        url: "{{ route('admin.fee-management.reports.fee-bills') }}",
+                        url: "{{ route('admin.fee-management.reports.fee-bills-by-class') }}",
                         data: function(d) {
                             // d.status = $('#status').val();
                             d.filter_month = $('#filter_month').val();
@@ -277,9 +277,9 @@
                     }
                 });
 
-                $('#class_id').change(function() {
-                    table.ajax.reload();
-                });
+                    $('#class_id').change(function() {
+                        table.ajax.reload();
+                    });
 
                 $('#resetFilters').click(function() {
                     // $('#status').val('').trigger('change');

@@ -1,6 +1,6 @@
 @extends('admin.layouts.main')
 
-@section('title', 'Fee Bills By Class')
+@section('title', 'Fee Bills By Account')
 
 @section('content')
     <div class="container-fluid">
@@ -8,13 +8,13 @@
             <div class="col-12">
                 <div class="page-header">
                     <div class="page-leftheader"></div>
-                    <h4 class="page-title mb-0">Fee Bills By Class</h4>
+                    <h4 class="page-title mb-0">Fee Bills By Account</h4>
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Home</a></li>
                         <li class="breadcrumb-item"><a href="{{ route('admin.fee-management.index') }}">Fee Management</a>
                         </li>
                         <li class="breadcrumb-item"><a href="{{ route('admin.fee-management.reports') }}">Reports</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Fee Bills By Class</li>
+                        <li class="breadcrumb-item active" aria-current="page">Fee Bills By Account</li>
                     </ol>
                 </div>
             </div>
@@ -29,17 +29,17 @@
                 </div>
                 <div class="card-body">
                     <di class="row">
-                        {{-- <div class="col-md-3">
+                        <div class="col-md-3">
                             <div class="form-group">
-                                <label for="class">Status</label>
-                                <select class="form-control select2" id="status">
-                                    <option value="" selected>--Select Status--</option>
-                                    <option value="paid">Paid</option>
-                                    <option value="generated">Generated</option>
-                                    <option value="partially_paid">Partially Paid</option>
+                                <label for="class">Category</label>
+                                <select class="form-control select2" id="category_id">
+                                    <option value="" selected>--Select category--</option>
+                                    @foreach ($categories as $cat)
+                                        <option value="{{ $cat->id }}"> {{ $cat->name }} </option>
+                                    @endforeach
                                 </select>
                             </div>
-                        </div> --}}
+                        </div>
 
                         <div class="col-md-3">
                             <div class="form-group">
@@ -49,7 +49,7 @@
                             </div>
                         </div>
 
-                        <div class="col-md-3">
+                        {{-- <div class="col-md-3">
                             <div class="form-group">
                                 <label for="class">Class</label>
                                 <select class="form-control select2" id="class_id">
@@ -59,7 +59,7 @@
                                     @endforeach
                                 </select>
                             </div>
-                        </div>
+                        </div> --}}
 
                         <div>
                             <button type="button" id="resetFilters" class="btn btn-sm btn-info">
@@ -79,29 +79,28 @@
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
-                            <table class="table table-striped table-vcenter text-nowrap mb-0">
+                            <table class="table table-striped table-vcenter text-nowrap mb-0" id="feeTable">
                                 <thead>
                                     <tr>
+                                        
+                                        <th>Challan Number</th>
+                                        <th>Bill Date</th>
                                         <th>Student ID</th>
                                         <th>Student Name</th>
                                         <th>Father Name</th>
-                                        <th>Class</th>
-                                        <th>Session</th>
-                                        <th>Bill Date</th>
-                                        <th>Challan Number</th>
-                                        <th>Status</th>
-                                        <th>Bill Amount</th>
-                                        <th>Paid Amount</th>
-                                        <th>Outstanding Amount</th>
+                                        <th>Previous Outstanding</th>
+                                        <th>Fee Category</th>
+                                        <th>Delayed Payment Charges</th>
+                                        
                                     </tr>
                                 </thead>
                                 <tbody>
                                 </tbody>
 
-                                <tfoot>
+                                {{-- <tfoot>
                                     <td colspan="8"></td>
                                     <td colspan="3">Outstanding Amount : Rs. <span id="outstanding_amount">0</span></td>
-                                </tfoot>
+                                </tfoot> --}}
                             </table>
                         </div>
                     </div>
@@ -143,150 +142,69 @@
         </style>
     @endsection
 
-    @section('js')
-        <script>
-            $("document").ready(function() {
-                var table = $('.table').DataTable({
-                    processing: true,
-                    serverSide: true,
-                    ajax: {
-                        url: "{{ route('admin.fee-management.reports.fee-bills') }}",
-                        data: function(d) {
-                            // d.status = $('#status').val();
-                            d.filter_month = $('#filter_month').val();
-                            d.class_id = $('#class_id').val();
-                        }
-                    },
+   @section('js')
+<script>
+    $(document).ready(function() {
+        // initialize Select2 if used
+        if ($.fn.select2) {
+            $('#category_id').select2({ width: '100%' });
+            // Remove initial selection if you prefer empty by default
+            // $('#filter_month').val('');
+        }
 
-                    dom: 'Bfrtip',
-                    buttons: [
-                        'pageLength',
-                        {
-                            extend: 'copy',
-                            text: 'Copy'
-                        },
-                        {
-                            extend: 'csv',
-                            text: 'CSV'
-                        },
-                        {
-                            extend: 'excel',
-                            text: 'Excel'
-                        },
-                        {
-                            extend: 'pdf',
-                            text: 'PDF'
-                        },
-                        {
-                            extend: 'print',
-                            text: 'Print'
-                        }
-                    ],
+        var table = $('#feeTable').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: "{{ route('admin.fee-management.reports.fee-bills-by-account') }}",
+                data: function(d) {
+                    d.category_id = $('#category_id').val();
+                    d.filter_month = $('#filter_month').val();
+                }
+            },
+            dom: 'Bfrtip',
+            buttons: [
+                'pageLength',
+                { extend: 'copy', text: 'Copy' },
+                { extend: 'csv', text: 'CSV' },
+                { extend: 'excel', text: 'Excel' },
+                { extend: 'pdf', text: 'PDF' },
+                { extend: 'print', text: 'Print' }
+            ],
+            lengthMenu: [[10,25,50,-1],[10,25,50,"All"]],
+            columns: [
+                { data: 'challan_number', name: 'challan_number' },
+                { data: 'billing_month', name: 'billing_month' },
+                { data: 'student_id', name: 'student_id' },
+                { data: 'student_name', name: 'student_name' },
+                { data: 'father_name', name: 'father_name' },
+                { data: 'previous_outstanding', name: 'previous_outstanding' },
+                { data: 'category', name: 'category' },
+                { data: 'fine_amount', name: 'fine_amount' },
+            ],
+            // optional: add index column rendering if you want
+        });
 
-                    lengthMenu: [
-                        [10, 25, 50, -1],
-                        [10, 25, 50, "All"]
-                    ],
+        // filters
+        $('#category_id').on('change', function() {
+            table.ajax.reload();
+        });
 
+        $('#filter_month').on('change', function() {
+            table.ajax.reload();
+        });
 
-                    columns: [{
-                            data: 'student_id',
-                            name: 'student_id',
-                            orderable: true,
-                            searchable: true
-                        },
+        $('#resetFilters').on('click', function() {
+            // clear selects and inputs, then reload once
+            if ($.fn.select2) {
+                $('#category_id').val(null).trigger('change');
+            } else {
+                $('#category_id').val('');
+            }
+            $('#filter_month').val('');
+            table.ajax.reload();
+        });
+    });
+</script>
+@endsection
 
-                        {
-                            data: 'student_name',
-                            name: 'student_name',
-                            orderable: true,
-                            searchable: true
-                        },
-                        {
-                            data: 'father_name',
-                            name: 'father_name',
-                            orderable: true,
-                            searchable: true
-                        },
-                        {
-                            data: 'class',
-                            name: 'class',
-                            orderable: true,
-                            searchable: true
-                        },
-                        {
-                            data: 'session',
-                            name: 'session',
-                            orderable: true,
-                            searchable: true
-                        },
-
-                        {
-                            data: 'billing_month',
-                            name: 'billing_month',
-                            orderable: true,
-                            searchable: true
-                        },
-
-                        {
-                            data: 'challan_number',
-                            name: 'challan_number',
-                            orderable: true,
-                            searchable: true
-                        },
-
-                        {
-                            data: 'status',
-                            name: 'status',
-                            orderable: true,
-                            searchable: true
-                        },
-                        {
-                            data: 'total_amount',
-                            name: 'total_amount',
-                            orderable: true,
-                            searchable: true
-                        },
-
-                        {
-                            data: 'paid_amount',
-                            name: 'paid_amount',
-                            orderable: true,
-                            searchable: true
-                        },
-                        {
-                            data: 'outstanding_amount',
-                            name: 'outstanding_amount',
-                            orderable: true,
-                            searchable: true
-                        }
-
-                        
-
-                    ],
-
-                    footerCallback: function(row, data, start, end, display) {
-                       let api = this.api();
-                       let total = api
-                        .column(8, { page: 'current' })
-                        .data()
-                        .reduce(function (a, b) {
-                            return Number(a) + Number(b);
-                        }, 0);
-                        $('#outstanding_amount').text(total.toLocaleString());
-                    }
-                });
-
-                $('#class_id').change(function() {
-                    table.ajax.reload();
-                });
-
-                $('#resetFilters').click(function() {
-                    // $('#status').val('').trigger('change');
-                    // $('#filter_month').val('').trigger('change');
-                    $('#class_id').val('').trigger('change');
-                    table.ajax.reload();
-                });
-            });
-        </script>
-    @endsection
