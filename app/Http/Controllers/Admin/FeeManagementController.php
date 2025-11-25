@@ -2747,6 +2747,216 @@ class FeeManagementController extends Controller
 
         return view('admin.fee-management.reports.category-bills', compact('categories'));
     }
+
+    
+    public function familyprofileReport(Request $request)
+    {
+            if ($request->ajax()) {
+            $data = Students::with(['academicClass', 'academicSession']);
+
+            return DataTables::of($data)
+
+                // ->addColumn('student_name', function ($data) {
+                //     return $data->fullname.' '.($data->student_id);
+                // })
+               ->addColumn('admission_date', function ($data) {
+                 
+                    return $data->admission_date;
+                })
+               ->addColumn('cell_no', function ($data) {
+                    return $data->cell_no;
+                })
+
+              ->addColumn('father_name', function ($data) {
+                    return $data->father_name;
+                })
+
+                ->addColumn('father_cnic', function ($data) {
+                    return $data->father_cnic ?? '-';
+                })
+
+
+
+                ->addColumn('class', function ($data) {
+                    return $data->academicClass->name;
+                })
+
+                ->addColumn('session', function ($data) {
+                    return $data->academicSession->name;
+                })
+                ->addColumn('action', function ($data) {
+                    return '<a href="' . route('admin.fee-management.reports.family-profile-view', $data->id) . '" class="btn btn-sm btn-info" title="View"><i class="fa fa-eye"></i></a>'; 
+                    
+                })
+
+                ->rawColumns([
+                    'father_name', 'class', 'session' ,'admission_date','cell_no','action'
+
+                ])
+                ->addIndexColumn()
+                ->make(true);
+        }        
+
+        return view('admin.fee-management.reports.family-fee-outstanding');
+    }
+
+   public function familyprofileviewReport($studentId)
+{
+    // Load the clicked student and all siblings (matching father_cnic / family_id)
+    $student = Students::with(
+        ['student_schools', 'studentPictures', 'student_emergency_contacts', 'AcademicClass']
+    )->findOrFail($studentId);
+
+    // choose family identifier: try family_id then father_cnic
+            $familyKey = null;
+            $familyKeyName = null;
+            if (!empty($student->father_cnic)) {
+                $familyKey = $student->father_cnic;
+                $familyKeyName = 'father_cnic';
+            } else {
+                $familyKey = $student->father_cnic;
+                $familyKeyName = 'father_cnic';
+            }
+
+    // Get all siblings in the family (including selected student)
+    $familyStudents = Students::with(['academicClass', 'student_schools', 'studentPictures'])
+        ->where($familyKeyName, $familyKey)
+        // ->orderBy('fullname')
+        ->get();
+
+    // Eager-load bills and payments for these students
+    $studentIds = $familyStudents->pluck('id')->toArray();
+
+    $bills = FeeBilling::whereIn('student_id', $studentIds)
+        // ->with('someRelationIfNeeded')
+        ->get()
+        ->groupBy('student_id');
+
+    $collections = FeeCollection::whereIn('student_id', $studentIds)
+        ->get()
+        ->groupBy('student_id');
+
+    // Build view-ready data
+    $familyData = [];
+    $familyTotals = [
+        'billed' => 0,
+        'paid' => 0,
+        'remaining' => 0,
+    ];
+
+    foreach ($familyStudents as $s) {
+        $studentBills = $bills->get($s->id, collect());
+        $studentCollections = $collections->get($s->id, collect());
+
+        $billedTotal = $studentBills->sum(function ($b) {
+            // adjust field name if your billed column is different (e.g. total_amount)
+            return $b->billed_amount ?? ($b->total_amount ?? 0);
+        });
+
+        $paidTotal = $studentCollections->sum(function ($c) {
+            return $c->paid_amount ?? 0;
+        });
+
+        // Last payment date (if any)
+        $lastPaymentDate = $studentCollections->sortByDesc('collection_date')->first()->collection_date ?? null;
+
+        // Prepare per-bill breakdown for table
+        $billRows = $studentBills->map(function ($b) use ($studentCollections) {
+            $billPaid = $studentCollections
+                ->where('billing_id', $b->id)
+                ->sum('paid_amount');
+
+            return (object)[
+                'billing_id'     => $b->id,
+                'description'    => $b->description ?? ('Bill #'.$b->id),
+                'billed_amount'  => $b->billed_amount ?? ($b->total_amount ?? 0),
+                'paid_amount'    => $billPaid,
+                'last_payment'   => $studentCollections->where('billing_id', $b->id)
+                                        ->sortByDesc('collection_date')
+                                        ->first()->collection_date ?? null,
+            ];
+        });
+
+        // Contact details (fall back to student/emergency contact)
+        $contactNumber = $s->phone ?? optional($s->student_emergency_contacts->first())->phone ?? '';
+        $email = $s->email ?? '';
+        $postal = $s->postal_address ?? ($s->address ?? '');
+
+        $remaining = $billedTotal - $paidTotal;
+
+        $familyTotals['billed'] += $billedTotal;
+        $familyTotals['paid'] += $paidTotal;
+        $familyTotals['remaining'] += max(0, $remaining);
+
+        $familyData[] = (object)[
+            'student_id'      => $s->student_id,
+            'first_name'        => $s->fullname,
+            'admission_date' => $s->date_of_joining ?? $s->created_at->toDateString(),
+            'father_cnic'       => $familyKey,
+            'billed_total'    => $billedTotal,
+            'paid_total'      => $paidTotal,
+            'last_payment'    => $lastPaymentDate,
+            'contact'         => [
+                'phone'  => $contactNumber,
+                'email'  => $email,
+                'postal' => $postal,
+            ],
+            'bill_rows'       => $billRows,
+            'remaining'       => $remaining,
+        ];
+    }
+
+    return view('admin.fee-management.reports.family-profile-view', compact('student', 'familyData', 'familyTotals'));
+}
+
+
+    public function feeBillsByFinancialAid(Request $request)
+    {
+        if ($request->ajax()) {
+        $query = FeeCollection::query()
+            ->where('status', 'paid')
+            ->with(['student', 'discount']);
+
+            if(request()->filled('student_id')) {
+                $query->wherehas('student', function($q) {
+                    $q->where('id', request()->student_id);
+                });
+            }
+
+        return DataTables::of($query)
+            ->addColumn('reference_id', function($row){
+                return $row->id;
+            })
+            ->addColumn('reference_doc_status', function($row){
+                return ucfirst($row->status); // Verified / Not Verified
+            })
+            ->addColumn('student_id', function($row){
+                return optional($row->student)->student_id ?? '-';
+            })
+            ->addColumn('student_name', function($row){
+                return optional($row->student)->full_name ?? '-';
+            })
+            ->addColumn('total_fee', function ($row) {
+                $total = FeeCollection::where('student_id', $row->student->id)->sum('paid_amount');
+               
+                return number_format($total, 2);
+            })
+            ->addColumn('discounted_fee', function($row){
+                if($row->discount->discount_type == 'percentage'){
+                        // return number_format($row->sum('paid_amount') - ($row->sum('paid_amount') * $row->discount->discount_value / 100), 2); //$row->discount->discount_value . '%' ?? 0;
+                        return $row->discount->discount_value . '%' ?? 0;
+                }else{
+                        return $row->discount->discount_value ?? 0;
+                        // return number_format($row->sum('total_amount') - $row->discount->discount_value, 2); //$row->discount->discount_value ?? 0;
+                }
+            })
+            ->rawColumns(['student_name', 'reference_id' , 'reference_doc_status', 'student_id', 'total_fee', 'discounted_fee'])
+            ->make(true);
+    }
+
+    $students = Students::with('AcademicClass')->get();
+    return view('admin.fee-management.reports.fee_collection_report' , compact('students'));
+    }
 }
 
 

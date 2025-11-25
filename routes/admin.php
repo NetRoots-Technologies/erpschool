@@ -258,6 +258,14 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'admin', 'as' => 'admin.'], 
           // Fee Bills By Category Reports by shahid
         Route::get('/reports/category-bills', [FeeManagementController::class, 'feeBillsByCategoryReport'])->name('reports.category');
 
+        // Family Profile Reports 
+        Route::get('/reports/family-profile', [FeeManagementController::class, 'familyprofileReport'])->name('reports.family-profile');
+        Route::get('/reports/family-profile-view/{studentId}', [FeeManagementController::class, 'familyprofileviewReport'])->name('reports.family-profile-view');
+
+        
+        // Fee Bills- By Financial Assistance
+        Route::get('/reports/fee-bills-by-financial-aid', [FeeManagementController::class, 'feeBillsByFinancialAid'])->name('reports.fee-bills-by-financial-aid');
+
     });
 
     // Dashboard Route
