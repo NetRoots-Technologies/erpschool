@@ -255,6 +255,8 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'admin', 'as' => 'admin.'], 
         // Fee Bills BY Month for all students
         Route::get('/reports/fee-bills-by-month-all-students', [FeeManagementController::class, 'feeBillsByMonthAllStudents'])->name('reports.fee-bills-by-month-all-students');
         Route::get('/reports/fee-bills/month-download', [FeeManagementController::class, 'downloadAllBillsByMonth'])->name('reports.month-download');
+          // Fee Bills By Category Reports by shahid
+        Route::get('/reports/category-bills', [FeeManagementController::class, 'feeBillsByCategoryReport'])->name('reports.category');
 
     });
 

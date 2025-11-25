@@ -659,6 +659,9 @@
                                     <li><a class="slide-item {{ request()->is('admin/fee-management/reports/fee-bills-by-month-all-students') ? 'active' : '' }}"
                                     href="{{ route('admin.fee-management.reports.fee-bills-by-month-all-students') }}" >Fee Bills in One Folder</a></li>
 
+                                    <li><a class="slide-item {{ request()->is('admin/fee-management/reports/category-bills') ? 'active' : '' }}"
+                                    href="{{ route('admin.fee-management.reports.category') }}">Fee Bills By Category</a></li>
+
                             {{-- @endcan --}}
 
 
