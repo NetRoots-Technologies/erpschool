@@ -180,4 +180,16 @@ class FeeCollection extends Model
     {
         return $this->total_amount + $this->fine_amount - $this->collected_amount - $this->discount_amount;
     }
+
+/**
+ * Get the active discount for this student
+ * optionally you can filter by date or billing_id
+ */
+public function discount() {
+    return $this->hasOne(FeeDiscount::class, 'student_id', 'student_id')
+                ->where(function($q) {
+                    $q->whereNull('valid_to')
+                      ->orWhere('valid_to', '>=', now());
+                });
+}
 }

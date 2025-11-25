@@ -662,6 +662,11 @@
                                     <li><a class="slide-item {{ request()->is('admin/fee-management/reports/category-bills') ? 'active' : '' }}"
                                     href="{{ route('admin.fee-management.reports.category') }}">Fee Bills By Category</a></li>
 
+                                    <li><a class="slide-item {{ request()->is('admin/fee-management/reports/family-profile') ? 'active' : '' }}"
+                                    href="{{ route('admin.fee-management.reports.family-profile') }}">Family Profile Report</a></li>
+                                    
+                                    <li><a class="slide-item {{ request()->is('admin/fee-management/reports/fee-bills-by-financial-aid') ? 'active' : '' }}"
+                                    href="{{ route('admin.fee-management.reports.fee-bills-by-financial-aid') }}">Fee Bills- By Financial Assistance</a></li>
                             {{-- @endcan --}}
 
 
