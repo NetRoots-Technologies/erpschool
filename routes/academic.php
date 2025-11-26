@@ -193,7 +193,11 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'academic', 'as' => 'academi
     Route::post('/import-file-session',[AcademicSessionController::class,'importBulkFile'])->name('session.import-file');
 
     Route::post('courses/clone', [CourseController::class, 'clone'])->name('courses.clone');
-
+    // for student leave
+    Route::post('/student/leave', [StudentController::class, 'studentLeave'])->name('students.leave');
+    Route::get('/student/leave/aprove', [StudentController::class, 'studentLeaveAprove'])->name('students.leave.aprove');
+    Route::post('/students/leave/approve/submit', [StudentController::class, 'studentLeaveApproveSubmit'])
+    ->name('students.leave.approve.submit');
     // Acedemic Reports
     Route::get('report/student-status', [AcadmicReportController::class, 'Studentstatus'])->name('report.student-status');
 

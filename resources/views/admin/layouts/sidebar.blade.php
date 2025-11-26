@@ -253,7 +253,7 @@
                             <i class="angle fe fe-chevron-down"></i>
                         </a>
                         <ul class="slide-menu"
-                            style="display: {{ request()->is('academic/student-class_adjustment*', 'academic/studentDataBank*', 'academic/students*', 'academic/students_form*', 'academic/students_details*', 'academic/student-siblings-report*') ? 'block' : 'none' }}">
+                            style="display: {{ request()->is('academic/student-class_adjustment*', 'academic/studentDataBank*', 'academic/students*', 'academic/students_form*', 'academic/students_details*', 'academic/student-siblings-report*, academic/student/leave/aprove') ? 'block' : 'none' }}">
                             @if (Gate::allows('PreAdmissionForm-list'))
                                 <li><a class="slide-item {{ request()->is('academic/studentDataBank*') ? 'active' : '' }}"
                                         href="{{ route('academic.studentDataBank.index') }}">Pre-Admission Form</a>
@@ -264,6 +264,11 @@
                                 <li><a class="slide-item {{ request()->is('academic/students*') ? 'active' : '' }}"
                                         href="{{ route('academic.students.index') }}">Students</a></li>
                             @endif
+
+                                 {{-- @if (Gate::allows('ViewStudents-list')) --}}
+                                <li><a class="slide-item {{ request()->is('academic/student/leave/aprove') ? 'active' : '' }}"
+                                        href="{{ route('academic.students.leave.aprove') }}">Leave Students Aproval</a></li>
+                            {{-- @endif --}}
 
                             @if (Gate::allows('StudentSiblingsReport-list'))
                                 <li><a class="slide-item {{ request()->is('academic/student-siblings-report*') ? 'active' : '' }}"

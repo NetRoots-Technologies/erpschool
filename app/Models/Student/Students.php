@@ -143,4 +143,8 @@ class Students extends Model
     {
         return $this->belongsTo(\App\Models\Fee\FeeStructure::class, 'student_id');
     }
+    public function approvedBy()
+    {
+        return $this->belongsTo(\App\Models\User::class, 'approved_by', 'id');
+    }
 }
