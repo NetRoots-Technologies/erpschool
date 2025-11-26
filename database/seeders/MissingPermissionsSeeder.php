@@ -140,6 +140,16 @@ class MissingPermissionsSeeder extends Seeder
                 'Assets-list', 'Assets-create', 'Assets-edit', 'Assets-delete',
                 'AssetsBulk-list', 'AssetsBulk-create', 'AssetsBulk-edit', 'AssetsBulk-delete',
             ],
+
+            'Acedemic Reprorts' => [
+                'Strength Summary Report list', 'Student Status Report list',
+            ],
+
+            'Fee Reports' => [
+                'Fee Bills Status Report', 'Fee Bills By Class Report', 'Fee Bills By Amount Report', 
+                'Fee Bills By Fee Category' , 'All Bills in one folder' , 'Fee Bills By Fee Month' , 'Fee Outstanding By Family profile',
+                'Fee Bills By Financial Assistance'
+            ],
            
 
 
