@@ -21,7 +21,7 @@ use App\Http\Controllers\Student\AcademicSessionController;
 use App\Http\Controllers\Student\StudentController;
 use App\Http\Controllers\Student\StudentDataBankController;
 use App\Http\Controllers\Student\StudentClassAdjustmentController;
-
+use App\Http\Controllers\Academic\AcadmicReportController;
 use App\Models\Academic\StudentAttendance;
 use Illuminate\Support\Facades\Route;
 
@@ -193,6 +193,13 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'academic', 'as' => 'academi
     Route::post('/import-file-session',[AcademicSessionController::class,'importBulkFile'])->name('session.import-file');
 
     Route::post('courses/clone', [CourseController::class, 'clone'])->name('courses.clone');
+
+    // Acedemic Reports
+    // Strength Summary Current
+
+    Route::get('report/strength-summary-current', [AcadmicReportController::class, 'StrengthSummaryCurrent'])->name('report.strength-summary-current');
+   
+
 });
 
 

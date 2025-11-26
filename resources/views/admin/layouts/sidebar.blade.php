@@ -328,6 +328,24 @@
                     </li>
                 @endcan
 
+                {{-- Acedemic Reports --}}
+                {{-- @can('StudentManagement') --}}
+                    <li class="slide">
+                        <a class="side-menu__item slide-change {{ request()->is('acedemic/report/strength-summary-current') ? 'active' : '' }}"
+                            data-bs-toggle="slide" href="javascript:void(0);">
+                            <i class="fa fa-child icons8 icon-style" aria-hidden="true"></i>
+                            <span class="side-menu__label">Acedemic Reports</span>
+                            <i class="angle fe fe-chevron-down"></i>
+                        </a>
+                        <ul class="slide-menu"
+                            style="display: {{ request()->is('acedemic/report/strength-summary-current') ? 'block' : 'none' }}">
+                            <li><a class="slide-item {{ request()->is('acedemic/report/strength-summary-current') ? 'active' : '' }}"
+                                    href="{{ route('academic.report.strength-summary-current') }}">Strength Summary Current Report</a></li>
+                            
+                        </ul>
+                    </li>
+                {{-- @endcan --}}
+
 
                 @if (Gate::allows('Employees'))
                     <li class="side-item side-item-category">HR Management</li>
