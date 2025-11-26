@@ -151,6 +151,7 @@ class MissingPermissionsSeeder extends Seeder
                 'Fee Bills By Financial Assistance'
             ],
            
+            'AcademicManagement' => ['Student Leave Approve'],
 
 
         ];

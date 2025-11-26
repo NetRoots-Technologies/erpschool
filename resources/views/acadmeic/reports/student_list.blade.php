@@ -11,6 +11,9 @@
                 <h4 class="page-title mb-0">Student List Report</h4>
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('admin.fee-management.index') }}">Acedemic</a>
+                        </li>
+                        <li class="breadcrumb-item"><a href="{{ route('admin.fee-management.reports') }}">Reports</a></li>
                     <li class="breadcrumb-item active" aria-current="page">Student List Report</li>
                 </ol>
             </div>
@@ -20,11 +23,13 @@
 
 {{-- Filters --}}
 <div class="row mb-3">
-    <div class="col-md-4">
+    <div class="col-md-12">
         <div class="card">
             <div class="card-header"><h3 class="card-title">Filter Options</h3></div>
             <div class="card-body">
-                <div class="form-group">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="form-group">
                     <label>Status</label>
                     <select class="form-control" id="status_filter">
                         <option value="" selected>All</option>
@@ -32,11 +37,7 @@
                         <option value="inactive">Inactive</option>
                     </select>
                 </div>
-
-                <div class="mt-2">
-                    <button type="button" id="resetFilters" class="btn btn-sm btn-primary">
-                        Reset
-                    </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -69,13 +70,6 @@
         </div>
     </div>
 </div>
-@endsection
-
-
-@section('css')
-<style>
-.badge { color: #212529 !important; }
-</style>
 @endsection
 
 @section('js')

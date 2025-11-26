@@ -17,35 +17,21 @@ class AcadmicReportController extends Controller
       public function Studentstatus(Request $request)
     {
 
-        // If AJAX request -> return datatables JSON
         if ($request->ajax()) {
-            $query = Students::with('AcademicClass', 'section')
-                        ->orderBy('created_at', 'desc');
-
-            // Filter by status if provided: 'active' | 'inactive' | '' (all)
-            if ($request->filled('status') && in_array($request->status, ['active', 'inactive'])) {
+            $query = Students::with('AcademicClass', 'section');
+            if ($request->filled('status')) {
                 if ($request->status === 'active') {
-                    $query->where(function($q) {
-                        $q->where('status', 1)
-                        ->orWhere('is_active', 1);
-                    });
-                } else { // inactive
-                    $query->where(function($q) {
-                        $q->where('status', 0)
-                        ->orWhere('is_active', 0);
-                    });
+                    $query->where('is_active', 1);
+                } elseif ($request->status === 'inactive') {
+                    $query->where('is_active', 0);
                 }
             }
+            return Datatables::of($query)
 
-            $data = $query->get();
-
-            return Datatables::of($data)->addIndexColumn()
-                // Name column (first + last)
                 ->addColumn('name', function ($row) {
-                    if ($row->first_name || $row->last_name) {
-                        return trim(($row->first_name ?? '') . ' ' . ($row->last_name ?? ''));
-                    }
-                    return '-';
+                    
+                    return $row->full_name ;
+                   
                 })
                 ->addColumn('student_id', function ($row) {
                     return $row->student_id ?? '-';
@@ -57,11 +43,9 @@ class AcadmicReportController extends Controller
                     return $row->AcademicClass->name ?? '-';
                 })
                 ->addColumn('section', function ($row) {
-                        return $row->section_id ? ($row->section->name ?? '-') : '-';
-                
+                        return $row->section->name ?? '-';
                 })
                 ->addColumn('status', function ($row) {
-                    // show Active / Inactive based on status or is_active
                     if (isset($row->status)) {
                         return $row->status ? 'Active' : 'Inactive';
                     }
@@ -70,13 +54,13 @@ class AcadmicReportController extends Controller
                     }
                     return '-';
                 })
-                // no action column (you requested to remove View button)
+                ->addIndexColumn()
                 ->rawColumns(['name', 'class', 'section', 'status'])
                 ->make(true);
         }
 
         // Non-AJAX: return the view
-        return view('academic.report.student_list');
+        return view('acadmeic.reports.student_list');
     }
 public function StrengthSummaryCurrent(Request $request)
 {
