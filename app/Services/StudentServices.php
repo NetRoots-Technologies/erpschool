@@ -190,7 +190,7 @@ class StudentServices
     public function getData()
     {
         
-        $data = Students::with('branch', 'student_siblings', 'student_schools', 'student_emergency_contacts')->orderBy('created_at', 'desc')->get();
+        $data = Students::with('branch', 'student_siblings', 'student_schools', 'student_emergency_contacts')->orderBy('created_at', 'desc')->where('status', '1')->where('is_active', '1');
 
 
         return Datatables::of($data)->addIndexColumn()
@@ -200,10 +200,11 @@ class StudentServices
                 if(auth()->user()->can('ViewStudents-edit')){
                 $btn .= '<a href="' . route("academic.students.edit", $row->id) . '" class="btn btn-primary btn-sm"  style="margin-right: 4px;">Edit</a>';
 
-                }
+                } 
+                $btn .=  '<button class="btn btn-success btn-sm leaveBtn" data-id="' . $row->id . '" data-toggle="modal" data-target="#leaveModalLabel">Leave</button>';
 
                 if(auth()->user()->can('ViewStudents-delete')){
-$btn .= '<form method="POST" action="' . route("academic.students.destroy", $row->id) . '">';
+                $btn .= '<form method="POST" action="' . route("academic.students.destroy", $row->id) . '">';
                 $btn .= '<button type="submit" class="btn btn-danger btn-sm deleteBtn" data-id="' . $row->id . '" data-url="' . route("academic.students.destroy", $row->id) . '" style="margin-right: 4px;">Delete</button>';
                 $btn .= '</form>';
                 $btn .= '</div>';

@@ -22,9 +22,12 @@ use Illuminate\Support\Facades\Config;
 use App\Models\Fee\StudentFee;
 use App\Exports\StudentSampleExport;
 use App\Imports\StudentExcelImport;
+use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Log;
 // use Illuminate\Support\Facades\Config;
+use Yajra\DataTables\DataTables;
+
 
 class StudentController extends Controller
 {
@@ -440,7 +443,66 @@ class StudentController extends Controller
         }
     }
 
+        public function studentLeave(Request $request)
+    {
+    
+    
+        $students = Students::Where('id', $request->id)->first();
+        if ($students) {
+            $students->update(['leave_reason' => $request->reason , 'is_active' => 0, 'status' => 0]);
+        }
+        return response()->json(['message' => 'Student leave updated successfully']);
+        
+    
+    }
 
+    public function studentLeaveAprove(Request $request)
+{
+    if ($request->ajax()) {
+        $data = Students::with('academicClass', 'AcademicSession', 'approvedBy')
+            ->where('is_active', 0)
+            ->get();
+
+        return Datatables::of($data)->addIndexColumn()
+            ->addColumn('action', function ($row) {
+
+               $btn = '';
+               if ($row->approved_by !== null) {
+                   $btn .= '<span class="text-success">Approved</span>'; 
+               } else {
+                  $btn .= '
+                    <button class="btn btn-primary btn-sm approveBtn" data-id="' . $row->id . '">
+                        Approve
+                    </button>
+                ';
+               } 
+                return $btn;
+               
+            })
+            ->addColumn('name', fn($row) => $row->full_name)
+            ->addColumn('student_id', fn($row) => $row->student_id)
+            ->addColumn('class', fn($row) => $row->academicClass->name ?? '')
+            ->addColumn('session', fn($row) => $row->AcademicSession->name ?? '')
+            ->addColumn('campus', fn($row) => $row->branch->name ?? '')
+            ->addColumn('approved_by', fn($row) => $row->approvedBy->name ?? '')
+           
+            ->rawColumns(['action'])
+            ->make(true);
+    }
+
+    // 👇 RETURN THE BLADE VIEW FOR PAGE LOAD
+    return view('acadmeic.student.leave_approve');
 }
 
+public function studentLeaveApproveSubmit(Request $request)
+{
+    $student = Students::find($request->id);
+    $student->approved_by = Auth::user()->id;
+    $student->save();
+    return response()->json(['message' => 'Student leave approved']);
+}
+
+
+
+}
 
