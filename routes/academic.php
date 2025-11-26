@@ -195,8 +195,9 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'academic', 'as' => 'academi
     Route::post('courses/clone', [CourseController::class, 'clone'])->name('courses.clone');
 
     // Acedemic Reports
-    // Strength Summary Current
+    Route::get('report/student-status', [AcadmicReportController::class, 'Studentstatus'])->name('report.student-status');
 
+    // Strength Summary Current
     Route::get('report/strength-summary-current', [AcadmicReportController::class, 'StrengthSummaryCurrent'])->name('report.strength-summary-current');
    
 
