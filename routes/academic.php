@@ -200,6 +200,8 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'academic', 'as' => 'academi
     ->name('students.leave.approve.submit');
     // Acedemic Reports
     Route::get('report/student-status', [AcadmicReportController::class, 'Studentstatus'])->name('report.student-status');
+    
+    Route::get('report/student-leave', [AcadmicReportController::class, 'StudentLeave'])->name('report.student-leave');
 
     // Strength Summary Current
     Route::get('report/strength-summary-current', [AcadmicReportController::class, 'StrengthSummaryCurrent'])->name('report.strength-summary-current');
