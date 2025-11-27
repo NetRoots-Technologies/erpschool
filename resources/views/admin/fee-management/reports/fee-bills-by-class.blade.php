@@ -265,16 +265,20 @@
 
                     ],
 
-                    footerCallback: function(row, data, start, end, display) {
-                       let api = this.api();
-                       let total = api
-                        .column(8, { page: 'current' })
-                        .data()
-                        .reduce(function (a, b) {
-                            return Number(a) + Number(b);
-                        }, 0);
-                        $('#outstanding_amount').text(total.toLocaleString());
+                    footerCallback: function (row, data, start, end, display) {
+                        var api = this.api();
+                        var totalOutstanding = api
+                            .column('outstanding_amount:name', { page: 'all' })
+                            .data()
+                            .reduce(function (a, b) {
+                                var x = typeof a === 'string' ? a.replace(/,/g, '')*1 : a;
+                                var y = typeof b === 'string' ? b.replace(/,/g, '')*1 : b;
+                                return x + y;
+                            }, 0);
+
+                        $('#outstanding_amount').text(totalOutstanding.toLocaleString());
                     }
+
                 });
 
                     $('#class_id').change(function() {

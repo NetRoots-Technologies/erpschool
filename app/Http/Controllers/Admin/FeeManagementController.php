@@ -1976,9 +1976,9 @@ class FeeManagementController extends Controller
             if ($newOutstandingAmount <= 0) {
                 $challan->status = 'paid';
             } else if ($newPaidAmount > 0) {
-                $challan->status = 'partial';
+                $challan->status = 'partially_paid';
             } else {
-                $challan->status = 'pending';
+                $challan->status = 'partially_paid';
             }
 
             $challan->fine_amount = $request->fine_amount ?? 0;
@@ -2462,9 +2462,6 @@ class FeeManagementController extends Controller
                         });
                     }
                 })
-
-
-
                 ->rawColumns(['father_name', 'student_name', 'class', 'session', 'student_id', 'status', 'outstanding_amount'])
                 ->addIndexColumn()
                 ->make(true);
@@ -2686,55 +2683,47 @@ class FeeManagementController extends Controller
     {
         if ($request->ajax()) {
 
-            $details = FeeCollectionDetail::with([
-                'feeCategory',
-                'feeCollection.student.academicClass',
-                'feeCollection.academicSession',
-                'feeCollection.createdBy',
-                'feeCollection.billing',
+           $details = FeeBilling::with([
+                'student',
+                'feeStructures.feeDetails.feeCategory'
             ]);
 
-            // Fee category filter (uncomment if needed)
+            // Filter by category
             if ($request->filled('category_id')) {
-                $details->where('fee_category_id', $request->category_id);
+                $details->whereHas('feeStructures.feeDetails', function($q) use ($request){
+                    $q->where('fee_category_id', $request->category_id);
+                });
             }
 
-            // Optional filter by student class
-            $details->when($request->filled('class_id'), function ($q) use ($request) {
-                $q->whereHas('feeCollection.student', function ($sq) use ($request) {
-                    $sq->where('class_id', $request->class_id);
+            // Filter by class
+            if ($request->filled('class_id')) {
+                $details->whereHas('student', function($q) use ($request){
+                    $q->where('class_id', $request->class_id);
                 });
-            });
+            }
 
             return DataTables::of($details)
-                ->addColumn('student_name', function ($row) {
-                    return optional($row->feeCollection->student)->fullname ?? '-';
+                ->addColumn('challan_number', fn($row) => $row->challan_number)
+                ->addColumn('billing_date', fn($row) => $row->bill_date)
+                ->addColumn('student_id', fn($row) => $row->student->student_id ?? '-')
+                ->addColumn('student_name', fn($row) => $row->student->fullname ?? '-')
+                ->addColumn('father_name', fn($row) => $row->student->father_name ?? '-')
+                ->addColumn('bill_category', function($row){
+                    return $row->feeStructures->flatMap->feeDetails->pluck('feeCategory.name')->implode(', ');
                 })
-                ->addColumn('student_id', function ($row) {
-                    return optional($row->feeCollection->student)->student_id ?? '-';
+                ->addColumn('billed_amount', function($row){
+                    return $row->feeStructures->flatMap->feeDetails->sum('amount');
                 })
-                ->addColumn('father_name', function ($row) {
-                    return optional($row->feeCollection->student)->father_name ?? '-';
-    
-                }) ->addColumn('category_amount', function ($row) {
-                        // dd($row->feeCategory->amount);\
-                        return optional($row)->amount ?? '-';
-                 })
-
-                ->addColumn('category_name', function ($row) {
-                    return optional($row->feeCategory)->name ?? '-';
+                ->addColumn('paid_amount', fn($row) => $row->paid_amount)
+                ->addColumn('total_amount', fn($row) => $row->total_amount)
+                ->addColumn('outstanding_amount', fn($row) => $row->outstanding_amount)
+                ->filter(function ($query) use ($request) {
+                    if ($request->filled('class_id')) {
+                        $query->whereHas('student', function($q) use ($request){
+                            $q->where('class_id', $request->class_id);
+                        });
+                    }
                 })
-                ->addColumn('billing_month', function ($row) {
-                    return optional($row->feeCollection->billing)->billing_month ?? '-';
-                })
-                ->addColumn('challan_number', function ($row) {
-                    return optional($row->feeCollection->billing)->challan_number ?? '-';
-                })
-                ->rawColumns([
-                    'student_name','student_id','father_name',
-                    'category_name','category_amount',
-                    'billing_month','challan_number'
-                ])
                 ->addIndexColumn()
                 ->make(true);
         }
@@ -2910,53 +2899,72 @@ class FeeManagementController extends Controller
 }
 
 
-    public function feeBillsByFinancialAid(Request $request)
-    {
-        if ($request->ajax()) {
-        $query = FeeCollection::query()
-            ->where('status', 'paid')
-            ->with(['student', 'discount']);
 
-            if(request()->filled('student_id')) {
-                $query->wherehas('student', function($q) {
-                    $q->where('id', request()->student_id);
-                });
-            }
+public function feeBillsByFinancialAid(Request $request)
+{
+    if ($request->ajax()) {
+        $month = $request->month ?? $request->filter_month ?? now()->format('Y-m');
 
-        return DataTables::of($query)
-            ->addColumn('reference_id', function($row){
-                return $row->id;
+        // Latest discount per student
+        $latestDiscount = DB::table('fee_discounts as fd1')
+            ->select('fd1.student_id', 'fd1.discount_type', 'fd1.discount_value')
+            ->whereRaw('fd1.id = (
+                SELECT fd2.id FROM fee_discounts fd2
+                WHERE fd2.student_id = fd1.student_id
+                ORDER BY fd2.created_at DESC, fd2.id DESC
+                LIMIT 1
+            )');
+
+        // Fee bills query
+        $query = DB::table('fee_billing as fb')
+            ->join('students as s', 's.id', '=', 'fb.student_id')
+            ->leftJoinSub($latestDiscount, 'd', function($join) {
+                $join->on('d.student_id', '=', 'fb.student_id');
             })
-            ->addColumn('reference_doc_status', function($row){
-                return ucfirst($row->status); // Verified / Not Verified
-            })
-            ->addColumn('student_id', function($row){
-                return optional($row->student)->student_id ?? '-';
-            })
-            ->addColumn('student_name', function($row){
-                return optional($row->student)->full_name ?? '-';
-            })
-            ->addColumn('total_fee', function ($row) {
-                $total = FeeCollection::where('student_id', $row->student->id)->sum('paid_amount');
-               
-                return number_format($total, 2);
-            })
-            ->addColumn('discounted_fee', function($row){
-                if($row->discount->discount_type == 'percentage'){
-                        // return number_format($row->sum('paid_amount') - ($row->sum('paid_amount') * $row->discount->discount_value / 100), 2); //$row->discount->discount_value . '%' ?? 0;
-                        return $row->discount->discount_value . '%' ?? 0;
-                }else{
-                        return $row->discount->discount_value ?? 0;
-                        // return number_format($row->sum('total_amount') - $row->discount->discount_value, 2); //$row->discount->discount_value ?? 0;
-                }
-            })
-            ->rawColumns(['student_name', 'reference_id' , 'reference_doc_status', 'student_id', 'total_fee', 'discounted_fee'])
-            ->make(true);
+            ->where('fb.billing_month', $month)
+            ->select(
+                's.student_id',
+                'd.discount_value',
+                DB::raw("CONCAT(s.first_name,' ',COALESCE(s.last_name,'')) as student_name"),
+                'fb.total_amount',
+            );
+
+        if ($request->filled('student_id')) {
+            $query->where('fb.student_id', $request->student_id);
+        }
+
+        // Compute totals for footer
+            $totals = DB::table('fee_billing as fb')
+                ->leftJoinSub($latestDiscount, 'd', function($join) {
+                    $join->on('d.student_id', '=', 'fb.student_id');
+                })
+                ->where('fb.billing_month', $month)
+                ->select(
+                    DB::raw('SUM(fb.total_amount) as total_fee'),
+                    DB::raw('SUM(
+                        CASE
+                            WHEN d.discount_type = "percentage" THEN (fb.total_amount * COALESCE(d.discount_value,0) / 100)
+                            WHEN d.discount_type = "fixed" THEN COALESCE(d.discount_value,0)
+                            ELSE 0
+                        END
+                    ) as total_discount')
+                )->first();
+
+            $averageDiscountPct = ($totals->total_fee > 0) 
+                ? round(($totals->total_discount / $totals->total_fee) * 100, 2) 
+                : 0.00;
+
+            return DataTables::of($query)
+                ->with('average_discount', $averageDiscountPct)
+                ->make(true);
     }
 
     $students = Students::with('AcademicClass')->get();
-    return view('admin.fee-management.reports.fee_collection_report' , compact('students'));
-    }
+    return view('admin.fee-management.reports.fee_collection_report', compact('students'));
 }
 
+
+
+
+}
 

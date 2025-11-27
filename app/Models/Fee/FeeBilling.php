@@ -214,4 +214,8 @@ class FeeBilling extends Model
     {
         return $this->status === 'completed';
     }
+
+    public function feeStructures() {
+    return $this->hasMany(FeeStructure::class, 'student_id', 'student_id');
+}
 }
