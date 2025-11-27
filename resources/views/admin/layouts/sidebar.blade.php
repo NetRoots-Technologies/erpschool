@@ -246,14 +246,14 @@
                 @endcanany
                 @if (Gate::allows('AcademicManagement') || Gate::allows('AttendanceManagement') || Gate::allows('StudentManagement'))
                     <li class="slide">
-                        <a class="side-menu__item slide-change {{ request()->is('academic/student-class_adjustment*', 'academic/studentDataBank*', 'academic/students*', 'academic/students_form*', 'academic/students_details*', 'academic/student-siblings-report*') ? 'active' : '' }}"
+                        <a class="side-menu__item slide-change {{ request()->is('academic/student-class_adjustment*', 'academic/studentDataBank*', 'academic/students*', 'academic/students_form*', 'academic/students_details*', 'academic/student-siblings-report*', 'academic/student/leave/aprove') ? 'active' : '' }}"
                             data-bs-toggle="slide" href="javascript:void(0);">
                             <i class="fa fa-graduation-cap icons8 icon-style" aria-hidden="true"></i>
                             <span class="side-menu__label">Admission Management</span>
                             <i class="angle fe fe-chevron-down"></i>
                         </a>
                         <ul class="slide-menu"
-                            style="display: {{ request()->is('academic/student-class_adjustment*', 'academic/studentDataBank*', 'academic/students*', 'academic/students_form*', 'academic/students_details*', 'academic/student-siblings-report*, academic/student/leave/aprove') ? 'block' : 'none' }}">
+                            style="display: {{ request()->is('academic/student-class_adjustment*', 'academic/studentDataBank*', 'academic/students*', 'academic/students_form*', 'academic/students_details*', 'academic/student-siblings-report*', 'academic/student/leave/aprove') ? 'block' : 'none' }}">
                             @if (Gate::allows('PreAdmissionForm-list'))
                                 <li><a class="slide-item {{ request()->is('academic/studentDataBank*') ? 'active' : '' }}"
                                         href="{{ route('academic.studentDataBank.index') }}">Pre-Admission Form</a>
@@ -265,10 +265,11 @@
                                         href="{{ route('academic.students.index') }}">Students</a></li>
                             @endif
 
-                                 {{-- @if (Gate::allows('ViewStudents-list')) --}}
+                            @can('Student Leave Approve')
                                 <li><a class="slide-item {{ request()->is('academic/student/leave/aprove') ? 'active' : '' }}"
-                                        href="{{ route('academic.students.leave.aprove') }}">Leave Students Aproval</a></li>
-                            {{-- @endif --}}
+                                        href="{{ route('academic.students.leave.aprove') }}">Leave Students Aproval</a>
+                                </li>
+                            @endcan
 
                             @if (Gate::allows('StudentSiblingsReport-list'))
                                 <li><a class="slide-item {{ request()->is('academic/student-siblings-report*') ? 'active' : '' }}"
@@ -335,31 +336,60 @@
 
                 {{-- Acedemic Reports --}}
                 @can('Acedemic Reprorts')
-                    <li class="slide">
-                        <a class="side-menu__item slide-change {{ request()->is('acedemic/report/strength-summary-current') || request()->is('acedemic/report/student-status') ? 'active' : '' }}"
+                    @php
+                        // Check if any of the academic report routes are active
+                        $academicRoutes = [
+                            'academic.report.student-status',
+                            'academic.report.strength-summary-current',
+                            'academic.report.student-status',
+                            // add other academic report route names here if needed
+                        ];
+                        $isAcademicActive = false;
+                        foreach ($academicRoutes as $r) {
+                            if (request()->routeIs($r)) {
+                                $isAcademicActive = true;
+                                break;
+                            }
+                        }
+                    @endphp
+
+                    <li class="slide {{ $isAcademicActive ? 'is-expanded' : '' }}">
+                        <a class="side-menu__item slide-change {{ $isAcademicActive ? 'active' : '' }}"
                             data-bs-toggle="slide" href="javascript:void(0);">
                             <i class="fa fa-child icons8 icon-style" aria-hidden="true"></i>
-                            <span class="side-menu__label">Acedemic Reports</span>
+                            <span class="side-menu__label">Academic Reports</span>
                             <i class="angle fe fe-chevron-down"></i>
                         </a>
-                        <ul
-                            class="slide-menu"style="display: {{ request()->is('acedemic/report/strength-summary-current') || request()->is('acedemic/report/student-status') ? 'block' : 'none' }}">
 
+                        <ul class="slide-menu" style="display: {{ $isAcademicActive ? 'block' : 'none' }}">
                             @can('Student Status Report list')
-                                 
-                             <li><a class="slide-item {{ request()->is('acedemic/report/student-status') ? 'active' : '' }}"
-                                    href="{{ route('academic.report.student-status') }}">Student Status List</a></li>
+                                <li>
+                                    <a class="slide-item {{ request()->routeIs('academic.report.student-status') ? 'active' : '' }}"
+                                        href="{{ route('academic.report.student-status') }}">
+                                        Student Status List
+                                    </a>
+                                </li>
                             @endcan
+
+
+                            @can('Student Leave Report list')
+                                <li><a class="slide-item {{ request()->is('acedemic/report/student-leave') ? 'active' : '' }}"
+                                        href="{{ route('academic.report.student-leave') }}">Student leave List</a></li>
+                            @endcan
+
                             @can('Strength Summary Report list')
-                                <li><a class="slide-item {{ request()->is('acedemic/report/strength-summary-current') ? 'active' : '' }}"
-                                        href="{{ route('academic.report.strength-summary-current') }}">Strength Summary
-                                        Current Report</a></li>
+                                <li>
+                                    <a class="slide-item {{ request()->routeIs('academic.report.strength-summary-current') ? 'active' : '' }}"
+                                        href="{{ route('academic.report.strength-summary-current') }}">
+                                        Strength Summary Current Report
+                                    </a>
+                                </li>
                             @endcan
-
-
                         </ul>
                     </li>
                 @endcan
+
+
 
 
                 @if (Gate::allows('Employees'))
