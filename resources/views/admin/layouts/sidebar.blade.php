@@ -341,7 +341,7 @@
                         $academicRoutes = [
                             'academic.report.student-status',
                             'academic.report.strength-summary-current',
-                            'academic.report.student-status',
+                            'academic.report.student-leave',
                             // add other academic report route names here if needed
                         ];
                         $isAcademicActive = false;
@@ -373,7 +373,7 @@
 
 
                             @can('Student Leave Report list')
-                                <li><a class="slide-item {{ request()->is('acedemic/report/student-leave') ? 'active' : '' }}"
+                                <li><a class="slide-item {{ request()->is('academic/report/student-leave') ? 'active' : '' }}"
                                         href="{{ route('academic.report.student-leave') }}">Student leave List</a></li>
                             @endcan
 
