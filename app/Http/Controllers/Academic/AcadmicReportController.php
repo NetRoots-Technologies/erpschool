@@ -119,4 +119,56 @@ public function StrengthSummaryCurrent(Request $request)
     return view('acadmeic.reports.strength_summary_current' , compact('classes', 'sections' , 'acadmeic_sessions'));
 }
 
+    public function StudentLeave(Request $request)
+    {
+
+            if ($request->ajax()) {
+                $query = Students::with('AcademicClass', 'section', 'approvedBy')->where('is_active', 0);
+                return Datatables::of($query)
+
+                    ->addColumn('name', function ($row) {
+                        return $row->full_name ?? '';
+                    
+                    })
+                    ->addColumn('student_id', function ($row) {
+                        return $row->student_id ?? '-';
+                    })
+                    ->addColumn('father_name', function ($row) {
+                        return $row->father_name ?? '-';
+                    })
+                    ->addColumn('class', function ($row) {
+                        return $row->AcademicClass->name ?? '-';
+                    })
+                    ->addColumn('section', function ($row) {
+                            return $row->section->name ?? '-';
+                    })
+                    ->addColumn('approve_by_name', function ($row) {
+                        if($row->approved_by == null){
+                            return '-';
+
+                        }else{
+                            return $row->approvedBy->name;
+                        }
+                        
+                    })
+                    
+                    ->addColumn('status', function ($row) {
+                        if (isset($row->status)) {
+                            return $row->status ? 'Active' : 'Inactive';
+                        }
+                        if (isset($row->is_active)) {
+                            return $row->is_active ? 'Active' : 'Inactive';
+                        }
+                        return '-';
+                    })
+                    ->addIndexColumn()
+                    ->rawColumns(['name', 'class', 'section', 'status', 'approve_by_name'])
+                    ->make(true);
+            }
+
+            // Non-AJAX: return the view
+            return view('acadmeic.reports.student_list_leave');
+        }
+
+
 }
