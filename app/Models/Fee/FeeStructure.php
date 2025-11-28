@@ -117,4 +117,8 @@ class FeeStructure extends Model
         return $this->belongsTo(\App\Models\Student\Students::class);
     }
     
+    public function feeDetails() {
+    return $this->hasMany(FeeStructureDetail::class, 'fee_structure_id');
+}
+
 }

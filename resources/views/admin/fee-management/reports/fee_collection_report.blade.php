@@ -35,31 +35,20 @@
                                 <select class="form-control select2" id="student_id">
                                     <option value="" selected>--Select Students--</option>
                                     @foreach ($students as $std)
-                                        <option value="{{ $std->id }}"> {{ $std->full_name }} ({{ $std->student_id }}) </option>
+                                        <option value="{{ $std->id }}"> {{ $std->full_name }} ({{ $std->student_id }})
+                                        </option>
                                     @endforeach
                                 </select>
                             </div>
                         </div>
 
-                        {{-- <div class="col-md-3">
+                        <div class="col-md-3">
                             <div class="form-group">
                                 <label for="filter_month" class="form-label">Filter by Month</label>
                                 <input type="month" class="form-control" id="filter_month" value="{{ date('Y-m') }}">
                                 <small class="form-text text-muted">Filter will apply automatically on current month</small>
                             </div>
-                        </div> --}}
-
-                        {{-- <div class="col-md-3">
-                            <div class="form-group">
-                                <label for="class">Class</label>
-                                <select class="form-control select2" id="class_id">
-                                    <option value="" selected>--Select class--</option>
-                                    @foreach ($classes as $class)
-                                        <option value="{{ $class->id }}">{{ $class->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div> --}}
+                        </div>
 
                         <div>
                             <button type="button" id="resetFilters" class="btn btn-sm btn-info">
@@ -82,23 +71,24 @@
                             <table class="table table-striped table-vcenter text-nowrap mb-0" id="feeTable">
                                 <thead>
                                     <tr>
-                                        
-                                        <th>Refrence ID</th>
-                                        <th>Status</th>
-                                        <th>Student Name</th>
-                                        <th>Student ID</th>
-                                        <th>Total Fee</th>
-                                        <th>Discounted Fee</th>
-                                        
+
+                                        <td>Student ID</td>
+                                        <td>Student Name</td>
+                                        <td>Total Fee</td>
+                                        <td>Applied Discounted</td>
                                     </tr>
                                 </thead>
                                 <tbody>
                                 </tbody>
 
-                                {{-- <tfoot>
-                                    <td colspan="8"></td>
-                                    <td colspan="3">Outstanding Amount : Rs. <span id="outstanding_amount">0</span></td>
-                                </tfoot> --}}
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="2">Summary</td>
+                                        <td>Average Discount</td>
+                                        <td id="discount_avg">0%</td>
+                                    </tr>
+                                </tfoot>
+
                             </table>
                         </div>
                     </div>
@@ -140,67 +130,71 @@
         </style>
     @endsection
 
-   @section('js')
-<script>
-    $(document).ready(function() {
-        // initialize Select2 if used
-        if ($.fn.select2) {
-            $('#student_id').select2({ width: '100%' });
-            // Remove initial selection if you prefer empty by default
-            // $('#filter_month').val('');
-        }
-
-        var table = $('#feeTable').DataTable({
-            processing: true,
-            serverSide: true,
-            ajax: {
-                url: "{{ route('admin.fee-management.reports.fee-bills-by-financial-aid') }}",
-                data: function(d) {
-                    d.student_id = $('#student_id').val();
-                    // d.filter_month = $('#filter_month').val();
+    @section('js')
+        <script>
+            $(document).ready(function() {
+                if ($.fn.select2) {
+                    $('#student_id').select2({
+                        width: '100%'
+                    });
                 }
-            },
-            dom: 'Bfrtip',
-            buttons: [
-                'pageLength',
-                { extend: 'copy', text: 'Copy' },
-                { extend: 'csv', text: 'CSV' },
-                { extend: 'excel', text: 'Excel' },
-                { extend: 'pdf', text: 'PDF' },
-                { extend: 'print', text: 'Print' }
-            ],
-            lengthMenu: [[10,25,50,-1],[10,25,50,"All"]],
-            columns: [
-                { data: 'reference_id', name: 'reference_id', orderable: true, searchable: true },
-                { data: 'reference_doc_status', name: 'reference_doc_status', orderable: true, searchable: true },
-                { data: 'student_name', name: 'student_name', orderable: true, searchable: true },
-                { data: 'student_id', name: 'student_id', orderable: true, searchable: true },
-                { data: 'total_fee', name: 'total_fee', orderable: true, searchable: true },
-                { data: 'discounted_fee', name: 'discounted_fee', orderable: true, searchable: true },
-            ],
-            // optional: add index column rendering if you want
-        });
 
-        // filters
-        $('#student_id').on('change', function() {
-            table.ajax.reload();
-        });
+                var table = $('#feeTable').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    ajax: {
+                        url: "{{ route('admin.fee-management.reports.fee-bills-by-financial-aid') }}",
+                        data: function(d) {
+                            d.student_id = $('#student_id').val();
+                            d.filter_month = $('#filter_month').val();
+                        }
+                    },
+                    dom: 'Bfrtip',
+                    buttons: ['pageLength', 'copy', 'csv', 'excel', 'pdf', 'print'],
+                    columns: [{
+                            data: 'student_id',
+                            name: 'student_id'
+                        },
+                        {
+                            data: 'student_name',
+                            name: 'student_name'
+                        },
+                        {
+                            data: 'total_amount',
+                            name: 'total_amount'
+                        },
+                        {
+                            data: 'discount_value',
+                            name: 'discount_value'
+                        },
 
-        $('#filter_month').on('change', function() {
-            table.ajax.reload();
-        });
+                    ],
+                    drawCallback: function(settings) {
+                        var api = this.api();
+                        var avgDiscount = api.ajax.json().average_discount;
+                        $('#discount_avg').html(avgDiscount + '%');
+                    }
+                });
 
-        $('#resetFilters').on('click', function() {
-            // clear selects and inputs, then reload once
-            if ($.fn.select2) {
-                $('#student_id').val(null).trigger('change');
-            } else {
-                $('#category_id').val('');
-            }
-            $('#filter_month').val('');
-            table.ajax.reload();
-        });
-    });
-</script>
-@endsection
 
+                // filters
+                $('#student_id').on('change', function() {
+                    table.ajax.reload();
+                });
+
+                $('#filter_month').on('change', function() {
+                    table.ajax.reload();
+                });
+
+                $('#resetFilters').on('click', function() {
+                    if ($.fn.select2) {
+                        $('#student_id').val(null).trigger('change');
+                    } else {
+                        $('#category_id').val('');
+                    }
+                    $('#filter_month').val('');
+                    table.ajax.reload();
+                });
+            });
+        </script>
+    @endsection
