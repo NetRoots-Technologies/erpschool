@@ -200,8 +200,17 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'academic', 'as' => 'academi
     ->name('students.leave.approve.submit');
     // Acedemic Reports
     Route::get('report/student-status', [AcadmicReportController::class, 'Studentstatus'])->name('report.student-status');
-    
+
     Route::get('report/student-leave', [AcadmicReportController::class, 'StudentLeave'])->name('report.student-leave');
+    Route::get('report/student-consolidated-report', [AcadmicReportController::class, 'StudentConsolidatedReport'])->name('report.student-consolidated-report');
+
+    Route::get('student/consolidated/month', [AcadmicReportController::class, 'studentsByMonth'])->name('reports.students.month');
+    Route::get('student/consolidated/year',  [AcadmicReportController::class, 'studentsByYear'])->name('reports.students.year');
+    Route::get('student/consolidated/term',  [AcadmicReportController::class, 'studentsByTerm'])->name('reports.students.term');
+
+    // Summary counts endpoint (used by front-end to show opening/closing counts)
+    Route::get('students/counts/summary', [AcadmicReportController::class, 'countsSummary'])->name('reports.students.counts_summary');
+
 
     // Strength Summary Current
     Route::get('report/strength-summary-current', [AcadmicReportController::class, 'StrengthSummaryCurrent'])->name('report.strength-summary-current');

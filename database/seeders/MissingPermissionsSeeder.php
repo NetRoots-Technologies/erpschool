@@ -142,7 +142,7 @@ class MissingPermissionsSeeder extends Seeder
             ],
 
             'Acedemic Reprorts' => [
-                'Strength Summary Report list', 'Student Status Report list', 'Student Leave Report list',
+                'Strength Summary Report list', 'Student Status Report list', 'Student Leave Report list','Monthly Student Report list','Yearly Student Report list','Term-wise Student Report list',
             ],
 
             'Fee Reports' => [

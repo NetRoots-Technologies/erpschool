@@ -49,6 +49,7 @@ class CreateStudentsTable extends Migration
                 $table->unsignedBigInteger('section_id')->nullable();
                 $table->unsignedBigInteger('branch_id')->nullable();
                 $table->unsignedBigInteger('company_id')->nullable();
+                $table->string('leave_date')->nullable();
                 $table->timestamps();
                 $table->softDeletes();
             });

@@ -87,7 +87,8 @@ $(function () {
             },
             success: function (res) {
                 toastr.success(res.message);
-                $('#leaveApproveTable').ajax().reload();
+                // $('#leaveApproveTable').ajax().reload();
+                window.location.reload();
             },
             error: function (xhr) {
                 toastr.error("Error approving student");

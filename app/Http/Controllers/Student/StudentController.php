@@ -445,11 +445,10 @@ class StudentController extends Controller
 
         public function studentLeave(Request $request)
     {
-    
-    
+        
         $students = Students::Where('id', $request->id)->first();
         if ($students) {
-            $students->update(['leave_reason' => $request->reason , 'is_active' => 0, 'status' => 0]);
+            $students->update(['leave_reason' => $request->reason , 'is_active' => 0, 'status' => 0 , 'leave_date' => now()->toDateString() ]);
         }
         return response()->json(['message' => 'Student leave updated successfully']);
         
@@ -498,6 +497,7 @@ public function studentLeaveApproveSubmit(Request $request)
 {
     $student = Students::find($request->id);
     $student->approved_by = Auth::user()->id;
+    $student->leave_date = now()->toDateString();
     $student->save();
     return response()->json(['message' => 'Student leave approved']);
 }

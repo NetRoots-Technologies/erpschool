@@ -157,30 +157,41 @@ All Students
 
 <!-- Leave Modal -->
 <div class="modal fade" id="leaveModal" tabindex="-1" aria-labelledby="leaveModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <form id="leaveForm">
-      @csrf
-      <input type="hidden" id="leave_student_id" name="id" value="">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="leaveModalLabel">Mark Student as Left</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+  <div class="modal-dialog modal-dialog-centered modal-md">
+    <div class="modal-content border-0 shadow">
+      <form id="leaveForm">
+        @csrf
+        <input type="hidden" id="leave_student_id" name="id" value="">
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title" id="leaveModalLabel">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>Mark Student as Left
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
+          <p class="mb-3">Please provide a reason for marking this student as left.</p>
           <div class="mb-3">
-            <label for="leave_reason" class="form-label">Reason</label>
-            <textarea id="leave_reason" name="reason" class="form-control" rows="4" placeholder="Enter reason (optional)"></textarea>
+            <textarea id="leave_reason" name="reason" class="form-control form-control-lg" rows="4" placeholder="Enter reason..." required></textarea>
+            <div id="leaveError" class="text-danger small mt-1" style="display:none;"></div>
           </div>
-          <div id="leaveError" class="text-danger" style="display:none;"></div>
         </div>
         <div class="modal-footer">
-          <button type="button" id="leaveCancel" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-          <button type="submit" id="leaveSaveBtn" class="btn btn-success">Save</button>
+          <button type="button" class="btn btn-outline-secondary cancel" data-bs-dismiss="modal">
+            <i class="bi bi-x-circle me-1"></i> Cancel
+          </button>
+          <button type="submit" id="leaveSaveBtn" class="btn btn-danger">
+            <i class="bi bi-check-circle me-1"></i> Save
+          </button>
         </div>
-      </div>
-    </form>
+      </form>
+    </div>
   </div>
 </div>
+
+
+
+
+
 
 
 @stop
@@ -366,77 +377,78 @@ All Students
             }
         }
 
+    $(document).ready(function () {
+        // Use a single modal instance
+        var leaveModalEl = document.getElementById('leaveModal');
+        var leaveModal = new bootstrap.Modal(leaveModalEl);
 
-        $(document).ready(function () {
-    // ... your existing DataTable init ...
-
-    // Delegate click because buttons are rendered dynamically
-    $('#data_table').on('click', '.leaveBtn', function (e) {
-        e.preventDefault();
-        let studentId = $(this).data('id');
-        $('#leave_student_id').val(studentId);
-        $('#leave_reason').val('');
-        $('#leaveError').hide().text('');
-        // show modal
-        var leaveModal = new bootstrap.Modal(document.getElementById('leaveModal'));
-        leaveModal.show();
-    });
-
-    // Handle submit
-    $('#leaveForm').on('submit', function (e) {
-        e.preventDefault();
-
-        let id = $('#leave_student_id').val();
-        let reason = $('#leave_reason').val();
-        let token = $('meta[name="csrf-token"]').attr('content');
-
-        $('#leaveSaveBtn').prop('disabled', true);
-
-        $.ajax({
-            url: "{{ route('academic.students.leave') }}",
-            type: 'POST',
-            dataType: 'json',
-            data: {
-                _token: token,
-                id: id,
-                reason: reason
-            },
-            success: function (res) {
-                // close modal
-                var modalEl = $('#leaveModal').modal('hide');
-                toastr.success(res.message);
-                window.location.reload();
-            },
-            error: function (xhr, status, error) {
-                $('#leaveSaveBtn').prop('disabled', false);
-
-                var msg = 'An error occurred';
-                if (xhr && xhr.responseJSON && xhr.responseJSON.message) {
-                    msg = xhr.responseJSON.message;
-                } else if (xhr && xhr.responseText) {
-                    try {
-                        var json = JSON.parse(xhr.responseText);
-                        if (json.errors) {
-                            msg = Object.values(json.errors).flat().join('<br>');
-                        } else if (json.message) {
-                            msg = json.message;
-                        }
-                    } catch (e) {
-                        msg = xhr.responseText;
-                    }
-                }
-                $('#leaveError').html(msg).show();
-            },
-            complete: function () {
-                $('#leaveSaveBtn').prop('disabled', false);
-            }
+        // Open modal on button click
+        $('#data_table').on('click', '.leaveBtn', function () {
+            let studentId = $(this).data('id');
+            $('#leave_student_id').val(studentId);
+            $('#leave_reason').val('');
+            $('#leaveError').hide().text('');
+            leaveModal.show();
         });
 
+        // Handle form submit
+        $('#leaveForm').on('submit', function (e) {
+            e.preventDefault();
+
+            let id = $('#leave_student_id').val();
+            let reason = $('#leave_reason').val().trim();
+
+            if (!reason) {
+                $('#leaveError').text('Reason is required').show();
+                return;
+            } else {
+                $('#leaveError').hide();
+            }
+
+            $('#leaveSaveBtn').prop('disabled', true).text('Saving...');
+
+            $.ajax({
+                url: "{{ route('academic.students.leave') }}",
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    _token: $('meta[name="csrf-token"]').attr('content'),
+                    id: id,
+                    reason: reason
+                },
+                success: function (res) {
+                    leaveModal.hide();
+                    toastr.success(res.message);
+                    $('#data_table').DataTable().ajax.reload();
+                    window.location.reload();
+                },
+                error: function (xhr) {
+                    let msg = 'An error occurred';
+                    if (xhr.responseJSON?.errors) {
+                        msg = Object.values(xhr.responseJSON.errors).flat().join('<br>');
+                    } else if (xhr.responseJSON?.message) {
+                        msg = xhr.responseJSON.message;
+                    }
+                    $('#leaveError').html(msg).show();
+                },
+                complete: function () {
+                    $('#leaveSaveBtn').prop('disabled', false).text('Save');
+                }
+            });
+        });
+
+        // Reset form when modal closes
+        leaveModalEl.addEventListener('hidden.bs.modal', function () {
+            $('#leaveForm')[0].reset();
+            $('#leaveError').hide().text('');
+            $('#leaveSaveBtn').prop('disabled', false).text('Save');
+        });
+
+        $('.cancel').on('click', function () {
+            leaveModal.hide();
+            window.location.reload();
+        });
     });
-
-});
-
-
 
     </script>
 @endsection

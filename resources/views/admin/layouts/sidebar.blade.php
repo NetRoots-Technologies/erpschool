@@ -342,6 +342,9 @@
                             'academic.report.student-status',
                             'academic.report.strength-summary-current',
                             'academic.report.student-leave',
+                            'academic.reports.students.month',
+                            'academic.reports.students.year',
+                            'academic.reports.students.term',
                             // add other academic report route names here if needed
                         ];
                         $isAcademicActive = false;
@@ -375,6 +378,21 @@
                             @can('Student Leave Report list')
                                 <li><a class="slide-item {{ request()->is('academic/report/student-leave') ? 'active' : '' }}"
                                         href="{{ route('academic.report.student-leave') }}">Student leave List</a></li>
+                            @endcan
+
+                              @can('Monthly Student Report list')
+                                <li><a class="slide-item {{ request()->is('academic/student/consolidated/month') ? 'active' : '' }}"
+                                        href="{{ route('academic.reports.students.month') }}">Monthly Consolidated</a></li>
+                            @endcan
+
+                               @can('Yearly Student Report list')
+                                <li><a class="slide-item {{ request()->is('academic/student/consolidated/year') ? 'active' : '' }}"
+                                        href="{{ route('academic.reports.students.year') }}">Yearly Consolidated</a></li>
+                            @endcan
+
+                              @can('Term-wise Student Report list')
+                                <li><a class="slide-item {{ request()->is('academic/student/consolidated/term') ? 'active' : '' }}"
+                                        href="{{ route('academic.reports.students.term') }}">Term-wise Consolidated </a></li>
                             @endcan
 
                             @can('Strength Summary Report list')

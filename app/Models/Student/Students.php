@@ -28,6 +28,9 @@ class Students extends Model
     // protected $appends = ['name_with_id'];
 
     protected $fillable = [
+        'leave_reason',
+        'approved_by',
+        'leave_date',
         'student_id',
         'second_language',
         'first_language',

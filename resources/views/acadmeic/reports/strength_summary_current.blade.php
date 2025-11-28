@@ -54,7 +54,7 @@
 
                     <div class="col-md-3">
                         <div class="form-group">
-                            <label>Section</label>
+                            <label>Academic Session</label>
                             <select class="form-control select2" id="acadmeic_session_id">
                                 <option value="" selected>--Select Session--</option>
                                 @foreach($acadmeic_sessions as $sa)
