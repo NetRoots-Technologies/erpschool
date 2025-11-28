@@ -287,8 +287,8 @@ class FeeManagementController extends Controller
 
     public function getStructuresData()
     {
-        $structures = FeeStructure::with(['student', 'academicClass', 'academicSession', 'createdBy', 'feeStructureDetails'])
-            ->select(['id', 'name', 'academic_class_id', 'academic_session_id', 'fee_factor_id', 'is_active', 'created_at', 'student_id']);
+        $structures = FeeStructure::with(['student', 'academicClass', 'academicSession', 'createdBy', 'feeStructureDetails' , 'feeFactor'])
+            ->select(['id', 'name', 'academic_class_id', 'academic_session_id', 'fee_factor_id', 'is_active', 'created_at', 'student_id', 'final_amount']);
 
         return DataTables::of($structures)
             ->addColumn('action', function ($structure) {
@@ -309,6 +309,9 @@ class FeeManagementController extends Controller
             ->addColumn('class_name', function ($structure) {
                 return $structure->academicClass->name ?? 'N/A';
             })
+            ->addColumn('factor_name', function ($structure) {
+                return $structure->feeFactor->name ?? 'N/A';
+            })
             ->addColumn('session_name', function ($structure) {
                 return $structure->academicSession->name ?? 'N/A';
             })
@@ -317,6 +320,10 @@ class FeeManagementController extends Controller
             })
             ->addColumn('status', function ($structure) {
                 return $structure->is_active ? '<span class="badge badge-success">Active</span>' : '<span class="badge badge-danger">Inactive</span>';
+            })
+
+            ->addColumn('fee_bill_amount', function ($structure) {
+                return $structure->final_amount ?? 0;
             })
             ->addColumn('student_name', function ($structure) {
                 return $structure->student->first_name . ' ' . $structure->student->last_name;
@@ -334,7 +341,7 @@ class FeeManagementController extends Controller
                     $q->whereRaw("TRIM(CONCAT(COALESCE(first_name,''),' ',COALESCE(last_name,''))) LIKE ?", ["%{$keyword}%"]);
                 });
             })
-            ->rawColumns(['action', 'status', 'student_name', 'student_id'])
+            ->rawColumns(['action', 'status', 'student_name', 'student_id' , 'factor_name' , 'fee_bill_amount'])
             ->make(true);
     }
 

@@ -48,9 +48,11 @@
                                     <th>Student ID</th>
                                     <th>Student Name</th>
                                     <th>Sturcture Name</th>
+                                    <th>Fee Factor</th>
                                     <th>Class</th>
                                     <th>Session</th>
                                     <th>Total Amount</th>
+                                    <th>Fee Bill Amount</th>
                                     <th>Status</th>
                                     <th>Created At</th>
                                     <th>Actions</th>
@@ -112,11 +114,19 @@
                 { data: 'student_id', name: 'student_id' , searchable: true},
                 { data: 'student_name', name: 'student_name' , searchable: true },
                 { data: 'name', name: 'name' },
+                { data: 'factor_name', name: 'factor_name' },
                 { data: 'class_name', name: 'class_name' },
                 { data: 'session_name', name: 'session_name' },
                 { 
                     data: 'total_amount', 
                     name: 'total_amount',
+                    render: function(data, type, row) {
+                        return 'Rs. ' + parseFloat(data).toLocaleString();
+                    }
+                },
+                { 
+                    data: 'fee_bill_amount', 
+                    name: 'fee_bill_amount',
                     render: function(data, type, row) {
                         return 'Rs. ' + parseFloat(data).toLocaleString();
                     }
