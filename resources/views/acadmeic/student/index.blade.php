@@ -321,7 +321,7 @@ All Students
                         orderable: false, searchable: false
                     },
                     { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false },
-                    { data: 'student_id', name: 'student_id' },
+                    { data: 'student_id', name: 'student_id', orderable: true, searchable: true },
                     { data: 'name', name: 'name' },
                     { data: 'student_email', name: 'student_email' },
                     { data: 'father_name', name: 'father_name' },

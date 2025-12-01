@@ -223,6 +223,9 @@ class StudentServices
             })->addColumn('student_id', function ($row) {
                 return $row->student_id;
             })
+            ->filterColumn('student_id', function ($query, $keyword) {
+                $query->where('student_id', 'like', "%{$keyword}%");
+            })
             ->addColumn('campus', function ($row) {
                 if ($row->branch) {
                     return $row->branch->name;
@@ -231,7 +234,7 @@ class StudentServices
                 }
             })
 
-            ->rawColumns(['action', 'name', 'campus'])
+            ->rawColumns(['action', 'name', 'campus', 'student_id'])
             ->make(true);
 
 
