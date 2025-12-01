@@ -1950,7 +1950,8 @@ class FeeManagementController extends Controller
 
 
             // Validate payment amount
-            $finalAmount = $challan->getFinalAmount();
+            // $finalAmount = $challan->getFinalAmount();
+            $finalAmount = $challan->total_amount;
             $currentPaidAmount = $challan->paid_amount ?? 0;
             $maxPayableAmount = $finalAmount + $request->fine_amount - $currentPaidAmount;
 
