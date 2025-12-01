@@ -214,23 +214,23 @@ class StudentServices
                 return $btn;
 
             })->addColumn('name', function ($row) {
-
                 if ($row->first_name && $row->last_name) {
                     return $row->first_name . '&nbsp' . $row->last_name;
                 } else {
                     return '-';
                 }
+
             })->addColumn('student_id', function ($row) {
                 return $row->student_id;
             })
             ->addColumn('campus', function ($row) {
-
                 if ($row->branch) {
                     return $row->branch->name;
                 } else {
                     return '-';
                 }
             })
+
             ->rawColumns(['action', 'name', 'campus'])
             ->make(true);
 

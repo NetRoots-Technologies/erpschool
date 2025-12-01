@@ -65,7 +65,7 @@
                                                    id="name"
                                                    type="text"
                                                    class="form-control"
-                                                   value="{{ old('name') ?? env('APP_ENV') == 'local' ? 'test name' : ''}}"
+                                                   value=""
                                                    onkeydown="return /[a-zA-Z\s]/.test(event.key) || event.key == 'Backspace'"
 
                                                    maxlength="70"
@@ -79,7 +79,7 @@
 
                                                    maxlength="70" id="name" type="text"
                                                    class="form-control"
-                                                   value="{{old('father_name')  ?? env('APP_ENV') == 'local' ? 'test father name' : ''}}"/>
+                                                   value=""/>
                                         </div>
                                         <div class="col-lg-4">
                                             <label for="cnic_card"> CNIC <b>*</b> <span
@@ -88,7 +88,7 @@
                                                    class="form-control cnic_card"
                                                    data-inputmask="'mask': '99999-9999999-9'"
                                                    placeholder="XXXXX-XXXXXXX-X" onchange="checkCNIC(this)"
-                                                   value="{{ old('cnic_card') ?? env('APP_ENV') == 'local' ? '1234512345671' : ''}}"/>
+                                                   value=""/>
                                         </div>
                                     </div>
                                     <div class="row mt-2">
@@ -100,7 +100,7 @@
                                             <label for="image">Mobile No <b>*</b></label>
                                             <input class="form-control" pattern="[0-9]+"
                                                    oninput="this.value = this.value.replace(/[^0-9]/g, '')"
-                                                   maxlength="20" required value="{{ old('mobile_no')  ?? env('APP_ENV') == 'local' ? '0321-1234567' : '' }}"
+                                                   maxlength="20" required value=""
                                                    type="number" name="mobile_no"
                                                    id="mobile_no">
                                         </div>
@@ -108,7 +108,7 @@
                                             <label for="tell_no">Emeregency Contact Number <b>*</b></label>
                                             <input class="form-control" pattern="[0-9]+"
                                                    oninput="this.value = this.value.replace(/[^0-9]/g, '')"
-                                                   maxlength="20" value="{{ old('tell_no')  ?? env('APP_ENV') == 'local' ? '0321-1234567' : '' }}" required
+                                                   maxlength="20" value="" required
                                                    type="text" name="tell_no"
                                                    id="tell_no">
                                         </div>
@@ -130,19 +130,19 @@
                                         <div class="col-lg-4 mt-2">
                                             <label for="personal_email_address">Personal Email Address <b>*</b></label>
                                             <input class="form-control" required type="text"
-                                                   id="personal_email_address" name="personal_email_address" value="{{ old('personal_email_address') ?? env('APP_ENV') == 'local' ? 'admin1@gmail.com' : '' }}">
+                                                   id="" name="personal_email_address" value="" placeholder="">
                                         </div>
                                         <div class="col-lg-4 mt-2">
                                             <label for="email_address">Professional Email Address <b>*</b></label>
                                             <input class="form-control"  type="text"
-                                                   value="{{ old('email_address') ?? env('APP_ENV') == 'local' ? 'admin1@gmail.com' : ''}}" name="email_address"
+                                                   value=""
                                                    id="email_address" required>
                                         </div>
 
 
                                         <div class="col-lg-4 mt-2">
                                             <label for="email">Password</label>
-                                            <input class="form-control" type="password" name="password" id="password" value="{{ old('password') ?? env('APP_ENV') == 'local' ? '12345678' : '' }}">
+                                            <input class="form-control" type="password" name="password" id="password" value="">
                                         </div>
                                     </div>
 
@@ -151,13 +151,13 @@
                                         <div class="col-lg-12">
                                             <label for="email">Present Address <b>*</b></label>
                                             <input class="form-control" type="text" name="present_address"
-                                                   id="present_address" value="{{ old('present_address') ?? env('APP_ENV') == 'local' ? 'present address' : '' }}">
+                                                   id="present_address" value="">
                                         </div>
                                     </div>
                                     <div class="row mt-3">
                                         <div class="col-lg-12">
                                             <label for="email">Permanent Address <b>*</b></label>
-                                            <input class="form-control" value="{{ old('permanent_address') ?? env('APP_ENV') == 'local' ? 'permanent address' : ''}}" required
+                                            <input class="form-control" value="" required
                                                    type="text" name="permanent_address"
                                                    id="permanent_address">
                                         </div>
@@ -172,7 +172,7 @@
                                                 </div>
                                                 <input required name="dob" class="form-control datePicker employee_dob"
                                                        id="datepicker-date" placeholder="MM/DD/YYYY"
-                                                       type="text" value="{{ old('dob') ?? env('APP_ENV') == 'local' ? '01-01-2000' : ''}}">
+                                                       type="text" value="">
                                             </div>
                                         </div>
 
