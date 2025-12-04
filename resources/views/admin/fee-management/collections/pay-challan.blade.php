@@ -306,6 +306,7 @@
                                     </p>
                                     <p id="summaryTransportRow" style="display: none;"><strong>Transport Fee:</strong>
                                         <span id="summaryTransportFee" class="text-info">Rs. 0</span>
+                                        <input type="hidden" name="transport_amount" value="" id="transportAmount">
                                     </p>
                                     <p><strong>Final Amount:</strong> <span id="summaryFinalAmount"></span></p>
                                     <p><strong>Amount to Pay:</strong> <span id="summaryPaidAmount">Rs. 0</span></p>
@@ -712,6 +713,7 @@
                 // Update payment summary
                 $('#summaryTransportFee').text('Rs. ' + parseFloat(totalTransportFee).toLocaleString());
                 $('#summaryTransportRow').show();
+                $('#transportAmount').val(parseFloat(totalTransportFee));
 
                 // Store transport data for payment calculation
                 window.totalTransportFee = parseFloat(totalTransportFee);

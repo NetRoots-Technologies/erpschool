@@ -1931,7 +1931,7 @@ class FeeManagementController extends Controller
         if (!Gate::allows('Dashboard-list')) {
             abort(403, 'Unauthorized access');
         }
-
+        
         $request->validate([
             'student_id' => 'required|exists:students,id',
             'academic_session_id' => 'required|exists:acadmeic_sessions,id',
@@ -1944,17 +1944,18 @@ class FeeManagementController extends Controller
 
         try {
             DB::beginTransaction();
-
+            
             // Get the challan
             $challan = FeeBilling::findOrFail($request->challan_id);
-
-
+            
+            
             // Validate payment amount
             // $finalAmount = $challan->getFinalAmount();
-            $finalAmount = $challan->total_amount;
+            $finalAmount = $challan->total_amount + $request->transport_amount ?? 0;
             $currentPaidAmount = $challan->paid_amount ?? 0;
             $maxPayableAmount = $finalAmount + $request->fine_amount - $currentPaidAmount;
-
+            
+            
             if ($request->paid_amount > $maxPayableAmount) {
                 return back()->withErrors(['paid_amount' => 'Payment amount cannot exceed maximum payable amount (Rs. ' . number_format($maxPayableAmount, 2) . ')'])->withInput();
             }
@@ -2908,12 +2909,76 @@ class FeeManagementController extends Controller
 
 
 
+// public function feeBillsByFinancialAid(Request $request)
+// {
+//     if ($request->ajax()) {
+//         $month = $request->month ?? $request->filter_month ?? now()->format('Y-m');
+
+//         // Latest discount per student
+//         $latestDiscount = DB::table('fee_discounts as fd1')
+//             ->select('fd1.student_id', 'fd1.discount_type', 'fd1.discount_value')
+//             ->whereRaw('fd1.id = (
+//                 SELECT fd2.id FROM fee_discounts fd2
+//                 WHERE fd2.student_id = fd1.student_id
+//                 ORDER BY fd2.created_at DESC, fd2.id DESC
+//                 LIMIT 1
+//             )');
+
+//         // Fee bills query
+//         $query = DB::table('fee_billing as fb')
+//             ->join('students as s', 's.id', '=', 'fb.student_id')
+//             ->leftJoinSub($latestDiscount, 'd', function($join) {
+//                 $join->on('d.student_id', '=', 'fb.student_id');
+//             })
+//             ->where('fb.billing_month', $month)
+//             ->select(
+//                 's.student_id',
+//                 'd.discount_value',
+//                 DB::raw("CONCAT(s.first_name,' ',COALESCE(s.last_name,'')) as student_name"),
+//                 'fb.total_amount',
+//             );
+
+//         if ($request->filled('student_id')) {
+//             $query->where('fb.student_id', $request->student_id);
+//         }
+
+//         // Compute totals for footer
+//             $totals = DB::table('fee_billing as fb')
+//                 ->leftJoinSub($latestDiscount, 'd', function($join) {
+//                     $join->on('d.student_id', '=', 'fb.student_id');
+//                 })
+//                 ->where('fb.billing_month', $month)
+//                 ->select(
+//                     DB::raw('SUM(fb.total_amount) as total_fee'),
+//                     DB::raw('SUM(
+//                         CASE
+//                             WHEN d.discount_type = "percentage" THEN (fb.total_amount * COALESCE(d.discount_value,0) / 100)
+//                             WHEN d.discount_type = "fixed" THEN COALESCE(d.discount_value,0)
+//                             ELSE 0
+//                         END
+//                     ) as total_discount')
+//                 )->first();
+
+//             $averageDiscountPct = ($totals->total_fee > 0) 
+//                 ? round(($totals->total_discount / $totals->total_fee) * 100, 2) 
+//                 : 0.00;
+
+//             return DataTables::of($query)
+//                 ->with('average_discount', $averageDiscountPct)
+//                 ->make(true);
+//     }
+
+//     $students = Students::with('AcademicClass')->get();
+//     return view('admin.fee-management.reports.fee_collection_report', compact('students'));
+// }
+
 public function feeBillsByFinancialAid(Request $request)
 {
     if ($request->ajax()) {
+
         $month = $request->month ?? $request->filter_month ?? now()->format('Y-m');
 
-        // Latest discount per student
+        // Fetch latest discount per student
         $latestDiscount = DB::table('fee_discounts as fd1')
             ->select('fd1.student_id', 'fd1.discount_type', 'fd1.discount_value')
             ->whereRaw('fd1.id = (
@@ -2923,7 +2988,7 @@ public function feeBillsByFinancialAid(Request $request)
                 LIMIT 1
             )');
 
-        // Fee bills query
+        // MAIN DATATABLE QUERY
         $query = DB::table('fee_billing as fb')
             ->join('students as s', 's.id', '=', 'fb.student_id')
             ->leftJoinSub($latestDiscount, 'd', function($join) {
@@ -2935,42 +3000,58 @@ public function feeBillsByFinancialAid(Request $request)
                 'd.discount_value',
                 DB::raw("CONCAT(s.first_name,' ',COALESCE(s.last_name,'')) as student_name"),
                 'fb.total_amount',
+                
+                
+                // CALCULATED discount per row
+                DB::raw("
+                    CASE
+                        WHEN d.discount_type = 'percentage' THEN 
+                            ROUND((fb.total_amount * COALESCE(d.discount_value, 0) / 100), 2)
+                        WHEN d.discount_type = 'fixed' THEN COALESCE(d.discount_value, 0)
+                        ELSE 0
+                    END as applied_discount
+                ")
             );
 
         if ($request->filled('student_id')) {
             $query->where('fb.student_id', $request->student_id);
         }
 
-        // Compute totals for footer
-            $totals = DB::table('fee_billing as fb')
-                ->leftJoinSub($latestDiscount, 'd', function($join) {
-                    $join->on('d.student_id', '=', 'fb.student_id');
-                })
-                ->where('fb.billing_month', $month)
-                ->select(
-                    DB::raw('SUM(fb.total_amount) as total_fee'),
-                    DB::raw('SUM(
+        // FOOTER CALCULATION (Total Fee, Total Discount, Avg Discount %)
+        $totals = DB::table('fee_billing as fb')
+            ->leftJoinSub($latestDiscount, 'd', function($join) {
+                $join->on('d.student_id', '=', 'fb.student_id');
+            })
+            ->where('fb.billing_month', $month)
+            ->select(
+                DB::raw('SUM(fb.total_amount) as total_fee'),
+                DB::raw("
+                    SUM(
                         CASE
-                            WHEN d.discount_type = "percentage" THEN (fb.total_amount * COALESCE(d.discount_value,0) / 100)
-                            WHEN d.discount_type = "fixed" THEN COALESCE(d.discount_value,0)
+                            WHEN d.discount_type = 'percentage' THEN 
+                                ROUND((fb.total_amount * COALESCE(d.discount_value, 0) / 100), 2)
+                            WHEN d.discount_type = 'fixed' THEN COALESCE(d.discount_value, 0)
                             ELSE 0
                         END
-                    ) as total_discount')
-                )->first();
+                    ) as total_discount
+                ")
+            )
+            ->first();
 
-            $averageDiscountPct = ($totals->total_fee > 0) 
-                ? round(($totals->total_discount / $totals->total_fee) * 100, 2) 
-                : 0.00;
+        // AVERAGE DISCOUNT %
+        $averageDiscountPct = ($totals->total_fee > 0)
+            ? round(($totals->total_discount / $totals->total_fee) * 100, 2)
+            : 0.00;
 
-            return DataTables::of($query)
-                ->with('average_discount', $averageDiscountPct)
-                ->make(true);
+        return DataTables::of($query)
+            ->with('total_discount', $totals->total_discount)
+            ->with('average_discount', $averageDiscountPct)
+            ->make(true);
     }
 
     $students = Students::with('AcademicClass')->get();
     return view('admin.fee-management.reports.fee_collection_report', compact('students'));
 }
-
 
 
 
