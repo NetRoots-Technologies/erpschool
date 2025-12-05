@@ -89,7 +89,7 @@
                    <div class="row g-3 mb-3">
                     <div class="col-md-4">
                         <label>Tax (%)</label>
-                        <input type="number" id="tax_percentage" name="tax_percentage" class="form-control form-control-lg" value="0">
+                        <input type="text" id="tax_percentage" name="tax_percentage" class="form-control form-control-lg" value="0">
                     </div>
                     <div class="col-md-4">
                         <label>Tax Amount</label>

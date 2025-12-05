@@ -2044,7 +2044,8 @@ class FeeManagementController extends Controller
                     'fee_amount' => $collection->paid_amount,
                     'collection_date' => $collection->collection_date,
                     'reference' => 'FEE-' . str_pad($collection->id, 6, '0', STR_PAD_LEFT) . ' (Challan: ' . $challan->challan_number . ')',
-                    'customer_invoice_id' => $challan->customer_invoice_id //new add Here
+                    'customer_invoice_id' => $challan->customer_invoice_id, //new add Here
+                    'payment_method' => $request->payment_method,
                 ]);
 
                 \Log::info("Calling recordAcademicFee with data: " . json_encode($integrationRequest->all()));

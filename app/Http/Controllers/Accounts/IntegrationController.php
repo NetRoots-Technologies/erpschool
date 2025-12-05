@@ -8,6 +8,7 @@ use App\Models\Accounts\JournalEntryLine;
 use App\Models\Accounts\AccountLedger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+ use App\Models\Student\Students;
 
 class IntegrationController extends Controller
 {
@@ -228,6 +229,8 @@ class IntegrationController extends Controller
      */
     public function recordAcademicFee(Request $request)
     {
+
+        
         $request->validate([
             'student_id' => 'required',
             'fee_amount' => 'required|numeric',
@@ -243,7 +246,29 @@ class IntegrationController extends Controller
         try {
             // Get or create ledgers
             \Log::info("Searching for Cash ledger...");
-            $cashLedger = AccountLedger::where('name', 'LIKE', '%MCB%')->first();
+            if(isset($request->payment_method)  && $request->payment_method == 'cash'){
+                $cashLedger = AccountLedger::where('name', 'LIKE', '%Cash in Hand%')->first();
+                if (!$cashLedger) {
+                    $cashLedger = AccountLedger::create([
+                        'name' => 'Cash in Hand',
+                        'description' => 'Auto-created cash ledger',
+                        'account_group_id' => 18, // Cash in Hand
+                        'opening_balance' => 0,
+                        'opening_balance_type' => 'debit',
+                        'current_balance' => 0,
+                        'current_balance_type' => 'debit',
+                        'is_active' => true,
+                        'created_by' => auth()->id() ?? 1
+                    ]);
+
+                     $cashLedger->code = 'AST-' . str_pad($cashLedger->id, 4, '0', STR_PAD_LEFT);
+                     $cashLedger->save();
+                }
+                
+                 $cashLedger = AccountLedger::where('name', 'LIKE', '%Cash in Hand%')->first();
+               
+            }elseif(isset($request->payment_method)  && $request->payment_method == 'bank_transfer'){
+                $cashLedger = AccountLedger::where('name', 'LIKE', '%MCB%')->first();
             
             if (!$cashLedger) {
                 \Log::info("Cash ledger not found, creating new one...");
@@ -259,25 +284,23 @@ class IntegrationController extends Controller
                     'is_active' => true,
                     'created_by' => auth()->id() ?? 1
                 ]);
-                \Log::info("✅ Cash ledger created with ID: {$cashLedger->id}");
-            } else {
-                \Log::info("✅ Cash ledger found with ID: {$cashLedger->id}, Name: {$cashLedger->name}");
+              
+            } 
+                $cashLedger = AccountLedger::where('name', 'LIKE', '%MCB%')->first();
             }
             
-            \Log::info("Searching for Fee Revenue ledger...");
-            $feeRevenueLedger = AccountLedger::where('name', 'LIKE', '%revenue%')
-            ->whereHas('accountGroup', function($q) {
-                $q->where('type', 'revenue');
-            })
-            ->first();
-            
+                
+            \Log::info("Searching forStudents Receivable...");
+
+            $feeRevenueLedger = AccountLedger::where('linked_module', Students::class)->where('linked_id', $request->student_id)->first();
+        
             if (!$feeRevenueLedger) {
-                \Log::info("Fee Revenue ledger not found, creating new one...");
+                \Log::info("Students Receivable ledger not found, creating new one...");
                 $feeRevenueLedger = AccountLedger::create([
-                    'name' => 'Fee Revenue',
-                    'code' => 'REV-FEE-' . time(),
+                    'name' => 'Students Receivable',
+                    'code' => '010020050001',
                     'description' => 'Student fees and tuition revenue',
-                    'account_group_id' => 85, // Revenue
+                    'account_group_id' => 32, // students receivable
                     'opening_balance' => 0,
                     'opening_balance_type' => 'credit',
                     'current_balance' => 0,
@@ -286,9 +309,9 @@ class IntegrationController extends Controller
                     'is_active' => true,
                     'created_by' => auth()->id() ?? 1
                 ]);
-                \Log::info("✅ Fee Revenue ledger created with ID: {$feeRevenueLedger->id}");
+                \Log::info("✅Students Receivable created with ID: {$feeRevenueLedger->id}");
             } else {
-                \Log::info("✅ Fee Revenue ledger found with ID: {$feeRevenueLedger->id}, Name: {$feeRevenueLedger->name}");
+                \Log::info("✅Students Receivable found with ID: {$feeRevenueLedger->id}, Name: {$feeRevenueLedger->name}");
             }
 
 

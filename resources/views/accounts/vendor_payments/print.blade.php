@@ -26,17 +26,18 @@
                 <th>Invoice Amount</th>
                 <td>{{ number_format($vp->invoice_amount ?? 0,2) }}</td>
             </tr>
-            <tr>
+            {{-- <tr>
                 <th>Pending Amount</th>
                 <td>{{ number_format($vp->pending_amount ?? 0,2) }}</td>
-            </tr>
+            </tr> --}}
             <tr>
                 <th>Payment Amount</th>
                 <td>{{ number_format($vp->payment_amount,2) }}</td>
             </tr>
             <tr>
                 <th>Mode / Account</th>
-                <td>{{ $vp->payment_mode }} {{ $vp->account_id ? ' | Account ID: '.$vp->account_id : '' }}</td>
+                {{-- <td>{{ $vp->payment_mode }} {{ $vp->account_id ? ' | Account ID: '.$vp->account_id : '' }}</td> --}}
+                <td>{{ __('MCB Bank') }}</td>
             </tr>
             <tr>
                 <th>Cheque</th>
@@ -66,6 +67,11 @@
             <div class="text-center" style="width:200px">
                 _______________________<br>
                 Receiver Signature
+            </div>
+
+            <div class="text-center" style="width:200px">
+                _______________________<br>
+                Checked By
             </div>
 
             <div class="text-center" style="width:200px">

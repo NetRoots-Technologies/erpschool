@@ -303,7 +303,7 @@ class VendorPaymentController extends Controller
             $vp->pending_amount = $validated['pending_amount'] ?? null;
             $vp->payment_amount = $validated['payment_amount'];
             $vp->payment_mode = $validated['payment_mode'];
-            $vp->account_id = $validated['account_id'] ?? null;
+            $vp->account_id = $validated['account_id'];
             $vp->cheque_no = $validated['cheque_no'] ?? null;
             $vp->cheque_date = $validated['cheque_date'] ?? null;
             $vp->remarks = $validated['remarks'] ?? null;
@@ -675,6 +675,7 @@ class VendorPaymentController extends Controller
     public function print($id)
     {
         $vp = VendorPayment::with(['vendor','invoice','preparedByUser','approvedByUser'])->findOrFail($id);
+        
         return view('accounts.vendor_payments.print', compact('vp'));
     }
 

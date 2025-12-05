@@ -1133,8 +1133,8 @@
                 {{-- auth()->user()->hasPermissionTo('Budget') --}}
                 {{-- @dd(auth()->user()->getAllPermissions()->pluck('name')); --}}
                 {{-- Maintenance Management Section --}}
-                <li class="side-item side-item-category" style="display: none;">Maintenance Management</li>
-                <li class="slide" style="display: none;">
+                <li class="side-item side-item-category">Maintenance Management</li>
+                <li class="slide">
                     <a class="side-menu__item {{ request()->is('maintainer*') ? 'active' : '' }}"
                         data-bs-toggle="slide" href="javascript:void(0);">
                         <i class="fa fa-money icons8 icon-style" aria-hidden="true"></i>
