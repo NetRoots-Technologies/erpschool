@@ -856,6 +856,8 @@
                                     href="{{ route('accounts.coa.index') }}">Chart of Accounts</a></li>
                             <li><a class="slide-item {{ request()->is('accounts/journal-entries*') ? 'active' : '' }}"
                                     href="{{ route('accounts.journal.index') }}">Journal Entries</a></li>
+                           <li><a class="slide-item {{ request()->is('accounts/report-ledger*') ? 'active' : '' }}"
+                                    href="{{ route('accounts.report_ledger') }}">Report Ledger</a></li>
 
                             {{-- Payables --}}
                             <li><a class="slide-item {{ request()->is('accounts/payables') ? 'active' : '' }}"

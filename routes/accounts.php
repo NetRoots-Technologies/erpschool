@@ -148,6 +148,11 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'accounts', 'as' => 'account
         Route::post('/academic-fee', [\App\Http\Controllers\Accounts\IntegrationController::class, 'recordAcademicFee'])->name('academic_fee');
         Route::post('/fleet-expense', [\App\Http\Controllers\Accounts\IntegrationController::class, 'recordFleetExpense'])->name('fleet_expense');
     });
+    // Report Ledger Route
+    Route::get('/report-ledger', [\App\Http\Controllers\Reports\LedgerController::class, 'ReportLedgerShow'])->name('report_ledger');
+    // AJAX data for Yajra DataTable
+    Route::get('/report-ledger/data', [\App\Http\Controllers\Reports\LedgerController::class, 'reportLedgerData'])
+        ->name('report_ledger.data');
     // Inside the main 'accounts' route group with middleware
 
 });
