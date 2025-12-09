@@ -89,7 +89,8 @@
                    <div class="row g-3 mb-3">
                     <div class="col-md-4">
                         <label>Tax (%)</label>
-                        <input type="text" id="tax_percentage" name="tax_percentage" class="form-control form-control-lg" value="0">
+                        {{-- <input type="text" id="tax_percentage" name="tax_percentage" class="form-control form-control-lg" value="0"> --}}
+                        <input type="number" id="tax_percentage" name="tax_percentage" class="form-control form-control-lg" value="0" step="0.01" min="0">
                     </div>
                     <div class="col-md-4">
                         <label>Tax Amount</label>
@@ -103,54 +104,39 @@
 
 
                     <!-- Bank / Cheque Info -->
-                    <h5 class="mb-3 text-primary">Bank / Cheque Info</h5>
-                    <div class="row g-3 mb-3">
-                        <div class="col-md-4">
-                            <label class="form-label fw-semibold">Bank / Cash Account</label>
-                            <select name="account_id" class="form-select form-select-lg">
-                                <option value="">-- Select Bank --</option>
+                    <div id="bankChequeSection" style="display:none;">
+                        <h5 class="mb-3 text-primary">Bank / Cheque Info</h5>
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Bank / Cash Account</label>
+                                <select name="account_id" id="account_id" class="form-select form-select-lg">
+                                    <option value="">-- Select Bank --</option>
 
-                                <!-- Static Bank List -->
-                                <option value="1" {{ old('account_id') == 'MCB Bank' ? 'selected' : '' }}>MCB Bank
-                                </option>
-                                {{-- <option value="Meezan Bank" {{ old('account_id') == 'Meezan Bank' ? 'selected' : '' }}>Meezan
-                                    Bank</option>
-                                <option value="HBL" {{ old('account_id') == 'HBL' ? 'selected' : '' }}>HBL - Habib Bank
-                                    Limited</option>
-                                <option value="UBL" {{ old('account_id') == 'UBL' ? 'selected' : '' }}>UBL - United Bank
-                                    Limited</option>
-                                <option value="Allied Bank" {{ old('account_id') == 'Allied Bank' ? 'selected' : '' }}>Allied
-                                    Bank</option>
-                                <option value="Bank Alfalah" {{ old('account_id') == 'Bank Alfalah' ? 'selected' : '' }}>Bank
-                                    Alfalah</option>
-                                <option value="Askari Bank" {{ old('account_id') == 'Askari Bank' ? 'selected' : '' }}>Askari
-                                    Bank</option>
-                                <option value="Soneri Bank" {{ old('account_id') == 'Soneri Bank' ? 'selected' : '' }}>Soneri
-                                    Bank</option>
-                                <option value="Bank Al Habib" {{ old('account_id') == 'Bank Al Habib' ? 'selected' : '' }}>
-                                    Bank Al Habib</option>
-                                <option value="Faysal Bank" {{ old('account_id') == 'Faysal Bank' ? 'selected' : '' }}>Faysal
-                                    Bank</option> --}}
-                            </select>
-                        </div>
+                                    <!-- Static Bank List -->
+                                    <option value="1" {{ old('account_id') == 'MCB Bank' ? 'selected' : '' }}>MCB Bank
+                                    </option>
+                                </select>
+                            </div>
 
-                        <div class="col-md-3">
-                            <label class="form-label fw-semibold">Cheque No</label>
-                            <input type="text" name="cheque_no" id="cheque_no" class="form-control form-control-lg"
-                                value="{{ old('cheque_no') }}">
-                        </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold">Cheque No</label>
+                                <input type="text" name="cheque_no" id="cheque_no" class="form-control form-control-lg"
+                                    value="{{ old('cheque_no') }}">
+                            </div>
 
-                        <div class="col-md-3">
-                            <label class="form-label fw-semibold">Cheque Date</label>
-                            <input type="date" name="cheque_date" id="cheque_date" class="form-control form-control-lg"
-                                value="{{ old('cheque_date') }}">
-                        </div>
+                            <div class="col-md-3">
+                                <label class="form-label fw-semibold">Cheque Date</label>
+                                <input type="text" name="cheque_date" id="cheque_date" class="form-control form-control-lg"
+                                    value="{{ old('cheque_date') }}" placeholder="dd/mm/yyyy">
+                            </div>
 
-                        <div class="col-md-2">
-                            <label class="form-label fw-semibold">Attachment</label>
-                            <input type="file" name="attachment" class="form-control form-control-lg">
+                            <div class="col-md-2">
+                                <label class="form-label fw-semibold">Attachment</label>
+                                <input type="file" name="attachment" class="form-control form-control-lg">
+                            </div>
                         </div>
                     </div>
+
                     {{-- Withholding Tax Payable --}}
                     <h5 class="mb-3 text-primary"></i>Withholding Tax Payable</h5>
                     <div class="row g-3 mb-3">
@@ -306,8 +292,49 @@
             $("#tax_amount").val(taxAmount.toFixed(2));
             $("#final_payment").val(finalAmount.toFixed(2));
         });
+
+        // for hide and show cheque section
+         document.addEventListener('DOMContentLoaded', function() {
+        const paymentMode = document.getElementById('payment_mode');
+        const bankChequeSection = document.getElementById('bankChequeSection');
+        const chequeNo = document.getElementById('cheque_no');
+        const chequeDate = document.getElementById('cheque_date');
+        const accountSelect = document.getElementById('account_id');
+
+        function toggleBankChequeSection() {
+            const isCheque = paymentMode && paymentMode.value === 'Cheque';
+            if (!bankChequeSection) return;
+
+            if (isCheque) {
+                bankChequeSection.style.display = ''; // show
+                // make required when visible
+                if (chequeNo) chequeNo.setAttribute('required', 'required');
+                if (chequeDate) chequeDate.setAttribute('required', 'required');
+                if (accountSelect) accountSelect.setAttribute('required', 'required');
+            } else {
+                bankChequeSection.style.display = 'none'; // hide
+                // remove required when hidden
+                if (chequeNo) chequeNo.removeAttribute('required');
+                if (chequeDate) chequeDate.removeAttribute('required');
+                if (accountSelect) accountSelect.removeAttribute('required');
+
+                // clear values optionally (uncomment if you want)
+                // if (chequeNo) chequeNo.value = '';
+                // if (chequeDate) chequeDate.value = '';
+                // if (accountSelect) accountSelect.value = '';
+            }
+        }
+
+        // run on load (handles old() or preselected values)
+        toggleBankChequeSection();
+
+        // run on change
+        if (paymentMode) {
+            paymentMode.addEventListener('change', function() {
+                toggleBankChequeSection();
+            });
+        }
+    });
     </script>
-
-
 
 @endsection

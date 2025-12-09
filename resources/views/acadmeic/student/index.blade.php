@@ -188,12 +188,6 @@ All Students
   </div>
 </div>
 
-
-
-
-
-
-
 @stop
 @section('css')
     <link href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css" rel="stylesheet">
@@ -423,14 +417,34 @@ All Students
                     window.location.reload();
                 },
                 error: function (xhr) {
+
                     let msg = 'An error occurred';
-                    if (xhr.responseJSON?.errors) {
+
+                    if (xhr.status === 422 && xhr.responseJSON?.message) {
+                        msg = xhr.responseJSON.message;
+                    } 
+                    else if (xhr.responseJSON?.errors) {
                         msg = Object.values(xhr.responseJSON.errors).flat().join('<br>');
-                    } else if (xhr.responseJSON?.message) {
+                    } 
+                    else if (xhr.responseJSON?.message) {
                         msg = xhr.responseJSON.message;
                     }
-                    $('#leaveError').html(msg).show();
+
+                    // 1) Hide modal
+                    leaveModal.hide();
+
+                    // 2) Clear modal errors
+                    $('#leaveError').hide().text('');
+
+                    // 3) Show toast
+                    toastr.error(msg);
+
+                    // 4) Reload after 3 seconds
+                    setTimeout(function () {
+                        window.location.reload();
+                    }, 4000);
                 },
+
                 complete: function () {
                     $('#leaveSaveBtn').prop('disabled', false).text('Save');
                 }

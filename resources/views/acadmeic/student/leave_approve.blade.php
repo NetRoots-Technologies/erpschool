@@ -91,8 +91,11 @@ $(function () {
                 window.location.reload();
             },
             error: function (xhr) {
-                toastr.error("Error approving student");
-                console.log(xhr);
+                   if (xhr.status === 422) {
+                    toastr.error(xhr.responseJSON.message);  
+                } else {
+                    toastr.error("Something went wrong!");
+                }
             }
         });
 

@@ -27,6 +27,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Log;
 // use Illuminate\Support\Facades\Config;
 use Yajra\DataTables\DataTables;
+use App\Models\Fee\FeeBilling;
 
 
 class StudentController extends Controller
@@ -394,7 +395,7 @@ class StudentController extends Controller
         ]);
 
         $students = Students::with(['company', 'branch', 'AcademicClass', 'section'])
-            ->where('branch_id', $request->branch_id)
+        ->where('branch_id', $request->branch_id)
             ->where('class_id', $request->class_id)
             ->where('section_id', $request->section_id)
             ->get();
@@ -443,64 +444,97 @@ class StudentController extends Controller
         }
     }
 
-        public function studentLeave(Request $request)
+    public function studentLeave(Request $request)
     {
-        
-        $students = Students::Where('id', $request->id)->first();
-        if ($students) {
-            $students->update(['leave_reason' => $request->reason , 'is_active' => 0, 'status' => 0 , 'leave_date' => now()->toDateString() ]);
+        $student = Students::find($request->id);
+
+        if (! $student) {
+            return response()->json(['message' => 'Student not found'], 404);
         }
-        return response()->json(['message' => 'Student leave updated successfully']);
-        
-    
+
+        // --- CHECK PENDING / UNPAID BILLS ---
+        $hasPendingBills = FeeBilling::where('student_id', $student->id)
+            ->whereNotNull('challan_number')   // challan exists
+            ->where('outstanding_amount', '>', 0) // not fully paid
+            ->exists();
+
+        if ($hasPendingBills) {
+            return response()->json([
+                'message' => 'Pending dues must be cleared before marking leave'
+            ], 422);
+        }
+
+        // --- UPDATE STUDENT LEAVE INFO ---
+        $student->update([
+            'leave_reason' => $request->reason,
+            'is_active'    => 0,
+            'status'       => 0,
+            'leave_date'   => now()->toDateString()
+        ]);
+
+        return response()->json(['message' => 'Student leave updated successfully'], 200);
     }
+
 
     public function studentLeaveAprove(Request $request)
-{
-    if ($request->ajax()) {
-        $data = Students::with('academicClass', 'AcademicSession', 'approvedBy')
-            ->where('is_active', 0)
-            ->get();
+    {
+        if ($request->ajax()) {
+            $data = Students::with('academicClass', 'AcademicSession', 'approvedBy')
+                ->where('is_active', 0)
+                ->get();
 
-        return Datatables::of($data)->addIndexColumn()
-            ->addColumn('action', function ($row) {
+            return Datatables::of($data)->addIndexColumn()
+                ->addColumn('action', function ($row) {
 
-               $btn = '';
-               if ($row->approved_by !== null) {
-                   $btn .= '<span class="text-success">Approved</span>'; 
-               } else {
-                  $btn .= '
-                    <button class="btn btn-primary btn-sm approveBtn" data-id="' . $row->id . '">
-                        Approve
-                    </button>
-                ';
-               } 
-                return $btn;
-               
-            })
-            ->addColumn('name', fn($row) => $row->full_name)
-            ->addColumn('student_id', fn($row) => $row->student_id)
-            ->addColumn('class', fn($row) => $row->academicClass->name ?? '')
-            ->addColumn('session', fn($row) => $row->AcademicSession->name ?? '')
-            ->addColumn('campus', fn($row) => $row->branch->name ?? '')
-            ->addColumn('approved_by', fn($row) => $row->approvedBy->name ?? '')
-           
-            ->rawColumns(['action'])
-            ->make(true);
+                $btn = '';
+                if ($row->approved_by !== null) {
+                    $btn .= '<span class="text-success">Approved</span>'; 
+                } else {
+                    $btn .= '
+                        <button class="btn btn-primary btn-sm approveBtn" data-id="' . $row->id . '">
+                            Approve
+                        </button>
+                    ';
+                } 
+                    return $btn;
+                
+                })
+                ->addColumn('name', fn($row) => $row->full_name)
+                ->addColumn('student_id', fn($row) => $row->student_id)
+                ->addColumn('class', fn($row) => $row->academicClass->name ?? '')
+                ->addColumn('session', fn($row) => $row->AcademicSession->name ?? '')
+                ->addColumn('campus', fn($row) => $row->branch->name ?? '')
+                ->addColumn('approved_by', fn($row) => $row->approvedBy->name ?? '')
+            
+                ->rawColumns(['action'])
+                ->make(true);
+        }
+
+        // 👇 RETURN THE BLADE VIEW FOR PAGE LOAD
+        return view('acadmeic.student.leave_approve');
     }
 
-    // 👇 RETURN THE BLADE VIEW FOR PAGE LOAD
-    return view('acadmeic.student.leave_approve');
-}
+    public function studentLeaveApproveSubmit(Request $request)
+    {
+        $student = Students::find($request->id);
+    // --- CHECK PENDING / UNPAID BILLS OR ANY CHALLAN EXISTS ---
+        $hasBillsIssue = FeeBilling::where('student_id', $student->id)
+            ->where(function ($q) {
+                $q->where('outstanding_amount', '>', 0)      
+                ->orWhereNotNull('challan_number');       
+            })
+            ->exists();
 
-public function studentLeaveApproveSubmit(Request $request)
-{
-    $student = Students::find($request->id);
-    $student->approved_by = Auth::user()->id;
-    $student->leave_date = now()->toDateString();
-    $student->save();
-    return response()->json(['message' => 'Student leave approved']);
-}
+        if ($hasBillsIssue) {
+            return response()->json([
+                'message' => 'Pending dues must be cleared before leave approval.'
+            ], 422);
+        }
+        $student->approved_by = Auth::user()->id;
+        $student->leave_date = now()->toDateString();
+        $student->save();
+        return response()->json(['message' => 'Student leave approved']);
+    }
 
 
 
