@@ -13,7 +13,9 @@ use App\Models\Accounts\AccountGroup;
 use Illuminate\Http\Request;
 use App\Models\Student\Students;
 use App\Models\Accounts\CustomerInvoice;
-
+use App\Models\Accounts\Customer;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 /**
  * LedgerService - Bridge to new Accounts system
@@ -462,13 +464,132 @@ class LedgerService
 
     // new work by zaheer
 
+    // public function generateMonthlyForStudents($student, $billingMonth, $due_date, $challanNumber, $billing, $totalAmount)
+    // {
+    //     try {
+
+            
+    //         $group = AccountGroup::where('name', 'Students Receivable')->where('type', 'asset')->where('is_active', 1)->first();
+
+    //         $ledger = AccountLedger::firstOrCreate(
+    //             ['linked_module' => Students::class, 'linked_id' => $student->id],
+    //             [
+    //                 'account_group_id' => $group->id,
+    //                 'name' => $student->fullname,
+    //                 'code' => 'STD-' . $student->id,
+    //                 'description' => 'Receivable ledger for student ID ' . $student->id,
+    //                 'opening_balance' => 0,
+    //                 'opening_balance_type' => 'debit',
+    //                 'current_balance' => $totalAmount,
+    //                 'current_balance_type' => 'debit',
+    //                 'currency_id' => Null,
+    //                 'is_active' => 1,
+    //                 'is_system' => 0,
+    //                 'created_by' => auth()->id(),
+    //                 'updated_by' => auth()->id(),
+    //             ]
+    //         );
+
+            
+
+    //         \Log::info("Ledger created for student {$student->id} with ID: {$ledger->id}");
+    //         $existingJE = JournalEntry::where('source_module', 'fee_billing')
+    //             ->where('source_id', $billing->id)
+    //             ->exists();
+
+    //         if (!$existingJE) {
+    //                 $je = JournalEntry::create([
+    //                     'entry_number'   => 'JV' . str_pad($ledger->id, 6, '0', STR_PAD_LEFT),
+    //                     'entry_date'     => $billingMonth,
+    //                     'reference'      => $challanNumber,
+    //                     'description'    => 'Fee billing from student ID:' . $student->id,
+    //                     'status'         => 'posted',
+    //                     'entry_type'     => 'journal_voucher',
+    //                     'branch_id'      => auth()->user()->branch_id ?? null,
+    //                     'source_module'  => 'fee_billing',
+    //                     'source_id'      => $billing->id,
+    //                     'posted_at'      => now(),
+    //                     'posted_by'      => auth()->id(),
+    //                     'created_by'     => auth()->id(),
+    //                 ]);
+
+    //                 \Log::info("Journal entry created for student {$student->id} with ID: {$je->id}");
+
+    //                 // UPDATE Ledger Ammount Dr for Student
+    //                 $balance = $ledger->current_balance;
+    //                 $ledger->current_balance = $balance + $totalAmount;
+    //                 $ledger->save();
+
+    //                 // Dr Student
+    //                 JournalEntryLine::create([
+    //                     'journal_entry_id' => $je->id,
+    //                     'account_ledger_id' => $ledger->id,
+    //                     'description'      => 'Receivable raised ' . $billingMonth,
+    //                     'debit'            => $totalAmount,
+    //                     'credit'           => 0,
+    //                     'reference'        => $challanNumber,
+    //                 ]);
+
+    //                 $feeIncomeLedger = AccountLedger::where('name', 'Fee Revenue')->where('is_active', 1)->first(); //Fee Revenue
+    //                 // Cr Fee Income
+    //                 JournalEntryLine::create([
+    //                     'journal_entry_id' => $je->id,
+    //                     'account_ledger_id' => $feeIncomeLedger->id,
+    //                     'description'      => 'Fee income ' . $billingMonth,
+    //                     'debit'            => 0,
+    //                     'credit'           => $totalAmount,
+    //                     'reference'        => $challanNumber,
+    //                 ]);
+
+    //                 $feeIncomeLedger->current_balance = $feeIncomeLedger->current_balance + $totalAmount;
+    //                 $feeIncomeLedger->save();
+
+    //                 // Student Invoice entry Account Receivable
+
+    //                 $invoice = CustomerInvoice::create([
+    //                 'invoice_number' => CustomerInvoice::generateNumber(),
+    //                 'student_id' => $student->id,
+    //                 'invoice_date' => $billingMonth,
+    //                 'due_date' => $due_date,
+    //                 'subtotal' => $totalAmount,
+    //                 'tax_amount' => 0,
+    //                 'discount' => 0,
+    //                 'total_amount' => $totalAmount,
+    //                 'balance' => $totalAmount,
+    //                 'status' => 'sent',
+    //                 'branch_id' => auth()->user()->branch_id ?? null,
+    //                 'created_by' => auth()->id(),
+    //                 'journal_entry_id'=> $je->id
+    //             ]);
+
+    //           $billing->update(['customer_invoice_id' => $invoice->id]);
+    //         }
+            
+    //         return $ledger;
+    //     } catch (\Exception $e) {
+    //         \Log::error('LedgerService::createLedger failed: ' . $e->getMessage());
+    //         return null;
+    //     }
+    // }
+
+    // By Shahid
     public function generateMonthlyForStudents($student, $billingMonth, $due_date, $challanNumber, $billing, $totalAmount)
     {
         try {
+            // Start transaction
+            DB::beginTransaction();
 
-            
-            $group = AccountGroup::where('name', 'Students Receivable')->where('type', 'asset')->where('is_active', 1)->first();
+            // 1️⃣ Ensure Account Group exists
+            $group = AccountGroup::where('name', 'Students Receivable')
+                ->where('type', 'asset')
+                ->where('is_active', 1)
+                ->first();
 
+            if (!$group) {
+                throw new \Exception('AccountGroup "Students Receivable" not configured.');
+            }
+
+            // 2️⃣ Ensure Student Ledger exists
             $ledger = AccountLedger::firstOrCreate(
                 ['linked_module' => Students::class, 'linked_id' => $student->id],
                 [
@@ -478,9 +599,9 @@ class LedgerService
                     'description' => 'Receivable ledger for student ID ' . $student->id,
                     'opening_balance' => 0,
                     'opening_balance_type' => 'debit',
-                    'current_balance' => $totalAmount,
+                    'current_balance' => 0,
                     'current_balance_type' => 'debit',
-                    'currency_id' => Null,
+                    'currency_id' => null,
                     'is_active' => 1,
                     'is_system' => 0,
                     'created_by' => auth()->id(),
@@ -488,85 +609,132 @@ class LedgerService
                 ]
             );
 
-            
+            Log::info("Ledger fetched/created for student {$student->id}, ledger_id={$ledger->id}");
 
-            \Log::info("Ledger created for student {$student->id} with ID: {$ledger->id}");
+            // 3️⃣ Ensure Customer exists for this student (unique code)
+            $customerCode = 'CUST-' . str_pad($student->id, 6, '0');
+
+            $customer = Customer::firstOrCreate(
+                ['code' => $customerCode],
+                [
+                    'name' => $student->fullname ?? ('Student ' . $student->id),
+                    'branch_id' => auth()->user()->branch_id ?? null,
+                    'created_by' => auth()->id(),
+                    'is_active' => 1,
+                ]
+            );
+
+            Log::info("Customer ensured for student {$student->id}, customer_id={$customer->id}");
+
+            // 4️⃣ Skip if Journal Entry already exists for this billing
             $existingJE = JournalEntry::where('source_module', 'fee_billing')
                 ->where('source_id', $billing->id)
                 ->exists();
 
-            if (!$existingJE) {
-                    $je = JournalEntry::create([
-                        'entry_number'   => 'JV' . str_pad($ledger->id, 6, '0', STR_PAD_LEFT),
-                        'entry_date'     => $billingMonth,
-                        'reference'      => $challanNumber,
-                        'description'    => 'Fee billing from student ID:' . $student->id,
-                        'status'         => 'posted',
-                        'entry_type'     => 'journal_voucher',
-                        'branch_id'      => auth()->user()->branch_id ?? null,
-                        'source_module'  => 'fee_billing',
-                        'source_id'      => $billing->id,
-                        'posted_at'      => now(),
-                        'posted_by'      => auth()->id(),
-                        'created_by'     => auth()->id(),
-                    ]);
-
-                    \Log::info("Journal entry created for student {$student->id} with ID: {$je->id}");
-
-                    // UPDATE Ledger Ammount Dr for Student
-                    $balance = $ledger->current_balance;
-                    $ledger->current_balance = $balance + $totalAmount;
-                    $ledger->save();
-
-                    // Dr Student
-                    JournalEntryLine::create([
-                        'journal_entry_id' => $je->id,
-                        'account_ledger_id' => $ledger->id,
-                        'description'      => 'Receivable raised ' . $billingMonth,
-                        'debit'            => $totalAmount,
-                        'credit'           => 0,
-                        'reference'        => $challanNumber,
-                    ]);
-
-                    $feeIncomeLedger = AccountLedger::where('name', 'Fee Revenue')->where('is_active', 1)->first(); //Fee Revenue
-                    // Cr Fee Income
-                    JournalEntryLine::create([
-                        'journal_entry_id' => $je->id,
-                        'account_ledger_id' => $feeIncomeLedger->id,
-                        'description'      => 'Fee income ' . $billingMonth,
-                        'debit'            => 0,
-                        'credit'           => $totalAmount,
-                        'reference'        => $challanNumber,
-                    ]);
-
-                    $feeIncomeLedger->current_balance = $feeIncomeLedger->current_balance + $totalAmount;
-                    $feeIncomeLedger->save();
-
-                    // Student Invoice entry Account Receivable
-
-                    $invoice = CustomerInvoice::create([
-                    'invoice_number' => CustomerInvoice::generateNumber(),
-                    'student_id' => $student->id,
-                    'invoice_date' => $billingMonth,
-                    'due_date' => $due_date,
-                    'subtotal' => $totalAmount,
-                    'tax_amount' => 0,
-                    'discount' => 0,
-                    'total_amount' => $totalAmount,
-                    'balance' => $totalAmount,
-                    'status' => 'sent',
-                    'branch_id' => auth()->user()->branch_id ?? null,
-                    'created_by' => auth()->id(),
-                    'journal_entry_id'=> $je->id
-                ]);
-
-              $billing->update(['customer_invoice_id' => $invoice->id]);
+            if ($existingJE) {
+                Log::info("Skipping JE creation for billing {$billing->id}: already exists");
+                DB::commit();
+                return $ledger;
             }
-            
+
+            // 5️⃣ Create Journal Entry with temporary unique entry_number
+            $tempEntry = 'JVTMP-' . uniqid() . '-' . \Illuminate\Support\Str::random(4);
+
+            $je = JournalEntry::create([
+                'entry_number'   => $tempEntry,
+                'entry_date'     => $billingMonth,
+                'reference'      => $challanNumber,
+                'description'    => 'Fee billing from student ID:' . $student->id,
+                'status'         => 'posted',
+                'entry_type'     => 'journal_voucher',
+                'branch_id'      => auth()->user()->branch_id ?? null,
+                'source_module'  => 'fee_billing',
+                'source_id'      => $billing->id,
+                'posted_at'      => now(),
+                'posted_by'      => auth()->id(),
+                'created_by'     => auth()->id(),
+            ]);
+
+            // 6️⃣ Update to final unique entry_number
+            $finalEntry = 'JV' . str_pad($je->id, 6, '0');
+            if (JournalEntry::where('entry_number', $finalEntry)->exists()) {
+                $finalEntry .= '-' . \Illuminate\Support\Str::random(3);
+            }
+            $je->entry_number = $finalEntry;
+            $je->save();
+
+            Log::info("Journal Entry created: je_id={$je->id}, entry_number={$finalEntry}");
+
+            // 7️⃣ Update ledger balance
+            $ledger->current_balance += $totalAmount;
+            $ledger->save();
+
+            // 8️⃣ Create Journal Entry Lines
+            // Dr Student
+            JournalEntryLine::create([
+                'journal_entry_id' => $je->id,
+                'account_ledger_id' => $ledger->id,
+                'description' => 'Receivable raised ' . $billingMonth,
+                'debit' => $totalAmount,
+                'credit' => 0,
+                'reference' => $challanNumber,
+            ]);
+
+            // Fee Revenue ledger (Cr)
+            $feeIncomeLedger = AccountLedger::where('name', 'Fee Revenue')->where('is_active', 1)->first();
+            if (!$feeIncomeLedger) {
+                throw new \Exception('Fee Revenue ledger not configured.');
+            }
+
+            JournalEntryLine::create([
+                'journal_entry_id' => $je->id,
+                'account_ledger_id' => $feeIncomeLedger->id,
+                'description' => 'Fee income ' . $billingMonth,
+                'debit' => 0,
+                'credit' => $totalAmount,
+                'reference' => $challanNumber,
+            ]);
+
+            $feeIncomeLedger->current_balance += $totalAmount;
+            $feeIncomeLedger->save();
+
+            // 9️⃣ Create Customer Invoice
+            $invoice = CustomerInvoice::create([
+                'invoice_number'  => CustomerInvoice::generateNumber(),
+                'customer_id'     => $customer->id,
+                'student_id'      => $student->id,
+                'invoice_date'    => $billingMonth,
+                'due_date'        => $due_date,
+                'subtotal'        => $totalAmount,
+                'tax_amount'      => 0,
+                'discount'        => 0,
+                'total_amount'    => $totalAmount,
+                'balance'         => $totalAmount,
+                'status'          => 'sent',
+                'branch_id'       => auth()->user()->branch_id ?? null,
+                'created_by'      => auth()->id(),
+                'journal_entry_id'=> $je->id,
+            ]);
+
+            // 10️⃣ Link invoice to billing
+            $billing->update(['customer_invoice_id' => $invoice->id]);
+
+            DB::commit();
+
+            Log::info("Billing completed for student {$student->id}, billing_id={$billing->id}, invoice_id={$invoice->id}");
+
             return $ledger;
+
         } catch (\Exception $e) {
-            \Log::error('LedgerService::createLedger failed: ' . $e->getMessage());
-            return null;
+            DB::rollBack();
+            Log::error('LedgerService::generateMonthlyForStudents error: ' . $e->getMessage(), [
+                'student_id' => $student->id ?? null,
+                'billing_id' => $billing->id ?? null,
+                'trace' => $e->getTraceAsString(),
+            ]);
+            throw $e;
         }
     }
+
+
 }

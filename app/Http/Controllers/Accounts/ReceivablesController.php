@@ -10,10 +10,12 @@ class ReceivablesController extends Controller
 {
     public function index()
     {
-        $invoices = CustomerInvoice::with(['customer', 'branch'])
+
+        $invoices = CustomerInvoice::with(['customer', 'student', 'branch'])
             ->whereIn('status', ['sent', 'partially_paid', 'overdue'])
             ->latest()
             ->paginate(20);
+
         
         $summary = [
             'total_receivable' => CustomerInvoice::whereIn('status', ['sent', 'partially_paid', 'overdue'])->sum('balance'),

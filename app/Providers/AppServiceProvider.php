@@ -4,13 +4,14 @@ namespace App\Providers;
 
 
 use App\Models\Admin\Vendor;
-use App\Models\Accounts\Vendor as AccountVendor;
 use App\Models\Accounts\Customer;
 use App\Observers\VendorObserver;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\ServiceProvider;
 use App\Observers\AccountVendorObserver;
 use App\Observers\AccountCustomerObserver;
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\Schema;
+use App\Models\Accounts\Vendor as AccountVendor;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -37,5 +38,7 @@ class AppServiceProvider extends ServiceProvider
         Vendor::observe(VendorObserver::class);
         AccountVendor::observe(AccountVendorObserver::class);
         Customer::observe(AccountCustomerObserver::class);
+        Paginator::useBootstrap();
+
     }
 }
