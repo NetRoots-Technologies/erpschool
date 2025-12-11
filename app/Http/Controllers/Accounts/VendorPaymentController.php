@@ -269,6 +269,7 @@ class VendorPaymentController extends Controller
             'payment_amount' => 'required|numeric|min:0.01',
             'payment_mode' => ['required', Rule::in(['Cash','Cheque','Bank Transfer','Other'])],
             // 'account_id' => 'nullable|exists:accounts,id',
+            'account_id' => 'nullable|exists:account_ledgers,id',
             'cheque_no' => 'nullable|string|required_if:payment_mode,Cheque',
             'cheque_date' => 'nullable|date|required_if:payment_mode,Cheque',
             'remarks' => 'nullable|string',

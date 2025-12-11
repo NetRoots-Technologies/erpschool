@@ -50,11 +50,12 @@ class ItemController extends Controller
         $request->validate([
             'name' => 'required|min:3',
         ]);
-// dd($request->all());
+       // dd($request->all());
         try {
             $item = Item::firstOrNew(["id" => $request->id]);
             $item->name = $request->name;
             $item->type = $this->type[$request->type];
+            $item->item_code = $request->item_code; 
             $item->measuring_unit = $request->measuring_unit ?? 'PCS';
             $item->save();
 

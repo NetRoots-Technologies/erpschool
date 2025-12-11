@@ -247,4 +247,92 @@ class BillController extends Controller
         $bill->vendor->accountLedger->updateBalance($amount, 0);
         $cashLedger->updateBalance(0, $amount);
     }
+
+    /**
+     * Create a bill from a Purchase Order
+     * This method is called when a purchase order status changes to COMPLETED or PARTIALLY
+     */
+    public function createBillFromPurchaseOrder($purchaseOrder, $amount, $status)
+    {
+        try {
+            // Check if a bill already exists for this purchase order
+            $existingBill = VendorBill::where('source_module', 'purchase_order')
+                ->where('source_id', $purchaseOrder->id)
+                ->first();
+
+            if ($existingBill) {
+                \Log::info("Bill already exists for Purchase Order #{$purchaseOrder->id}. Skipping bill creation.");
+                return $existingBill;
+            }
+
+            // Get or create vendor account in Accounts system
+            $accountVendor = \App\Models\Accounts\Vendor::where('name', $purchaseOrder->supplier->name)->first();
+            
+            if (!$accountVendor) {
+                // Create vendor in accounts system if it doesn't exist
+                $accountVendor = \App\Models\Accounts\Vendor::create([
+                    'name' => $purchaseOrder->supplier->name,
+                    'code' => 'SUP-' . $purchaseOrder->supplier_id,
+                    'email' => $purchaseOrder->supplier->email ?? null,
+                    'phone' => $purchaseOrder->supplier->phone ?? null,
+                    'is_active' => true,
+                ]);
+            }
+
+            // Create the bill
+            $bill = VendorBill::create([
+                'bill_number' => VendorBill::generateNumber(),
+                'vendor_id' => $accountVendor->id,
+                'bill_date' => $purchaseOrder->order_date,
+                'due_date' => $purchaseOrder->delivery_date,
+                'vendor_invoice_number' => $purchaseOrder->number,
+                'subtotal' => $amount,
+                'tax_amount' => 0,
+                'discount' => 0,
+                'total_amount' => $amount,
+                'balance' => $amount,
+                'status' => 'pending',
+                'notes' => "Auto-generated from Purchase Order #{$purchaseOrder->id}. Status: {$status}",
+                'branch_id' => $purchaseOrder->branch_id,
+                'created_by' => auth()->id() ?? 1,
+                'source_module' => 'purchase_order',
+                'source_id' => $purchaseOrder->id,
+            ]);
+
+            // Load the vendor relationship with accountLedger
+            $bill->load('vendor.accountLedger');
+            
+            // Ensure vendor has an account ledger
+            if (!$bill->vendor->accountLedger) {
+                $vendorLedger = AccountLedger::create([
+                    'name' => 'Vendor - ' . $bill->vendor->name,
+                    'code' => 'VEN-' . $bill->vendor->id . '-' . time(),
+                    'description' => 'Vendor payable account',
+                    'account_group_id' => 647, // Accounts Payable
+                    'opening_balance' => 0,
+                    'opening_balance_type' => 'credit',
+                    'current_balance' => 0,
+                    'current_balance_type' => 'credit',
+                    'is_active' => true,
+                    'created_by' => auth()->id() ?? 1
+                ]);
+                
+                // Update vendor with ledger
+                $bill->vendor->account_ledger_id = $vendorLedger->id;
+                $bill->vendor->save();
+                
+                // Reload the relationship
+                $bill->load('vendor.accountLedger');
+            }
+
+            // Create journal entry
+            $this->createJournalEntry($bill);
+
+            \Log::info("Bill #{$bill->bill_number} created from Purchase Order #{$purchaseOrder->id}");
+            return $bill;
+        } catch (\Exception $e) {
+            \Log::error("Failed to create bill from Purchase Order #{$purchaseOrder->id}: " . $e->getMessage());
+            throw $e;
+        }
+    }
 }

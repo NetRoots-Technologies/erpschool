@@ -24,6 +24,11 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Http;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\Accounts\AccountLedger;
+use App\Models\Accounts\VendorBill;
+use App\Models\Accounts\Vendor;
+use App\Models\Accounts\JournalEntry;
+use App\Models\Accounts\JournalEntryLine;
+use App\Http\Controllers\Accounts\BillController;
 
 class PurchaseOrderController extends Controller
 {
@@ -31,10 +36,12 @@ class PurchaseOrderController extends Controller
     protected $payment_status;
     protected $payment_method;
     protected $ledgerService;
+    protected $billController;
 
-    public function __construct(LedgerService $ledgerService)
+    public function __construct(LedgerService $ledgerService, BillController $billController)
     {
         $this->ledgerService = $ledgerService;
+        $this->billController = $billController;
         $this->delivery_status = config('constants.delivery_status');
         $this->payment_status = config('constants.payment_status');
         $this->payment_method = config('constants.payment_method');
@@ -292,7 +299,7 @@ class PurchaseOrderController extends Controller
 
     public function changeStatus(PurchaseOrder $purchaseOrder, $status , Request $request)
 {
-    
+    // dd($request->items, $request->all(),$purchaseOrder, $status);
 
 //     array:3 [
 //   0 => array:2 [
@@ -466,6 +473,14 @@ class PurchaseOrderController extends Controller
                 \Log::error('Purchase order accounting entry failed: ' . $e->getMessage());
                 // Don't fail the whole transaction, just log the error
             }
+
+            // Create bill for the partial delivery
+            try {
+                $this->billController->createBillFromPurchaseOrder($purchaseOrder, $request->grn_amount ?? $purchaseOrder->total_amount, 'PARTIALLY');
+            } catch (\Exception $e) {
+                \Log::error('Bill creation failed for partial PO: ' . $e->getMessage());
+                // Don't fail the whole transaction, just log the error
+            }
         }
 
 
@@ -600,6 +615,14 @@ class PurchaseOrderController extends Controller
                 }
             } catch (\Exception $e) {
                 \Log::error('Purchase order accounting entry failed: ' . $e->getMessage());
+                // Don't fail the whole transaction, just log the error
+            }
+
+            // Create bill for the completed delivery
+            try {
+                $this->billController->createBillFromPurchaseOrder($purchaseOrder, $purchaseOrder->total_amount, 'COMPLETED');
+            } catch (\Exception $e) {
+                \Log::error('Bill creation failed for completed PO: ' . $e->getMessage());
                 // Don't fail the whole transaction, just log the error
             }
         }

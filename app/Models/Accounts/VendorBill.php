@@ -28,6 +28,8 @@ class VendorBill extends Model
         'branch_id',
         'created_by',
         'updated_by',
+        'source_module',
+        'source_id',
     ];
 
     protected $casts = [

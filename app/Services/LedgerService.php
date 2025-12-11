@@ -16,6 +16,10 @@ use App\Models\Accounts\CustomerInvoice;
 use App\Models\Accounts\Customer;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use App\Models\Fee\FeeStructure;
+use App\Models\Fee\FeeStructureDetail;
+use App\Models\Fee\FeeCategory;
+use App\Models\Fee\FeeFactor;
 
 /**
  * LedgerService - Bridge to new Accounts system
@@ -573,8 +577,172 @@ class LedgerService
     // }
 
     // By Shahid
+    // public function generateMonthlyForStudents($student, $billingMonth, $due_date, $challanNumber, $billing, $totalAmount)
+    // {
+    //     try {
+    //         // Start transaction
+    //         DB::beginTransaction();
+
+    //         // 1️⃣ Ensure Account Group exists
+    //         $group = AccountGroup::where('name', 'Students Receivable')
+    //             ->where('type', 'asset')
+    //             ->where('is_active', 1)
+    //             ->first();
+
+    //         if (!$group) {
+    //             throw new \Exception('AccountGroup "Students Receivable" not configured.');
+    //         }
+
+    //         // 2️⃣ Ensure Student Ledger exists
+    //         $ledger = AccountLedger::firstOrCreate(
+    //             ['linked_module' => Students::class, 'linked_id' => $student->id],
+    //             [
+    //                 'account_group_id' => $group->id,
+    //                 'name' => $student->fullname,
+    //                 'code' => 'STD-' . $student->id,
+    //                 'description' => 'Receivable ledger for student ID ' . $student->id,
+    //                 'opening_balance' => 0,
+    //                 'opening_balance_type' => 'debit',
+    //                 'current_balance' => 0,
+    //                 'current_balance_type' => 'debit',
+    //                 'currency_id' => null,
+    //                 'is_active' => 1,
+    //                 'is_system' => 0,
+    //                 'created_by' => auth()->id(),
+    //                 'updated_by' => auth()->id(),
+    //             ]
+    //         );
+
+    //         Log::info("Ledger fetched/created for student {$student->id}, ledger_id={$ledger->id}");
+
+    //         // 3️⃣ Ensure Customer exists for this student (unique code)
+    //         $customerCode = 'CUST-' . str_pad($student->id, 6, '0');
+
+    //         $customer = Customer::firstOrCreate(
+    //             ['code' => $customerCode],
+    //             [
+    //                 'name' => $student->fullname ?? ('Student ' . $student->id),
+    //                 'branch_id' => auth()->user()->branch_id ?? null,
+    //                 'created_by' => auth()->id(),
+    //                 'is_active' => 1,
+    //             ]
+    //         );
+
+    //         Log::info("Customer ensured for student {$student->id}, customer_id={$customer->id}");
+
+    //         // 4️⃣ Skip if Journal Entry already exists for this billing
+    //         $existingJE = JournalEntry::where('source_module', 'fee_billing')
+    //             ->where('source_id', $billing->id)
+    //             ->exists();
+
+    //         if ($existingJE) {
+    //             Log::info("Skipping JE creation for billing {$billing->id}: already exists");
+    //             DB::commit();
+    //             return $ledger;
+    //         }
+
+    //         // 5️⃣ Create Journal Entry with temporary unique entry_number
+    //         $tempEntry = 'JVTMP-' . uniqid() . '-' . \Illuminate\Support\Str::random(4);
+
+    //         $je = JournalEntry::create([
+    //             'entry_number'   => $tempEntry,
+    //             'entry_date'     => $billingMonth,
+    //             'reference'      => $challanNumber,
+    //             'description'    => 'Fee billing from student ID:' . $student->id,
+    //             'status'         => 'posted',
+    //             'entry_type'     => 'journal_voucher',
+    //             'branch_id'      => auth()->user()->branch_id ?? null,
+    //             'source_module'  => 'fee_billing',
+    //             'source_id'      => $billing->id,
+    //             'posted_at'      => now(),
+    //             'posted_by'      => auth()->id(),
+    //             'created_by'     => auth()->id(),
+    //         ]);
+
+    //         // 6️⃣ Update to final unique entry_number
+    //         $finalEntry = 'JV' . str_pad($je->id, 6, '0');
+    //         if (JournalEntry::where('entry_number', $finalEntry)->exists()) {
+    //             $finalEntry .= '-' . \Illuminate\Support\Str::random(3);
+    //         }
+    //         $je->entry_number = $finalEntry;
+    //         $je->save();
+
+    //         Log::info("Journal Entry created: je_id={$je->id}, entry_number={$finalEntry}");
+
+    //         // 7️⃣ Update ledger balance
+    //         $ledger->current_balance += $totalAmount;
+    //         $ledger->save();
+
+    //         // 8️⃣ Create Journal Entry Lines
+    //         // Dr Student
+    //         JournalEntryLine::create([
+    //             'journal_entry_id' => $je->id,
+    //             'account_ledger_id' => $ledger->id,
+    //             'description' => 'Receivable raised ' . $billingMonth,
+    //             'debit' => $totalAmount,
+    //             'credit' => 0,
+    //             'reference' => $challanNumber,
+    //         ]);
+
+    //         // Fee Revenue ledger (Cr)
+    //         $feeIncomeLedger = AccountLedger::where('name', 'Fee Revenue')->where('is_active', 1)->first();
+    //         if (!$feeIncomeLedger) {
+    //             throw new \Exception('Fee Revenue ledger not configured.');
+    //         }
+
+    //         JournalEntryLine::create([
+    //             'journal_entry_id' => $je->id,
+    //             'account_ledger_id' => $feeIncomeLedger->id,
+    //             'description' => 'Fee income ' . $billingMonth,
+    //             'debit' => 0,
+    //             'credit' => $totalAmount,
+    //             'reference' => $challanNumber,
+    //         ]);
+
+    //         $feeIncomeLedger->current_balance += $totalAmount;
+    //         $feeIncomeLedger->save();
+
+    //         // 9️⃣ Create Customer Invoice
+    //         $invoice = CustomerInvoice::create([
+    //             'invoice_number'  => CustomerInvoice::generateNumber(),
+    //             'customer_id'     => $customer->id,
+    //             'student_id'      => $student->id,
+    //             'invoice_date'    => $billingMonth,
+    //             'due_date'        => $due_date,
+    //             'subtotal'        => $totalAmount,
+    //             'tax_amount'      => 0,
+    //             'discount'        => 0,
+    //             'total_amount'    => $totalAmount,
+    //             'balance'         => $totalAmount,
+    //             'status'          => 'sent',
+    //             'branch_id'       => auth()->user()->branch_id ?? null,
+    //             'created_by'      => auth()->id(),
+    //             'journal_entry_id'=> $je->id,
+    //         ]);
+
+    //         // 10️⃣ Link invoice to billing
+    //         $billing->update(['customer_invoice_id' => $invoice->id]);
+
+    //         DB::commit();
+
+    //         Log::info("Billing completed for student {$student->id}, billing_id={$billing->id}, invoice_id={$invoice->id}");
+
+    //         return $ledger;
+
+    //     } catch (\Exception $e) {
+    //         DB::rollBack();
+    //         Log::error('LedgerService::generateMonthlyForStudents error: ' . $e->getMessage(), [
+    //             'student_id' => $student->id ?? null,
+    //             'billing_id' => $billing->id ?? null,
+    //             'trace' => $e->getTraceAsString(),
+    //         ]);
+    //         throw $e;
+    //     }
+    // }
+    // By Shahid
     public function generateMonthlyForStudents($student, $billingMonth, $due_date, $challanNumber, $billing, $totalAmount)
     {
+        // dd('rtyui');
         try {
             // Start transaction
             DB::beginTransaction();
@@ -686,17 +854,212 @@ class LedgerService
                 throw new \Exception('Fee Revenue ledger not configured.');
             }
 
+            // --- TRICKY PART: Compute credit amount for Fee Revenue
+            // Formula: (tuition_fee / fee_factor_months) + sum(all other categories amounts)
+            // This separates tuition (which is divided by months) from other fees
+
+            $creditAmount = 0.0;
+            $tuitionAmount = 0.0;
+            $otherCategoriesTotal = 0.0;
+            $feeFactorMonths = 12; // Default to 12 months
+
+            // Get fee structure for this billing
+            $feeStructure = FeeStructure::where('student_id', $student->id)
+                ->where('academic_session_id', $billing->academic_session_id)
+                ->where('is_active', 1)
+                ->orderBy('id', 'desc')
+                ->first();
+
+            if ($feeStructure) {
+                // Load fee structure details with categories
+                $feeStructureDetails = FeeStructureDetail::where('fee_structure_id', $feeStructure->id)
+                    ->with('feeCategory')
+                    ->get();
+
+                // Get fee factor
+                if ($feeStructure->fee_factor_id) {
+                    $feeFactor = FeeFactor::find($feeStructure->fee_factor_id);
+                    if ($feeFactor && $feeFactor->months) {
+                        $feeFactorMonths = (int) $feeFactor->months;
+                    }
+                }
+
+                // Separate tuition fee from other categories
+                foreach ($feeStructureDetails as $detail) {
+                    $category = $detail->feeCategory;
+                    $amount = (float) ($detail->amount ?? 0);
+
+                    if ($category) {
+                        $categoryName = strtolower(trim($category->name ?? ''));
+
+                        // Check if this is tuition fee (case-insensitive)
+                        if (in_array($categoryName, ['tuition fee', 'tuition', 'tuitionfee'])) {
+                            $tuitionAmount = $amount;
+                        } else {
+                            // All other categories
+                            $otherCategoriesTotal += $amount;
+                        }
+                    } else {
+                        // If category not found, treat as other category
+                        $otherCategoriesTotal += $amount;
+                    }
+                }
+
+                // Calculate credit amount: (tuition / months) + other categories
+                if ($feeFactorMonths > 0) {
+                    $creditAmount = ($tuitionAmount / $feeFactorMonths) + $otherCategoriesTotal;
+                } else {
+                    // Fallback if months is 0 or null
+                    $creditAmount = $tuitionAmount + $otherCategoriesTotal;
+                }
+
+                Log::info('Computed fee income credit', [
+                    'billing_id' => $billing->id,
+                    'student_id' => $student->id,
+                    'fee_structure_id' => $feeStructure->id,
+                    'tuition_amount' => $tuitionAmount,
+                    'fee_factor_months' => $feeFactorMonths,
+                    'other_categories_total' => $otherCategoriesTotal,
+                    'credit_amount' => $creditAmount,
+                    'total_amount' => $totalAmount,
+                ]);
+            } else {
+                // Fallback: if fee structure not found, use totalAmount
+                // This should not happen in normal flow, but provides safety
+                Log::warning('Fee structure not found for billing, using totalAmount as credit', [
+                    'billing_id' => $billing->id,
+                    'student_id' => $student->id,
+                ]);
+                $creditAmount = $totalAmount;
+            }
+
+            // Create credit entry for Fee Revenue
             JournalEntryLine::create([
                 'journal_entry_id' => $je->id,
                 'account_ledger_id' => $feeIncomeLedger->id,
                 'description' => 'Fee income ' . $billingMonth,
                 'debit' => 0,
-                'credit' => $totalAmount,
+                'credit' => $creditAmount,
                 'reference' => $challanNumber,
             ]);
 
-            $feeIncomeLedger->current_balance += $totalAmount;
+            // Update fee income ledger balance with the calculated credit amount
+            $feeIncomeLedger->current_balance += $creditAmount;
             $feeIncomeLedger->save();
+
+            // Calculate discount amount: creditAmount - totalAmount
+            $discountAmount = $creditAmount - $totalAmount;
+
+            // If there's a discount difference, create discount journal entry line
+            if (abs($discountAmount) > 0.01) { // Allow for small rounding differences
+                // Find or create Discount Allowance ledger
+                $discountLedger = AccountLedger::where(function($q) {
+                        $q->where('name', 'LIKE', '%Discount%')
+                          ->orWhere('name', 'LIKE', '%Fee Discount%')
+                          ->orWhere('name', 'LIKE', '%Discount Allowance%');
+                    })
+                    ->where('is_active', 1)
+                    ->first();
+
+                // If discount ledger doesn't exist, try to create it
+                if (!$discountLedger) {
+                    // Find expense group for discounts
+                    $expenseGroup = AccountGroup::where('type', 'expense')
+                        ->where(function($q) {
+                            $q->where('name', 'LIKE', '%Discount%')
+                              ->orWhere('name', 'LIKE', '%Allowance%');
+                        })
+                        ->first();
+
+                    // If no specific discount group, use a general expense group
+                    if (!$expenseGroup) {
+                        $expenseGroup = AccountGroup::where('type', 'expense')
+                            ->where('is_active', 1)
+                            ->first();
+                    }
+
+                    if ($expenseGroup) {
+                        // Create discount ledger
+                        $discountLedger = AccountLedger::create([
+                            'name' => 'Fee Discount Allowance',
+                            'code' => 'DISC-' . time() . '-' . rand(1000, 9999),
+                            'description' => 'Discount allowance for fee billing',
+                            'account_group_id' => $expenseGroup->id,
+                            'opening_balance' => 0,
+                            'opening_balance_type' => 'debit',
+                            'current_balance' => 0,
+                            'current_balance_type' => 'debit',
+                            'is_active' => 1,
+                            'is_system' => 0,
+                            'branch_id' => auth()->user()->branch_id ?? null,
+                            'created_by' => auth()->id(),
+                            'updated_by' => auth()->id(),
+                        ]);
+                        Log::info('Created discount ledger', ['ledger_id' => $discountLedger->id]);
+                    } else {
+                        Log::warning('Could not create discount ledger: no expense group found', [
+                            'billing_id' => $billing->id,
+                            'discount_amount' => $discountAmount,
+                        ]);
+                    }
+                }
+
+                // Create discount journal entry line
+                if ($discountLedger) {
+                    if ($discountAmount > 0) {
+                        // creditAmount > totalAmount: Need debit entry (discount expense)
+                        JournalEntryLine::create([
+                            'journal_entry_id' => $je->id,
+                            'account_ledger_id' => $discountLedger->id,
+                            'description' => 'Fee discount adjustment ' . $billingMonth,
+                            'debit' => $discountAmount,
+                            'credit' => 0,
+                            'reference' => $challanNumber,
+                        ]);
+                        // Update discount ledger balance (expense increases with debit)
+                        $discountLedger->updateBalance($discountAmount, 0);
+                    } else {
+                        // totalAmount > creditAmount: Need credit entry (discount allowance/income)
+                        JournalEntryLine::create([
+                            'journal_entry_id' => $je->id,
+                            'account_ledger_id' => $discountLedger->id,
+                            'description' => 'Fee discount allowance ' . $billingMonth,
+                            'debit' => 0,
+                            'credit' => abs($discountAmount),
+                            'reference' => $challanNumber,
+                        ]);
+                        // Update discount ledger balance
+                        $discountLedger->updateBalance(0, abs($discountAmount));
+                    }
+                }
+            }
+
+            // Verify debit = credit (double-entry accounting principle)
+            $totalDebit = $totalAmount + ($discountAmount > 0 ? $discountAmount : 0);
+            $totalCredit = $creditAmount + ($discountAmount < 0 ? abs($discountAmount) : 0);
+
+            // Log for verification and debugging
+            Log::info('Journal entry balance check', [
+                'journal_entry_id' => $je->id,
+                'billing_id' => $billing->id ?? null,
+                'student_id' => $student->id,
+                'total_debit' => $totalDebit,
+                'total_credit' => $totalCredit,
+                'credit_amount' => $creditAmount,
+                'discount_amount' => $discountAmount,
+                'balance_diff' => abs($totalDebit - $totalCredit),
+                'is_balanced' => abs($totalDebit - $totalCredit) < 0.01, // Allow small rounding differences
+            ]);
+
+            // Warn if entries don't balance (should not happen in normal flow)
+            if (abs($totalDebit - $totalCredit) > 0.01) {
+                Log::warning('Journal entry may not be balanced!', [
+                    'journal_entry_id' => $je->id,
+                    'debit' => $totalDebit,
+                    'credit' => $totalCredit,
+                    'difference' => $totalDebit - $totalCredit,
+                ]);
+            }
 
             // 9️⃣ Create Customer Invoice
             $invoice = CustomerInvoice::create([
@@ -735,6 +1098,7 @@ class LedgerService
             throw $e;
         }
     }
+
 
 
 }

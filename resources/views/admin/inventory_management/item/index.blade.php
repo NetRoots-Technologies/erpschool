@@ -18,11 +18,18 @@ Item
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
+                        <label for="item_code" class="form-label">Item Code</label>
+                        <input type="text" class="form-control" id="item_code" name="item_code"
+                            placeholder="Enter item code" required>
+                    </div>
+                    <div class="mb-3">
                         <label for="nameInput" class="form-label">Item Name</label>
                         <input type="text" class="form-control" id="nameInput" name="name" placeholder="Enter item name"
                             required aria-describedby="nameHelp">
                     </div>
-                    @if($type == "food" || $type == "uniform")
+                    {{-- @if($type == "food" || $type == "uniform") --}}
+                    @if(in_array($type, ['food', 'uniform', 'stationary']))
+
                     <div class="mb-3">
                         <label for="measuring_unit" class="form-label">Measuring Unit</label>
                         <select id="measuring_unit" name="measuring_unit" class="form-control" required>
@@ -79,12 +86,21 @@ Item
             const type = @json($type);
             const canEditRawMaterial = @json(Gate::allows('RawMaterialItems-edit'));
 
+            // $(`#measuring_unit`).select2({
+            //     placeholder: "Select A Unit",
+            //     allowClear: true,
+            //     width: '100%',
+            //     dropdownParent: $('#iModal')
+            // });
+
+            if ($('#measuring_unit').length) {
             $(`#measuring_unit`).select2({
                 placeholder: "Select A Unit",
                 allowClear: true,
                 width: '100%',
                 dropdownParent: $('#iModal')
             });
+        }
 
             $(`#iForm`).validate({
                 rules: {
@@ -149,11 +165,12 @@ Item
                     }
                 },
                 columns: [
-                    { data: null, title: 'Sr No', width: "7%", orderable: false,
-                        render: function (data, type, row, meta) {
-                            return meta.row + 1;
-                        }
-                    },
+                    // { data: null, title: 'Sr No', width: "7%", orderable: false,
+                    //     render: function (data, type, row, meta) {
+                    //         return meta.row + 1;
+                    //     }
+                    // },
+                    { data: 'item_code', title: 'Item Code' },
                     { data: 'name', title: 'Name' },
                     { data: 'measuring_unit', title: 'Measuring Unit' },
                     { data: 'status', title: 'Status',
@@ -166,7 +183,13 @@ Item
                         render: function (data, type, row, meta) {
                             let html = '';
                         if(canEditRawMaterial){
-                            html += `<a class="btn btn-sm btn-warning edit-item" data-id="${row.id}" data-name="${row.name}" data-unit="${row.measuring_unit}"><i class="fa fa-pencil"></i></a>`;
+                                    html += `<a class="btn btn-sm btn-warning edit-item"
+                                        data-id="${row.id}"
+                                        data-name="${row.name}"
+                                        data-code="${row.item_code}"
+                                        data-unit="${row.measuring_unit}">
+                                        <i class="fa fa-pencil"></i>
+                                    </a>`;
                         }
 
                         return html;
@@ -199,6 +222,7 @@ Item
                 $("#iForm").validate().resetForm();
                 $(".error").removeClass("error");
                 $('#nameInput').val("");
+                $('#item_code').val("");
                 $('#id').val("");
             });
 
@@ -209,6 +233,7 @@ Item
                 $("#iForm").validate().resetForm();
                 $(".error").removeClass("error");
                 $('#nameInput').val($(this).data('name'));
+                $('#item_code').val($(this).data('code'));
                 $("#measuring_unit").val($(this).data('unit')).trigger('change');
                 $('#id').val($(this).data('id'));
 
