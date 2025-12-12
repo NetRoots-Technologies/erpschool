@@ -49,6 +49,10 @@ class Supplier extends Model
     {
         return $query->where('type', 'U');
     }
+      public function scopeGeneral($query)
+    {
+        return $query->where('type', 'G');
+    }
 
 
 }

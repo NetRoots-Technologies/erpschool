@@ -1198,7 +1198,7 @@
 
 
                 {{-- ================= INVENTORY MANAGEMENT ================= --}}
-                @canany(['Vendor', 'VendorCategory', 'CafeInventory', 'StationeryInventory', 'UniformInventory', 'POS'])
+                @canany(['Vendor', 'VendorCategory', 'CafeInventory', 'StationeryInventory', 'UniformInventory', 'GeneralInventory','POS'])
                     @php
                         $paramType = request()->route('type');
                         $queryType = request('type');
@@ -1218,6 +1218,9 @@
 
                         // Uniform open logic
                         $isUniformOpen = $type === 'uniform';
+
+                        // General inventory open logic
+                        $isGeneralOpen = $type === 'general';
 
                         $isPOSOpen = request()->routeIs('inventory.pos.view');
                     @endphp
@@ -1497,6 +1500,76 @@
                                 <li>
                                     <a class="slide-item {{ request()->routeIs('inventory.product.index') && $type === 'uniform' ? 'active' : '' }}"
                                         href="{{ route('inventory.product.index', ['type' => 'uniform']) }}">
+                                        Bundles
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    @endcanany
+
+                      {{-- ================= GENERAL INVENTORY ================= --}}
+                    @canany(['UniformInventory', 'CafeInventory', 'StationeryInventory' ,'GeneralInventory'])
+                        {{-- flexible: show for any of these perms --}}
+                        <li class="slide">
+                            <a class="side-menu__item {{ $isGeneralOpen ? 'active' : '' }}" data-bs-toggle="slide"
+                                href="javascript:void(0);">
+                               <i class="fas fa-layer-group me-3"></i>
+                                <span class="side-menu__label">General Inventory</span>
+                                <i class="angle fe fe-chevron-down"></i>
+                            </a>
+
+                            <ul class="slide-menu" style="display: {{ $isGeneralOpen ? 'block' : 'none' }}">
+                                <li>
+                                    <a class="slide-item {{ request()->routeIs('inventory.items.index') && $type === 'general' ? 'active' : '' }}"
+                                        href="{{ route('inventory.items.index', ['type' => 'general']) }}">
+                                        Items
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="slide-item {{ request()->routeIs('inventory.suppliers.index') && $type === 'general' ? 'active' : '' }}"
+                                        href="{{ route('inventory.suppliers.index', ['type' => 'general']) }}">
+                                        Suppliers
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="slide-item {{ request()->routeIs('inventory.requisitions.index') && $type === 'general' ? 'active' : '' }}"
+                                        href="{{ route('inventory.requisitions.index', ['type' => 'general']) }}">
+                                        Requisitions
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="slide-item {{ request()->routeIs('inventory.requisitions.approval') && $type === 'general' ? 'active' : '' }}"
+                                        href="{{ route('inventory.requisitions.approval', ['type' => 'general']) }}">
+                                        Requisition Approval
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="slide-item {{ request()->routeIs('inventory.quotes.index') && $type === 'general' ? 'active' : '' }}"
+                                        href="{{ route('inventory.quotes.index', ['type' => 'general']) }}">
+                                        Quotes
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="slide-item {{ request()->routeIs('inventory.purchase_order.index') && $type === 'general' ? 'active' : '' }}"
+                                        href="{{ route('inventory.purchase_order.index', ['type' => 'general']) }}">
+                                        Purchase Order
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="slide-item {{ request()->routeIs('inventory.grn') && $type === 'general' ? 'active' : '' }}"
+                                        href="{{ route('inventory.grn', ['type' => 'general']) }}">
+                                        GRN
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="slide-item {{ request()->routeIs('inventory.inventry.index') && $type === 'general' ? 'active' : '' }}"
+                                        href="{{ route('inventory.inventry.index', ['type' => 'general']) }}">
+                                        Store Inventory
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="slide-item {{ request()->routeIs('inventory.product.index') && $type === 'general' ? 'active' : '' }}"
+                                        href="{{ route('inventory.product.index', ['type' => 'general']) }}">
                                         Bundles
                                     </a>
                                 </li>

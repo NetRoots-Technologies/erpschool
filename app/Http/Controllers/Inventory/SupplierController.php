@@ -23,6 +23,7 @@ class SupplierController extends Controller
         $this->type['food'] = 'F';
         $this->type['stationary'] = 'S';
         $this->type['uniform'] = 'U';
+        $this->type['general'] = 'G';
 
         $this->ledgerService = $ledgerService;
 
@@ -43,6 +44,8 @@ class SupplierController extends Controller
             $query = $query->stationary();
         }elseif ($type == 'uniform') {
             $query = $query->uniform();
+        }elseif ($type == 'general') {
+            $query = $query->general();
         }
         $items = $query->get();
 
@@ -143,6 +146,8 @@ class SupplierController extends Controller
             $query = $query->stationary();
         }elseif ($request->type == 'uniform') {
             $query = $query->uniform();
+        }elseif ($request->type == 'general') {
+            $query = $query->general();
         }
         
         $supplier = $query->latest()->with([

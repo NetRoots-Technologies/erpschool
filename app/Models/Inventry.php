@@ -28,6 +28,10 @@ class Inventry extends Model
     {
         return $query->where('type', 'S');
     }
+     public function scopeG($query)
+    {
+        return $query->where('type', 'G');
+    }
 
     public function scopeCanteen($query)
     {

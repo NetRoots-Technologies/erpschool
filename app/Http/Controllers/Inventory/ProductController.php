@@ -28,6 +28,7 @@ class ProductController extends Controller
         $this->type['food'] = 'F';
         $this->type['stationary'] = 'S';
         $this->type['uniform'] = 'U';
+        $this->type['general'] = 'G';
     }
 
     public function index($type)
@@ -43,6 +44,8 @@ class ProductController extends Controller
             $query = $query->stationary();
         } elseif ($type == 'uniform') {
             $query = $query->uniform();
+        } elseif ($type == 'general') {
+            $query = $query->general();
         }
         $ingredients = $query->get();
         $branches = Branch::all();
@@ -126,6 +129,8 @@ class ProductController extends Controller
             $query = $query->stationary();
         } elseif ($request->type == 'uniform') {
             $query = $query->uniform();
+        } elseif ($request->type == 'general') {
+            $query = $query->general();
         }
         $query = $query->latest()->get();
 

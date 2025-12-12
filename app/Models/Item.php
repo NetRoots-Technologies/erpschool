@@ -31,6 +31,10 @@ class Item extends Model
     {
         return $query->where('type', 'S');
     }
+      public function scopeGeneral($query)
+    {
+        return $query->where('type', 'G');
+    }
 
     public function quoteItem()
     {

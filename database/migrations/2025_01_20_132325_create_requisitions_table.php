@@ -20,7 +20,7 @@ class CreateRequisitionsTable extends Migration
                 $table->integer('requester_id');
                 $table->integer('item_id');
                 $table->integer('branch_id');
-                $table->enum('type', ['F', 'P', 'S', 'U'])->defaultValue('F');
+                $table->enum('type', ['F', 'P', 'S', 'U', 'G'])->defaultValue('F');
                 $table->integer('quantity')->defaultValue(1);
                 $table->enum('priority', ['HIGH', 'MEDIUM', 'LOW'])->defaultValue('LOW');
                 $table->text('justification');

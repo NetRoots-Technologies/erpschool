@@ -24,6 +24,8 @@ class RequisitionController extends Controller
         $this->type['food'] = 'F';
         $this->type['stationary'] = 'S';
         $this->type['uniform'] = 'U';
+        $this->type['general'] = 'G';
+
     }
 
     public function index($type)
@@ -41,6 +43,8 @@ class RequisitionController extends Controller
             $query = $query->stationary();
         }elseif ($type == 'uniform') {
             $query = $query->uniform();
+        }elseif ($type == 'general') {
+            $query = $query->general();
         }
         
         $items = $query->get();
@@ -129,6 +133,8 @@ class RequisitionController extends Controller
             $query = $query->stationary();
         }elseif ($request->type == 'uniform') {
             $query = $query->uniform();
+        }elseif ($request->type == 'general') {
+            $query = $query->general();
         }
 
         $query = $query->get();

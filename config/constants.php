@@ -351,6 +351,10 @@ return [
             "Uniform" => 139,                  // <— NEW: supplier/customer group for Uniform
             "Uniform_Inventory" => 140,        // <— NEW: parent inventory group for Uniform (optional but nice)
             "Uniform_Inventory_Items" => 142,  // <— NEW: items ledger group used in ItemController@store
+            "General" => 143,
+            "General_Inventory" => 144,
+            "General_Inventory_Items" => 145,
+
  
         ],
     // "UNITS" => [

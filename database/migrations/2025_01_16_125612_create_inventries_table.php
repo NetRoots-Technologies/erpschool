@@ -26,7 +26,7 @@ class CreateInventriesTable extends Migration
                 $table->decimal('cost_price', 8, 2)->default(0.00);
                 $table->decimal('sale_price', 8, 2)->default(0.00);
                 $table->string('measuring_unit')->nullable();
-                $table->enum('type', ['F', 'S', 'P', 'SP', 'U'])->default('F');
+                $table->enum('type', ['F', 'S', 'P', 'SP', 'U', 'G'])->default('F');
                 $table->date('expiry_date')->nullable();
                 $table->timestamps();
                 $table->softDeletes();

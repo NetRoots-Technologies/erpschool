@@ -24,7 +24,7 @@ class CreateProductsTable extends Migration
                 $table->double('sale_price')->default(0.00);
                 $table->boolean('status')->default(false);
                 // $table->text('description')->nullable();
-                $table->enum('type', ['F', 'S'])->default('F');
+                $table->enum('type', ['F', 'S', 'U', 'G'])->default('F');
                 $table->timestamps();
                 $table->softDeletes();
             });

@@ -61,21 +61,50 @@ class InventryController extends Controller
         }
     }
 
+    // public function getData(Request $request)
+    // {
+    //     if (!Gate::allows('inventory-list')) {
+    //         return abort(503);
+    //     }
+    //     $query = Inventry::latest()->with('branch');
+    //     // $query = $request->type == 'food' ? $query->food()->orWhere('type', 'p') : $query->stationary()->orWhere('type', 'SP');
+    //     $query = $request->type == 'food'
+    //     ? $query->food()->orWhereIn('type', ['F', 'P'])
+    //     : ($request->type == 'uniform'
+    //         ? $query->uniform()->orWhereIn('type', ['U'])
+    //         : $query->stationary()->orWhereIn('type', ['S', 'SP']));
+
+    //     return response()->json(["success" => true, 'message' => 'Listing', 'data' => $query->get()], 200);
+
+    // }
+
     public function getData(Request $request)
     {
         if (!Gate::allows('inventory-list')) {
             return abort(503);
         }
+
         $query = Inventry::latest()->with('branch');
-        // $query = $request->type == 'food' ? $query->food()->orWhere('type', 'p') : $query->stationary()->orWhere('type', 'SP');
-        $query = $request->type == 'food'
-        ? $query->food()->orWhereIn('type', ['F', 'P'])
-        : ($request->type == 'uniform'
-            ? $query->uniform()->orWhereIn('type', ['U'])
-            : $query->stationary()->orWhereIn('type', ['S', 'SP']));
 
-        return response()->json(["success" => true, 'message' => 'Listing', 'data' => $query->get()], 200);
+        if ($request->type == 'food') {
+            $query->whereIn('type', ['F', 'P']);
+        }
+        elseif ($request->type == 'uniform') {
+            $query->where('type', 'U');
+        }
+        elseif ($request->type == 'general') {
+            $query->where('type', 'G');
+        }
+        else { 
+            // stationary default
+            $query->whereIn('type', ['S', 'SP']);
+        }
 
+        return response()->json([
+            "success" => true,
+            "message" => "Listing",
+            "data" => $query->get()
+        ], 200);
     }
 
     public function view($type = 'food')

@@ -28,7 +28,7 @@ Item
                             required aria-describedby="nameHelp">
                     </div>
                     {{-- @if($type == "food" || $type == "uniform") --}}
-                    @if(in_array($type, ['food', 'uniform', 'stationary']))
+                    @if(in_array($type, ['food', 'uniform', 'stationary', 'general']))
 
                     <div class="mb-3">
                         <label for="measuring_unit" class="form-label">Measuring Unit</label>

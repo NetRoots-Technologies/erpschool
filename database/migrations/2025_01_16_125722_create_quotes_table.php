@@ -23,7 +23,7 @@ class CreateQuotesTable extends Migration
                 $table->date('quote_date')->nullable();
                 $table->date('due_date')->nullable();
                 $table->text('comments')->nullable();
-                $table->enum('type', ['F', 'S', 'U'])->default('F');
+                $table->enum('type', ['F', 'S', 'U', 'G'])->default('F');
                 $table->timestamps();
                 $table->softDeletes();
             });

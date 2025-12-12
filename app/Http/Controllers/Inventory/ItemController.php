@@ -21,7 +21,8 @@ class ItemController extends Controller
         $this->ledgerService = $ledgerService;
         $this->type['food'] = 'F';
         $this->type['stationary'] = 'S';
-        $this->type['uniform'] = 'U'; // NEW
+        $this->type['uniform'] = 'U'; 
+        $this->type['general'] = 'G';
     }
     public function index($type)
     {
@@ -63,8 +64,10 @@ class ItemController extends Controller
                 $group_id = config('constants.FixedGroups.Cafe_Inventory_Items');
             }elseif($request->type == "stationary"){
                 $group_id = config('constants.FixedGroups.Stationery_Inventory_Items');
-            }else{
+            }elseif($request->type == "uniform"){
                 $group_id = config('constants.FixedGroups.Uniform_Inventory_Items');
+            }else{
+                $group_id = config('constants.FixedGroups.General_Inventory_Items');
             }
             $this->ledgerService->createAutoLedgers([$group_id], "$item->name"."[$item->measuring_unit]", 0 , Item::class, $item->id);
 
@@ -117,6 +120,8 @@ class ItemController extends Controller
             $query = $query->stationary();
         } elseif ($request->type == 'uniform') {
             $query = $query->uniform();
+        } elseif ($request->type == 'general') {
+            $query = $query->general();
         }
 
         

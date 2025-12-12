@@ -57,6 +57,7 @@ class PurchaseOrderController extends Controller
                                             'food' => 'F',
                                             'stationary' => 'S',
                                             'uniform' => 'U',
+                                            'general' => 'G',
                                             default => 'S',
                                         };
         $branches = Branches::active()->with([
@@ -126,6 +127,7 @@ class PurchaseOrderController extends Controller
             'food' => 'F',
             'stationary' => 'S',
             'uniform' => 'U',
+            'general' => 'G',
             default => 'S',
         };
 
@@ -236,13 +238,14 @@ class PurchaseOrderController extends Controller
          //   $type = $request->get('type') == "food" ? 'F' : "S";
          // normalize + map
             $rawType = $request->get('type');
-            $type = in_array($rawType, ['food','stationary','uniform']) ? $rawType : 'stationary';
+            $type = in_array($rawType, ['food','stationary','uniform','general']) ? $rawType : 'stationary';
 
             // map to DB code
             $mappedType = match ($type) {
                 'food' => 'F',
                 'stationary' => 'S',
                 'uniform' => 'U',
+                'general' => 'G',
                 default => 'S',
             };
 
@@ -719,7 +722,13 @@ class PurchaseOrderController extends Controller
             return abort(503);
         }
 
-         $mappedType = $type == 'food' ? 'F' : 'S';
+        //  $mappedType = $type == 'food' ? 'F' : 'S' ;
+        $mappedType =
+                    $type == 'food' ? 'F' :
+                    ($type == 'stationary' ? 'S' :
+                    ($type == 'uniform' ? 'U' :
+                    ($type == 'general' ? 'G' : null)));
+
         //  dd($mappedType);
 
         $branches = Branches::active()

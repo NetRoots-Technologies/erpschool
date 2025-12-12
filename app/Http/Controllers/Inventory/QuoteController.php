@@ -21,6 +21,7 @@ class QuoteController extends Controller
         $this->type['food'] = 'F';
         $this->type['stationary'] = 'S';
         $this->type['uniform'] = 'U';
+        $this->type['general'] = 'G';
     }
 
     public function index($type)
@@ -39,8 +40,10 @@ class QuoteController extends Controller
                         $query->food();
                     }elseif($type == 'stationary') {
                         $query->stationary();
-                    }else {
+                    }elseif($type == 'uniform') {
                         $query->uniform();
+                    }elseif($type == 'general') {
+                        $query->general();
                     }
 
                     $query->with([
@@ -51,8 +54,10 @@ class QuoteController extends Controller
                                 $query->food();
                             } elseif($type == 'stationary') {
                                 $query->stationary();
-                            } else {
+                            } elseif($type == 'uniform') {
                                 $query->uniform();
+                            } elseif($type == 'general') {
+                                $query->general();
                             }
                         }
                     ]);
@@ -114,9 +119,11 @@ class QuoteController extends Controller
                 $data->type = 'F';
             } elseif ($request->type == 'stationary') {
                 $data->type = 'S';
-            } else {
+            } elseif ($request->type == 'uniform') {
                 $data->type = 'U';
-            }       
+            } elseif ($request->type == 'general') {
+                $data->type = 'G';
+            } 
             $data->save();
 
             $data->quoteItems()->delete();
@@ -185,6 +192,9 @@ class QuoteController extends Controller
         }
         elseif ($request->type == 'uniform') {
             $supplier = $supplier->uniform();
+        }
+        elseif ($request->type == 'general') {
+            $supplier = $supplier->general();
         }
 
         $supplier = $supplier->get();
