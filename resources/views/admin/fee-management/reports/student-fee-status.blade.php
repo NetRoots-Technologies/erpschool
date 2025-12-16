@@ -97,6 +97,13 @@
                                 </thead>
                                 <tbody>
                                 </tbody>
+                                 <tfoot>
+                                <tr>
+                                    <th colspan="8" class="text-right">Total</th>
+                                    <th id="total_bill">0</th>
+                                    <th id="total_paid">0</th>
+                                </tr>
+                            </tfoot>
                             </table>
                         </div>
                     </div>
@@ -140,129 +147,67 @@
 
     @section('js')
         <script>
-            $("document").ready(function() {
-                var table = $('.table').DataTable({
-                    processing: true,
-                    serverSide: true,
-                    ajax: {
-                        url: "{{ route('admin.fee-management.reports.fee-bills') }}",
-                        data: function(d) {
-                            d.status = $('#status').val();
-                            d.filter_month = $('#filter_month').val();
-                            d.class_id = $('#class_id').val();
-                        }
-                    },
-
-                    dom: 'Bfrtip',
-                    buttons: [
-                        'pageLength',
-                        {
-                            extend: 'copy',
-                            text: 'Copy'
-                        },
-                        {
-                            extend: 'csv',
-                            text: 'CSV'
-                        },
-                        {
-                            extend: 'excel',
-                            text: 'Excel'
-                        },
-                        {
-                            extend: 'pdf',
-                            text: 'PDF'
-                        },
-                        {
-                            extend: 'print',
-                            text: 'Print'
-                        }
+      $("document").ready(function() {
+        var table = $('.table').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: {
+                url: "{{ route('admin.fee-management.reports.fee-bills') }}",
+                data: function(d) {
+                    d.status = $('#status').val();
+                    d.filter_month = $('#filter_month').val();
+                    d.class_id = $('#class_id').val();
+                }
+            },
+            dom: 'Bfrtip',
+            buttons: [
+                    'pageLength',
+                        { extend: 'copy', footer: true },
+                        { extend: 'csv', footer: true, exportOptions: { columns: ':visible', modifier: { page: 'all' } } },
+                        { extend: 'excel', footer: true, exportOptions: { columns: ':visible', modifier: { page: 'all' } } },
+                        { extend: 'pdf', footer: true, exportOptions: { columns: ':visible', modifier: { page: 'all' } } },
+                        { extend: 'print', footer: true, exportOptions: { columns: ':visible', modifier: { page: 'all' } } }
                     ],
+            lengthMenu: [[10, 25, 50, -1],[10, 25, 50, "All"]],
+            columns: [
+                { data: 'student_id', name: 'student_id' },
+                { data: 'student_name', name: 'student_name' },
+                { data: 'father_name', name: 'father_name' },
+                { data: 'class', name: 'class' },
+                { data: 'session', name: 'session' },
+                { data: 'billing_month', name: 'billing_month' },
+                { data: 'challan_number', name: 'challan_number' },
+                { data: 'status', name: 'status' },
+                { data: 'total_amount', name: 'total_amount' },
+                { data: 'paid_amount', name: 'paid_amount' }
+            ],
+            footerCallback: function(row, data, start, end, display) {
+                var api = this.api();
 
-                    lengthMenu: [
-                        [10, 25, 50, -1],
-                        [10, 25, 50, "All"]
-                    ],
+                var parseNumber = function(i) {
+                    return typeof i === 'string' ? i.replace(/[\$,]/g, '')*1 :
+                        typeof i === 'number' ? i : 0;
+                };
 
+                var totalBill = api.column(8, {page:'all'}).data().reduce((a,b) => parseNumber(a) + parseNumber(b), 0);
+                var totalPaid = api.column(9, {page:'all'}).data().reduce((a,b) => parseNumber(a) + parseNumber(b), 0);
 
-                    columns: [{
-                            data: 'student_id',
-                            name: 'student_id',
-                            orderable: true,
-                            searchable: true
-                        },
+                $(api.column(8).footer()).html(totalBill.toLocaleString());
+                $(api.column(9).footer()).html(totalPaid.toLocaleString());
+            }
+        });
 
-                        {
-                            data: 'student_name',
-                            name: 'student_name',
-                            orderable: true,
-                            searchable: true
-                        },
-                        {
-                            data: 'father_name',
-                            name: 'father_name',
-                            orderable: true,
-                            searchable: true
-                        },
-                        {
-                            data: 'class',
-                            name: 'class',
-                            orderable: true,
-                            searchable: true
-                        },
-                        {
-                            data: 'session',
-                            name: 'session',
-                            orderable: true,
-                            searchable: true
-                        },
+        $('#status, #filter_month, #class_id').change(function() {
+            table.ajax.reload();
+        });
 
-                        {
-                            data: 'billing_month',
-                            name: 'billing_month',
-                            orderable: true,
-                            searchable: true
-                        },
+        $('#resetFilters').click(function() {
+            $('#status').val('').trigger('change');
+            $('#filter_month').val('').trigger('change');
+            $('#class_id').val('').trigger('change');
+            table.ajax.reload();
+        });
+    });
 
-                        {
-                            data: 'challan_number',
-                            name: 'challan_number',
-                            orderable: true,
-                            searchable: true
-                        },
-
-                        {
-                            data: 'status',
-                            name: 'status',
-                            orderable: true,
-                            searchable: true
-                        },
-                        {
-                            data: 'total_amount',
-                            name: 'total_amount',
-                            orderable: true,
-                            searchable: true
-                        },
-
-                        {
-                            data: 'paid_amount',
-                            name: 'paid_amount',
-                            orderable: true,
-                            searchable: true
-                        }
-
-                    ]
-                });
-
-                $('#status , #filter_month , #class_id').change(function() {
-                    table.ajax.reload();
-                });
-
-                $('#resetFilters').click(function() {
-                    $('#status').val('').trigger('change');
-                    $('#filter_month').val('').trigger('change');
-                    $('#class_id').val('').trigger('change');
-                    table.ajax.reload();
-                });
-            });
         </script>
     @endsection

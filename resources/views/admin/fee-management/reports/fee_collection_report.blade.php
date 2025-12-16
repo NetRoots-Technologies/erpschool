@@ -152,7 +152,36 @@
                     }
                 },
                 dom: 'Bfrtip',
-                buttons: ['pageLength', 'copy', 'csv', 'excel', 'pdf', 'print'],
+                buttons: [
+                    'pageLength',
+                    {
+                        extend: 'copy',
+                        footer: true
+                    },
+                    {
+                        extend: 'csv',
+                        footer: true
+                    },
+                    {
+                        extend: 'excel',
+                        footer: true,
+                        customize: function(xlsx) {
+                            var sheet = xlsx.xl.worksheets['sheet1.xml'];
+                        }
+                    },
+                    {
+                        extend: 'pdf',
+                        footer: true,
+                        orientation: 'landscape',
+                        pageSize: 'A4',
+                        customize: function(doc) {
+                        }
+                    },
+                    {
+                        extend: 'print',
+                        footer: true
+                    }
+                ],
                 columns: [{
                         data: 'student_id',
                         name: 'student_id'

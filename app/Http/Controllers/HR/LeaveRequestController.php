@@ -58,6 +58,7 @@ class LeaveRequestController extends Controller
      */
     public function store(Request $request)
     {
+    //   dd($request->leave_type_id, $request->employee_id);
         if (!Gate::allows('Leave Request create')) {
             return abort(503);
         }

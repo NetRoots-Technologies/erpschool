@@ -188,5 +188,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'inventory', 'as' => 'invent
                [SupplierLedgerController::class, 'exportSupplierLedgerExcel'])->name('supplier-ledger.excel');
 
         });
+        Route::post('suppliers/import',[SupplierController::class, 'import'])->name('suppliers.import');
+
 
 });

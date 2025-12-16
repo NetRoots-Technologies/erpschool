@@ -15,25 +15,42 @@ use Illuminate\Support\Facades\Gate;
 class HolidayService
 {
 
+    // public function store($request)
+    // {
+
+    //     $isRecurring = $request->has('is_recurring') ? $request->is_recurring : 0;
+
+    //     $holiday = new Holiday();
+    //     $holiday->name = $request->input('name');
+    //     $holiday->branch_id = $request->input('branch_id');
+    //     $holiday->department_id = $request->input('department_id');
+    //     $holiday->employee_id = $request->input('employee_id');
+    //     $holiday->holiday_date = $request->input('holiday_date');
+    //     $holiday->holiday_date_to = $request->input('holiday_date_to');
+    //     $holiday->length = $request->input('holiday_length');
+    //     $holiday->is_recurring = $isRecurring;
+    //     $holiday->save();
+
+
+    //     return $holiday;
+    // }
+
     public function store($request)
-    {
+{
+    $holiday = new Holiday();
 
-        $isRecurring = $request->has('is_recurring') ? $request->is_recurring : 0;
+    $holiday->name = $request->input('name');
+    $holiday->shot_name = $request->input('shot_name');
+    $holiday->holiday_date = $request->input('holiday_date');
+    $holiday->holiday_date_to = $request->input('holiday_date_to');
+    $holiday->length = $request->input('holiday_length');
+    $holiday->is_recurring = $request->has('is_recurring') ? 1 : 0;
 
-        $holiday = new Holiday();
-        $holiday->name = $request->input('name');
-        $holiday->branch_id = $request->input('branch_id');
-        $holiday->department_id = $request->input('department_id');
-        $holiday->employee_id = $request->input('employee_id');
-        $holiday->holiday_date = $request->input('holiday_date');
-        $holiday->holiday_date_to = $request->input('holiday_date_to');
-        $holiday->length = $request->input('holiday_length');
-        $holiday->is_recurring = $isRecurring;
-        $holiday->save();
+    $holiday->save();
 
+    return $holiday;
+}
 
-        return $holiday;
-    }
     public function getdata()
     {
 
@@ -78,25 +95,40 @@ class HolidayService
         return Holiday::find($id);
     }
 
+    // public function update($request, $id)
+    // {
+
+    //     $holiday = Holiday::findOrFail($id);
+    //     $isRecurring = $request->has('is_recurring') ? $request->is_recurring : 0;
+
+    //     $holiday->name = $request->input('name');
+    //     $holiday->branch_id = $request->input('branch_id');
+    //     $holiday->department_id = $request->input('department_id');
+    //     $holiday->employee_id = $request->input('employee_id');
+    //     $holiday->holiday_date = $request->input('holiday_date');
+
+    //     $holiday->holiday_date_to = $request->input('holiday_date_to');
+
+    //     $holiday->length = $request->input('holiday_length');
+
+    //     $holiday->is_recurring = $isRecurring;
+    //     $holiday->save();
+    // }
+
     public function update($request, $id)
-    {
+{
+    $holiday = Holiday::findOrFail($id);
 
-        $holiday = Holiday::findOrFail($id);
-        $isRecurring = $request->has('is_recurring') ? $request->is_recurring : 0;
+    $holiday->name = $request->input('name');
+    $holiday->shot_name = $request->input('shot_name');
+    $holiday->holiday_date = $request->input('holiday_date');
+    $holiday->holiday_date_to = $request->input('holiday_date_to');
+    $holiday->length = $request->input('holiday_length');
+    $holiday->is_recurring = $request->has('is_recurring') ? 1 : 0;
 
-        $holiday->name = $request->input('name');
-        $holiday->branch_id = $request->input('branch_id');
-        $holiday->department_id = $request->input('department_id');
-        $holiday->employee_id = $request->input('employee_id');
-        $holiday->holiday_date = $request->input('holiday_date');
+    $holiday->save();
+}
 
-        $holiday->holiday_date_to = $request->input('holiday_date_to');
-
-        $holiday->length = $request->input('holiday_length');
-
-        $holiday->is_recurring = $isRecurring;
-        $holiday->save();
-    }
     public function destroy($id)
     {
 

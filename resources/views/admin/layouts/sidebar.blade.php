@@ -737,11 +737,11 @@
                                         By Class Report</a></li>
                             @endcan
 
-                            @can('Fee Bills By Amount Report')
+                            {{-- @can('Fee Bills By Amount Report')
                                 <li><a class="slide-item {{ request()->is('admin/fee-management/reports/fee-bills-by-account') ? 'active' : '' }}"
                                         href="{{ route('admin.fee-management.reports.fee-bills-by-account') }}">Fee Bills
                                         By Account</a></li>
-                            @endcan
+                            @endcan --}}
 
                             @can('Fee Bills By Fee Category')
                                 <li><a class="slide-item {{ request()->is('admin/fee-management/reports/category-bills') ? 'active' : '' }}"

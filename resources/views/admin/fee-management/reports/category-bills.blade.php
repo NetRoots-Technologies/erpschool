@@ -72,7 +72,14 @@
                                 <th>Bill Amount</th>
                             </tr>
                         </thead>
-                        <tbody></tbody>
+                        <tbody>
+                              <tfoot>
+                            <tr>
+                                <th colspan="6" class="text-right">Total</th>
+                                <th id="total_bill">0</th>
+                            </tr>
+                        </tfoot>
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -106,18 +113,40 @@ $(document).ready(function() {
             }
         },
         dom: 'Bfrtip',
-        buttons: ['pageLength', 'copy', 'csv', 'excel', 'pdf', 'print'],
+         buttons: [
+                    'pageLength',
+                        { extend: 'copy', footer: true },
+                        { extend: 'csv', footer: true, exportOptions: { columns: ':visible', modifier: { page: 'all' } } },
+                        { extend: 'excel', footer: true, exportOptions: { columns: ':visible', modifier: { page: 'all' } } },
+                        { extend: 'pdf', footer: true, exportOptions: { columns: ':visible', modifier: { page: 'all' } } },
+                        { extend: 'print', footer: true, exportOptions: { columns: ':visible', modifier: { page: 'all' } } }
+                    ],
         lengthMenu: [[10,25,50,-1],[10,25,50,"All"]],
         columns: [
-            { data: 'student_id', name: 'student_id' , searhable: true, orderable: true },
-            { data: 'student_name', name: 'student_name' , searhable: true, orderable: true },
-            { data: 'father_name', name: 'father_name' , searhable: true, orderable: true },
-            { data: 'billing_month', name: 'billing_month', searhable: true, orderable: true },
-            { data: 'challan_number', name: 'feeCollection.billing.challan_number', defaultContent: '-', searhable: true, orderable: true },
-            { data: 'bill_category', name: 'bill_category', defaultContent: '-', searhable: true, orderable: true },
-            { data: 'total_amount', name: 'total_amount', defaultContent: '0.00', searhable: true, orderable: true },
+            { data: 'student_id', name: 'student_id' },
+            { data: 'student_name', name: 'student_name' },
+            { data: 'father_name', name: 'father_name' },
+            { data: 'billing_month', name: 'billing_month' },
+            { data: 'challan_number', name: 'feeCollection.billing.challan_number', defaultContent: '-' },
+            { data: 'bill_category', name: 'bill_category', defaultContent: '-' },
+            { data: 'total_amount', name: 'total_amount', defaultContent: '0.00' },
         ],
         order: [[3, 'desc']],
+
+        footerCallback: function(row, data, start, end, display) {
+            var api = this.api();
+
+            // Parse numbers properly
+            var parseNumber = function(i) {
+                return typeof i === 'string' ? i.replace(/[\$,]/g,'')*1 : typeof i === 'number' ? i : 0;
+            };
+
+            // Calculate total bill
+            var totalBill = api.column(6, { page: 'all' }).data().reduce((a,b) => parseNumber(a) + parseNumber(b), 0);
+
+            // Update footer
+            $(api.column(6).footer()).html(totalBill.toLocaleString());
+        }
     });
 
     // Filter change
@@ -132,5 +161,6 @@ $(document).ready(function() {
     });
 
 });
+
 </script>
 @endsection

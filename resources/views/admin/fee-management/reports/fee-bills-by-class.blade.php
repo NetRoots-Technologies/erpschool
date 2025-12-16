@@ -98,10 +98,15 @@
                                 <tbody>
                                 </tbody>
 
-                                <tfoot>
-                                    <td colspan="8"></td>
-                                    <td colspan="3">Outstanding Amount : Rs. <span id="outstanding_amount">0</span></td>
-                                </tfoot>
+                          <tfoot>
+                                <tr>
+                                    <th colspan="8" class="text-right">Total</th>
+                                    <th id="total_bill">0</th>
+                                    <th id="total_paid">0</th>
+                                    <th id="total_outstanding">0</th>
+                                </tr>
+                            </tfoot>
+
                             </table>
                         </div>
                     </div>
@@ -159,28 +164,13 @@
                     },
 
                     dom: 'Bfrtip',
-                    buttons: [
-                        'pageLength',
-                        {
-                            extend: 'copy',
-                            text: 'Copy'
-                        },
-                        {
-                            extend: 'csv',
-                            text: 'CSV'
-                        },
-                        {
-                            extend: 'excel',
-                            text: 'Excel'
-                        },
-                        {
-                            extend: 'pdf',
-                            text: 'PDF'
-                        },
-                        {
-                            extend: 'print',
-                            text: 'Print'
-                        }
+                      buttons: [
+                    'pageLength',
+                        { extend: 'copy', footer: true },
+                        { extend: 'csv', footer: true, exportOptions: { columns: ':visible', modifier: { page: 'all' } } },
+                        { extend: 'excel', footer: true, exportOptions: { columns: ':visible', modifier: { page: 'all' } } },
+                        { extend: 'pdf', footer: true, exportOptions: { columns: ':visible', modifier: { page: 'all' } } },
+                        { extend: 'print', footer: true, exportOptions: { columns: ':visible', modifier: { page: 'all' } } }
                     ],
 
                     lengthMenu: [
@@ -265,19 +255,40 @@
 
                     ],
 
-                    footerCallback: function (row, data, start, end, display) {
-                        var api = this.api();
-                        var totalOutstanding = api
-                            .column('outstanding_amount:name', { page: 'all' })
-                            .data()
-                            .reduce(function (a, b) {
-                                var x = typeof a === 'string' ? a.replace(/,/g, '')*1 : a;
-                                var y = typeof b === 'string' ? b.replace(/,/g, '')*1 : b;
-                                return x + y;
-                            }, 0);
+            footerCallback: function (row, data, start, end, display) {
+                var api = this.api();
 
-                        $('#outstanding_amount').text(totalOutstanding.toLocaleString());
-                    }
+                // Helper to parse numbers
+                var parseNumber = function(i) {
+                    return typeof i === 'string' ?
+                        i.replace(/[\$,]/g, '')*1 :
+                        typeof i === 'number' ? i : 0;
+                };
+
+                // Total Bill Amount
+                var totalBill = api
+                    .column(8, { page: 'all' })
+                    .data()
+                    .reduce(function(a, b) { return parseNumber(a) + parseNumber(b); }, 0);
+
+                // Total Paid Amount
+                var totalPaid = api
+                    .column(9, { page: 'all' })
+                    .data()
+                    .reduce(function(a, b) { return parseNumber(a) + parseNumber(b); }, 0);
+
+                // Total Outstanding Amount
+                var totalOutstanding = api
+                    .column(10, { page: 'all' })
+                    .data()
+                    .reduce(function(a, b) { return parseNumber(a) + parseNumber(b); }, 0);
+
+                // Update the footer cells
+                $(api.column(8).footer()).html(totalBill.toLocaleString());
+                $(api.column(9).footer()).html(totalPaid.toLocaleString());
+                $(api.column(10).footer()).html(totalOutstanding.toLocaleString());
+            }
+
 
                 });
 

@@ -6,10 +6,13 @@ use App\Models\Item;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
 use App\Models\Admin\Branches;
+use App\Imports\SupplierImport;
 use App\Services\LedgerService;
+use App\Imports\SupplierVendorImport;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Gate;
+use Maatwebsite\Excel\Facades\Excel;
 
 class SupplierController extends Controller
 {
@@ -166,5 +169,21 @@ class SupplierController extends Controller
         $supplier->save();
         return response()->json(["success" => true, 'message' => 'Status Changed', 'data' => []], 200);
     }
+
+    
+    public function import(Request $request)
+{
+    $import = new SupplierVendorImport();
+
+    Excel::import($import, $request->file('file'));
+
+    if ($import->failures()->isNotEmpty()) {
+        return back()->with([
+            'import_errors' => $import->failures()
+        ]);
+    }
+
+    return back()->with('success', 'Suppliers imported successfully');
+}
 }
 

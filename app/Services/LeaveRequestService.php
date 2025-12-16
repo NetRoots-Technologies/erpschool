@@ -24,6 +24,8 @@ class LeaveRequestService
 
     public function store($request)
     {
+
+        // dd($request->all());
        
         $uploadedFile = $request->file('employee_image');
         $fileNameToStore = null;
@@ -287,9 +289,13 @@ class LeaveRequestService
         $compensatoryQuota = Quotta::where('compensatory_status', 1)->get();
 
         $employee = Employees::find($request->employee_id);
+        // $quotaSettings = Quotta::whereHas('department', function ($query) use ($employee) {
+        //     $query->where('department_id', $employee->department_id);
+        // })->get();
         $quotaSettings = Quotta::whereHas('department', function ($query) use ($employee) {
-            $query->where('department_id', $employee->department_id);
+            $query->where('departments', $employee->department_id);
         })->get();
+
 
         $quotaSettings = $compensatoryQuota->merge($quotaSettings);
 

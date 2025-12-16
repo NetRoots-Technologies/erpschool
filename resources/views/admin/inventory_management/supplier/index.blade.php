@@ -98,6 +98,20 @@
         </div>
     </div>
     </div>
+        @if(session('import_errors'))
+        <div class="alert alert-danger">
+            <strong>Import Errors:</strong>
+            <ul>
+                @foreach(session('import_errors') as $failure)
+                    <li>
+                        Row {{ $failure->row() }} :
+                        {{ implode(', ', $failure->errors()) }}
+                    </li>
+                @endforeach
+            </ul>
+        </div>
+        @endif
+
 
 
 
@@ -107,7 +121,9 @@
             <i class="fa fa-plus"></i> Add
         </button>
         @endif
-        
+        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#importModal">
+            <i class="fa fa-upload"></i> Import Suppliers
+        </button>
 
         <div class="row justify-content-center my-4">
             <div class="col-12">
@@ -120,6 +136,27 @@
             </div>
         </div>
     </div>
+
+        <div class="modal fade" id="importModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="{{ route('inventory.suppliers.import') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="modal-header">
+                        <h5>Import Suppliers</h5>
+                    </div>
+                    <div class="modal-body">
+                        <input type="file" name="file" class="form-control" required>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button class="btn btn-success">Import</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
 
 @endsection
 
