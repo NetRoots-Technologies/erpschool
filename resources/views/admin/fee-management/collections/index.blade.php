@@ -30,6 +30,11 @@
                     <button type="button" class="btn btn-success" data-toggle="modal" data-target="#exampleModal">
                        <i class="fa fa-upload"></i> Import Fee Collection
                     </button> 
+
+                      <a href="{{ route('admin.fee-management.fee.reversal') }}" class="btn btn-danger">
+                        <i class="fa fa-undo"></i> Fee Reversal
+                    </a>
+
                 </div>
             </div>
         </div>

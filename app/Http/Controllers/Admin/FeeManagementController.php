@@ -36,6 +36,11 @@ use App\Models\Fee\FeeCollectionDetail;
 use App\Models\Student\AcademicSession;
 use App\Models\Accounts\CustomerInvoice;
 use App\Models\Fee\StudentFeeAssignment;
+use App\Models\Accounts\JournalEntryLine;
+use App\Models\Accounts\JournalEntry;
+use App\Models\Accounts\Account;
+use App\Models\Accounts\AccountGroup;
+use App\Models\Accounts\AccountLedger;
 use Yajra\DataTables\Facades\DataTables;
 use App\Exports\StudentLedgerSingleSheetExport;
 use Illuminate\Support\Facades\Storage;
@@ -3053,7 +3058,148 @@ public function feeBillsByFinancialAid(Request $request)
     $students = Students::with('AcademicClass')->get();
     return view('admin.fee-management.reports.fee_collection_report', compact('students'));
 }
+    public function feeReversalIndex()
+    {
+         $students = Students::where('status', 1)->where('is_active', 1)->get();
+        $classes = AcademicClass::where('status', 1)->get();
 
+        return view('admin.fee-management.fee-reversal.index', compact('classes', 'students'));
+    }
+
+    public function processFeeReversal(Request $request)
+    {
+        $rules = [
+            'challan_id' => 'required',
+            'student_id' => 'required',
+        ];
+
+        $validated = $request->validate($rules);
+
+        DB::beginTransaction();
+        try {
+
+            // 1️⃣ Get Generated Challan
+            $challan = FeeBilling::where('id', $validated['challan_id'])
+                ->where('student_id', $validated['student_id'])
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if ($challan->status !== 'generated') {
+                throw new \Exception('Only generated challans can be reversed');
+            }
+
+            if ($challan->reversed_at) {
+                throw new \Exception('Challan already reversed');
+            }
+
+            $amount = $challan->total_amount;
+            if ($amount <= 0) {
+                throw new \Exception('Invalid challan amount');
+            }
+
+            // 2️⃣ Create Journal Entry (Voucher)
+            $entryNumber = $this->generateUniqueEntryNo('FR');
+
+            $journalEntry = JournalEntry::create([
+                'entry_number'  => $entryNumber,
+                'entry_date'    => now(),
+                'description'   => 'Fee Reversal (Generated) Challan #' . $challan->challan_number,
+                'status'        => 'posted',
+                'entry_type'    => 'journal_voucher',
+                'source_module' => 'fee_reversal',
+                'source_id'     => $challan->id,
+                'created_by'    => auth()->id(),
+            ]);
+
+        // 3️⃣ Debit: Fee Reversal Ledger
+            $feeReversalLedger = AccountLedger::firstOrCreate(
+                ['code' => '050010010003', 'is_active' => 1],
+                [
+                    'name' => 'Fee Reversal Ledger',
+                    'account_group_id' => 1, 
+                    'current_balance' => 0,
+                    'current_balance_type' => 'debit',
+                    'created_by' => auth()->id(),
+                ]
+            );
+
+                JournalEntryLine::create([
+                    'journal_entry_id'  => $journalEntry->id,
+                    'account_ledger_id' => $feeReversalLedger->id,
+                    'debit'             => $amount,
+                    'credit'            => 0,
+                    'description'       => 'Fee reversal (generated challan)',
+                ]);
+
+            // 4️⃣ Credit: Students Receivable Ledger
+             $studentsReceivableLedger = AccountLedger::firstOrCreate(
+                ['code' => '010020050001'],
+                [
+                    'name' => 'Students Receivable',
+                    'description' => 'Students Receivable',
+                    'account_group_id' => 261, // Receivable group
+                    'opening_balance' => 0,
+                    'opening_balance_type' => 'debit',
+                    'current_balance' => 0,
+                    'current_balance_type' => 'debit',
+                    'currency_id' => 1,
+                    'is_active' => 1,
+                    'created_by' => auth()->id(),
+                ]
+            );
+
+            JournalEntryLine::create([
+                'journal_entry_id'  => $journalEntry->id,
+                'account_ledger_id' => $studentsReceivableLedger->id,
+                'debit'             => 0,
+                'credit'            => $amount,
+                'description'       => 'Students receivable reversed',
+            ]);
+
+            // Update Fee Reversal Ledger Balance
+            $feeReversalLedger->current_balance += $amount;
+            $feeReversalLedger->current_balance_type = 'debit';
+            $feeReversalLedger->save();
+
+            // // For Students Receivable Ledger
+            // $studentsReceivableLedger->current_balance -= $amount;
+
+            // // Balance type auto adjust
+            // if ($studentsReceivableLedger->current_balance >= 0) {
+            //     $studentsReceivableLedger->current_balance_type = 'debit';
+            // } else {
+            //     $studentsReceivableLedger->current_balance_type = 'credit';
+            // }
+
+            // $studentsReceivableLedger->save();
+
+            // // for logs 
+            // \Log::info('Students Receivable Updated', [
+            // 'ledger' => $studentsReceivableLedger->code,
+            // 'balance' => $studentsReceivableLedger->current_balance,
+            // 'type' => $studentsReceivableLedger->current_balance_type,
+            // ]);
+
+            // 5️⃣ Update Challan
+            $challan->update([
+                'status'      => 'paid',
+            ]);
+
+            DB::commit();
+
+            return redirect()->back()->with('success', 'Generated challan fee reversed successfully.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Fee Reversal error: ' . $e->getMessage());
+            return redirect()->back()->withInput()->withErrors(['error' => 'Failed to reverse fee: ' . $e->getMessage()]);
+        }
+    }
+
+    private function generateUniqueEntryNo($prefix)
+    {
+            return $prefix . '-' . now()->format('YmdHis') . '-' . mt_rand(100, 999);
+     }
 
 
 }

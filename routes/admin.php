@@ -205,7 +205,9 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'admin', 'as' => 'admin.'], 
         // Export And Import Collections
         Route::get('/download-collection-template', [FeeManagementController::class, 'downloadTemplateByCollection'])->name('template.download.fee.collection');
         Route::post('/collection/import', [FeeManagementController::class, 'importByCollection'])->name('fee.collection.import');
-
+        // Fee Reversal
+        Route::get('/fee-reversal', [FeeManagementController::class, 'feeReversalIndex'])->name('fee.reversal');
+        Route::post('/process-fee-reversal', [FeeManagementController::class, 'processFeeReversal'])->name('process.fee.reversal');
 
         // Discounts
         Route::get('/discounts', [FeeManagementController::class, 'discounts'])->name('discounts');

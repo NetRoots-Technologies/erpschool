@@ -43,7 +43,7 @@
 <!-- Footer opened -->
 <div class="main-footer ht-45">
     <div class="container-fluid pd-t-0 ht-100p">
-        <span> Copyright © 2024 <a href="https://www.netrootstech.com/" target="_blank" class="text-primary">Netroots
+        <span> Copyright © 2025 <a href="https://www.netrootstech.com/" target="_blank" class="text-primary">Netroots
                 Technologies</a>. All rights reserved.</span>
     </div>
 </div>
