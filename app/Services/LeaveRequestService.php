@@ -45,12 +45,12 @@ class LeaveRequestService
 
         $leaves = Quotta::find($request->leave_type_id);
 
-        if ($leaves->compensatory_status == 1) {
-            $compensatoryLeaveCount = EmployeeCompensatoryLeaves::where('employee_id', $request->employee_id)->first();
-            $days = ($compensatoryLeaveCount->past_leaves ?? 0) + ($compensatoryLeaveCount->current_leaves ?? 0);
-        } else {
+        // if ($leaves->compensatory_status == 1) {
+        //     $compensatoryLeaveCount = EmployeeCompensatoryLeaves::where('employee_id', $request->employee_id)->first();
+        //     $days = ($compensatoryLeaveCount->past_leaves ?? 0) + ($compensatoryLeaveCount->current_leaves ?? 0);
+        // } else {
             $days = $leaves->permitted_days;
-        }
+        // }
 
         $leaves_balance = $days - $accumulatedDays;
 

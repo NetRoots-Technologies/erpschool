@@ -6,9 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Models\HR\Quotta;
 use App\Models\HR\WorkShift;
 use App\Models\HRM\Employees;
+use App\Models\ApprovalAuthority;
+use App\Models\HR\LeaveRequest;
+use App\Models\ApprovalRequest;
 use App\Services\LeaveRequestService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class LeaveRequestController extends Controller
@@ -56,21 +60,52 @@ class LeaveRequestController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
+    // public function store(Request $request)
+    // {
+    // //   dd($request->leave_type_id, $request->employee_id);
+    //     if (!Gate::allows('Leave Request create')) {
+    //         return abort(503);
+    //     }
+    //     try {
+    //         $this->LeaveRequestService->store($request);
+    //         return redirect()->route('hr.leave_requests.index')->with('success', 'Leave Request created successfully');
+
+    //     } catch (ValidationException $e) {
+    //         return redirect()->back()->withErrors($e->errors())->withInput();
+    //     }
+    // }
+
+    
     public function store(Request $request)
     {
-    //   dd($request->leave_type_id, $request->employee_id);
-        if (!Gate::allows('Leave Request create')) {
-            return abort(503);
-        }
-        try {
-            $this->LeaveRequestService->store($request);
-            return redirect()->route('hr.leave_requests.index')->with('success', 'Leave Request created successfully');
+        DB::transaction(function() use ($request) {
 
-        } catch (ValidationException $e) {
-            return redirect()->back()->withErrors($e->errors())->withInput();
-        }
+            // 1️⃣ Create LeaveRequest
+            $leaveRequest = LeaveRequest::create([
+                'hrm_employee_id' => $request->employee_id,
+                'hr_quota_setting_id' => $request->leave_type_id,
+                'start_date' => $request->start_date,
+                'end_date' => $request->end_date,
+                'days' => $request->days,
+                'comments' => $request->comments,
+                'status' => 0, // pending
+            ]);
+
+            // 2️⃣ Create ApprovalRequests for authorities
+            $authorities = ApprovalAuthority::all(); // ya role/department specific filter
+            foreach($authorities as $authority) {
+                ApprovalRequest::create([
+                    'leave_request_id' => $leaveRequest->id,
+                    'approval_authority_id' => $authority->id,
+                    'status' => 0, // pending
+                    'remarks' => null
+                ]);
+            }
+
+        });
+
+        return redirect()->back()->with('success', 'Leave request created successfully.');
     }
-
 
     /**
      * Display the specified resource.

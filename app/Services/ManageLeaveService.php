@@ -71,29 +71,61 @@ class ManageLeaveService
                     return "N/A";
                 }
             })
+
+            //     ->addColumn('approval_info', function ($row) {
+            //     if ($row->approvalRequest) {
+            //         return [
+            //             'status' => $row->approvalRequest->status ?? 'N/A',
+            //             'remarks' => $row->approvalRequest->remarks ?? 'No comment',
+            //             'created_at' => $row->approvalRequest->created_at ?? 'N/A',
+            //         ];
+            //     } else {
+            //         return null;
+            //     }
+        // })
            
-            ->addColumn('approval_info', function ($row) {
-                if ($row->approvalRequest) {
-                    return [
-                        'status' => $row->approvalRequest->status ?? 'N/A',
-                        'remarks' => $row->approvalRequest->remarks ?? 'No comment',
-                        'created_at' => $row->approvalRequest->created_at ?? 'N/A',
-                    ];
-                } else {
-                    return null;
-                }
-            })
-            ->addColumn('approval_requests', function ($row) {
-                return json_encode($row->approvalRequests->map(function ($item) {
-                    return [
-                        'status' => $item->status,
-                        'remarks' => $item->remarks,
-                        'created_at' => $item->created_at ? $item->created_at->format('Y-m-d H:i:s') : 'N/A',
-                        'approved_by' => $item->approved_by ?? 'N/A',
-                        'approver_name' => $item->approvalAuthority->user->name ?? 'N/A', // This will now work
-                    ];
-                }));
-            })
+        ->addColumn('approval_info', function ($row) {
+    if ($row->approvalRequests->count() > 0) {
+        $item = $row->approvalRequests->first();
+        return [
+            'status' => $item->status ?? 'N/A',
+            'remarks' => $item->remarks ?? 'No comment',
+            'created_at' => $item->created_at ?? 'N/A',
+        ];
+    } else {
+        return null;
+    }
+})
+    // ->addColumn('approval_requests', function ($row) {
+    //             return json_encode($row->approvalRequests->map(function ($item) {
+    //                 return [
+    //                     'status' => $item->status,
+    //                     'remarks' => $item->remarks,
+    //                     'created_at' => $item->created_at ? $item->created_at->format('Y-m-d H:i:s') : 'N/A',
+    //                     'approved_by' => $item->approved_by ?? 'N/A',
+    //                     'approver_name' => $item->approvalAuthority->user->name ?? 'N/A', // This will now work
+    //                 ];
+    //             }));
+    //         })
+
+        ->addColumn('approval_requests', function ($row) {
+    return json_encode($row->approvalRequests->map(function ($item) {
+        $statusText = match($item->status) {
+            0 => 'Pending',
+            1 => 'Approved',
+            2 => 'Rejected',
+            default => 'N/A',
+        };
+        return [
+            'status' => $statusText,
+            'remarks' => $item->remarks ?? 'No comment',
+            'created_at' => $item->created_at ? $item->created_at->format('Y-m-d H:i:s') : 'N/A',
+            'approved_by' => $item->approved_by ?? 'N/A',
+            'approver_name' => $item->approvalAuthority->user->name ?? 'N/A',
+        ];
+    }));
+})
+
 
             //->rawColumns(['action', 'employee', 'Leave Type', 'status', 'approved_by', 'approval_info', 'approval_requests'])
             ->rawColumns(['employee', 'Leave Type', 'status', 'approved_by', 'approval_info', 'approval_requests'])
@@ -168,12 +200,12 @@ class ManageLeaveService
             if ($leaves) {
                 $leavetype = $leaves->leave_type;
 
-                if ($leaves->compensatory_status == 1) {
-                    $compensatoryLeaveCount = EmployeeCompensatoryLeaves::where('employee_id', $request->employee_id)->first();
-                    $total_days = ($compensatoryLeaveCount->past_leaves ?? 0) + ($compensatoryLeaveCount->current_leaves ?? 0);
-                } else {
+                // if ($leaves->compensatory_status == 1) {
+                //     $compensatoryLeaveCount = EmployeeCompensatoryLeaves::where('employee_id', $request->employee_id)->first();
+                //     $total_days = ($compensatoryLeaveCount->past_leaves ?? 0) + ($compensatoryLeaveCount->current_leaves ?? 0);
+                // } else {
                     $total_days = $leaves->permitted_days;
-                }
+                // }
 
                 $result['employeeName'] = $employeeName;
                 $result['employeeDesignation'] = $employeeDesignation;

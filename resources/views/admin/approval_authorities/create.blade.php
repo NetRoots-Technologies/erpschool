@@ -50,8 +50,7 @@
                         <option value="">Select Branch</option>
                     </select>
                 </div>
-
-                <div class="form-group">
+                 {{-- <div class="form-group">
                     <label for="role_id">Approval Role</label>
                     <select name="approval_role_id" class="form-control">
                         <option value="">Select Role (optional)</option>
@@ -59,7 +58,21 @@
                             <option value="{{ $role->id }}">{{ $role->name }} (Level {{ $role->level }})</option>
                         @endforeach
                     </select>
-                </div>
+                </div> --}}
+
+               <div class="form-group">
+                <label>Approval Role</label>
+                <select name="approval_role_id" class="form-control" required>
+                    <option value="">Select Role</option>
+                    @foreach ($roles as $role)
+                        <option value="{{ $role->id }}">
+                            {{ $role->name }}
+                        </option>
+
+                    @endforeach
+                </select>
+            </div>
+
 
                 <div class="form-group">
                     <label for="user_id">Specific User</label>

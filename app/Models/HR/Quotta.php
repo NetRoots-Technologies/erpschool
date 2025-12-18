@@ -15,6 +15,7 @@ class Quotta extends Model
     protected $fillable = [
         'leave_type',
         'permitted_days',
+        'compensatory_status', 
     ];
 
     protected $table = 'hr_quota_settings';

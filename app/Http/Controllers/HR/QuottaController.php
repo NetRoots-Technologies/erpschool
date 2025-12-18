@@ -36,9 +36,9 @@ class QuottaController extends Controller
      */
     public function create()
     {
-        if (!Gate::allows('Quota create')) {
-            return abort(503);
-        }
+        // if (!Gate::allows('Quota create')) {
+        //     return abort(503);
+        // }
         $departments = Department::all();
         return view('hr.quota_settings.create', compact('departments'));
 
@@ -52,9 +52,9 @@ class QuottaController extends Controller
      */
     public function store(Request $request)
     {
-        if (!Gate::allows('Quota create')) {
-            return abort(503);
-        }
+        // if (!Gate::allows('Quota create')) {
+        //     return abort(503);
+        // }
         try {
             $this->QuottaService->store($request);
 

@@ -19,6 +19,7 @@ class QuottaService
         $quota = Quotta::create([
             'leave_type' => $request->name,
             'permitted_days' => $request->permit_days,
+            'compensatory_status' => 1, // ✅ auto insert
         ]);
 
         foreach ($request->departments as $department) {
@@ -35,6 +36,8 @@ class QuottaService
     {
 
         return Quotta::with('department')->find($id);
+
+        // return Quotta::with('departments')->findOrFail($id);
     }
 
     public function getdata()
@@ -82,7 +85,6 @@ class QuottaService
 
         return $quota;
     }
-
 
     public function destroy($id)
     {
