@@ -250,7 +250,7 @@ $(document).ready(function () {
 
         // 2️⃣ Load challans
         $.get(
-            '{{ route('admin.fee-management.collections.challans-by-student', ':id') }}'
+            '{{ route('admin.fee-management.collections.challans-by-student-fee', ':id') }}'
             .replace(':id', studentId),
             function (res) {
 

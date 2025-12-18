@@ -37,51 +37,93 @@ class StudentViewController extends Controller
         return view('acadmeic.view_students.index', compact('branches', 'classes'));
     }
 
-    public function getData()
-    {
-         if (!Gate::allows('ViewStudents-list')) {
+    // public function getData()
+    // {
+    //      if (!Gate::allows('ViewStudents-list')) {
+    //     return abort(403);
+    // }
+    //     $data = Students::with('AcademicClass', 'branch', 'student_siblings', 'student_schools', 'student_emergency_contacts')->orderBy('created_at', 'desc')->get();
+
+    //     return Datatables::of($data)->addIndexColumn()
+    //         ->addColumn('action', function ($row) {
+    //             $btn = '<div style="display: flex;">';
+
+    //             $btn .= '<a href="' . route("academic.student_view.show", $row->id) . '" class="btn btn-warning btn-sm"  style="margin-right: 4px;">View</a>';
+
+    //             $btn .= '</div>';
+
+    //             return $btn;
+
+    //         })->addColumn('name', function ($row) {
+
+    //             if ($row->first_name && $row->last_name) {
+    //                 return $row->first_name . '&nbsp' . $row->last_name;
+    //             }
+    //         })->addColumn('student_id', function ($row) {
+    //             return $row->student_id;
+    //         })->addColumn('campus', function ($row) {
+
+    //             if ($row->branch) {
+    //                 return $row->branch->name;
+    //             }
+    //         })->addColumn('campus', function ($row) {
+
+    //             if ($row->branch) {
+    //                 return $row->branch->name;
+    //             }
+    //         })->addColumn('AcademicClass', function ($row) {
+
+    //             if ($row->AcademicClass) {
+    //                 return $row->AcademicClass->name;
+    //             }
+    //         })
+    //         ->rawColumns(['action', 'name', 'campus', 'AcademicClass'])
+    //         ->make(true);
+
+
+    // }
+
+    public function getData(Request $request)
+{
+    if (!Gate::allows('ViewStudents-list')) {
         return abort(403);
     }
-        $data = Students::with('AcademicClass', 'branch', 'student_siblings', 'student_schools', 'student_emergency_contacts')->orderBy('created_at', 'desc')->get();
 
-        return Datatables::of($data)->addIndexColumn()
-            ->addColumn('action', function ($row) {
-                $btn = '<div style="display: flex;">';
+    // Start query
+    $query = Students::with('AcademicClass', 'branch', 'student_siblings', 'student_schools', 'student_emergency_contacts');
 
-                $btn .= '<a href="' . route("academic.student_view.show", $row->id) . '" class="btn btn-warning btn-sm"  style="margin-right: 4px;">View</a>';
-
-                $btn .= '</div>';
-
-                return $btn;
-
-            })->addColumn('name', function ($row) {
-
-                if ($row->first_name && $row->last_name) {
-                    return $row->first_name . '&nbsp' . $row->last_name;
-                }
-            })->addColumn('student_id', function ($row) {
-                return $row->student_id;
-            })->addColumn('campus', function ($row) {
-
-                if ($row->branch) {
-                    return $row->branch->name;
-                }
-            })->addColumn('campus', function ($row) {
-
-                if ($row->branch) {
-                    return $row->branch->name;
-                }
-            })->addColumn('AcademicClass', function ($row) {
-
-                if ($row->AcademicClass) {
-                    return $row->AcademicClass->name;
-                }
-            })
-            ->rawColumns(['action', 'name', 'campus', 'AcademicClass'])
-            ->make(true);
-
-
+    // Apply campus filter
+    if ($request->filled('campus')) {
+        $query->whereHas('branch', function($q) use ($request) {
+            $q->where('id', $request->campus);
+        });
     }
+
+    // Apply class filter
+    if ($request->filled('academic_class')) {
+        $query->whereHas('AcademicClass', function($q) use ($request) {
+            $q->where('id', $request->academic_class);
+        });
+    }
+
+    // Return to DataTables (no get() yet)
+    return Datatables::of($query)
+        ->addIndexColumn()
+        ->addColumn('action', function ($row) {
+            return '<div style="display: flex;">
+                        <a href="' . route("academic.student_view.show", $row->id) . '" class="btn btn-warning btn-sm" style="margin-right:4px;">View</a>
+                    </div>';
+        })
+        ->addColumn('name', function ($row) {
+            return $row->first_name && $row->last_name ? $row->first_name . ' ' . $row->last_name : '';
+        })
+        ->addColumn('student_id', fn($row) => $row->student_id)
+        ->addColumn('campus', fn($row) => $row->branch->name ?? '')
+        ->addColumn('AcademicClass', fn($row) => $row->AcademicClass->name ?? '')
+        ->rawColumns(['action', 'name', 'campus', 'AcademicClass'])
+        ->make(true);
+}
+
 
     public function show($id)
     {

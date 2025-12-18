@@ -1838,6 +1838,36 @@ class FeeManagementController extends Controller
         return response()->json(['challans' => $challans]);
     }
 
+    public function getChallansByStudentfeereversal($studentId)
+    {
+        if (!Gate::allows('Dashboard-list')) {
+            abort(403);
+        }
+
+        $challans = FeeBilling::where('student_id', $studentId)
+            ->whereIn('status', ['generated', 'partial']) // ⭐ KEY LINE
+            ->where('outstanding_amount', '>', 0)
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function ($challan) {
+
+                return [
+                    'id'                 => $challan->id,
+                    'challan_number'     => $challan->challan_number,
+                    'billing_month'      => $challan->billing_month,
+                    'total_amount'       => $challan->total_amount,
+                    'paid_amount'        => $challan->paid_amount ?? 0,
+                    'outstanding_amount' => $challan->outstanding_amount,
+                    'due_date'           => $challan->due_date,
+                    'status'             => $challan->status, // ✅ DB truth
+                ];
+            });
+
+        return response()->json(['challans' => $challans]);
+    }
+
+
+
     /**
      * Get Challan Discounts
      */
@@ -3084,6 +3114,10 @@ public function feeBillsByFinancialAid(Request $request)
                 ->lockForUpdate()
                 ->firstOrFail();
 
+                if ($challan->status === 'reversed') {
+                    throw new \Exception('This challan is already reversed');
+                }
+
             if ($challan->status !== 'generated') {
                 throw new \Exception('Only generated challans can be reversed');
             }
@@ -3160,29 +3194,12 @@ public function feeBillsByFinancialAid(Request $request)
             $feeReversalLedger->current_balance += $amount;
             $feeReversalLedger->current_balance_type = 'debit';
             $feeReversalLedger->save();
-
-            // // For Students Receivable Ledger
-            // $studentsReceivableLedger->current_balance -= $amount;
-
-            // // Balance type auto adjust
-            // if ($studentsReceivableLedger->current_balance >= 0) {
-            //     $studentsReceivableLedger->current_balance_type = 'debit';
-            // } else {
-            //     $studentsReceivableLedger->current_balance_type = 'credit';
-            // }
-
-            // $studentsReceivableLedger->save();
-
-            // // for logs 
-            // \Log::info('Students Receivable Updated', [
-            // 'ledger' => $studentsReceivableLedger->code,
-            // 'balance' => $studentsReceivableLedger->current_balance,
-            // 'type' => $studentsReceivableLedger->current_balance_type,
-            // ]);
-
+        
             // 5️⃣ Update Challan
             $challan->update([
-                'status'      => 'paid',
+                'status' => 'reversed',
+                'paid_amount'        => 0,
+                'outstanding_amount' => 0,
             ]);
 
             DB::commit();

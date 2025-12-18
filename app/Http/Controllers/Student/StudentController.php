@@ -444,6 +444,37 @@ class StudentController extends Controller
         }
     }
 
+    // public function studentLeave(Request $request)
+    // {
+    //     $student = Students::find($request->id);
+
+    //     if (! $student) {
+    //         return response()->json(['message' => 'Student not found'], 404);
+    //     }
+
+    //     // --- CHECK PENDING / UNPAID BILLS ---
+    //     $hasPendingBills = FeeBilling::where('student_id', $student->id)
+    //         ->whereNotNull('challan_number')   // challan exists
+    //         ->where('outstanding_amount', '>', 0) // not fully paid
+    //         ->exists();
+
+    //     if ($hasPendingBills) {
+    //         return response()->json([
+    //             'message' => 'Pending dues must be cleared before marking leave'
+    //         ], 422);
+    //     }
+
+    //     // --- UPDATE STUDENT LEAVE INFO ---
+    //     $student->update([
+    //         'leave_reason' => $request->reason,
+    //         'is_active'    => 0,
+    //         'status'       => 0,
+    //         'leave_date'   => now()->toDateString()
+    //     ]);
+
+    //     return response()->json(['message' => 'Student leave updated successfully'], 200);
+    // }
+
     public function studentLeave(Request $request)
     {
         $student = Students::find($request->id);
@@ -452,11 +483,18 @@ class StudentController extends Controller
             return response()->json(['message' => 'Student not found'], 404);
         }
 
-        // --- CHECK PENDING / UNPAID BILLS ---
+        /**
+         * ❗ Block ONLY if:
+         * - challan exists
+         * - outstanding > 0
+         * - status is NOT reversed
+         */
         $hasPendingBills = FeeBilling::where('student_id', $student->id)
-            ->whereNotNull('challan_number')   // challan exists
-            ->where('outstanding_amount', '>', 0) // not fully paid
+            ->whereNotNull('challan_number')
+            ->where('outstanding_amount', '>', 0)
+            ->whereNotIn('status', ['reversed'])
             ->exists();
+            // dd($hasPendingBills);
 
         if ($hasPendingBills) {
             return response()->json([
@@ -464,7 +502,7 @@ class StudentController extends Controller
             ], 422);
         }
 
-        // --- UPDATE STUDENT LEAVE INFO ---
+        // ✅ Allow leave if fee is paid OR reversed
         $student->update([
             'leave_reason' => $request->reason,
             'is_active'    => 0,
@@ -472,8 +510,11 @@ class StudentController extends Controller
             'leave_date'   => now()->toDateString()
         ]);
 
-        return response()->json(['message' => 'Student leave updated successfully'], 200);
+        return response()->json([
+            'message' => 'Student leave updated successfully'
+        ], 200);
     }
+
 
 
     public function studentLeaveAprove(Request $request)
@@ -514,27 +555,62 @@ class StudentController extends Controller
         return view('acadmeic.student.leave_approve');
     }
 
-    public function studentLeaveApproveSubmit(Request $request)
-    {
-        $student = Students::find($request->id);
-    // --- CHECK PENDING / UNPAID BILLS OR ANY CHALLAN EXISTS ---
-        $hasBillsIssue = FeeBilling::where('student_id', $student->id)
-            ->where(function ($q) {
-                $q->where('outstanding_amount', '>', 0)      
-                ->orWhereNotNull('challan_number');       
-            })
-            ->exists();
+    // public function studentLeaveApproveSubmit(Request $request)
+    // {
+    //     $student = Students::find($request->id);
+    // // --- CHECK PENDING / UNPAID BILLS OR ANY CHALLAN EXISTS ---
+    //     $hasBillsIssue = FeeBilling::where('student_id', $student->id)
+    //         ->where(function ($q) {
+    //             $q->where('outstanding_amount', '>', 0)      
+    //             ->orWhereNotNull('challan_number');       
+    //         })
+    //         ->exists();
 
-        if ($hasBillsIssue) {
-            return response()->json([
-                'message' => 'Pending dues must be cleared before leave approval.'
-            ], 422);
-        }
-        $student->approved_by = Auth::user()->id;
-        $student->leave_date = now()->toDateString();
-        $student->save();
-        return response()->json(['message' => 'Student leave approved']);
+    //     if ($hasBillsIssue) {
+    //         return response()->json([
+    //             'message' => 'Pending dues must be cleared before leave approval.'
+    //         ], 422);
+    //     }
+    //     $student->approved_by = Auth::user()->id;
+    //     $student->leave_date = now()->toDateString();
+    //     $student->save();
+    //     return response()->json(['message' => 'Student leave approved']);
+    // }
+
+    public function studentLeaveApproveSubmit(Request $request)
+{
+    $student = Students::find($request->id);
+
+    if (!$student) {
+        return response()->json(['message' => 'Student not found'], 404);
     }
+
+    if (!$student->leave_date) {
+        return response()->json(['message' => 'Leave not requested for this student.'], 422);
+    }
+
+    // ✅ Check for bills that are not reversed and have outstanding
+    $hasPendingBills = FeeBilling::where('student_id', $student->id)
+        ->where('outstanding_amount', '>', 0)
+        ->whereNotIn('status', ['reversed'])
+        ->exists();
+
+    if ($hasPendingBills) {
+        return response()->json([
+            'message' => 'Pending dues must be cleared before leave approval.'
+        ], 422);
+    }
+
+    // ✅ Approve leave regardless of reversed bills
+    $student->update([
+        'approved_by' => auth()->id(),
+        'status' => 2,          // approved
+        'approved_at' => now(),
+    ]);
+
+    return response()->json(['message' => 'Student leave approved']);
+}
+
 
 
 
