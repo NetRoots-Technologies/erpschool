@@ -10,11 +10,11 @@ class ApprovalRoleSeeder extends Seeder
     public function run()
     {
         ApprovalRole::updateOrCreate(
-            ['id' => 1], // fixed ID (optional)
+            ['id' => 2], // HR role ID
             [
-                'name' => 'Super Admin',
-                'level' => 0, // highest priority
-                'description' => 'System Super Administrator with full approval authority',
+                'name' => 'HR',
+                'level' => 1,
+                'description' => 'Human Resource approval authority for leave requests',
             ]
         );
     }

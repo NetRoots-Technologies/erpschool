@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\ApprovalRequest;
+use App\Models\HR\Quotta;
+use App\Models\HR\WorkShift;
+use App\Models\HR\LeaveApproval;
 
 
 class LeaveRequest extends Model
@@ -39,6 +42,23 @@ class LeaveRequest extends Model
    public function approvalRequests()
     {
         return $this->hasMany(ApprovalRequest::class);
+    }
+
+    // public function approvals() {
+    //     return $this->hasMany(LeaveApproval::class);
+    // }
+    // 🔥 THIS IS REQUIRED
+    public function approval()
+    {
+        return $this->hasOne(
+            \App\Models\HR\LeaveApproval::class,
+            'leave_request_id',
+            'id'
+        );
+    }
+
+    public function latestApproval() {
+        return $this->hasOne(LeaveApproval::class)->latestOfMany();
     }
 
    

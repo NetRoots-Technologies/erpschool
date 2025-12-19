@@ -23,26 +23,9 @@ class ManageLeaveService
     {
         
         $data = LeaveRequest::with(['workShift', 'quota', 'employee', 'approvalRequests.approvalAuthority.user'])->get();
-        //dd($data);
+
         return Datatables::of($data)->addIndexColumn()
-            // ->addColumn('action', function ($row) {
-            //     $user = Auth::user();
-            //     $hideClass = ($row->status == 1 || $row->status == 2) ? 'hide' : '';
-
-            //     $btn = '<div style="display: inline-flex">';
-            //     $btn .= '<a href="' . route("hr.manage_leaves.status", [$row->id, 'status' => 1]) . '" class="btn btn-success accept_btn btn-sm ' . $hideClass . '" style="margin-right: 3px"><i class="fas fa-check"></i></a>';
-            //     $btn .= '<a href="' . route("hr.manage_leaves.status", [$row->id, 'status' => 2]) . '" class="btn btn-danger reject_btn btn-sm ' . $hideClass . '"  style="margin-right: 3px;" ><i class="fas fa-times"></i></a>';
-            //     $btn .= '<a href="' . route("hr.manage_leaves.detail", $row->id) . '" class="btn btn-primary btn-sm"><i class="fas fa-eye"></i></a>';
-            //     $btn .= '</div>';
-
-            //     if ($user->hasRole('Admin')) {
-            //         return $btn;
-            //     } elseif ($user->hasRole('team_lead') && ($row->hr_approved == 1 || $row->team_lead_approved == 1 || $row->head_cord_approved == 1)) {
-            //         return $btn;
-            //     }
-
-            //     return '';
-            // })
+        
             ->addColumn('employee', function ($row) {
                 return $row->employee ? $row->employee->name : "N/A";
             })
@@ -71,51 +54,29 @@ class ManageLeaveService
                     return "N/A";
                 }
             })
-
-            //     ->addColumn('approval_info', function ($row) {
-            //     if ($row->approvalRequest) {
-            //         return [
-            //             'status' => $row->approvalRequest->status ?? 'N/A',
-            //             'remarks' => $row->approvalRequest->remarks ?? 'No comment',
-            //             'created_at' => $row->approvalRequest->created_at ?? 'N/A',
-            //         ];
-            //     } else {
-            //         return null;
-            //     }
-        // })
            
         ->addColumn('approval_info', function ($row) {
-    if ($row->approvalRequests->count() > 0) {
-        $item = $row->approvalRequests->first();
-        return [
-            'status' => $item->status ?? 'N/A',
-            'remarks' => $item->remarks ?? 'No comment',
-            'created_at' => $item->created_at ?? 'N/A',
-        ];
-    } else {
-        return null;
-    }
-})
-    // ->addColumn('approval_requests', function ($row) {
-    //             return json_encode($row->approvalRequests->map(function ($item) {
-    //                 return [
-    //                     'status' => $item->status,
-    //                     'remarks' => $item->remarks,
-    //                     'created_at' => $item->created_at ? $item->created_at->format('Y-m-d H:i:s') : 'N/A',
-    //                     'approved_by' => $item->approved_by ?? 'N/A',
-    //                     'approver_name' => $item->approvalAuthority->user->name ?? 'N/A', // This will now work
-    //                 ];
-    //             }));
-    //         })
+            if ($row->approvalRequests->count() > 0) {
+                $item = $row->approvalRequests->first();
+                return [
+                    'status' => $item->status ?? 'N/A',
+                    'remarks' => $item->remarks ?? 'No comment',
+                    'created_at' => $item->created_at ?? 'N/A',
+                ];
+            } else {
+                return null;
+            }
+        })
 
-        ->addColumn('approval_requests', function ($row) {
-    return json_encode($row->approvalRequests->map(function ($item) {
-        $statusText = match($item->status) {
-            0 => 'Pending',
-            1 => 'Approved',
-            2 => 'Rejected',
-            default => 'N/A',
-        };
+
+            ->addColumn('approval_requests', function ($row) {
+            return json_encode($row->approvalRequests->map(function ($item) {
+            $statusText = match($item->status) {
+                0 => 'Pending',
+                1 => 'Approved',
+                2 => 'Rejected',
+                default => 'N/A',
+            };
         return [
             'status' => $statusText,
             'remarks' => $item->remarks ?? 'No comment',
@@ -123,8 +84,8 @@ class ManageLeaveService
             'approved_by' => $item->approved_by ?? 'N/A',
             'approver_name' => $item->approvalAuthority->user->name ?? 'N/A',
         ];
-    }));
-})
+        }));
+    })
 
 
             //->rawColumns(['action', 'employee', 'Leave Type', 'status', 'approved_by', 'approval_info', 'approval_requests'])
@@ -136,28 +97,44 @@ class ManageLeaveService
 
     public function status($request, $id)
     {
-        
-        $leaveRequest = LeaveRequest::find($id);
+        $leaveRequest = LeaveRequest::findOrFail($id);
 
-        $user = Auth::user();
+        // 🔹 Current user ki authority nikalo
+        $approvalRequest = ApprovalRequest::where('leave_request_id', $id)
+            ->whereHas('approvalAuthority', function ($q) {
+                $q->where('user_id', Auth::id());
+            })
+            ->first();
 
-        if ($user->hasRole('Admin')) {
-            $leaveRequest->hr_approved = $request->get('status');
-        } elseif ($user->hasRole('team_lead')) {
-            $leaveRequest->team_lead_approved = $request->get('status');
-        } elseif ($user->hasRole('head_cord')) {
-            $leaveRequest->head_cord_approved = $request->get('status');
-        } elseif ($user->hasRole('hco')) {
-            $leaveRequest->hco_approved = $request->get('status');
+        if (!$approvalRequest) {
+            abort(403, 'You are not authorized to approve this leave');
         }
 
-        $leaveRequest->status = $request->get('status');
+        // 🔹 ApprovalRequest update
+        $approvalRequest->update([
+            'status' => $request->status,
+            'remarks' => $request->remarks ?? null,
+            'approved_by' => Auth::user()->name,
+        ]);
 
-        $leaveRequest->update();
+        // 🔹 Agar approve hua
+        if ($request->status == 1) {
+            $leaveRequest->update([
+                'status' => 1,
+                'hr_approved' => 1,
+            ]);
+        }
 
-        return $leaveRequest;
+        // 🔹 Agar reject hua
+        if ($request->status == 2) {
+            $leaveRequest->update([
+                'status' => 2,
+            ]);
+        }
 
+        return true;
     }
+
 
     public function leave_balance($request)
     {

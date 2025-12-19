@@ -19,6 +19,10 @@ use Yajra\DataTables\Facades\DataTables;
 use App\Models\ApprovalAuthority;
 use App\Models\ApprovalRequest;
 use App\Models\ApprovalRole;
+use App\Models\HR\EmployeeLeave;
+use App\Models\HR\EmployeeLeaves;
+use Carbon\Carbon;
+
 class LeaveRequestService
 {
 
@@ -154,6 +158,19 @@ class LeaveRequestService
             })
             ->orderBy('approval_role_id')
             ->get();
+
+            EmployeeLeaves::create([
+            'leave_title'        => $leaves->leave_type,
+            'employee_id'        => $request->employee_id,
+            'leave_type'         => $request->leave_type_id,
+            'leave_reason'       => $request->comment,
+            'leave_date'         => $request->start_date . ' to ' . $request->end_date,
+            'hod_approval'       => 0,
+            'admin_approval'     => 0,
+            'hr_approval'        => 0,
+            'team_lead_approval' => 0,
+        ]);
+
 
         if ($approvalAuthorities->isNotEmpty()) {
             $firstLevelAuthority = $approvalAuthorities->first(); // Level 1 only

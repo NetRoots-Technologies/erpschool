@@ -42,7 +42,7 @@ use App\Http\Controllers\HR\EmployeeAllowanceController;
 use App\Http\Controllers\HR\CalculateComissionController;
 use App\Http\Controllers\HR\StudentAssignSessionController;
 use App\Http\Controllers\HR\TeacherAssignSessionController;
-
+use App\Http\Controllers\HR\ApproveLeaveController;
 
 Route::group(['middleware' => ['auth'], 'prefix' => 'hr', 'as' => 'hr.'], function () {
     //    for attendance detail
@@ -196,6 +196,9 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'hr', 'as' => 'hr.'], functi
 
     Route::post('/import-employee', [EmployeeController::class, 'import'])->name('import.employee');
 
+    Route::get('approve_leaves', [ApproveLeaveController::class, 'index'])->name('approve_leaves.index');
+    Route::post('approve_leaves/approve/{id}', [ApproveLeaveController::class, 'approve'])->name('approve_leaves.approve');
+    Route::post('approve_leaves/reject/{id}', [ApproveLeaveController::class, 'reject'])->name('approve_leaves.reject');
 
 });
 
