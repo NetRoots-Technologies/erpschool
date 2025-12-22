@@ -27,9 +27,16 @@
                 <td>{{ $row->Quota->leave_type ?? 'N/A' }}</td>
                 <td>{{ $row->start_date }}</td>
                 <td>{{ $row->end_date }}</td>
-                <td id="status-{{ $row->id }}">
-                    {{ $row->status ?? 'Pending' }}
+                        <td id="status-{{ $row->id }}">
+                    @if($row->status == 1)
+                        <span class="badge bg-success">Approved</span>
+                    @elseif($row->status == 2)
+                        <span class="badge bg-danger">Rejected</span>
+                    @else
+                        <span class="badge bg-warning">Pending</span>
+                    @endif
                 </td>
+
 
                 <td>
                     @if($row->status == null || $row->status == 'Pending')
