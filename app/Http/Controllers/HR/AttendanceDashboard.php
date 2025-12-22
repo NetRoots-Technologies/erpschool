@@ -355,8 +355,36 @@ class AttendanceDashboard extends Controller
                                 ->whereDate('attendance_date', $date)
                                 ->first();
 
-                            if ($attendance && $attendance->timeIn && $attendance->timeOut) {
+                            // if ($attendance && $attendance->timeIn && $attendance->timeOut) {
 
+                            //     $present = true;
+                            //     $absent = false;
+                            //     $leave = false;
+
+                            //     $checkin_time = $attendance->timeIn;
+                            //     $checkout_time = $attendance->timeOut;
+
+                            //     $lateAndOvertime = GeneralSettingsHelper::calculateLateAndOvertime(
+                            //         $startTime,
+                            //         $endTime,
+                            //         $checkin_time,
+                            //         $checkout_time,
+                            //         $gracePeriod,
+                            //         $date,
+                            //     );
+                            //     $late = $lateAndOvertime['late'];
+
+                            //     $lateTime = $lateAndOvertime['lateTime'];
+
+                            //     $overtime = $lateAndOvertime['overtime'];
+
+                            // }
+                            if ($attendance) {
+
+                            // ✅ Present
+                            if ($attendance->status == 1 && $attendance->timeIn && $attendance->timeOut) {
+
+                                $status = 1;
                                 $present = true;
                                 $absent = false;
                                 $leave = false;
@@ -372,13 +400,53 @@ class AttendanceDashboard extends Controller
                                     $gracePeriod,
                                     $date,
                                 );
+
                                 $late = $lateAndOvertime['late'];
-
                                 $lateTime = $lateAndOvertime['lateTime'];
-
                                 $overtime = $lateAndOvertime['overtime'];
 
                             }
+
+                            // ✅ Approved Leave
+                            elseif ($attendance->status == 2) {
+
+                                $status = 2;
+                                $present = false;
+                                $absent = false;
+                                $leave = true;
+
+                                // Use actual check-in/out if available, otherwise null
+                                $checkin_time = $attendance->timeIn ?? null;
+                                $checkout_time = $attendance->timeOut ?? null;
+
+                                if ($checkin_time && $checkout_time) {
+                                    // Calculate late and overtime even for approved leave
+                                    $lateAndOvertime = GeneralSettingsHelper::calculateLateAndOvertime(
+                                        $startTime,
+                                        $endTime,
+                                        $checkin_time,
+                                        $checkout_time,
+                                        $gracePeriod,
+                                        $date,
+                                    );
+
+                                    $late = $lateAndOvertime['late'];
+                                    $lateTime = $lateAndOvertime['lateTime'];
+                                    $overtime = $lateAndOvertime['overtime'];
+                                } else {
+                                    $late = false;
+                                    $overtime = false;
+                                    $lateTime = '00:00:00';
+                                    $lateAndOvertime = [
+                                        'total_hours_worked' => '—',
+                                        'overtime_hours' => '—'
+                                    ];
+                                }
+                            }
+
+
+                        }
+
                         } else {
                             $offDay = true;
                         }

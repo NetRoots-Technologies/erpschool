@@ -117,7 +117,7 @@
                                 <td>{{ $formattedDate }}</td>
                                 <td>{{ $day }}</td>
 
-                                @if($attendanceData['present'] == true )
+                                {{-- @if($attendanceData['present'] == true )
                                     <td><p style="color: darkgreen;">Present</p></td>
                                     <td style="color: darkgreen;">{!! $attendanceData['checkin_time'] ?? 'N/A' !!}</td>
                                     <td style="color: darkgreen;">{!! $attendanceData['checkout_time'] ?? 'N/A' !!}</td>
@@ -135,7 +135,40 @@
                                     <td></td>
                                 @else
                                     <td colspan="6">Unknown status</td>
-                                @endif
+                                @endif --}}
+
+                                @if($attendanceData['present'] == true)
+
+                                <td><p style="color: darkgreen;">Present</p></td>
+                                <td style="color: darkgreen;">{{ $attendanceData['checkin_time'] ?? 'N/A' }}</td>
+                                <td style="color: darkgreen;">{{ $attendanceData['checkout_time'] ?? 'N/A' }}</td>
+                                <td style="color: darkgreen;">{{ $attendanceData['total_hours_worked'] ?? 'N/A' }}</td>
+
+                                @elseif($attendanceData['leave'] == true)
+                                    <td><p style="color: #0dcaf0;"><b>Approved Leave</b></p></td>
+                                    <td>{{ $attendanceData['checkin_time'] ?? '-' }}</td>
+                                    <td>{{ $attendanceData['checkout_time'] ?? '-' }}</td>
+                                    <td>{{ $attendanceData['total_hours_worked'] ?? '-' }}</td>
+
+
+                            @elseif($attendanceData['offDay'] == true)
+
+                                <td><p style="color: blue;">Day Off</p></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+
+                            @elseif($attendanceData['absent'] == true)
+
+                                <td><p style="color : red;">Absent</p></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+
+                            @else
+                                <td colspan="6">Unknown status</td>
+                            @endif
+
                             </tr>
                         @endif
                     @endforeach
