@@ -1023,8 +1023,12 @@
 
                             @if (Gate::allows('Manage Leave List'))
                                 <li><a class="slide-item {{ request()->is('hr/manage_leaves*') ? 'active' : '' }}"
-                                        href="{{ route('hr.manage_leaves.index') }}">Manage Leaves</a></li>
+                                        href="{{ route('hr.manage_leaves.index') }}">Listing Leaves</a></li>
                             @endif
+                             {{-- @if (Gate::allows('Manage Leave List')) --}}
+                                <li><a class="slide-item {{ request()->is('hr/approve_leaves*') ? 'active' : '' }}"
+                                        href="{{ route('hr.approve_leaves.index') }}">Approve Leaves</a></li>
+                            {{-- @endif --}}
                         </ul>
                     </li>
                 @endif

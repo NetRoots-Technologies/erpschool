@@ -31,7 +31,7 @@
 @section('content')
 <div class="container-fluid">
     <div class="row w-100 mt-4">
-        <h3 class="text-22 text-center text-bold w-100 mb-4">Manage Leave</h3>
+        <h3 class="text-22 text-center text-bold w-100 mb-4">Listing Leave</h3>
     </div>
     <div class="row w-100 text-center">
         <div class="col-12">
