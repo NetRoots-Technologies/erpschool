@@ -97,7 +97,7 @@ Payroll | Generate
                 <input type="hidden" name="hrm_employee_id" id="hrm_employee_id">
                 <input type="hidden" name="generated_month_year" id="generated_month_year">
                 <div class="row align-items-center my-3 date-div d-none">
-                    <div class="col-2 text-end">
+                    {{-- <div class="col-2 text-end">
                         <label for="bank_account_ledger" class="form-label">Bank Account Ledger</label>
                     </div>
                     <div class="col-2">
@@ -109,7 +109,7 @@ Payroll | Generate
                             </option>
                             @endforeach
                         </select>
-                    </div>
+                    </div> --}}
                     <div class="col-2 text-end">
                         <label for="start_date" class="form-label">Start Date:</label>
                     </div>
@@ -381,7 +381,7 @@ Payroll | Generate
                 "department_id": $("#selectDepartment").val(),
                 "hrm_employee_id": $("#hrm_employee_id").val(),
                 "generated_month_year": $("#generated_month_year").val(),
-                "bank_account_ledger": $("#bank_account_ledger").val(),
+                // "bank_account_ledger": $("#bank_account_ledger").val(),
                 "start_date": $("#start_date").val(),
                 "end_date": $("#end_date").val(),
                 "total_present": total_present,
