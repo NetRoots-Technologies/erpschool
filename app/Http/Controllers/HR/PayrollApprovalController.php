@@ -10,6 +10,7 @@ use App\Models\HR\Payroll;
 use App\Mail\SalarySlipMail;
 use Illuminate\Http\Request;
 use App\Models\Accounts\AccountLedger;
+use App\Models\Accounts\AccountGroup;
 use App\Models\HR\SalarySlip;
 use App\Models\Admin\Branches;
 use App\Services\LedgerService;
@@ -199,25 +200,127 @@ class PayrollApprovalController extends Controller
                     ]);
                     \Log::info("Salary expense ledger auto-created for branch: {$branch->name}");
                 }
+                // Get or create Salary Payable ledger (Accounts Payable for salary)
+                $salaryPayableGroup = AccountGroup::where('name', 'Salaries Payable Account')
+                    ->orWhere('code', '040020020002')
+                    ->first();
+                
+                if (!$salaryPayableGroup) {
+                    // Try to find any liability group under Accrued Liabilities
+                    $accruedLiabGroup = AccountGroup::where('name', 'Accrued Liabilities')
+                        ->orWhere('code', '04002002')
+                        ->first();
+                    
+                    if ($accruedLiabGroup) {
+                        $salaryPayableGroup = AccountGroup::where('parent_id', $accruedLiabGroup->id)
+                            ->where('type', 'liability')
+                            ->first();
+                    }
+                }
+                
+                if (!$salaryPayableGroup) {
+                    // Try to find any liability group
+                    $salaryPayableGroup = AccountGroup::where('type', 'liability')
+                        ->where('level', 2)
+                        ->first();
+                }
+
+                $salaryPayableLedger = AccountLedger::where('name', 'LIKE', '%Salary Payable%')
+                    ->whereHas('accountGroup', function($q) {
+                        $q->where('type', 'liability');
+                    })
+                    ->where('linked_module', 'branch')
+                    ->where('linked_id', $payrollApprovals->branch_id)
+                    ->first();
+
+                if (!$salaryPayableLedger && $salaryPayableGroup) {
+                    $salaryPayableLedger = AccountLedger::create([
+                        'name' => 'Salary Payable - ' . $branch->name,
+                        'code' => 'LIA-SAL-PAY-' . $payrollApprovals->branch_id . '-' . time(),
+                        'description' => 'Salary payable liability for ' . $branch->name,
+                        'account_group_id' => $salaryPayableGroup->id,
+                        'opening_balance' => 0,
+                        'opening_balance_type' => 'credit',
+                        'current_balance' => 0,
+                        'current_balance_type' => 'credit',
+                        'linked_module' => 'branch',
+                        'linked_id' => $payrollApprovals->branch_id,
+                        'is_active' => true,
+                        'created_by' => auth()->id() ?? 1
+                    ]);
+                    \Log::info("Salary Payable ledger auto-created for branch: {$branch->name}");
+                }
+
                 foreach ($payrollApprovals->payroll as $payroll) {
                     if ($payroll->cash_in_hand == 0 && $payroll->cash_in_bank == 0) {
                         throw new Exception("Cash in bank and Bank can not be 0 for " . $payroll->employee->name);
                     }
 
-                    $data = [
+                    // STEP 1: Payroll Accrual JE - Debit Salary Expense, Credit Salary Payable (AP)
+                    $accrualData = [
+                        'entry_id' => $entry->id,
+                        'balanceType' => "d",
+                        'entry_type_id' => 1,
+                        'narration' => "Payroll Accrual for Employee {$payroll->employee->name}, Month {$salary->generated_month}",
+                    ];
+
+                    if ($salaryPayableLedger && $payroll_ledger) {
+                        // Debit: Salary Expense (expense increases)
+                        $this->ledgerService->createEntryItems(array_merge($accrualData, [
+                            'ledger_id' => $payroll_ledger->id,
+                            'balanceType' => "d",
+                            'amount' => $payroll->net_salary
+                        ]));
+                        
+                        // Credit: Salary Payable / Accounts Payable (liability increases)
+                        $this->ledgerService->createEntryItems(array_merge($accrualData, [
+                            'ledger_id' => $salaryPayableLedger->id,
+                            'balanceType' => "c",
+                            'amount' => $payroll->net_salary
+                        ]));
+                    }
+
+                    // STEP 2: Salary Disbursement - Debit Salary Payable, Credit Cash/Bank
+                    $disbursementData = [
                         'entry_id' => $entry->id,
                         'balanceType' => "c",
                         'entry_type_id' => 1,
-                        'narration' => "Approving Paylip of Month {$salary->generated_month}, for Employee {$payroll->employee->name}",
+                        'narration' => "Salary Disbursement for Employee {$payroll->employee->name}, Month {$salary->generated_month}",
                     ];
 
-                    if ($payroll->cash_in_hand > 0) {
-                        $this->ledgerService->createEntryItems(array_merge($data, ['ledger_id' => $cash_ledger->id, 'amount' => $payroll->cash_in_hand]));
+                    if ($salaryPayableLedger) {
+                        // Debit: Salary Payable (liability decreases)
+                        if ($payroll->cash_in_hand > 0) {
+                            $this->ledgerService->createEntryItems(array_merge($disbursementData, [
+                                'ledger_id' => $salaryPayableLedger->id,
+                                'balanceType' => "d",
+                                'amount' => $payroll->cash_in_hand
+                            ]));
+                            // Credit: Cash (asset decreases)
+                            $this->ledgerService->createEntryItems(array_merge($disbursementData, [
+                                'ledger_id' => $cash_ledger->id,
+                                'balanceType' => "c",
+                                'amount' => $payroll->cash_in_hand
+                            ]));
+                        }
+                        
+                        if ($payroll->cash_in_bank > 0 && $bank_ledger) {
+                            // Debit: Salary Payable (liability decreases)
+                            $this->ledgerService->createEntryItems(array_merge($disbursementData, [
+                                'ledger_id' => $salaryPayableLedger->id,
+                                'balanceType' => "d",
+                                'amount' => $payroll->cash_in_bank
+                            ]));
+                            // Credit: Bank (asset decreases)
+                            $this->ledgerService->createEntryItems(array_merge($disbursementData, [
+                                'ledger_id' => $bank_ledger->id,
+                                'balanceType' => "c",
+                                'amount' => $payroll->cash_in_bank
+                            ]));
+                        }
+                    } else {
+                        throw new Exception("Salary Payable ledger not found. Cannot process salary disbursement.");
                     }
-                    if ($payroll->cash_in_bank > 0) {
-                        $this->ledgerService->createEntryItems(array_merge($data, ['ledger_id' => $bank_ledger->id, 'amount' => $payroll->cash_in_bank]));
-                    }
-                    $this->ledgerService->createEntryItems(array_merge($data, ['ledger_id' => $payroll_ledger->id, 'balanceType' => "d", 'amount' => $payroll->net_salary]));
 
 
                     $groups['eobi_provident_fund'] = config('constants.FixedGroups.EOBI');
@@ -233,13 +336,15 @@ class PayrollApprovalController extends Controller
                         $ledgers = $this->ledgerService->getLedgers($group, Branches::class, $payrollApprovals->branch_id);
                         // dd($ledgers , $payroll->fund_values[$key] , 'e');
                         foreach ($ledgers as $ledger) {
-                            $data['amount'] = $payroll->fund_values[$key];
-                            $data['entry_id'] = $entry->id;
-                            $data['balanceType'] = $ledger->account_type_id == 2 ? "c" : "d";
-                            $data['narration'] = "Entry of " . $key . " For " . $payroll->employee->name;
-                            $data['ledger_id'] = $ledger->id;
+                            if (isset($payroll->fund_values[$key])) {
+                                $data['amount'] = $payroll->fund_values[$key];
+                                $data['entry_id'] = $entry->id;
+                                $data['balanceType'] = $ledger->account_type_id == 2 ? "c" : "d";
+                                $data['narration'] = "Entry of " . $key . " For " . $payroll->employee->name;
+                                $data['ledger_id'] = $ledger->id;
 
-                            $this->ledgerService->createEntryItems($data);
+                                $this->ledgerService->createEntryItems($data);
+                            }
                         }
                     }
 
@@ -247,27 +352,34 @@ class PayrollApprovalController extends Controller
                     // creating Emplyeee Benifits
 
                     // eobi
-
-                    $this->employeeBenefitService->createEmployeeBenefit($payroll->employee_id, $compnay_eobi['company'], $payroll->fund_values['eobi_provident_fund']);
+                    if ($compnay_eobi && isset($compnay_eobi['company']) && isset($payroll->fund_values['eobi_provident_fund'])) {
+                        $this->employeeBenefitService->createEmployeeBenefit($payroll->employee_id, $compnay_eobi['company'], $payroll->fund_values['eobi_provident_fund']);
+                    }
+                    
                     // PF
-                    $this->employeeBenefitService->createEmployeeBenefit($payroll->employee_id, $payroll->fund_values['provident_fund'], $payroll->fund_values['provident_fund'], "PF");
+                    if (isset($payroll->fund_values['provident_fund'])) {
+                        $this->employeeBenefitService->createEmployeeBenefit($payroll->employee_id, $payroll->fund_values['provident_fund'], $payroll->fund_values['provident_fund'], "PF");
+                    }
+                    
                     //SS
-                    $percentage = $socialSecurity['percentage'];
-                    $min_salary = $socialSecurity['min-salary'];
-                    if ($min_salary <= (int) $payroll->employee->grossSalary) {
-                        $ss = ((int) $payroll->employee->grossSalary * (int) $percentage) / 100;
-                        $this->employeeBenefitService->createEmployeeBenefit($payroll->employee_id, $ss, 0, "SS");
-                        $groups['Social_Security'] = config('constants.FixedGroups.SS');
+                    if ($socialSecurity && isset($socialSecurity['percentage']) && isset($socialSecurity['min-salary'])) {
+                        $percentage = $socialSecurity['percentage'];
+                        $min_salary = $socialSecurity['min-salary'];
+                        if ($min_salary <= (int) $payroll->employee->grossSalary) {
+                            $ss = ((int) $payroll->employee->grossSalary * (int) $percentage) / 100;
+                            $this->employeeBenefitService->createEmployeeBenefit($payroll->employee_id, $ss, 0, "SS");
+                            $groups['Social_Security'] = config('constants.FixedGroups.SS');
 
-                        $ledgers = $this->ledgerService->getLedgers($groups['Social_Security'], Branches::class, $payrollApprovals->branch_id);
-                        foreach ($ledgers as $ledger) {
-                            $data['amount'] = $ss;
-                            $data['entry_id'] = $entry->id;
-                            $data['balanceType'] = $ledger->account_type_id == 2 ? "c" : "d";
-                            $data['narration'] = "Entry of Social_Security  For " . $payroll->employee->name;
-                            $data['ledger_id'] = $ledger->id;
+                            $ledgers = $this->ledgerService->getLedgers($groups['Social_Security'], Branches::class, $payrollApprovals->branch_id);
+                            foreach ($ledgers as $ledger) {
+                                $data['amount'] = $ss;
+                                $data['entry_id'] = $entry->id;
+                                $data['balanceType'] = $ledger->account_type_id == 2 ? "c" : "d";
+                                $data['narration'] = "Entry of Social_Security  For " . $payroll->employee->name;
+                                $data['ledger_id'] = $ledger->id;
 
-                            $this->ledgerService->createEntryItems($data);
+                                $this->ledgerService->createEntryItems($data);
+                            }
                         }
                     }
                     // ----------------------
