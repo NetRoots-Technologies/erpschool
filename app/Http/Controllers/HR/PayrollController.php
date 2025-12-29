@@ -28,6 +28,7 @@ use App\Helpers\GeneralSettingsHelper;
 use App\Models\Admin\Bank;
 use App\Models\Admin\BankAccount;
 use App\Models\Accounts\AccountLedger;
+use App\Models\Accounts\AccountGroup;
 
 class PayrollController extends Controller
 {
@@ -547,6 +548,81 @@ class PayrollController extends Controller
                 return response()->json(['error' => "Payroll for employee(s) $employeeNamesString already exists."], 422);
             }
            
+            // Get default bank account ledger if not provided
+            if (empty($data['bank_account_ledger'])) {
+                $bank_accounts = BankAccount::where('type', 'MOA')->get();
+                
+                if ($bank_accounts->isEmpty()) {
+                    return response()->json([
+                        'error' => 'No bank account found. Please create a bank account (Type: MOA) first in Admin → Bank Accounts.',
+                        'message' => 'Bank account configuration required'
+                    ], 422);
+                }
+                
+                // Try to find existing ledger
+                $bank_account_ids = $bank_accounts->pluck('id');
+                $default_ledger = AccountLedger::where('linked_module', BankAccount::class)
+                    ->whereIn('linked_id', $bank_account_ids)
+                    ->where('is_active', true)
+                    ->first();
+                
+                // If no ledger found, auto-create for first MOA bank account
+                if (!$default_ledger) {
+                    $first_bank_account = $bank_accounts->first();
+                    
+                    // Get or create Bank Accounts group
+                    $assetsId = AccountGroup::where('name', 'Assets')->orWhere('code', 'AST-000')->value('id');
+                    $bankGroup = AccountGroup::firstOrCreate(
+                        ['name' => 'Bank Accounts'],
+                        [
+                            'code' => 'AST-BANK-' . time(),
+                            'parent_id' => AccountGroup::where('name', 'Current Assets')->value('id') ?? $assetsId,
+                            'description' => 'Bank accounts under current assets',
+                            'is_active' => 1,
+                            'created_by' => auth()->id(),
+                            'updated_by' => auth()->id(),
+                        ]
+                    );
+                    
+                    // Create ledger for the bank account
+                    $default_ledger = AccountLedger::create([
+                        'name'                  => 'Bank - ' . $first_bank_account->account_no,
+                        'code'                  => 'BANK-' . str_pad($first_bank_account->id, 4, '0', STR_PAD_LEFT) . '-' . time(),
+                        'description'           => 'Ledger for bank account #' . $first_bank_account->account_no,
+                        'account_group_id'      => $bankGroup->id,
+                        'opening_balance'       => 0,
+                        'opening_balance_type'  => 'debit',
+                        'current_balance'       => 0,
+                        'current_balance_type'  => 'debit',
+                        'currency_id'           => 1, // PKR
+                        'is_active'             => 1,
+                        'is_system'             => 0,
+                        'linked_module'         => BankAccount::class,
+                        'linked_id'             => $first_bank_account->id,
+                        'branch_id'             => $data['branch_id'] ?? null,
+                        'created_by'            => auth()->id(),
+                        'updated_by'            => auth()->id(),
+                    ]);
+                    
+                    \Log::info("Auto-created bank account ledger for Bank Account ID: {$first_bank_account->id}");
+                }
+                
+                $data['bank_account_ledger'] = $default_ledger->id;
+            }
+            
+            // Validate that the provided ledger exists and is active
+            if (!empty($data['bank_account_ledger'])) {
+                $ledger = AccountLedger::where('id', $data['bank_account_ledger'])
+                    ->where('is_active', true)
+                    ->first();
+                if (!$ledger) {
+                    return response()->json([
+                        'error' => 'Selected bank account ledger is invalid or inactive. Please select a valid bank account.',
+                        'message' => 'Invalid bank account ledger'
+                    ], 422);
+                }
+            }
+
             $payrollApproval = PayrollApproval::create([
                 'hrm_employee_id' => $data['hrm_employee_id'],
                 'branch_id' => $data['branch_id'],

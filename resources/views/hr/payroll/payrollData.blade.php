@@ -82,10 +82,22 @@ $offDayCount = 0;
 
             <input type="hidden" name="total_salary[]" value="{!! $employeeData['totalSalary'] == null ? 0 : $employeeData['totalSalary'] !!}">
 
-            <input type="number" name="cash_in_hand[]" value="" class="cash-in-hand">
-        </td>
-        <td>
-            <input type="number" name="cash_in_bank[]" value="" class="cash-in-bank">
+            <div class="payment-method-wrapper" style="display: flex; align-items: center; gap: 8px;">
+                <select name="payment_method[]" class="form-select form-select-sm payment-method-select" style="min-width: 110px; font-size: 13px; padding: 6px 10px;">
+                    <option value="cash">Cash</option>
+                    <option value="bank" selected>Bank</option>
+                </select>
+                <input type="number" 
+                       name="payment_amount[]" 
+                       value="{!! $employeeData['totalSalary'] == null ? 0 : $employeeData['totalSalary'] !!}" 
+                       class="form-control form-control-sm payment-amount" 
+                       style="flex: 1; min-width: 120px; font-size: 13px; padding: 6px 10px; text-align: right;" 
+                       placeholder="0.00"
+                       step="0.01"
+                       min="0">
+            </div>
+            <input type="hidden" name="cash_in_hand[]" class="cash-in-hand" value="0">
+            <input type="hidden" name="cash_in_bank[]" class="cash-in-bank" value="{!! $employeeData['totalSalary'] == null ? 0 : $employeeData['totalSalary'] !!}">
         </td>
     </tr>
 
@@ -127,36 +139,78 @@ $offDayCount = 0;
         const employeesData = @json($employees_data);
         localStorage.setItem("employeesData", JSON.stringify(employeesData));
 
-        $(document).on('input', '.cash-in-hand', function() {
+        // Initialize default values for payment method (Bank) - set cash_in_bank = net_salary by default
+        $('.payment-method-select').each(function() {
             var $row = $(this).closest('tr');
-            var netSalary = parseFloat($row.find('.net_salary').text()) || 0;
-            var cashInHand = parseFloat($(this).val()) || 0;
-
-            if (cashInHand > netSalary) {
-                toastr.warning("Value Exceeds!");
-                $(this).val(netSalary);
-                cashInHand = netSalary;
+            var netSalary = parseFloat($row.find('.net_salary').text().replace(/,/g, '')) || 0;
+            var paymentMethod = $(this).val();
+            
+            // Format number with 2 decimal places
+            netSalary = parseFloat(netSalary.toFixed(2));
+            
+            // Set default amount to net salary when bank is selected
+            if (paymentMethod === 'bank' && netSalary > 0) {
+                $row.find('.payment-amount').val(netSalary);
+                $row.find('.cash-in-hand').val(0);
+                $row.find('.cash-in-bank').val(netSalary);
+            } else if (paymentMethod === 'cash' && netSalary > 0) {
+                $row.find('.payment-amount').val(netSalary);
+                $row.find('.cash-in-hand').val(netSalary);
+                $row.find('.cash-in-bank').val(0);
             }
-
-            var cashInBank = netSalary - cashInHand;
-            cashInBank = parseFloat(cashInBank.toFixed(2));
-            $row.find('.cash-in-bank').val(cashInBank);
         });
 
-        $(document).on('input', '.cash-in-bank', function() {
+        // Handle payment method and amount
+        $(document).on('input', '.payment-amount', function() {
             var $row = $(this).closest('tr');
-            var netSalary = parseFloat($row.find('.net_salary').text()) || 0;
-            var cashInBank = parseFloat($(this).val()) || 0;
+            var netSalaryText = $row.find('.net_salary').text().replace(/,/g, '');
+            var netSalary = parseFloat(netSalaryText) || 0;
+            var paymentAmount = parseFloat($(this).val()) || 0;
+            var paymentMethod = $row.find('.payment-method-select').val();
 
-            if (cashInBank > netSalary) {
-                toastr.warning("Value Exceeds!");
-                $(this).val(netSalary);
-                cashInBank = netSalary;
+            // Format payment amount
+            paymentAmount = parseFloat(paymentAmount.toFixed(2));
+
+            if (paymentAmount > netSalary) {
+                toastr.warning("Value Exceeds Net Salary!");
+                $(this).val(parseFloat(netSalary.toFixed(2)));
+                paymentAmount = parseFloat(netSalary.toFixed(2));
             }
 
-            var cashInHand = netSalary - cashInBank;
-            cashInHand = parseFloat(cashInHand.toFixed(2));
-            $row.find('.cash-in-hand').val(cashInHand);
+            // Update hidden fields based on payment method
+            if (paymentMethod === 'cash') {
+                $row.find('.cash-in-hand').val(paymentAmount);
+                $row.find('.cash-in-bank').val(0);
+            } else {
+                $row.find('.cash-in-hand').val(0);
+                $row.find('.cash-in-bank').val(paymentAmount);
+            }
+        });
+
+        $(document).on('change', '.payment-method-select', function() {
+            var $row = $(this).closest('tr');
+            var paymentAmount = parseFloat($row.find('.payment-amount').val()) || 0;
+            var paymentMethod = $(this).val();
+            var netSalaryText = $row.find('.net_salary').text().replace(/,/g, '');
+            var netSalary = parseFloat(netSalaryText) || 0;
+
+            // If no amount is set or amount is 0, set it to net salary
+            if (paymentAmount <= 0 && netSalary > 0) {
+                paymentAmount = parseFloat(netSalary.toFixed(2));
+                $row.find('.payment-amount').val(paymentAmount);
+            }
+
+            // Format payment amount
+            paymentAmount = parseFloat(paymentAmount.toFixed(2));
+
+            // Update hidden fields based on payment method
+            if (paymentMethod === 'cash') {
+                $row.find('.cash-in-hand').val(paymentAmount);
+                $row.find('.cash-in-bank').val(0);
+            } else {
+                $row.find('.cash-in-hand').val(0);
+                $row.find('.cash-in-bank').val(paymentAmount);
+            }
         });
 
     });

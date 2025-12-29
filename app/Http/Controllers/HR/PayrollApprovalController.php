@@ -260,7 +260,6 @@ class PayrollApprovalController extends Controller
                         $groups['Social_Security'] = config('constants.FixedGroups.SS');
 
                         $ledgers = $this->ledgerService->getLedgers($groups['Social_Security'], Branches::class, $payrollApprovals->branch_id);
-                        dd(  $ledgers , '3');
                         foreach ($ledgers as $ledger) {
                             $data['amount'] = $ss;
                             $data['entry_id'] = $entry->id;

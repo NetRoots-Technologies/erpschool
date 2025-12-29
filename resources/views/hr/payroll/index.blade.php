@@ -10,6 +10,25 @@ Payroll | Generate
         font-weight: 500;
         font-size: 14px;
     }
+    .payment-method-wrapper {
+        min-width: 240px;
+    }
+    .payment-method-wrapper .form-select-sm,
+    .payment-method-wrapper .form-control-sm {
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    }
+    .payment-method-wrapper .form-select-sm:focus,
+    .payment-method-wrapper .form-control-sm:focus {
+        border-color: #86b7fe;
+        outline: 0;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+    .payment-method-wrapper .form-control-sm {
+        font-weight: 500;
+        color: #495057;
+    }
 </style>
 @endsection
 
@@ -96,20 +115,8 @@ Payroll | Generate
                 <input type="hidden" name="department_id" id="department_id">
                 <input type="hidden" name="hrm_employee_id" id="hrm_employee_id">
                 <input type="hidden" name="generated_month_year" id="generated_month_year">
+                <input type="hidden" name="bank_account_ledger" id="bank_account_ledger" value="{{ !empty($ledgers) && $ledgers->count() > 0 ? $ledgers->first()->id : '' }}">
                 <div class="row align-items-center my-3 date-div d-none">
-                    {{-- <div class="col-2 text-end">
-                        <label for="bank_account_ledger" class="form-label">Bank Account Ledger</label>
-                    </div>
-                    <div class="col-2">
-                        <select class="form-control" name="bank_account_ledger" id="bank_account_ledger" required>
-                            <option value="" disabled selected>Select Bank Account</option>
-                            @foreach($ledgers as $bank_account)
-                            <option value="{{ $bank_account->id }}">
-                                {{ $bank_account->name }}
-                            </option>
-                            @endforeach
-                        </select>
-                    </div> --}}
                     <div class="col-2 text-end">
                         <label for="start_date" class="form-label">Start Date:</label>
                     </div>
@@ -143,8 +150,7 @@ Payroll | Generate
                             <th>Assessment Amount</th>
                             <th>Tax Amount</th>
                             <th>Net Salary</th>
-                            <th>Cash Handed Over</th>
-                            <th>Bank Transfer</th>
+                            <th>Payment Method</th>
                         </tr>
                         <tbody id="loadData">
                         </tbody>
@@ -224,19 +230,13 @@ Payroll | Generate
     }, "All fields are required.");
     $("#salaryForm").validate({
         rules: {
-            'cash_in_hand[]': {
-                checkArray: ".cash-in-hand"
-            },
-            'cash_in_bank[]': {
-                checkArray: ".cash-in-bank"
+            'payment_amount[]': {
+                checkArray: ".payment-amount"
             }
         },
         messages: {
-            'cash_in_hand[]': {
-                checkArray: "Please fill out all Cash in Hand fields."
-            },
-            'cash_in_bank[]': {
-                checkArray: "Please fill out all Cash in Bank fields."
+            'payment_amount[]': {
+                checkArray: "Please fill out all Payment Amount fields."
             }
         },
         submitHandler: function (form) {
@@ -375,13 +375,16 @@ Payroll | Generate
             }).get();
 
 
+            // Note: Backend will handle bank_account_ledger - auto-create if needed
+            // We don't block here, let backend handle validation and auto-creation
+
             const data = {
                 "branch_id": $(`#branch_id`).val(),
                 "generated_month": $("#month_year").val(),
                 "department_id": $("#selectDepartment").val(),
                 "hrm_employee_id": $("#hrm_employee_id").val(),
                 "generated_month_year": $("#generated_month_year").val(),
-                // "bank_account_ledger": $("#bank_account_ledger").val(),
+                "bank_account_ledger": $("#bank_account_ledger").val(),
                 "start_date": $("#start_date").val(),
                 "end_date": $("#end_date").val(),
                 "total_present": total_present,
@@ -410,29 +413,51 @@ Payroll | Generate
                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
                 },
                 success: function (response) {
-                    // loader.remove();
-
-                    Swal.fire({
-                        title: 'Generated!',
-                        text: response.message,
-                        icon: 'success',
-                        showCancelButton: false,
-                        confirmButtonColor: '#3085d6',
-                        confirmButtonText: 'OK'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            location.reload();
-                        }
-                    });
+                    if (response.message) {
+                        Swal.fire({
+                            title: 'Generated!',
+                            text: response.message,
+                            icon: 'success',
+                            showCancelButton: false,
+                            confirmButtonColor: '#3085d6',
+                            confirmButtonText: 'OK'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload();
+                            }
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Success!',
+                            text: 'Payroll generated successfully',
+                            icon: 'success',
+                            showCancelButton: false,
+                            confirmButtonColor: '#3085d6',
+                            confirmButtonText: 'OK'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload();
+                            }
+                        });
+                    }
                 },
                 error: function (xhr, status, error) {
-                    // loader.remove();
-                    if (xhr.responseJSON && xhr.responseJSON.error) {
-                        toastr.error('Error', xhr.responseJSON.error);
-                    } else {
-                        const errorMessage = 'Error saving form data: ' + error;
-                        toastr.error('Error', errorMessage);
+                    let errorMessage = 'Error saving form data';
+                    if (xhr.responseJSON) {
+                        if (xhr.responseJSON.error) {
+                            errorMessage = xhr.responseJSON.error;
+                        } else if (xhr.responseJSON.message) {
+                            errorMessage = xhr.responseJSON.message;
+                        }
                     }
+                    
+                    Swal.fire({
+                        title: 'Error!',
+                        html: errorMessage + '<br><br><small>Please check your bank account configuration in the Admin panel.</small>',
+                        icon: 'error',
+                        confirmButtonColor: '#3085d6',
+                        confirmButtonText: 'OK'
+                    });
                 }
             });
             console.log("🚀 ~ data>>", data)
