@@ -29,11 +29,11 @@
             <h3 class="text-22 text-center text-bold w-100 mb-4">EOBI</h3>
         </div>
         <div class="row    mt-4 mb-4 ">
-@if (Gate::allows('EOBI-list'))
-            {{-- <div class="col-12 text-right">
+{{-- @if (Gate::allows('EOBI-list')) --}}
+           <div class="col-12 text-right"> 
                 <a href="{!! route('hr.eobis.create') !!}" class="btn btn-primary btn-md"><b>Add Eobi</b></a>
-            </div> --}}
-                        @endif
+            </div> 
+                        {{-- @endif --}}
         </div>
         <div class="row w-100 text-center">
             <div class="col-12">
