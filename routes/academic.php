@@ -214,8 +214,9 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'academic', 'as' => 'academi
 
     // Strength Summary Current
     Route::get('report/strength-summary-current', [AcadmicReportController::class, 'StrengthSummaryCurrent'])->name('report.strength-summary-current');
-   
-
+    // for student challan
+    Route::get('studentChallans/{student_databank_id}', [StudentDataBankController::class, 'studentChallan'])
+        ->name('studentChallans'); 
 });
 
 

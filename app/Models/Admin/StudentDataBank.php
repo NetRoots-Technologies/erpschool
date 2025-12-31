@@ -2,10 +2,13 @@
 
 namespace App\Models\Admin;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\Admin\Course;
+use App\Models\StudentChallan;
 use App\Models\Student\AcademicSession;
+use Illuminate\Database\Eloquent\Model;
+use App\Models\Admin\StudentDataBankCourse;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class StudentDataBank extends Model
 {
@@ -51,4 +54,9 @@ class StudentDataBank extends Model
     {
         return $this->belongsTo(AcademicSession::class, 'academic_session_id');
     }
+    public function challans()
+    {
+        return $this->hasMany(StudentChallan::class, 'student_databank_id');
+    }
+
 }

@@ -135,12 +135,34 @@
             width: 320px;
         }
 
-        .note_style {
+        /* .note_style {
             border-top: 4px solid black;
             border-bottom: 4px solid black;
             overflow: hidden;
             margin: 8px 0px 0px 8px;
             width: 320px;
+        } */
+        .note_style {
+            border-top: 2px solid #000;
+            border-bottom: 2px solid #000;   /* ✅ END LINE */
+            margin: 8px 0 0 8px;
+            padding: 6px 0;
+            width: 320px;
+            font-size: 9px;
+            line-height: 1.4;
+            color: #000;
+            font-style: italic;
+            page-break-inside: avoid;
+        }
+
+        .note_style span {
+            display: block;
+            text-align: justify;
+        }
+
+        .note_style strong {
+            font-style: normal;
+            font-weight: 700;
         }
 
         .bank_stamp_style {
@@ -557,16 +579,44 @@
                 </div>
 
 
+                {{-- <div class="section-last note_style"> --}}
+                    {{-- <span style="margin: 3px 0px;">Note:<br> --}}
+                        {{-- {!! $billing->message ?? '' !!} --}}
+                    {{-- </span>
+                </div> --}}
+
                 <div class="section-last note_style">
-                    <span style="margin: 3px 0px;">Note:<br>
-                        {!! $billing->message ?? '' !!}
+                    <span>
+                        <strong>Note:</strong><br>
+
+                        This is a provisional bill subject to the approval of the District Education Authority.
+                        In case of online submission, please use A/C 1042024051003582 for MCB Bank and submit
+                        the details of the online transfer via WhatsApp 0309-9049095 or E-mail
+                        fee@cornerstone.pk.
+
+                        <br><br>
+
+                        Delayed payment charges of Rs. 1500 will be levied for the payment of the fee after
+                        the due date which will not be waived in any case. Fee bills after the valid date
+                        will not be accepted.
+
+                        <br><br>
+
+                        If a child is absent for more than a week without notice and the fee is not paid,
+                        his/her name will be struck off the rolls. If the fee remains unpaid 1 week after
+                        the due date, he/she will not be allowed to sit in class. If unpaid 2 weeks after
+                        the due date, the name will be struck off the rolls.
+
+                        <br><br>
+
+                        Monthly fee is subject to revision before each academic session.
+
+                        <br><br>
+
+                        <strong>Disclaimer:</strong> Payment of this bill does not guarantee promotion to the next class.
                     </span>
                 </div>
 
-
-                {{--            <div class="section-14"> --}}
-                {{--                <span>Awais.Abid, 04/05/2024, 3:28:18PM, FE0001</span> --}}
-                {{--            </div> --}}
             </div>
         </div>
 
@@ -829,16 +879,43 @@
                 </div>
 
 
+                {{-- <div class="section-last note_style"> --}}
+                    {{-- <span style="margin: 3px 0px;">Note:<br> --}}
+                        {{-- {!! $billing->message ?? '' !!} --}}
+                    {{-- </span> --}}
+                {{-- </div> --}}
                 <div class="section-last note_style">
-                    <span style="margin: 3px 0px;">Note:<br>
-                        {!! $billing->message ?? '' !!}
-                    </span>
-                </div>
+                <span>
+                    <strong>Note:</strong><br>
 
+                    This is a provisional bill subject to the approval of the District Education Authority.
+                    In case of online submission, please use A/C 1042024051003582 for MCB Bank and submit
+                    the details of the online transfer via WhatsApp 0309-9049095 or E-mail
+                    fee@cornerstone.pk.
 
-                {{--            <div class="section-14"> --}}
-                {{--                <span>Awais.Abid, 04/05/2024, 3:28:18PM, FE0001</span> --}}
-                {{--            </div> --}}
+                    <br><br>
+
+                    Delayed payment charges of Rs. 1500 will be levied for the payment of the fee after
+                    the due date which will not be waived in any case. Fee bills after the valid date
+                    will not be accepted.
+
+                    <br><br>
+
+                    If a child is absent for more than a week without notice and the fee is not paid,
+                    his/her name will be struck off the rolls. If the fee remains unpaid 1 week after
+                    the due date, he/she will not be allowed to sit in class. If unpaid 2 weeks after
+                    the due date, the name will be struck off the rolls.
+
+                    <br><br>
+
+                    Monthly fee is subject to revision before each academic session.
+
+                    <br><br>
+
+                    <strong>Disclaimer:</strong> Payment of this bill does not guarantee promotion to the next class.
+                </span>
+            </div>
+
             </div>
         </div>
 
@@ -1102,16 +1179,45 @@
                 </div>
 
 
+                {{-- <div class="section-last note_style"> --}}
+                    {{-- <span style="margin: 3px 0px;">Note:<br> --}}
+                        {{-- {!! $billing->message ?? '' !!} --}}
+                    {{-- </span> --}}
+                {{-- </div> --}}
+
                 <div class="section-last note_style">
-                    <span style="margin: 3px 0px;">Note:<br>
-                        {!! $billing->message ?? '' !!}
-                    </span>
-                </div>
+                <span>
+                    <strong>Note:</strong><br>
+
+                    This is a provisional bill subject to the approval of the District Education Authority.
+                    In case of online submission, please use A/C 1042024051003582 for MCB Bank and submit
+                    the details of the online transfer via WhatsApp 0309-9049095 or E-mail
+                    fee@cornerstone.pk.
+
+                    <br><br>
+
+                    Delayed payment charges of Rs. 1500 will be levied for the payment of the fee after
+                    the due date which will not be waived in any case. Fee bills after the valid date
+                    will not be accepted.
+
+                    <br><br>
+
+                    If a child is absent for more than a week without notice and the fee is not paid,
+                    his/her name will be struck off the rolls. If the fee remains unpaid 1 week after
+                    the due date, he/she will not be allowed to sit in class. If unpaid 2 weeks after
+                    the due date, the name will be struck off the rolls.
+
+                    <br><br>
+
+                    Monthly fee is subject to revision before each academic session.
+
+                    <br><br>
+
+                    <strong>Disclaimer:</strong> Payment of this bill does not guarantee promotion to the next class.
+                </span>
+            </div>
 
 
-                {{--            <div class="section-14"> --}}
-                {{--                <span>Awais.Abid, 04/05/2024, 3:28:18PM, FE0001</span> --}}
-                {{--            </div> --}}
             </div>
         </div>
 

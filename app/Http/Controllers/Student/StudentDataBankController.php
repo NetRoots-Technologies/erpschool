@@ -210,5 +210,21 @@ class StudentDataBankController extends Controller
         }
     }
 
+    // for student challan
+    public function studentChallan($id)
+    {
+        $studentDatabank = StudentDataBank::with('challans')->find($id);
+
+        if (!$studentDatabank) {
+            return abort(404, 'Student not found');
+        }
+
+        $companies = Company::where('status', 1)->get();
+        $branches = Branch::where('status', 1)->get();
+        $students = Students::all();
+
+        return view('acadmeic.student.studentchallan', compact('students', 'branches', 'studentDatabank', 'companies'));
+    }
+
 }
 

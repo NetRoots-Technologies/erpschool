@@ -70,7 +70,7 @@ class MissingPermissionsSeeder extends Seeder
             ],
 
             "StudentManagement" => [
-                'ViewStudents-create', 'ViewStudents-edit' , "ViewStudents-delete",
+                'ViewStudents-create', 'ViewStudents-edit' , "ViewStudents-delete",'Leave-button',
                 "Timetable-list", "Timetable-create", "Timetable-edit", "Timetable-delete",
             ],
 

@@ -34,6 +34,9 @@ class StudentDataBankService
             'reason_of_switch' => $request->get('reason_of_switch'),
             'academic_session_id' => $request->get('academic_session_id'),
         ]);
+        
+        // 2. Auto Challan create
+        $this->createChallanForStudent($studentDatabank);
 
         return $studentDatabank;
     }
@@ -57,6 +60,10 @@ class StudentDataBankService
                 $btn .= '<a href="' . route("academic.studentDataBank.edit", $row->id) . '" class="btn btn-primary btn-sm"  style="margin-right: 4px;">Edit</a>';
 
                 }
+                // studentchallan creation link
+                // if(auth()->user()->can('PreAdmissionForm-list')){
+                $btn .= '<a href="' . route("academic.studentChallans", ['student_databank_id' => $row->id]) . '" class="btn btn-info btn-sm"  style="margin-right: 4px;">Challans</a>';
+                // }   
                 // $btn .= '<form method="POST" action="' . route("academic.studentDataBank.destroy", $row->id) . '">';
                 // $btn .= '<button type="submit" class="btn btn-danger btn-sm deleteBtn"
                 // data-id="' . $row->id . '"
@@ -126,6 +133,22 @@ class StudentDataBankService
             $studentDatabank->delete();
         }
     }
+
+    protected function createChallanForStudent($student)
+    {
+        $lastChallan = \App\Models\StudentChallan::latest()->first();
+        $challanNo = 'CH-' . str_pad(($lastChallan ? $lastChallan->id + 1 : 1), 6, '0', STR_PAD_LEFT);
+
+        \App\Models\StudentChallan::create([
+            'student_databank_id' => $student->id,
+            'challan_no'          => $challanNo,
+            'reference_no'        => uniqid('REF-'),
+            'amount'              => 5000,  // Default amount
+            'issue_date'          => now(),
+            'due_date'            => now()->addDays(7), // Optional
+        ]);
+    }
+
 
 }
 
