@@ -6,16 +6,21 @@ use Carbon\Carbon;
 use App\Models\Admin\Branch;
 use Illuminate\Http\Request;
 use App\Models\Admin\Company;
+use App\Models\StudentChallan;
 use App\Models\Student\Students;
+use Illuminate\Support\Facades\DB;
 use App\Exports\PreAdmissionExport;
 use App\Imports\PreAdmissionImport;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Gate;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Models\Accounts\JournalEntry;
 use App\Models\Admin\StudentDataBank;
+use App\Models\Accounts\AccountLedger;
 use App\Models\Student\AcademicSession;
 use App\Services\StudentDataBankService;
+use App\Models\Accounts\JournalEntryLine;
 use Maatwebsite\Excel\Validators\ValidationException;
 
 class StudentDataBankController extends Controller
@@ -224,6 +229,138 @@ class StudentDataBankController extends Controller
         $students = Students::all();
 
         return view('acadmeic.student.studentchallan', compact('students', 'branches', 'studentDatabank', 'companies'));
+    }
+
+    // public function studentChallanPayment($id)
+    // {
+    //     // update the challan paid date
+    //     $challan = StudentChallan::find($id);
+    //     if (!$challan) {
+    //         return abort(404, 'Challan not found');
+    //     }   
+    //     $challan->paid_date = Carbon::now()->toDateString();
+    //     $challan->status = 'Paid';
+    //     $challan->save();
+    //     // also hit the  
+    // }
+
+    public function studentChallanPayment($id)
+    {
+        $challan = StudentChallan::find($id);
+
+        if (!$challan) {
+            abort(404, 'Challan not found');
+        }
+
+        if ($challan->status === 'Paid') {
+            return back()->with('warning', 'Challan already paid');
+        }
+
+        // Update challan
+        $challan->paid_date = Carbon::now()->toDateString();
+        $challan->status = 'Paid';
+        $challan->save();
+
+        // Create accounting entry
+        $this->createChallanJournalEntry($challan);
+
+        return back()->with('success', 'Challan paid & journal entry created successfully');
+    }
+
+    private function createChallanJournalEntry(StudentChallan $challan)
+    {
+        DB::beginTransaction();
+
+        try {
+
+            // ===============================
+            // 1. Pre Admission Revenue Ledger
+            // ===============================
+            $revenueLedger = AccountLedger::where('account_group_id', 108)
+                ->where('linked_module', 'New Admission Test Charges')
+                ->first();
+
+            if (!$revenueLedger) {
+                $revenueLedger = AccountLedger::create([
+                    'name' => 'Pre Admission Form Charges',
+                    'code' => 'REV-PRE-' . time(),
+                    'description' => 'Pre Admission Test Charges',
+                    'account_group_id' => 108,
+                    'opening_balance' => 0,
+                    'opening_balance_type' => 'credit',
+                    'current_balance' => 0,
+                    'current_balance_type' => 'credit',
+                    'linked_module' => 'preadmission',
+                    'is_active' => true,
+                    'created_by' => auth()->id() ?? 1,
+                ]);
+            }
+
+            // ===============================
+            // 2. Cash Ledger (Fixed ID)
+            // ===============================
+            $cashLedger = AccountLedger::find(509);
+
+            if (!$cashLedger) {
+                throw new \Exception('Cash in Hand ledger (ID 18) not found');
+            }
+
+            // ===============================
+            // 3. Journal Entry Header
+            // ===============================
+            $entry = JournalEntry::create([
+                'entry_number'  => JournalEntry::generateNumber(),
+                'entry_date'    => now()->toDateString(),
+                'reference'     => 'CHALLAN-' . $challan->id,
+                'description'   => 'Pre Admission Test Charges',
+                'status'        => 'posted',
+                'entry_type'    => 'receipt_voucher',
+                'source_module' => 'student_challan',
+                'source_id'     => $challan->id,
+                'branch_id'     => $challan->branch_id ?? null,
+                'posted_at'     => now(),
+                'posted_by'     => auth()->id(),
+                'created_by'    => auth()->id(),
+            ]);
+
+            // ===============================
+            // 4. Debit → Cash
+            // ===============================
+            JournalEntryLine::create([
+                'journal_entry_id' => $entry->id,
+                'account_ledger_id' => $cashLedger->id,
+                'debit' => $challan->amount,
+                'credit' => 0,
+            ]);
+
+            // ===============================
+            // 5. Credit → Pre Admission Revenue
+            // ===============================
+            JournalEntryLine::create([
+                'journal_entry_id' => $entry->id,
+                'account_ledger_id' => $revenueLedger->id,
+                'debit' => 0,
+                'credit' => $challan->amount,
+            ]);
+
+            // ===============================
+            // 6. Link Journal Entry with Challan
+            // ===============================
+            $challan->journal_entry_id = $entry->id;
+            $challan->save();
+
+            // ===============================
+            // 7. Update Ledger Balances
+            // ===============================
+            $cashLedger->updateBalance($challan->amount, 0);
+            $revenueLedger->updateBalance(0, $challan->amount);
+
+            DB::commit();
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
     }
 
 }

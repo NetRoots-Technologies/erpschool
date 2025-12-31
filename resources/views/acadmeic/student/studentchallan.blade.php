@@ -36,6 +36,7 @@
                         <th>Issue Date</th>
                         <th>Due Date</th>
                         <th>Paid Date</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -49,6 +50,10 @@
                         <td>{{ $challan->issue_date }}</td>
                         <td>{{ $challan->due_date ?? '-' }}</td>
                         <td>{{ $challan->paid_date ?? '-' }}</td>
+                        {{-- payment --}}
+                        <td>
+                            <a href="{{ route('academic.studentChallans.payment', $challan->id) }}" class="btn btn-sm btn-info">Payment</a>
+                        </td>
                     </tr>
                     @endforeach
                 </tbody>

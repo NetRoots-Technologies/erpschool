@@ -217,6 +217,8 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'academic', 'as' => 'academi
     // for student challan
     Route::get('studentChallans/{student_databank_id}', [StudentDataBankController::class, 'studentChallan'])
         ->name('studentChallans'); 
+    Route::get('studentChallans-payment/{student_databank_id}', [StudentDataBankController::class, 'studentChallanPayment'])
+        ->name('studentChallans.payment'); 
 });
 
 
