@@ -342,7 +342,7 @@
                 <div class="section-2">
                     <h5>BANK Copy</h5>
                     <h5 style="margin-top: -5px;">FEE BILL </h5>
-                    <h5 style="margin-top: -5px;">BANK AL-HABIB LTD. COLLECTION A/C: 0080-900445-01</h5>
+                    {{-- <h5 style="margin-top: -5px;">BANK AL-HABIB LTD. COLLECTION A/C: 0080-900445-01</h5> --}}
                     <h5 style="margin-top: -5px;">MCB BANK LTD. A/C: PK72MUCB1042024051003582</h5>
                     <h5 style="margin-top: -5px;">(PAYABLE AT ANY BANK BRANCH)</h5>
                 </div>
@@ -425,7 +425,7 @@
                     <div style="display:flex; border-bottom:1px solid #ddd; padding:6px 0; margin-left: 10px;">
                         <span style="width:70%;">
                             Fine Amount
-                            
+
                         </span>
                         <span style="width:27%; text-align:right;">
                             <span>Rs. {{ number_format($fineAmount, 2) }}</span>
@@ -480,7 +480,7 @@
 
                 {{-- Fine Show --}}
 
-                
+
 
                 @if ($applicableDiscounts && $applicableDiscounts->count() > 0 && $showDiscount->show_on_voucher == 1)
                     <div class="discount-section">
@@ -525,21 +525,21 @@
 
 
 
-                
+
                 <div class="section-9-9" style="justify-content: space-between; margin-top: 7px">
                     <h6 style="margin: 10px 0px 0px 5px; display: inline;">Total Payable Payment By Due Date
                         ({{ $billing->due_date ? \Carbon\Carbon::parse($billing->due_date)->format('d M Y') : 'N/A' }})
                     </h6>
 
-                    
+
                         {{-- Overdue: show fine applied --}}
                         <span style="margin: 0px 9px 0px 0px; display: inline; float: right;">
                             Rs: <span style="border-bottom: 2px solid black; font-weight: bold;">
                                 {{ number_format($sumForAllData, 2) }}
                             </span>
-                            
+
                         </span>
-                    
+
                 </div>
 
 
@@ -642,7 +642,7 @@
                 <div class="section-2">
                     <h5>BANK Copy</h5>
                     <h5 style="margin-top: -5px;">FEE BILL </h5>
-                    <h5 style="margin-top: -5px;">BANK AL-HABIB LTD. COLLECTION A/C: 0080-900445-01</h5>
+                    {{-- <h5 style="margin-top: -5px;">BANK AL-HABIB LTD. COLLECTION A/C: 0080-900445-01</h5> --}}
                     <h5 style="margin-top: -5px;">MCB BANK LTD. A/C: PK72MUCB1042024051003582</h5>
                     <h5 style="margin-top: -5px;">(PAYABLE AT ANY BANK BRANCH)</h5>
                 </div>
@@ -725,7 +725,7 @@
                     <div style="display:flex; border-bottom:1px solid #ddd; padding:6px 0; margin-left: 10px;">
                         <span style="width:70%;">
                             Fine Amount
-                            
+
                         </span>
                         <span style="width:27%; text-align:right;">
                             <span>Rs. {{ number_format($fineAmount, 2) }}</span>
@@ -780,7 +780,7 @@
 
                 {{-- Fine Show --}}
 
-                
+
 
                 @if ($applicableDiscounts && $applicableDiscounts->count() > 0 && $showDiscount->show_on_voucher == 1)
                     <div class="discount-section">
@@ -825,21 +825,21 @@
 
 
 
-                
+
                 <div class="section-9-9" style="justify-content: space-between; margin-top: 7px">
                     <h6 style="margin: 10px 0px 0px 5px; display: inline;">Total Payable Payment By Due Date
                         ({{ $billing->due_date ? \Carbon\Carbon::parse($billing->due_date)->format('d M Y') : 'N/A' }})
                     </h6>
 
-                    
+
                         {{-- Overdue: show fine applied --}}
                         <span style="margin: 0px 9px 0px 0px; display: inline; float: right;">
                             Rs: <span style="border-bottom: 2px solid black; font-weight: bold;">
                                 {{ number_format($sumForAllData, 2) }}
                             </span>
-                            
+
                         </span>
-                    
+
                 </div>
 
 
@@ -942,7 +942,7 @@
                 <div class="section-2">
                     <h5>BANK Copy</h5>
                     <h5 style="margin-top: -5px;">FEE BILL </h5>
-                    <h5 style="margin-top: -5px;">BANK AL-HABIB LTD. COLLECTION A/C: 0080-900445-01</h5>
+                    {{-- <h5 style="margin-top: -5px;">BANK AL-HABIB LTD. COLLECTION A/C: 0080-900445-01</h5> --}}
                     <h5 style="margin-top: -5px;">MCB BANK LTD. A/C: PK72MUCB1042024051003582</h5>
                     <h5 style="margin-top: -5px;">(PAYABLE AT ANY BANK BRANCH)</h5>
                 </div>
@@ -1025,7 +1025,7 @@
                     <div style="display:flex; border-bottom:1px solid #ddd; padding:6px 0; margin-left: 10px;">
                         <span style="width:70%;">
                             Fine Amount
-                            
+
                         </span>
                         <span style="width:27%; text-align:right;">
                             <span>Rs. {{ number_format($fineAmount, 2) }}</span>
@@ -1080,7 +1080,7 @@
 
                 {{-- Fine Show --}}
 
-                
+
 
                 @if ($applicableDiscounts && $applicableDiscounts->count() > 0 && $showDiscount->show_on_voucher == 1)
                     <div class="discount-section">
@@ -1125,21 +1125,21 @@
 
 
 
-                
+
                 <div class="section-9-9" style="justify-content: space-between; margin-top: 7px">
                     <h6 style="margin: 10px 0px 0px 5px; display: inline;">Total Payable Payment By Due Date
                         ({{ $billing->due_date ? \Carbon\Carbon::parse($billing->due_date)->format('d M Y') : 'N/A' }})
                     </h6>
 
-                    
+
                         {{-- Overdue: show fine applied --}}
                         <span style="margin: 0px 9px 0px 0px; display: inline; float: right;">
                             Rs: <span style="border-bottom: 2px solid black; font-weight: bold;">
                                 {{ number_format($sumForAllData, 2) }}
                             </span>
-                            
+
                         </span>
-                    
+
                 </div>
 
 

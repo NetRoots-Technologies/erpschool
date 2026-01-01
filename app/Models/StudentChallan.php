@@ -20,6 +20,7 @@ class StudentChallan extends Model
         'issue_date',
         'due_date',
         'paid_date',
+        'payment_mode',
     ];
 
     protected $casts = [

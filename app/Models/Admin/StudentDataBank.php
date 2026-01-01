@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\Admin\StudentDataBankCourse;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Academic\AcademicClass;
 
 class StudentDataBank extends Model
 {
@@ -58,5 +59,10 @@ class StudentDataBank extends Model
     {
         return $this->hasMany(StudentChallan::class, 'student_databank_id');
     }
+    public function classes()
+    {
+        return $this->belongsTo(AcademicClass::class, 'admission_for'); 
+    }
+
 
 }
