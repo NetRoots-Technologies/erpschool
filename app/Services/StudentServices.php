@@ -201,7 +201,11 @@ class StudentServices
                 $btn .= '<a href="' . route("academic.students.edit", $row->id) . '" class="btn btn-primary btn-sm"  style="margin-right: 4px;">Edit</a>';
 
                 } 
-                $btn .=  '<button class="btn btn-success btn-sm leaveBtn" data-id="' . $row->id . '" data-toggle="modal" data-target="#leaveModalLabel">Leave</button>';
+                // gate for leave button
+
+                  if (Gate::allows('Leave-button')) {
+                  $btn .=  '<button class="btn btn-success btn-sm leaveBtn" data-id="' . $row->id . '" data-toggle="modal" data-target="#leaveModalLabel">Leave</button>';
+                }
 
                 if(auth()->user()->can('ViewStudents-delete')){
                 $btn .= '<form method="POST" action="' . route("academic.students.destroy", $row->id) . '">';

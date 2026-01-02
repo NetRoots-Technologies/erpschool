@@ -106,11 +106,19 @@
                                     </select>
                                 </div>
 
-                                <div class="col-md-6">
-                                    <label for="seeking_admission"><b>Seeking admission for *</b></label>
-                                    <input type="text" class="form-control" name="admission_for" required>
-                                </div>
-                            </div>
+                                            <div class="col-md-6">
+                            <label for="admission_for"><b>Seeking admission for *</b></label>
+                            <select name="admission_for" class="form-control" required>
+                                <option value="">-- Select Class --</option>
+
+                                @foreach($classes as $class)
+                                    <option value="{{ $class->id }}">
+                                        {{ $class->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
 
                             <div class="row mt-4">
                                 <div class="col-md-6">
@@ -251,7 +259,7 @@
                 if (fatherCNIC === motherCNIC) {
                     toastr.error("Father's CNIC and Mother's CNIC must not be the same.");
                     $('#father_cnic, #mother_cnic').css('border-color', 'red');
-                    $('#submitBtn').attr('disabled', true); 
+                    $('#submitBtn').attr('disabled', true);
                     return false;
                 } else {
                     $('#father_cnic, #mother_cnic').css('border-color', 'green');

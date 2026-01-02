@@ -207,9 +207,15 @@ All Students
         $(document).ready(function () {
             var dataTable = $('#data_table').DataTable({
                 "processing": true,
-                "serverSide": true,
-                "pageLength": 10,
-                dom: 'Bfrtip',
+                "serverSide": false,
+                // "pageLength": 10,
+                    pageLength: -1,   // 👈 show ALL records
+                     lengthMenu: [
+                        [10, 25, 50, 100, -1],
+                        [10, 25, 50, 100, "All"]
+                    ],
+                // dom: 'Bfrtip',
+                dom: 'lBfrtip',
                 buttons: [
                     {
                         extend: 'collection',
@@ -422,10 +428,10 @@ All Students
 
                     if (xhr.status === 422 && xhr.responseJSON?.message) {
                         msg = xhr.responseJSON.message;
-                    } 
+                    }
                     else if (xhr.responseJSON?.errors) {
                         msg = Object.values(xhr.responseJSON.errors).flat().join('<br>');
-                    } 
+                    }
                     else if (xhr.responseJSON?.message) {
                         msg = xhr.responseJSON.message;
                     }

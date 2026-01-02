@@ -195,7 +195,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'admin', 'as' => 'admin.'], 
         Route::post('/collections', [FeeManagementController::class, 'storeCollection'])->name('collections.store');
         Route::get('/collections/pay-challan', [FeeManagementController::class, 'payChallan'])->name('collections.pay-challan');
         Route::get('/collections/challans-by-student/{studentId}', [FeeManagementController::class, 'getChallansByStudent'])->name('collections.challans-by-student');
-        Route::get('/collections/challans-by-student/{studentId}', [FeeManagementController::class, 'getChallansByStudentfeereversal'])->name('collections.challans-by-student-fee');
+        Route::get('/collections/challans-by-studentS/{studentId}', [FeeManagementController::class, 'getChallansByStudentfeereversal'])->name('collections.challans-by-student-fee');
         Route::get('/collections/challan-discounts/{challanId}', [FeeManagementController::class, 'getChallanDiscounts'])->name('collections.challan-discounts');
         Route::get('/collections/student-transport-fees/{studentId}', [FeeManagementController::class, 'getStudentTransportFees'])->name('collections.student-transport-fees');
         Route::post('/collections/store-challan-payment', [FeeManagementController::class, 'storeChallanPayment'])->name('collections.store-challan-payment');

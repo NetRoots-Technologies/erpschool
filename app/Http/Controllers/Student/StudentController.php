@@ -265,37 +265,70 @@ class StudentController extends Controller
         }
     }
 
+    // public function fetchStudentData(Request $request)
+    // {
+    //     if (!Gate::allows('ViewStudents-create')) {
+    //         return abort(503);
+    //     }
+        
+    //     $branch = Branch::find($request->branch_id);
+    //     if (!$branch) {
+    //         return response()->json(['error' => 'Branch not found'], 404);
+    //     }
+
+    //     $branchCode = $branch->branch_code;
+
+    //     if (!$branchCode) {
+    //         return response()->json(['error' => 'Branch Code not found'], 404);
+    //     }
+
+    //     $latestStudent = Students::where('student_id', 'like', $branchCode . '-%')
+    //         ->orderBy('student_id', 'desc')
+    //         ->first();
+
+    //     if ($latestStudent) {
+    //         $latestIdNumber = intval(substr($latestStudent->student_id, strlen($branchCode) + 1)) + 1;
+    //     } else {
+    //         $latestIdNumber = 1;
+    //     }
+
+    //     $newStudentId = $branchCode . '-' . str_pad($latestIdNumber, 2, '0', STR_PAD_LEFT);
+
+    //     return response()->json(['new_student_id' => $newStudentId]);
+    // }
+
     public function fetchStudentData(Request $request)
     {
         if (!Gate::allows('ViewStudents-create')) {
-            return abort(503);
+            abort(403);
         }
-        
+
         $branch = Branch::find($request->branch_id);
-        if (!$branch) {
-            return response()->json(['error' => 'Branch not found'], 404);
+
+        if (!$branch || !$branch->branch_code) {
+            return response()->json([
+                'message' => 'Branch or branch code not found'
+            ], 404);
         }
 
-        $branchCode = $branch->branch_code;
+        $branchCode = (int) $branch->branch_code;
 
-        if (!$branchCode) {
-            return response()->json(['error' => 'Branch Code not found'], 404);
-        }
-
-        $latestStudent = Students::where('student_id', 'like', $branchCode . '-%')
+        // check latest student_id >= branch_code
+        $latestStudent = Students::where('student_id', '>=', $branchCode)
             ->orderBy('student_id', 'desc')
             ->first();
 
         if ($latestStudent) {
-            $latestIdNumber = intval(substr($latestStudent->student_id, strlen($branchCode) + 1)) + 1;
+            $newStudentId = $latestStudent->student_id + 1;
         } else {
-            $latestIdNumber = 1;
+            $newStudentId = $branchCode;
         }
 
-        $newStudentId = $branchCode . '-' . str_pad($latestIdNumber, 2, '0', STR_PAD_LEFT);
-
-        return response()->json(['new_student_id' => $newStudentId]);
+        return response()->json([
+            'new_student_id' => $newStudentId
+        ]);
     }
+
 
     public function StudentRollNo(Request $request)
     {
