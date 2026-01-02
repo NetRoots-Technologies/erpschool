@@ -6,7 +6,7 @@
 
 @section('content')
     @if (Gate::allows('SkillEvaluation-create'))
-        {
+
         <div class="row mt-4 mb-4">
             <div class="col-12 text-end">
                 <a href="{{ route('exam.skill_evaluation.create') }}" class="btn btn-primary btn-md shadow-sm">
@@ -14,7 +14,7 @@
                 </a>
             </div>
         </div>
-        }
+        
     @endif
 
 

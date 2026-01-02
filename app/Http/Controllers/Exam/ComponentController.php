@@ -184,7 +184,7 @@ class ComponentController extends Controller
 
     public function fetchComponentSubject(Request $request)
     {
-       
+
         $component = Component::where('subject_id', $request->course_id)->get();
 
         return response()->json($component);

@@ -181,9 +181,21 @@
                             class="underline">{{ date('Y-m-d', strtotime($student->admission_date)) }}</span></p>
 
                     <p style="text-align:left;"><strong>Attendance</strong></p>
-                    <p>Total No. of Days: <span class="underline">82</span></p>
+                    {{-- <p>Total No. of Days: <span class="underline">82</span></p>
                     <p>Days Attended: <span class="underline">88</span></p>
-                    <p>Attendance Percentage: <span class="underline">92%</span></p>
+                    <p>Attendance Percentage: <span class="underline">92%</span></p> --}}
+                    <p>Total No. of Days:
+                        <span class="underline">{{ $totalDays }}</span>
+                    </p>
+
+                    <p>Days Attended:
+                        <span class="underline">{{ $daysAttended }}</span>
+                    </p>
+
+                    <p>Attendance Percentage:
+                        <span class="underline">{{ $attendancePercentage }}%</span>
+                    </p>
+
                 </div>
 
                 <div class="line"></div>

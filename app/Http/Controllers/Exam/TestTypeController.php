@@ -57,9 +57,9 @@ class TestTypeController extends Controller
      */
     public function store(Request $request)
     {
-        if (!Gate::allows('TestTypes-craete')) {
-            return abort(503);
-        }
+        // if (!Gate::allows('TestTypes-craete')) {
+        //     return abort(503);
+        // }
         return $this->TestTypeService->store($request);
 
     }

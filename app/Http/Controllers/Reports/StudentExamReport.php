@@ -10,10 +10,12 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Academic\Section;
 use App\Models\Exam\EffortLevel;
 use App\Models\Student\Students;
+use App\Models\Academic\StudentAttendance;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Gate;
 use App\Models\Academic\ActiveSession;
-use App\Models\Academic\AcademicClass; 
+use App\Models\Academic\AcademicClass;
+use App\Models\Academic\StudentAttendanceData;
 
 
 
@@ -87,11 +89,11 @@ class StudentExamReport extends Controller
             ->make(true);
     }
 
-    
+
         public function viewReport($student_id)
         {
              $student = Students::with(['branch','class','section.session','studentPictures' , 'remarks'])->findOrFail($student_id);
-             $efforts = EffortLevel::where('student_id', $student_id)->get()->groupBy('student_id');    
+             $efforts = EffortLevel::where('student_id', $student_id)->get()->groupBy('student_id');
              $skills = SkillType::with([
                     'subject.EvolutionKeySkills' => function ($q) use ($student_id) {
                         $q->where('student_id', $student_id)   // Student ka filter sirf yahan
@@ -107,8 +109,27 @@ class StudentExamReport extends Controller
             ->get()
             ->groupBy('subject_id');
 
-            
-            return view('reports.students.show' , compact('student','efforts','skills'));
+
+        /* 1️⃣ Get attendance master IDs (class + section wise) */
+        $attendanceIds = StudentAttendance::where('class_id', $student->class_id)
+            ->where('section_id', $student->section_id)
+            ->pluck('id');
+
+        /* 2️⃣ Total working days */
+        $totalDays = $attendanceIds->count();
+
+        /* 3️⃣ Days attended (attendance = present) */
+        $daysAttended = StudentAttendanceData::whereIn('student_attendance_id', $attendanceIds)
+            ->where('student_id', $student->id)
+            ->where('attendance', 'present')   // ✅ correct column
+            ->count();
+
+        /* 4️⃣ Attendance percentage */
+        $attendancePercentage = $totalDays > 0
+            ? round(($daysAttended / $totalDays) * 100)
+            : 0;
+
+            return view('reports.students.show' , compact('student','efforts','skills','totalDays' ,'daysAttended','attendancePercentage',));
             // dd($skills , $student_id , request()->all() , $student , $efforts);
         //    $pdf = Pdf::loadView('reports.students.report_card', compact('student','efforts','skills'))
         //       ->setOptions([
@@ -124,7 +145,7 @@ class StudentExamReport extends Controller
          public function printReport($student_id)
         {
              $student = Students::with(['branch','class','section.session','studentPictures' , 'remarks'])->findOrFail($student_id);
-             $efforts = EffortLevel::where('student_id', $student_id)->get()->groupBy('student_id');    
+             $efforts = EffortLevel::where('student_id', $student_id)->get()->groupBy('student_id');
              $skills = SkillType::with([
                     'subject.EvolutionKeySkills' => function ($q) use ($student_id) {
                         $q->where('student_id', $student_id)   // Student ka filter sirf yahan
@@ -140,8 +161,8 @@ class StudentExamReport extends Controller
             ->get()
             ->groupBy('subject_id');
 
-            
-           
+
+
             // dd($skills , $student_id , request()->all() , $student , $efforts);
            $pdf = Pdf::loadView('reports.students.report_card', compact('student','efforts','skills'))
               ->setOptions([
