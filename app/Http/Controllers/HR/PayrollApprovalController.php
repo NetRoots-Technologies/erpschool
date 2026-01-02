@@ -304,6 +304,7 @@ class PayrollApprovalController extends Controller
     /**
      * Process Salary Disbursement - Create ledger entries
      */
+    
     public function salary_disburse($id)
     {
         if (!Gate::allows('Dashboard-list')) {
