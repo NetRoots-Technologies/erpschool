@@ -190,6 +190,11 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'hr', 'as' => 'hr.'], functi
     Route::get('payroll_status_approve/{id}', [PayrollApprovalController::class, 'payroll_status_approve'])->name('payroll.status.approve');
     Route::get('payroll_status_reject/{id}', [PayrollApprovalController::class, 'payroll_status_reject'])->name('payroll.status.reject');
 
+    //    for salary disburse
+    Route::get('salary_disburse', [PayrollApprovalController::class, 'salaryDisburseIndex'])->name('salary.disburse');
+    Route::get('salary_disburse_status/{id}', [PayrollApprovalController::class, 'salaryDisburseStatus'])->name('salary.disburse.status');
+    Route::get('salary_disburse/{id}', [PayrollApprovalController::class, 'salary_disburse'])->name('salary.disburse.process');
+
     Route::get('/export/pdf', [AttendanceDashboard::class, 'exportPdf'])->name('export.pdf');
     Route::get('/export/pdf1', [AttendanceDashboard::class, 'exportPdf1'])->name('export.pdf1');
     Route::get('/export/excel', [AttendanceController::class, 'exportExcel'])->name('export.excel');

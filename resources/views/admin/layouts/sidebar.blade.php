@@ -490,6 +490,10 @@
                                 <li><a class="slide-item {{ request()->is('hr/payroll_approve') ? 'active' : '' }}"
                                         href="{{ route('hr.payroll.approve') }}">PayRoll Approve</a></li>
                             @endif
+                            @if (Gate::allows('Payroll-approve'))
+                                <li><a class="slide-item {{ request()->is('hr/salary_disburse') ? 'active' : '' }}"
+                                        href="{{ route('hr.salary.disburse') }}">Salary Disburse</a></li>
+                            @endif
                             @if (Gate::allows('Payroll-slip'))
                                 <li><a class="slide-item {{ request()->is('hr/salary_slip') ? 'active' : '' }}"
                                         href="{{ route('hr.salary_slip.index') }}">PayRoll Slip</a></li>

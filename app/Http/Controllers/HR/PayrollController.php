@@ -29,9 +29,17 @@ use App\Models\Admin\Bank;
 use App\Models\Admin\BankAccount;
 use App\Models\Accounts\AccountLedger;
 use App\Models\Accounts\AccountGroup;
+use App\Models\Admin\Department;
+use App\Services\LedgerService;
 
 class PayrollController extends Controller
 {
+    protected $ledgerService;
+    
+    public function __construct(LedgerService $ledgerService)
+    {
+        $this->ledgerService = $ledgerService;
+    }
     /**
      * Display a listing of the resource.
      *
@@ -675,6 +683,147 @@ class PayrollController extends Controller
 
                 $payroll->fund_values = $combinedData;
                 $payroll->save();
+            }
+
+            // STEP 1: Create Payroll Accrual Journal Entry when payroll is generated
+            // Debit: Salary Expense, Credit: Salary Payable (Accounts Payable)
+            $branch = Branch::findOrFail($data['branch_id']);
+            $department = Department::findOrFail($data['department_id']);
+            
+            // Create Entry for accrual
+            $entryData['amount'] = array_sum($data['total_salary']);
+            $entryData['narration'] = "Payroll Accrual for Month {$data['generated_month']}, Department {$department->name} of Branch {$branch->name}";
+            $entryData['branch_id'] = $data['branch_id'];
+            $entryData['entry_type_id'] = 1;
+            
+            $accrualEntry = $this->ledgerService->createEntry($entryData);
+            
+            // Get or create Salary Expense ledger
+            $payroll_ledger = AccountLedger::where('linked_module', 'branch')
+                ->where('linked_id', $data['branch_id'])
+                ->whereHas('accountGroup', function($q) {
+                    $q->where('name', 'LIKE', '%Salary%')->orWhere('name', 'LIKE', '%Expense%');
+                })
+                ->first();
+            
+            if (!$payroll_ledger) {
+                $salaryExpenseGroup = AccountGroup::where('name', 'LIKE', '%Salary%Expense%')
+                    ->orWhere('code', '040020020001')
+                    ->first();
+                
+                if (!$salaryExpenseGroup) {
+                    $expenseGroup = AccountGroup::where('type', 'expense')
+                        ->where('level', 2)
+                        ->first();
+                    
+                    if ($expenseGroup) {
+                        $salaryExpenseGroup = AccountGroup::create([
+                            'name' => 'Salary Expense',
+                            'code' => 'EXP-SAL-' . time(),
+                            'parent_id' => $expenseGroup->id,
+                            'type' => 'expense',
+                            'level' => 3,
+                            'is_active' => 1,
+                            'created_by' => auth()->id(),
+                        ]);
+                    }
+                }
+                
+                if ($salaryExpenseGroup) {
+                    $payroll_ledger = AccountLedger::create([
+                        'name' => 'Salary Expense - ' . $branch->name,
+                        'code' => 'SAL-EXP-BR-' . $data['branch_id'] . '-' . time(),
+                        'description' => 'Salary expense for ' . $branch->name,
+                        'account_group_id' => $salaryExpenseGroup->id,
+                        'opening_balance' => 0,
+                        'opening_balance_type' => 'debit',
+                        'current_balance' => 0,
+                        'current_balance_type' => 'debit',
+                        'linked_module' => 'branch',
+                        'linked_id' => $data['branch_id'],
+                        'is_active' => true,
+                        'created_by' => auth()->id() ?? 1
+                    ]);
+                    \Log::info("Salary expense ledger auto-created for branch: {$branch->name}");
+                }
+            }
+            
+            // Get or create Salary Payable ledger (Accounts Payable for salary)
+            $salaryPayableGroup = AccountGroup::where('name', 'Salaries Payable Account')
+                ->orWhere('code', '040020020002')
+                ->first();
+            
+            if (!$salaryPayableGroup) {
+                $accruedLiabGroup = AccountGroup::where('name', 'Accrued Liabilities')
+                    ->orWhere('code', '04002002')
+                    ->first();
+                
+                if ($accruedLiabGroup) {
+                    $salaryPayableGroup = AccountGroup::where('parent_id', $accruedLiabGroup->id)
+                        ->where('type', 'liability')
+                        ->first();
+                }
+            }
+            
+            if (!$salaryPayableGroup) {
+                $salaryPayableGroup = AccountGroup::where('type', 'liability')
+                    ->where('level', 2)
+                    ->first();
+            }
+            
+            $salaryPayableLedger = AccountLedger::where('name', 'LIKE', '%Salary Payable%')
+                ->whereHas('accountGroup', function($q) {
+                    $q->where('type', 'liability');
+                })
+                ->where('linked_module', 'branch')
+                ->where('linked_id', $data['branch_id'])
+                ->first();
+            
+            if (!$salaryPayableLedger && $salaryPayableGroup) {
+                $salaryPayableLedger = AccountLedger::create([
+                    'name' => 'Salary Payable - ' . $branch->name,
+                    'code' => 'LIA-SAL-PAY-' . $data['branch_id'] . '-' . time(),
+                    'description' => 'Salary payable liability for ' . $branch->name,
+                    'account_group_id' => $salaryPayableGroup->id,
+                    'opening_balance' => 0,
+                    'opening_balance_type' => 'credit',
+                    'current_balance' => 0,
+                    'current_balance_type' => 'credit',
+                    'linked_module' => 'branch',
+                    'linked_id' => $data['branch_id'],
+                    'is_active' => true,
+                    'created_by' => auth()->id() ?? 1
+                ]);
+                \Log::info("Salary Payable ledger auto-created for branch: {$branch->name}");
+            }
+            
+            // Create accrual entries for each employee
+            foreach ($data['employee_id'] as $key => $employeeId) {
+                $employee = Employees::findOrFail($employeeId);
+                $netSalary = $data['total_salary'][$key];
+                
+                if ($netSalary > 0 && $salaryPayableLedger && $payroll_ledger) {
+                    $accrualData = [
+                        'entry_id' => $accrualEntry->id,
+                        'balanceType' => "d",
+                        'entry_type_id' => 1,
+                        'narration' => "Payroll Accrual for Employee {$employee->name}, Month {$data['generated_month']}",
+                    ];
+                    
+                    // Debit: Salary Expense (expense increases)
+                    $this->ledgerService->createEntryItems(array_merge($accrualData, [
+                        'ledger_id' => $payroll_ledger->id,
+                        'balanceType' => "d",
+                        'amount' => $netSalary
+                    ]));
+                    
+                    // Credit: Salary Payable / Accounts Payable (liability increases)
+                    $this->ledgerService->createEntryItems(array_merge($accrualData, [
+                        'ledger_id' => $salaryPayableLedger->id,
+                        'balanceType' => "c",
+                        'amount' => $netSalary
+                    ]));
+                }
             }
 
             DB::commit();
