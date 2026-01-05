@@ -117,6 +117,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'datatable', 'as' => 'datata
     Route::post('get-advanceApproval', [\App\Http\Controllers\HR\AdvanceApprovalController::class, 'getData'])->name('data.advanceApproval');
     Route::post('get-employeeWelfare', [\App\Http\Controllers\HR\EmployeeWelfareController::class, 'getData'])->name('data.welfareData');
     Route::post('get-payrollApproval', [\App\Http\Controllers\HR\PayrollApprovalController::class, 'getData'])->name('data.payroll.approvalDatatable');
+    Route::post('get-payrollDisburse', [\App\Http\Controllers\HR\PayrollApprovalController::class, 'getDisburseData'])->name('data.payroll.disburseDatatable');
     Route::post('get-payrollSlip', [\App\Http\Controllers\HR\PaySlipController::class, 'getData'])->name('data.payroll.slip');
     Route::post('get-items', [ItemController::class, 'getData'])->name('data.items');
     Route::post('get-suppliers', [SupplierController::class, 'getData'])->name('data.suppliers');
