@@ -139,5 +139,11 @@ require __DIR__.'/exam.php';
 // Include Fleet Routes
 require __DIR__.'/fleet.php';
 
+// MCB eBilling API Routes (CSRF Exempt - External Bank Integration)
+Route::prefix('eBillingapi')->group(function () {
+    Route::post('/getpaymentinfo', [\App\Http\Controllers\EbillingApiController::class, 'getPaymentInfo']);
+    Route::post('/paybill', [\App\Http\Controllers\EbillingApiController::class, 'payBill']);
+});
+
 
 
