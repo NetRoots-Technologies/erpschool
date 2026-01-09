@@ -29,7 +29,10 @@ class EbillingApiController extends Controller
 
             // Validate request parameters according to spec
             $validated = $request->validate([
-                'consumernumber' => 'required|string|max:60',
+                // 'consumernumber' => 'required|string|max:60',
+                // 'institutioncode' => 'required|string|max:5',
+                // 'reserved' => 'nullable|string'
+                'consumernumber' => 'nullable',
                 'institutioncode' => 'required|string|max:5',
                 'reserved' => 'nullable|string'
             ]);
@@ -182,10 +185,15 @@ class EbillingApiController extends Controller
 
             // Validate request parameters
             $validated = $request->validate([
-                'consumernumber' => 'required|string|max:60',
-                'institutioncode' => 'required|string|max:5',
-                'amount' => 'required|string',
-                'transactiondate' => 'required|string|date',
+                // 'consumernumber' => 'required|string|max:60',
+                // 'institutioncode' => 'required|string|max:5',
+                // 'amount' => 'required|string',
+                // 'transactiondate' => 'required|string|date',
+                // 'reserved' => 'nullable'
+                  'consumernumber' => 'nullable',
+                'institutioncode' => 'nullable',
+                'amount' => 'nullable',
+                'transactiondate' => 'nullable',
                 'reserved' => 'nullable'
             ]);
 
