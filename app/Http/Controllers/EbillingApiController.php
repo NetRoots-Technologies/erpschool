@@ -14,7 +14,7 @@ class EbillingApiController extends Controller
     /**
      * Bill Inquiry Endpoint
      * POST /eBillingapi/getpaymentinfo
-     * 
+     *
      * This endpoint is used to get bill details for MCB payment gateway
      */
     public function getPaymentInfo(Request $request)
@@ -54,16 +54,16 @@ class EbillingApiController extends Controller
                 if ($biling) {
                     // Get student information
                     $student = $biling->student;
-                    
+
                     // Format dates
                     $dueDate = $biling->due_date ? date('Y-m-d', strtotime($biling->due_date)) : null;
                     $billingMonth = $biling->year_month ? date('Y-m', strtotime($biling->year_month)) : date('Y-m');
-                    
+
                     // Calculate amounts
                     $totalAmount = floatval($biling->fees ?? 0);
                     $paidAmount = floatval($biling->paid_amount ?? 0);
                     $outstanding = max(0, $totalAmount - $paidAmount);
-                    
+
                     // Calculate amount after due date (add late fee if overdue)
                     $amountAfterDue = $outstanding;
                     if ($dueDate && strtotime($dueDate) < time()) {
@@ -90,16 +90,16 @@ class EbillingApiController extends Controller
             } else {
                 // Use FeeBilling data
                 $student = $feeBilling->student;
-                
+
                 // Format dates
                 $dueDate = $feeBilling->due_date ? $feeBilling->due_date->format('Y-m-d') : null;
                 $billingMonth = $feeBilling->billing_month ? date('Y-m', strtotime($feeBilling->billing_month)) : date('Y-m');
-                
+
                 // Calculate amounts
                 $totalAmount = floatval($feeBilling->total_amount ?? 0);
                 $paidAmount = floatval($feeBilling->paid_amount ?? 0);
                 $outstanding = floatval($feeBilling->outstanding_amount ?? max(0, $totalAmount - $paidAmount));
-                
+
                 // Calculate amount after due date
                 $amountAfterDue = $outstanding;
                 if ($dueDate && strtotime($dueDate) < time()) {
@@ -134,7 +134,7 @@ class EbillingApiController extends Controller
                 'consumernumber' => $consumerNumber,
                 'institutioncode' => $institutionCode
             ]);
-            
+
             return response()->json([
                 'responsecode' => '01',
                 'message' => 'failed'
@@ -145,7 +145,7 @@ class EbillingApiController extends Controller
                 'errors' => $e->errors(),
                 'request' => $request->all()
             ]);
-            
+
             return response()->json([
                 'responsecode' => '04',
                 'message' => 'invalid request'
@@ -157,7 +157,7 @@ class EbillingApiController extends Controller
                 'line' => $e->getLine(),
                 'trace' => $e->getTraceAsString()
             ]);
-            
+
             return response()->json([
                 'responsecode' => '03',
                 'message' => 'unknown error'
@@ -168,13 +168,13 @@ class EbillingApiController extends Controller
     /**
      * Bill Payment Endpoint
      * POST /eBillingapi/paybill
-     * 
+     *
      * This endpoint is used to process bill payments from MCB
      */
     public function payBill(Request $request)
     {
         DB::beginTransaction();
-        
+
         try {
             // Log incoming request
             Log::info('MCB Bill Payment Request', [
@@ -217,7 +217,7 @@ class EbillingApiController extends Controller
                     'amount' => $amount,
                     'transactiondate' => $transactionDate
                 ]);
-                
+
                 // Return success for duplicate (already processed)
                 return response()->json([
                     'responsecode' => '00',
@@ -232,12 +232,19 @@ class EbillingApiController extends Controller
                 ->first();
 
             // If not found, try Biling table
+            // $biling = null;
+            // if (!$feeBilling) {
+            //     $biling = Biling::where('voucher_number', $consumerNumber)
+            //         ->orWhere('bill_number', $consumerNumber)
+            //         ->first();
+            // }
+
+            // If not found, try Bills table (voucher_number is the consumer number)
             $biling = null;
             if (!$feeBilling) {
-                $biling = Biling::where('voucher_number', $consumerNumber)
-                    ->orWhere('bill_number', $consumerNumber)
-                    ->first();
+                $biling = Biling::where('voucher_number', $consumerNumber)->first();
             }
+
 
             // If bill not found in either table
             if (!$feeBilling && !$biling) {
@@ -257,14 +264,14 @@ class EbillingApiController extends Controller
                 } catch (\Exception $logError) {
                     Log::error('MCB Payment Log: Failed to log', ['error' => $logError->getMessage()]);
                 }
-                
+
                 DB::commit();
-                
+
                 Log::warning('MCB Bill Payment: Consumer not found', [
                     'consumernumber' => $consumerNumber,
                     'institutioncode' => $institutionCode
                 ]);
-                
+
                 return response()->json([
                     'responsecode' => '01',
                     'message' => 'failed'
@@ -276,7 +283,7 @@ class EbillingApiController extends Controller
                 // Check if already fully paid
                 $totalAmount = floatval($feeBilling->total_amount ?? 0);
                 $currentPaid = floatval($feeBilling->paid_amount ?? 0);
-                
+
                 if ($feeBilling->status == 'paid' || $currentPaid >= $totalAmount) {
                     // Already paid, log and return success
                     try {
@@ -295,9 +302,9 @@ class EbillingApiController extends Controller
                     } catch (\Exception $logError) {
                         Log::error('MCB Payment Log: Failed to log', ['error' => $logError->getMessage()]);
                     }
-                    
+
                     DB::commit();
-                    
+
                     return response()->json([
                         'responsecode' => '00',
                         'message' => 'success',
@@ -308,24 +315,24 @@ class EbillingApiController extends Controller
                 // Update FeeBilling with payment
                 $newPaidAmount = $currentPaid + $amount;
                 $newOutstanding = max(0, $totalAmount - $newPaidAmount);
-                
+
                 $feeBilling->paid_amount = $newPaidAmount;
                 $feeBilling->outstanding_amount = $newOutstanding;
-                
+
                 // Update status
                 if ($newPaidAmount >= $totalAmount) {
                     $feeBilling->status = 'paid';
                 } elseif ($newPaidAmount > 0) {
                     $feeBilling->status = 'partially_paid';
                 }
-                
+
                 $feeBilling->save();
 
             } else if ($biling) {
                 // Process payment for Biling table
                 $totalFees = floatval($biling->fees ?? 0);
                 $currentPaid = floatval($biling->paid_amount ?? 0);
-                
+
                 // Check if already fully paid
                 if ($biling->status == 1 || $currentPaid >= $totalFees) {
                     // Already paid, log and return success
@@ -345,9 +352,9 @@ class EbillingApiController extends Controller
                     } catch (\Exception $logError) {
                         Log::error('MCB Payment Log: Failed to log', ['error' => $logError->getMessage()]);
                     }
-                    
+
                     DB::commit();
-                    
+
                     return response()->json([
                         'responsecode' => '00',
                         'message' => 'success',
@@ -357,15 +364,15 @@ class EbillingApiController extends Controller
 
                 // Update Biling with payment
                 $newPaidAmount = $currentPaid + $amount;
-                
+
                 $biling->paid_amount = $newPaidAmount;
-                
+
                 // Update status if fully paid
                 if ($newPaidAmount >= $totalFees) {
                     $biling->status = 1; // 1 = Paid
                     $biling->paid_date = now();
                 }
-                
+
                 $biling->save();
             }
 
@@ -402,26 +409,26 @@ class EbillingApiController extends Controller
 
         } catch (\Illuminate\Validation\ValidationException $e) {
             DB::rollBack();
-            
+
             Log::error('MCB Bill Payment: Validation Error', [
                 'errors' => $e->errors(),
                 'request' => $request->all()
             ]);
-            
+
             return response()->json([
                 'responsecode' => '04',
                 'message' => 'invalid request'
             ], 200);
         } catch (\Exception $e) {
             DB::rollBack();
-            
+
             Log::error('MCB Bill Payment: Exception', [
                 'error' => $e->getMessage(),
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
                 'trace' => $e->getTraceAsString()
             ]);
-            
+
             // Try to log failed payment
             try {
                 DB::table('mcb_payment_logs')->insert([
@@ -439,7 +446,7 @@ class EbillingApiController extends Controller
             } catch (\Exception $logError) {
                 // Ignore logging errors
             }
-            
+
             return response()->json([
                 'responsecode' => '05',
                 'message' => 'processing failed'
