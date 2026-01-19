@@ -777,6 +777,11 @@
                                         Bills- By Financial Assistance</a></li>
                             @endcan
 
+                            @can('fee-billing-print')
+                                <li><a class="slide-item {{ request()->is('admin/fee-management/reports/fee-billing-by-branch-month') ? 'active' : '' }}"
+                                        href="{{ route('admin.fee-management.reports.fee-billing-by-branch-month') }}">Fee Billing Report (Branch & Month)</a></li>
+                            @endcan
+
                         </ul>
                     </li>
                 @endif
@@ -1581,6 +1586,14 @@
                                         Bundles
                                     </a>
                                 </li>
+                                @can('inventory-list')
+                                    <li>
+                                        <a class="slide-item {{ request()->routeIs('inventory.reports.journal-voucher') ? 'active' : '' }}"
+                                            href="{{ route('inventory.reports.journal-voucher') }}">
+                                            Store Issuance Report
+                                        </a>
+                                    </li>
+                                @endcan
                             </ul>
                         </li>
                     @endcanany

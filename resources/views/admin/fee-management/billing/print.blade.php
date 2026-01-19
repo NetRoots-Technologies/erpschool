@@ -526,6 +526,24 @@
 
 
 
+                {{-- Consolidated Total Sum Section --}}
+                <div style="margin-top: 15px; margin-bottom: 10px; padding: 12px; background: #f8f9fa; border: 2px solid #000; border-radius: 4px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h6 style="margin: 0; font-size: 12px; font-weight: bold; color: #000;">
+                            CONSOLIDATED TOTAL SUM (Total Payable Payment By Due Date)
+                            <br>
+                            <span style="font-size: 10px; font-weight: normal; color: #666;">
+                                Due Date: {{ $billing->due_date ? \Carbon\Carbon::parse($billing->due_date)->format('d M Y') : 'N/A' }}
+                            </span>
+                        </h6>
+                        <div style="text-align: right;">
+                            <span style="font-size: 16px; font-weight: bold; color: #000; border-bottom: 3px solid #000; padding-bottom: 2px;">
+                                Rs. {{ number_format($sumForAllData, 2) }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="section-9-9" style="justify-content: space-between; margin-top: 7px">
                     <h6 style="margin: 10px 0px 0px 5px; display: inline;">Total Payable Payment By Due Date
                         ({{ $billing->due_date ? \Carbon\Carbon::parse($billing->due_date)->format('d M Y') : 'N/A' }})
@@ -826,6 +844,24 @@
 
 
 
+                {{-- Consolidated Total Sum Section --}}
+                <div style="margin-top: 15px; margin-bottom: 10px; padding: 12px; background: #f8f9fa; border: 2px solid #000; border-radius: 4px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h6 style="margin: 0; font-size: 12px; font-weight: bold; color: #000;">
+                            CONSOLIDATED TOTAL SUM (Total Payable Payment By Due Date)
+                            <br>
+                            <span style="font-size: 10px; font-weight: normal; color: #666;">
+                                Due Date: {{ $billing->due_date ? \Carbon\Carbon::parse($billing->due_date)->format('d M Y') : 'N/A' }}
+                            </span>
+                        </h6>
+                        <div style="text-align: right;">
+                            <span style="font-size: 16px; font-weight: bold; color: #000; border-bottom: 3px solid #000; padding-bottom: 2px;">
+                                Rs. {{ number_format($sumForAllData, 2) }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="section-9-9" style="justify-content: space-between; margin-top: 7px">
                     <h6 style="margin: 10px 0px 0px 5px; display: inline;">Total Payable Payment By Due Date
                         ({{ $billing->due_date ? \Carbon\Carbon::parse($billing->due_date)->format('d M Y') : 'N/A' }})
@@ -1125,6 +1161,24 @@
 
 
 
+
+                {{-- Consolidated Total Sum Section --}}
+                <div style="margin-top: 15px; margin-bottom: 10px; padding: 12px; background: #f8f9fa; border: 2px solid #000; border-radius: 4px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h6 style="margin: 0; font-size: 12px; font-weight: bold; color: #000;">
+                            CONSOLIDATED TOTAL SUM (Total Payable Payment By Due Date)
+                            <br>
+                            <span style="font-size: 10px; font-weight: normal; color: #666;">
+                                Due Date: {{ $billing->due_date ? \Carbon\Carbon::parse($billing->due_date)->format('d M Y') : 'N/A' }}
+                            </span>
+                        </h6>
+                        <div style="text-align: right;">
+                            <span style="font-size: 16px; font-weight: bold; color: #000; border-bottom: 3px solid #000; padding-bottom: 2px;">
+                                Rs. {{ number_format($sumForAllData, 2) }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
 
                 <div class="section-9-9" style="justify-content: space-between; margin-top: 7px">
                     <h6 style="margin: 10px 0px 0px 5px; display: inline;">Total Payable Payment By Due Date

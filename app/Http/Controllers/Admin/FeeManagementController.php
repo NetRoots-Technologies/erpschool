@@ -41,6 +41,7 @@ use App\Models\Accounts\JournalEntry;
 use App\Models\Accounts\Account;
 use App\Models\Accounts\AccountGroup;
 use App\Models\Accounts\AccountLedger;
+use App\Models\Admin\Branch;
 use Yajra\DataTables\Facades\DataTables;
 use App\Exports\StudentLedgerSingleSheetExport;
 use Illuminate\Support\Facades\Storage;
@@ -3217,6 +3218,89 @@ public function feeBillsByFinancialAid(Request $request)
     {
             return $prefix . '-' . now()->format('YmdHis') . '-' . mt_rand(100, 999);
      }
+
+    /**
+     * Fee Billing Total Report by Branch and Month
+     * Total summary report for selected branch and month
+     */
+    public function feeBillingReportByBranchMonth(Request $request)
+    {
+        if (!Gate::allows('fee-billing-print')) {
+            abort(403, 'Unauthorized access');
+        }
+
+        if ($request->ajax()) {
+            $branchId = $request->branch_id;
+            $month = $request->filter_month;
+
+            if (!$branchId || !$month) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Branch and Month are required'
+                ]);
+            }
+
+            $baseQuery = FeeBilling::query()
+                ->where('billing_month', $month)
+                ->whereHas('student', function ($q) use ($branchId) {
+                    $q->where('branch_id', $branchId);
+                });
+
+            // Get total summary for the branch and month
+            $summary = (clone $baseQuery)
+                ->selectRaw('
+                    COUNT(*) as total_bills,
+                    COALESCE(SUM(total_amount), 0) as total_billed,
+                    COALESCE(SUM(paid_amount), 0) as total_paid,
+                    COALESCE(SUM(outstanding_amount), 0) as total_outstanding,
+                    SUM(CASE WHEN status = "paid" THEN 1 ELSE 0 END) as paid_bills,
+                    SUM(CASE WHEN status = "partially_paid" OR status = "partial" THEN 1 ELSE 0 END) as partial_bills,
+                    SUM(CASE WHEN status = "generated" OR status = "pending" THEN 1 ELSE 0 END) as pending_bills
+                ')
+                ->first();
+
+            // Get class-wise breakdown
+            $classBreakdown = (clone $baseQuery)
+                ->with(['student.AcademicClass'])
+                ->get()
+                ->groupBy(function ($item) {
+                    return $item->student && $item->student->AcademicClass
+                        ? $item->student->AcademicClass->name
+                        : 'Unknown';
+                })
+                ->map(function ($group) {
+                    return [
+                        'class_name' => $group->first()->student && $group->first()->student->AcademicClass
+                            ? $group->first()->student->AcademicClass->name
+                            : 'Unknown',
+                        'total_bills' => $group->count(),
+                        'total_billed' => $group->sum('total_amount'),
+                        'total_paid' => $group->sum('paid_amount'),
+                        'total_outstanding' => $group->sum('outstanding_amount'),
+                    ];
+                })
+                ->values();
+
+            return response()->json([
+                'success' => true,
+                'summary' => [
+                    'total_bills' => (int)($summary->total_bills ?? 0),
+                    'total_billed' => (float)($summary->total_billed ?? 0),
+                    'total_paid' => (float)($summary->total_paid ?? 0),
+                    'total_outstanding' => (float)($summary->total_outstanding ?? 0),
+                    'paid_bills' => (int)($summary->paid_bills ?? 0),
+                    'partial_bills' => (int)($summary->partial_bills ?? 0),
+                    'pending_bills' => (int)($summary->pending_bills ?? 0),
+                ],
+                'class_breakdown' => $classBreakdown
+            ]);
+        }
+
+        // Get branches for filter dropdown
+        $branches = Branch::where('deleted_at', null)->orderBy('name')->get();
+
+        return view('admin.fee-management.reports.fee-billing-by-branch-month', compact('branches'));
+    }
 
 
 }

@@ -269,6 +269,9 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'admin', 'as' => 'admin.'], 
         // Fee Bills- By Financial Assistance
         Route::get('/reports/fee-bills-by-financial-aid', [FeeManagementController::class, 'feeBillsByFinancialAid'])->name('reports.fee-bills-by-financial-aid');
 
+        // Fee Billing Report by Branch and Month
+        Route::get('/reports/fee-billing-by-branch-month', [FeeManagementController::class, 'feeBillingReportByBranchMonth'])->name('reports.fee-billing-by-branch-month');
+
     });
 
     // Dashboard Route

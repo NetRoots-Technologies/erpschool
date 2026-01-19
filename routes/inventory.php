@@ -21,6 +21,7 @@ use App\Http\Controllers\Inventory\StaffLunchController;
 use App\Http\Controllers\Admin\InventoryCategoryController;
 use App\Http\Controllers\Inventory\PurchaseOrderController;
 use App\Http\Controllers\Inventory\SupplierLedgerController;
+use App\Http\Controllers\Inventory\InventoryReportController;
 use App\Http\Controllers\Admin\SuppliementaryBudgetController;
 
 
@@ -186,6 +187,10 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'inventory', 'as' => 'invent
 
             Route::get('/reports/supplier-ledger/{supplierId}/excel', 
                [SupplierLedgerController::class, 'exportSupplierLedgerExcel'])->name('supplier-ledger.excel');
+
+        // Journal Voucher Report (Inventory)
+        Route::get('/journal-voucher', [InventoryReportController::class, 'journalVoucher'])
+            ->name('journal-voucher');
 
         });
         Route::post('suppliers/import',[SupplierController::class, 'import'])->name('suppliers.import');
