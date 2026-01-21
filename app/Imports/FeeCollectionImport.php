@@ -233,6 +233,7 @@ class FeeCollectionImport implements ToModel, WithHeadingRow, SkipsEmptyRows
                     'bill_date'           => $valid_collection_Date,
                     'due_date'            => $valid_collection_Date,
                     'billing_month'       => $billMonth,   //$billMonth,
+                    'food_amount'         => 0, // Default to 0 for imports
                     'company_id'          => auth()->user()->company_id ?? null,
                     'branch_id'           => auth()->user()->branch_id ?? null,
                     'created_by'          => auth()->id(),

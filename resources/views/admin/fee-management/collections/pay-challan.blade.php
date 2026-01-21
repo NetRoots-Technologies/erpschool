@@ -159,6 +159,7 @@
                                             <div class="col-md-6">
                                                 <p><strong>Challan Number:</strong> <span id="challanNumber"></span></p>
                                                 <p><strong>Total Amount:</strong> <span id="totalAmount"></span></p>
+                                                <p id="foodAmountRow" style="display:none;"><strong>Food Amount:</strong> <span id="foodAmount"></span></p>
                                                 <p><strong>Paid Amount:</strong> <span id="paidAmount"></span></p>
                                                 <p><strong>Fine Amount:</strong> <span id="fineAmount"></span></p>
                                                 <p><strong>Due Date:</strong> <span id="dueDate"></span></p>
@@ -297,6 +298,9 @@
                                 <div class="alert alert-info">
                                     <h6>Payment Summary:</h6>
                                     <p><strong>Challan Amount:</strong> <span id="summaryChallanAmount"></span></p>
+                                    <p id="summaryFoodRow" style="display: none;"><strong>Food Amount:</strong>
+                                        <span id="summaryFoodAmount" class="text-info">Rs. 0</span>
+                                    </p>
                                     <p><strong>Already Paid:</strong> <span id="summaryAlreadyPaid">Rs. 0</span></p>
                                     <p id="summaryDiscountRow" style="display: none;"><strong>Total Discount:</strong>
                                         <span id="summaryTotalDiscount" class="text-success">Rs. 0</span>
@@ -580,6 +584,15 @@
                 console.log(challan);
                 $('#challanNumber').text(challan.challan_number);
                 $('#totalAmount').text('Rs. ' + parseFloat(challan.total_amount).toLocaleString());
+                
+                // Display food amount if exists
+                if (challan.food_amount && parseFloat(challan.food_amount) > 0) {
+                    $('#foodAmount').text('Rs. ' + parseFloat(challan.food_amount).toLocaleString());
+                    $('#foodAmountRow').show();
+                } else {
+                    $('#foodAmountRow').hide();
+                }
+                
                 $('#paidAmount').text('Rs. ' + parseFloat(challan.paid_amount || 0).toLocaleString());
                 
                
@@ -598,6 +611,15 @@
 
                 // Initialize payment summary with original amounts
                 $('#summaryChallanAmount').text('Rs. ' + parseFloat(challan.total_amount).toLocaleString());
+                
+                // Display food amount in summary if exists
+                if (challan.food_amount && parseFloat(challan.food_amount) > 0) {
+                    $('#summaryFoodAmount').text('Rs. ' + parseFloat(challan.food_amount).toLocaleString());
+                    $('#summaryFoodRow').show();
+                } else {
+                    $('#summaryFoodRow').hide();
+                }
+                
                 $('#summaryFinalAmount').text('Rs. ' + parseFloat(challan.total_amount).toLocaleString());
                 
 

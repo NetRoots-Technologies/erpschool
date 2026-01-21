@@ -156,6 +156,24 @@ class FeeManagementService
                 // Calculate total amount
                 $totalAmount = $this->calculateFeeAmount($feeStructure, $billingMonth);
                 
+                // Calculate food amount from fee structure details
+                $foodAmount = 0.0;
+                $foodCategory = FeeCategory::where('name', 'Food Charges')
+                    ->orWhere('name', 'food charges')
+                    ->orWhere('name', 'Food charges')
+                    ->where('is_active', 1)
+                    ->first();
+                
+                if ($foodCategory) {
+                    $foodStructureDetail = FeeStructureDetail::where('fee_structure_id', $feeStructure->id)
+                        ->where('fee_category_id', $foodCategory->id)
+                        ->first();
+                    
+                    if ($foodStructureDetail) {
+                        $foodAmount = (float) $foodStructureDetail->amount;
+                    }
+                }
+                
                 // Add arrears if not excluded
                 if (!$excludeArrears) {
                     $arrears = $this->getStudentArrears($student->id);
@@ -172,6 +190,7 @@ class FeeManagementService
                     'session_id' => $sessionId,
                     'challan_number' => $challanNumber,
                     'total_amount' => $totalAmount,
+                    'food_amount' => $foodAmount,
                     'due_date' => $this->calculateDueDate($billingMonth),
                     'status' => 'pending',
                     'billing_month' => $billingMonth,

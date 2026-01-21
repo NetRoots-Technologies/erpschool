@@ -168,6 +168,13 @@
                                             <td class="text-right">Rs. {{ number_format($collection->billing->total_amount ?? 0, 2) }}</td>
                                         </tr>
 
+                                        @if(isset($collection->billing->food_amount) && $collection->billing->food_amount > 0)
+                                        <tr>
+                                            <td><strong>Food Amount:</strong></td>
+                                            <td class="text-right">Rs. {{ number_format($collection->billing->food_amount, 2) }}</td>
+                                        </tr>
+                                        @endif
+
                                         <tr>
                                             <td><strong>Fine Amount:</strong></td>
                                             <td class="text-right">Rs. {{ number_format($collection->billing->fine_amount ?? 0, 2) }}</td>

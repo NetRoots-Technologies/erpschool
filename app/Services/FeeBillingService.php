@@ -64,6 +64,24 @@ class FeeBillingService
         // Calculate total amount
         $totalAmount = $this->calculateStudentFeeAmount($feeStructure, $billingMonth);
         
+        // Calculate food amount from fee structure details
+        $foodAmount = 0.0;
+        $foodCategory = FeeCategory::where('name', 'Food Charges')
+            ->orWhere('name', 'food charges')
+            ->orWhere('name', 'Food charges')
+            ->where('is_active', 1)
+            ->first();
+        
+        if ($foodCategory) {
+            $foodStructureDetail = FeeStructureDetail::where('fee_structure_id', $feeStructure->id)
+                ->where('fee_category_id', $foodCategory->id)
+                ->first();
+            
+            if ($foodStructureDetail) {
+                $foodAmount = (float) $foodStructureDetail->amount;
+            }
+        }
+        
         if ($totalAmount <= 0) {
             return null; // No amount to bill
         }
@@ -84,6 +102,7 @@ class FeeBillingService
             'session_id' => $session->id,
             'challan_number' => $challanNumber,
             'total_amount' => $totalAmount,
+            'food_amount' => $foodAmount,
             'outstanding_amount' => $totalAmount, // Initially same as total
             'due_date' => $this->calculateDueDate($billingMonth),
             'status' => 'pending',

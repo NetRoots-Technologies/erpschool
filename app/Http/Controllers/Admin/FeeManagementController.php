@@ -1653,7 +1653,25 @@ class FeeManagementController extends Controller
 
                 // Calculate total amount from fee structure (using final_amount as in your code)
                 $totalAmount = (float) $feeStructure->final_amount;
-                \Log::info("Total amount calculated for student {$student->id}: {$totalAmount}");
+                
+                // Calculate food amount from fee structure details
+                $foodAmount = 0.0;
+                $foodCategory = FeeCategory::where('name', 'Food Charges')
+                    ->orWhere('name', 'food charges')
+                    ->orWhere('name', 'Food charges')
+                    ->where('is_active', 1)
+                    ->first();
+                
+                if ($foodCategory) {
+                    $foodStructureDetail = FeeStructureDetail::where('fee_structure_id', $feeStructure->id)
+                        ->where('fee_category_id', $foodCategory->id)
+                        ->first();
+                    
+                    if ($foodStructureDetail) {
+                        $foodAmount = (float) $foodStructureDetail->amount;
+                    }
+                }
+                
 
                 // Generate challan number (kept your format; ensure uniqueness if needed)
                 // $challanNumber = 'CHL-' . date('Y') . '-' . str_pad($student->id, 6, '0', STR_PAD_LEFT);
@@ -1667,6 +1685,7 @@ class FeeManagementController extends Controller
                     'challan_number'     => $challanNumber,
                     'billing_month'      => $request->billing_month,
                     'total_amount'       => $totalAmount,
+                    'food_amount'        => $foodAmount,
                     'bill_date'          => $billDate,
                     'due_date'           => $dueDate,
                     'outstanding_amount' => $totalAmount,
@@ -1763,13 +1782,16 @@ class FeeManagementController extends Controller
         }
 
 
+        // Get food amount from billing
+        $foodAmount = (float) ($billing->food_amount ?? 0);
+        
         // $sumForAllData =  $baseAmount - $totalDiscount + $fineAmount + $totalTransportFee +  $previousArrears;
         $sumForAllData =  $baseAmount + $fineAmount + $totalTransportFee +  $previousArrears;
 
         $hardcodedAmount =  $baseAmount + $totalTransportFee +  $previousArrears;
         // $hardcodedAmount =  $baseAmount - $totalDiscount + $totalTransportFee +  $previousArrears;
 
-        return view('admin.fee-management.billing.print', compact('billing', 'applicableDiscounts', 'showDiscount', 'transportFees', 'totalTransportFee', 'previousArrears', 'unpaidMonthsList', 'previousUnpaidBills', 'fineAmount', 'sumForAllData', 'hardcodedAmount'));
+        return view('admin.fee-management.billing.print', compact('billing', 'applicableDiscounts', 'showDiscount', 'transportFees', 'totalTransportFee', 'previousArrears', 'unpaidMonthsList', 'previousUnpaidBills', 'fineAmount', 'foodAmount', 'sumForAllData', 'hardcodedAmount'));
     }
 
     /**
@@ -1827,6 +1849,7 @@ class FeeManagementController extends Controller
                     'challan_number' => $challan->challan_number,
                     'billing_month' => $challan->billing_month,
                     'total_amount' => $challan->total_amount,
+                    'food_amount' => $challan->food_amount ?? 0,
                     'paid_amount' => $paidAmount,
                     'outstanding_amount' => $outstandingAmount,
                     'due_date' => $challan->due_date,
@@ -1857,6 +1880,7 @@ class FeeManagementController extends Controller
                     'challan_number'     => $challan->challan_number,
                     'billing_month'      => $challan->billing_month,
                     'total_amount'       => $challan->total_amount,
+                    'food_amount'        => $challan->food_amount ?? 0,
                     'paid_amount'        => $challan->paid_amount ?? 0,
                     'outstanding_amount' => $challan->outstanding_amount,
                     'due_date'           => $challan->due_date,
