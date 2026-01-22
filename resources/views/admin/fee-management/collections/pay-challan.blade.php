@@ -148,7 +148,7 @@
                                 </div>
                             </div>
 
-                            <!-- Challan Details Display -->
+                            <!-- Challan Details Display --> 
                             <div id="challanDetails" style="display: none;">
                                 <div class="card">
                                     <div class="card-header">
