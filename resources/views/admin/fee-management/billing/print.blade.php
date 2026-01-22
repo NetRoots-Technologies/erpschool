@@ -415,22 +415,16 @@
                         <span style="width:70%;">
                             Total Amount
                             ({{ \Carbon\Carbon::parse($billing->billing_month ?? $billing->bill_date)->format('M Y') }})
+                            @if (isset($foodAmount) && $foodAmount > 0)
+                                <span style="font-size: 8px; color: #666; display: block;">
+                                    Includes Food: Rs. {{ number_format($foodAmount, 2) }}
+                                </span>
+                            @endif
                         </span>
                         <span style="width:27%; text-align:right;">
                             <span>Rs. {{ number_format($billing->total_amount, 2) }}</span>
                         </span>
                     </div>
-
-                    @if (isset($foodAmount) && $foodAmount > 0)
-                    <div style="display:flex; border-bottom:1px solid #ddd; padding:6px 0; margin-left: 10px;">
-                        <span style="width:70%;">
-                            Food Amount
-                        </span>
-                        <span style="width:27%; text-align:right;">
-                            <span>Rs. {{ number_format($foodAmount, 2) }}</span>
-                        </span>
-                    </div>
-                    @endif
 
                     @if ($fineAmount > 0)
                     <div style="display:flex; border-bottom:1px solid #ddd; padding:6px 0; margin-left: 10px;">
@@ -744,22 +738,16 @@
                         <span style="width:70%;">
                             Total Amount
                             ({{ \Carbon\Carbon::parse($billing->billing_month ?? $billing->bill_date)->format('M Y') }})
+                            @if (isset($foodAmount) && $foodAmount > 0)
+                                <span style="font-size: 8px; color: #666; display: block;">
+                                    Includes Food: Rs. {{ number_format($foodAmount, 2) }}
+                                </span>
+                            @endif
                         </span>
                         <span style="width:27%; text-align:right;">
                             <span>Rs. {{ number_format($billing->total_amount, 2) }}</span>
                         </span>
                     </div>
-
-                    @if (isset($foodAmount) && $foodAmount > 0)
-                    <div style="display:flex; border-bottom:1px solid #ddd; padding:6px 0; margin-left: 10px;">
-                        <span style="width:70%;">
-                            Food Amount
-                        </span>
-                        <span style="width:27%; text-align:right;">
-                            <span>Rs. {{ number_format($foodAmount, 2) }}</span>
-                        </span>
-                    </div>
-                    @endif
 
                     @if ($fineAmount > 0)
                     <div style="display:flex; border-bottom:1px solid #ddd; padding:6px 0; margin-left: 10px;">
@@ -1073,22 +1061,16 @@
                         <span style="width:70%;">
                             Total Amount
                             ({{ \Carbon\Carbon::parse($billing->billing_month ?? $billing->bill_date)->format('M Y') }})
+                            @if (isset($foodAmount) && $foodAmount > 0)
+                                <span style="font-size: 8px; color: #666; display: block;">
+                                    Includes Food: Rs. {{ number_format($foodAmount, 2) }}
+                                </span>
+                            @endif
                         </span>
                         <span style="width:27%; text-align:right;">
                             <span>Rs. {{ number_format($billing->total_amount, 2) }}</span>
                         </span>
                     </div>
-
-                    @if (isset($foodAmount) && $foodAmount > 0)
-                    <div style="display:flex; border-bottom:1px solid #ddd; padding:6px 0; margin-left: 10px;">
-                        <span style="width:70%;">
-                            Food Amount
-                        </span>
-                        <span style="width:27%; text-align:right;">
-                            <span>Rs. {{ number_format($foodAmount, 2) }}</span>
-                        </span>
-                    </div>
-                    @endif
 
                     @if ($fineAmount > 0)
                     <div style="display:flex; border-bottom:1px solid #ddd; padding:6px 0; margin-left: 10px;">
