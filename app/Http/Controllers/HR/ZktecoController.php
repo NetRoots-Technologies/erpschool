@@ -103,9 +103,25 @@ class ZktecoController extends Controller
             return abort(503);
         }
         
-        // Use provided IP/port from request or default to the new cornerstone device
-        $device_ip = $request->input('ip', '10.105.187.50');
-        $device_port = $request->input('port', 4370);
+        // Get all fields from request (no defaults - user must enter all)
+        $device_ip = $request->input('ip');
+        $device_port = $request->input('port');
+        $subnet_mask = $request->input('subnet_mask');
+        $gateway = $request->input('gateway');
+        
+        // Validate required fields
+        if (empty($device_ip) || empty($device_port)) {
+            return response()->json([
+                'status' => 'Validation Error',
+                'message' => 'IP Address and Port are required fields',
+                'entered_values' => [
+                    'ip' => $device_ip,
+                    'port' => $device_port,
+                    'subnet_mask' => $subnet_mask,
+                    'gateway' => $gateway
+                ]
+            ], 400);
+        }
         
         ini_set('max_execution_time', 30);
         ini_set('default_socket_timeout', 10);
@@ -148,9 +164,17 @@ class ZktecoController extends Controller
                         'status' => 'Connected',
                         'ip' => $device_ip,
                         'port' => $device_port,
+                        'subnet_mask' => $subnet_mask,
+                        'gateway' => $gateway,
                         'users_count' => is_array($users) ? count($users) : 0,
                         'message' => 'Device connection successful!',
-                        'network_test' => $errorDetails['network_test'] ?? null
+                        'network_test' => $errorDetails['network_test'] ?? null,
+                        'entered_configuration' => [
+                            'ip_address' => $device_ip,
+                            'subnet_mask' => $subnet_mask,
+                            'gateway' => $gateway,
+                            'port' => $device_port
+                        ]
                     ];
                     
                     return response()->json($deviceInfo, 200);
@@ -159,6 +183,8 @@ class ZktecoController extends Controller
                         'status' => 'Partial Connection',
                         'ip' => $device_ip,
                         'port' => $device_port,
+                        'subnet_mask' => $subnet_mask,
+                        'gateway' => $gateway,
                         'message' => 'Connected but failed to get device data',
                         'error' => [
                             'message' => $e->getMessage(),
@@ -166,7 +192,13 @@ class ZktecoController extends Controller
                             'line' => $e->getLine(),
                             'code' => $e->getCode()
                         ],
-                        'network_test' => $errorDetails['network_test'] ?? null
+                        'network_test' => $errorDetails['network_test'] ?? null,
+                        'entered_configuration' => [
+                            'ip_address' => $device_ip,
+                            'subnet_mask' => $subnet_mask,
+                            'gateway' => $gateway,
+                            'port' => $device_port
+                        ]
                     ], 200);
                 }
             } else {
@@ -187,12 +219,20 @@ class ZktecoController extends Controller
                     'status' => 'Failed',
                     'ip' => $device_ip,
                     'port' => $device_port,
+                    'subnet_mask' => $subnet_mask,
+                    'gateway' => $gateway,
                     'message' => 'ZKTeco device connection failed. connect() returned false.',
                     'error_details' => $errorDetails,
+                    'entered_configuration' => [
+                        'ip_address' => $device_ip,
+                        'subnet_mask' => $subnet_mask,
+                        'gateway' => $gateway,
+                        'port' => $device_port
+                    ],
                     'troubleshooting' => [
                         '1. Verify device IP is correct: ' . $device_ip,
                         '2. Check if device is powered ON',
-                        '3. Verify device network settings match',
+                        '3. Verify device network settings match (IP: ' . $device_ip . ', Subnet: ' . $subnet_mask . ', Gateway: ' . $gateway . ', Port: ' . $device_port . ')',
                         '4. Check if firewall/security is blocking port ' . $device_port,
                         '5. Ensure server can reach device IP (network connectivity)',
                         '6. Check ZKTeco device firmware version compatibility'
@@ -205,6 +245,8 @@ class ZktecoController extends Controller
                 'status' => 'Error',
                 'ip' => $device_ip,
                 'port' => $device_port,
+                'subnet_mask' => $subnet_mask ?? null,
+                'gateway' => $gateway ?? null,
                 'message' => 'PHP Error occurred',
                 'error' => [
                     'type' => get_class($e),
@@ -215,7 +257,13 @@ class ZktecoController extends Controller
                     'trace' => $e->getTraceAsString()
                 ],
                 'network_test' => $errorDetails['network_test'] ?? null,
-                'connection_attempted' => $connectionAttempted
+                'connection_attempted' => $connectionAttempted,
+                'entered_configuration' => [
+                    'ip_address' => $device_ip,
+                    'subnet_mask' => $subnet_mask ?? null,
+                    'gateway' => $gateway ?? null,
+                    'port' => $device_port
+                ]
             ], 500);
         } catch (\Exception $e) {
             // Catch all other exceptions
@@ -223,6 +271,8 @@ class ZktecoController extends Controller
                 'status' => 'Exception',
                 'ip' => $device_ip,
                 'port' => $device_port,
+                'subnet_mask' => $subnet_mask ?? null,
+                'gateway' => $gateway ?? null,
                 'message' => 'Exception occurred during connection',
                 'error' => [
                     'type' => get_class($e),
@@ -233,7 +283,13 @@ class ZktecoController extends Controller
                     'trace' => $e->getTraceAsString()
                 ],
                 'network_test' => $errorDetails['network_test'] ?? null,
-                'connection_attempted' => $connectionAttempted
+                'connection_attempted' => $connectionAttempted,
+                'entered_configuration' => [
+                    'ip_address' => $device_ip,
+                    'subnet_mask' => $subnet_mask ?? null,
+                    'gateway' => $gateway ?? null,
+                    'port' => $device_port
+                ]
             ], 500);
         } catch (\Throwable $e) {
             // Catch any other throwable
@@ -241,6 +297,8 @@ class ZktecoController extends Controller
                 'status' => 'Throwable Error',
                 'ip' => $device_ip,
                 'port' => $device_port,
+                'subnet_mask' => $subnet_mask ?? null,
+                'gateway' => $gateway ?? null,
                 'message' => 'Unexpected error occurred',
                 'error' => [
                     'type' => get_class($e),
@@ -251,7 +309,13 @@ class ZktecoController extends Controller
                     'trace' => $e->getTraceAsString()
                 ],
                 'network_test' => $errorDetails['network_test'] ?? null,
-                'connection_attempted' => $connectionAttempted
+                'connection_attempted' => $connectionAttempted,
+                'entered_configuration' => [
+                    'ip_address' => $device_ip,
+                    'subnet_mask' => $subnet_mask ?? null,
+                    'gateway' => $gateway ?? null,
+                    'port' => $device_port
+                ]
             ], 500);
         }
     }

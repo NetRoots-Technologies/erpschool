@@ -33,39 +33,8 @@
                                 <h5><strong>2. Configure ZKTeco Device Network Settings</strong></h5>
                                 <p>Go to the device menu:</p>
                                 <p><strong>Menu → Communication/Network → TCP/IP Settings</strong></p>
-                                <div class="table-responsive">
-                                    <table class="table table-bordered table-sm">
-                                        <thead class="thead-light">
-                                            <tr>
-                                                <th>Setting</th>
-                                                <th>Value</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td><strong>IP Address</strong></td>
-                                                <td><code>10.105.187.50</code></td>
-                                            </tr>
-                                            <tr>
-                                                <td><strong>Subnet Mask</strong></td>
-                                                <td><code>255.255.255.0</code></td>
-                                            </tr>
-                                            <tr>
-                                                <td><strong>Gateway</strong></td>
-                                                <td><code>10.105.187.250</code></td>
-                                            </tr>
-                                            <tr>
-                                                <td><strong>Port</strong></td>
-                                                <td><code>4370</code></td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
+                                <p class="text-muted">Configure the device network settings as per your requirements and enter the IP Address and Port below to test the connection.</p>
                             </div>
-                        </div>
-                        <div class="alert alert-warning mt-3">
-                            <strong>Note:</strong> This configuration has been done in the Cornerstone biometric machine. 
-                            Please test and confirm if the connection is established.
                         </div>
                     </div>
                 </div>
@@ -80,18 +49,36 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="device_ip"><strong>Device IP Address</strong></label>
+                                        <label for="device_ip"><strong>IP Address</strong></label>
                                         <input type="text" class="form-control" id="device_ip" name="ip" 
-                                               value="10.105.187.50" placeholder="e.g., 10.105.187.50" required>
+                                               placeholder="Enter IP address" required>
                                         <small class="form-text text-muted">Enter the IP address configured on the device</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="subnet_mask"><strong>Subnet Mask</strong></label>
+                                        <input type="text" class="form-control" id="subnet_mask" name="subnet_mask" 
+                                               placeholder="Enter subnet mask" required>
+                                        <small class="form-text text-muted">Enter the subnet mask (e.g., 255.255.255.0)</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="gateway"><strong>Gateway</strong></label>
+                                        <input type="text" class="form-control" id="gateway" name="gateway" 
+                                               placeholder="Enter gateway address" required>
+                                        <small class="form-text text-muted">Enter the gateway address</small>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="device_port"><strong>Port</strong></label>
                                         <input type="number" class="form-control" id="device_port" name="port" 
-                                               value="4370" placeholder="e.g., 4370" required>
-                                        <small class="form-text text-muted">Default ZKTeco port is 4370</small>
+                                               placeholder="Enter port number" required>
+                                        <small class="form-text text-muted">Enter the port number (default: 4370)</small>
                                     </div>
                                 </div>
                             </div>
@@ -122,21 +109,25 @@
             e.preventDefault();
             
             const ip = document.getElementById('device_ip').value;
+            const subnetMask = document.getElementById('subnet_mask').value;
+            const gateway = document.getElementById('gateway').value;
             const port = document.getElementById('device_port').value;
             const testBtn = document.getElementById('testBtn');
             const resultContainer = document.getElementById('resultContainer');
             const resultAlert = document.getElementById('resultAlert');
             const resultTitle = document.getElementById('resultTitle');
             const resultContent = document.getElementById('resultContent');
-            const customUrl = document.getElementById('customUrl');
             
             // Show loading
             testBtn.disabled = true;
             testBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Testing Connection...';
             resultContainer.style.display = 'none';
             
-            // Build URL (internal API endpoint)
-            const url = '{{ url("/zkt-test-connection-api") }}?ip=' + encodeURIComponent(ip) + '&port=' + encodeURIComponent(port);
+            // Build URL (internal API endpoint) - send all fields to controller
+            const url = '{{ url("/zkt-test-connection-api") }}?ip=' + encodeURIComponent(ip) + 
+                       '&port=' + encodeURIComponent(port) + 
+                       '&subnet_mask=' + encodeURIComponent(subnetMask) + 
+                       '&gateway=' + encodeURIComponent(gateway);
             
             // Make request
             fetch(url, {
