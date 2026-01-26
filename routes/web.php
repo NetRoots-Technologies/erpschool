@@ -38,6 +38,7 @@ Route::get('/zkt-ShowAttendance', [ZktecoController::class, 'ShowAttendance'])->
 Route::get('/zkt-show-user', [ZktecoController::class, 'ShowUser'])->name('zkt-show-user');
 Route::get('/zkt-add-user', [ZktecoController::class, 'addUser'])->name('zkt-add-user');
 Route::get('/zkt-test-voice', [ZktecoController::class, 'textVoice'])->name('zkt-test-voice');
+Route::get('/zkt-test-connection', [ZktecoController::class, 'testConnection'])->name('zkt-test-connection');
 Route::get('/zkt-delete-user', [ZktecoController::class, 'DeleteUser'])->name('zkt-delete-user');
 Route::get('/zkt-delete-attendance-machine', [ZktecoController::class, 'DeleteAttendance'])->name('zkt-delete-attendance-machine');
 Route::get('/zkt-sync', [ZktecoController::class, 'sync'])->name('zkt-sync');

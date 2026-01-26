@@ -89,6 +89,51 @@ class ZktecoController extends Controller
         }
     }
 
+    public function testConnection($ip = null, $port = null) //zkt-test-connection
+    {
+        if (!Gate::allows('Dashboard-list')) {
+            return abort(503);
+        }
+        
+        // Use provided IP/port or default to the new cornerstone device
+        $device_ip = $ip ?? '10.105.187.50';
+        $device_port = $port ?? 4370;
+        
+        ini_set('max_execution_time', 30);
+        
+        try {
+            $zk = new ZKTeco($device_ip, $device_port);
+            
+            if ($zk->connect()) {
+                // Try to get device info to confirm connection
+                $users = $zk->getUser();
+                $deviceInfo = [
+                    'status' => 'Connected',
+                    'ip' => $device_ip,
+                    'port' => $device_port,
+                    'users_count' => is_array($users) ? count($users) : 0,
+                    'message' => 'Device connection successful!'
+                ];
+                
+                return response()->json($deviceInfo, 200);
+            } else {
+                return response()->json([
+                    'status' => 'Failed',
+                    'ip' => $device_ip,
+                    'port' => $device_port,
+                    'message' => 'Device connection failed. Please check: 1) Device is powered ON, 2) Network cable is connected, 3) IP address is correct, 4) Firewall is not blocking port 4370'
+                ], 400);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'Error',
+                'ip' => $device_ip,
+                'port' => $device_port,
+                'message' => 'Connection error: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function DeleteUser(Request $request)
     {
         if (!Gate::allows('Dashboard-list')) {
