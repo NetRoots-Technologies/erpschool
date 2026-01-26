@@ -89,6 +89,14 @@ class ZktecoController extends Controller
         }
     }
 
+    public function testConnectionPage() //zkt-test-connection-page
+    {
+        if (!Gate::allows('Dashboard-list')) {
+            return abort(503);
+        }
+        return view('hr.zkt.ZktTestConnection');
+    }
+
     public function testConnection(Request $request) //zkt-test-connection
     {
         if (!Gate::allows('Dashboard-list')) {
