@@ -89,47 +89,161 @@ class ZktecoController extends Controller
         }
     }
 
-    public function testConnection($ip = null, $port = null) //zkt-test-connection
+    public function testConnection(Request $request) //zkt-test-connection
     {
         if (!Gate::allows('Dashboard-list')) {
             return abort(503);
         }
         
-        // Use provided IP/port or default to the new cornerstone device
-        $device_ip = $ip ?? '10.105.187.50';
-        $device_port = $port ?? 4370;
+        // Use provided IP/port from request or default to the new cornerstone device
+        $device_ip = $request->input('ip', '10.105.187.50');
+        $device_port = $request->input('port', 4370);
         
         ini_set('max_execution_time', 30);
+        ini_set('default_socket_timeout', 10);
+        
+        $errorDetails = [];
+        $connectionAttempted = false;
         
         try {
+            // First, test basic network connectivity (ping test)
+            $pingResult = @fsockopen($device_ip, $device_port, $errno, $errstr, 5);
+            if (!$pingResult) {
+                $errorDetails['network_test'] = [
+                    'reachable' => false,
+                    'error_code' => $errno,
+                    'error_message' => $errstr,
+                    'note' => 'Cannot reach device on network. Check IP address and network connectivity.'
+                ];
+            } else {
+                fclose($pingResult);
+                $errorDetails['network_test'] = [
+                    'reachable' => true,
+                    'note' => 'Device is reachable on network'
+                ];
+            }
+            
+            // Now try ZKTeco connection
+            $connectionAttempted = true;
             $zk = new ZKTeco($device_ip, $device_port);
             
-            if ($zk->connect()) {
+            // Capture any output/errors
+            ob_start();
+            $connectResult = $zk->connect();
+            $output = ob_get_clean();
+            
+            if ($connectResult) {
                 // Try to get device info to confirm connection
-                $users = $zk->getUser();
-                $deviceInfo = [
-                    'status' => 'Connected',
-                    'ip' => $device_ip,
-                    'port' => $device_port,
-                    'users_count' => is_array($users) ? count($users) : 0,
-                    'message' => 'Device connection successful!'
+                try {
+                    $users = $zk->getUser();
+                    $deviceInfo = [
+                        'status' => 'Connected',
+                        'ip' => $device_ip,
+                        'port' => $device_port,
+                        'users_count' => is_array($users) ? count($users) : 0,
+                        'message' => 'Device connection successful!',
+                        'network_test' => $errorDetails['network_test'] ?? null
+                    ];
+                    
+                    return response()->json($deviceInfo, 200);
+                } catch (\Exception $e) {
+                    return response()->json([
+                        'status' => 'Partial Connection',
+                        'ip' => $device_ip,
+                        'port' => $device_port,
+                        'message' => 'Connected but failed to get device data',
+                        'error' => [
+                            'message' => $e->getMessage(),
+                            'file' => $e->getFile(),
+                            'line' => $e->getLine(),
+                            'code' => $e->getCode()
+                        ],
+                        'network_test' => $errorDetails['network_test'] ?? null
+                    ], 200);
+                }
+            } else {
+                // Connection failed - try to get more details
+                $errorDetails['zkteco_connection'] = [
+                    'connected' => false,
+                    'output' => $output,
+                    'note' => 'ZKTeco connect() returned false'
                 ];
                 
-                return response()->json($deviceInfo, 200);
-            } else {
+                // Try to get last error if available
+                $lastError = error_get_last();
+                if ($lastError) {
+                    $errorDetails['php_error'] = $lastError;
+                }
+                
                 return response()->json([
                     'status' => 'Failed',
                     'ip' => $device_ip,
                     'port' => $device_port,
-                    'message' => 'Device connection failed. Please check: 1) Device is powered ON, 2) Network cable is connected, 3) IP address is correct, 4) Firewall is not blocking port 4370'
+                    'message' => 'ZKTeco device connection failed. connect() returned false.',
+                    'error_details' => $errorDetails,
+                    'troubleshooting' => [
+                        '1. Verify device IP is correct: ' . $device_ip,
+                        '2. Check if device is powered ON',
+                        '3. Verify device network settings match',
+                        '4. Check if firewall/security is blocking port ' . $device_port,
+                        '5. Ensure server can reach device IP (network connectivity)',
+                        '6. Check ZKTeco device firmware version compatibility'
+                    ]
                 ], 400);
             }
-        } catch (\Exception $e) {
+        } catch (\Error $e) {
+            // Catch PHP 7+ errors
             return response()->json([
                 'status' => 'Error',
                 'ip' => $device_ip,
                 'port' => $device_port,
-                'message' => 'Connection error: ' . $e->getMessage()
+                'message' => 'PHP Error occurred',
+                'error' => [
+                    'type' => get_class($e),
+                    'message' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                    'code' => $e->getCode(),
+                    'trace' => $e->getTraceAsString()
+                ],
+                'network_test' => $errorDetails['network_test'] ?? null,
+                'connection_attempted' => $connectionAttempted
+            ], 500);
+        } catch (\Exception $e) {
+            // Catch all other exceptions
+            return response()->json([
+                'status' => 'Exception',
+                'ip' => $device_ip,
+                'port' => $device_port,
+                'message' => 'Exception occurred during connection',
+                'error' => [
+                    'type' => get_class($e),
+                    'message' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                    'code' => $e->getCode(),
+                    'trace' => $e->getTraceAsString()
+                ],
+                'network_test' => $errorDetails['network_test'] ?? null,
+                'connection_attempted' => $connectionAttempted
+            ], 500);
+        } catch (\Throwable $e) {
+            // Catch any other throwable
+            return response()->json([
+                'status' => 'Throwable Error',
+                'ip' => $device_ip,
+                'port' => $device_port,
+                'message' => 'Unexpected error occurred',
+                'error' => [
+                    'type' => get_class($e),
+                    'message' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                    'code' => $e->getCode(),
+                    'trace' => $e->getTraceAsString()
+                ],
+                'network_test' => $errorDetails['network_test'] ?? null,
+                'connection_attempted' => $connectionAttempted
             ], 500);
         }
     }
